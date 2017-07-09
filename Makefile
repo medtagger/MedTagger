@@ -14,13 +14,16 @@ venv:
 # Testing
 #
 
-test: pylint flake8 pytest
+test: pylint flake8 mypy pytest
 
 pylint:
 	pylint $(MAIN_MODULE)
 
 flake8:
 	flake8 $(MAIN_MODULE)
+
+mypy:
+	mypy $(MAIN_MODULE)
 
 pytest:
 	pytest --cov=$(MAIN_MODULE) --cov-fail-under=80 $(UNIT_TESTS_MODULE)
