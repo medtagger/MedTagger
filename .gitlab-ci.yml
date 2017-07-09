@@ -1,0 +1,8 @@
+image: python:3.6
+
+unit_tests:
+  script:
+    - pip install virtualenv
+    - make venv
+    - . venv/bin/activate
+    - make test

@@ -1,0 +1,8 @@
+# App requirements
+flask-restplus>=0.10.1
+
+# Dev requirements
+pylint
+flake8
+pytest
+pytest-cov
