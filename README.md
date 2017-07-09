@@ -7,6 +7,7 @@ Repository contains code for backend API written in Python.
 Requirements:
 - Linux (recommended Ubuntu) / macOS
 - Python 3.6
+- Virtualenv
 - Make
 
 **WARNING!:** *Windows has not been tested yet. Feel free to check it out.*
