@@ -2,6 +2,7 @@
 flask-restplus>=0.10.1
 
 # Dev requirements
+mypy
 pylint
 flake8
 pytest
