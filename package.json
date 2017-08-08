@@ -1,5 +1,5 @@
 {
-  "name": "test-app",
+  "name": "LungTagger",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -41,7 +41,10 @@
     "karma-coverage-istanbul-reporter": "^1.2.1",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "node-sass": "^4.5.3",
     "protractor": "~5.1.2",
+    "raw-loader": "^0.5.1",
+    "sass-loader": "^6.0.6",
     "ts-node": "~3.0.4",
     "tslint": "~5.3.2",
     "typescript": "~2.3.3"
