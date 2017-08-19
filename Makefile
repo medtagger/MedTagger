@@ -10,6 +10,9 @@ venv:
 	virtualenv -p $(PYTHON) venv
 	venv/bin/pip install -r requirements.txt
 
+install_packages:
+	$(PYTHON) -m pip install -r requirements.txt
+
 #
 # Testing
 #
