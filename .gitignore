@@ -104,3 +104,6 @@ ENV/
 
 # IDEs
 .idea
+
+# Configuration files
+backend_api.conf

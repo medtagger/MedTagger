@@ -1,6 +1,15 @@
+# Global constants for whole Makefile
 PYTHON=python3.6
 MAIN_MODULE=data_labeling
 UNIT_TESTS_MODULE=tests
+COVERAGE_LIMIT=0
+
+# Third party configuration files
+PYLINT_CONFIG_FILE = .pylintrc
+PYLINT_UNIT_TESTS_CONFIG_FILE = .test.pylintrc
+
+# Our application configuration files
+UNIT_TESTS_CONFIG_FILE = backend_api.test.conf
 
 #
 # Development
@@ -17,19 +26,20 @@ install_packages:
 # Testing
 #
 
-test: pylint flake8 mypy pytest
+test: test_pylint test_flake8 test_mypy test_pytest
 
-pylint:
-	pylint $(MAIN_MODULE)
+test_pylint:
+	pylint $(MAIN_MODULE) --rcfile=$(PYLINT_CONFIG_FILE)
+	pylint $(UNIT_TESTS_MODULE) --rcfile=$(PYLINT_UNIT_TESTS_CONFIG_FILE)
 
-flake8:
-	flake8 $(MAIN_MODULE)
+test_flake8:
+	flake8 $(MAIN_MODULE) $(UNIT_TESTS_MODULE)
 
-mypy:
-	mypy $(MAIN_MODULE)
+test_mypy:
+	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE)
 
-pytest:
-	pytest --cov=$(MAIN_MODULE) --cov-fail-under=80 $(UNIT_TESTS_MODULE)
+test_pytest:
+	CONFIG_FILE=$(UNIT_TESTS_CONFIG_FILE) pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TESTS_MODULE)
 
 #
 # Utilities
@@ -38,4 +48,4 @@ pytest:
 clean:
 	rm -rf venv
 
-.PHONY: venv clean test pylint flake8 pytest
+.PHONY: venv install_packages clean test test_pylint test_flake8 test_mypy test_pytest
