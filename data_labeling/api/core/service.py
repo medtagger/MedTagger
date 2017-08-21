@@ -1,5 +1,5 @@
 """Module responsible for definition of Core service"""
-from typing import Dict
+from typing import Any
 from flask_restplus import Resource
 
 from data_labeling.api import api
@@ -17,6 +17,6 @@ class Status(Resource):
     @core_ns.marshal_with(serializers.status)
     @core_ns.doc(description='Checks if API is running properly.')
     @core_ns.doc(responses={200: 'Success'})
-    def get() -> Dict[str, bool]:
+    def get() -> Any:
         """Return status of the API"""
         return success()
