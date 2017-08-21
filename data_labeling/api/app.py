@@ -16,6 +16,7 @@ from data_labeling.config import ConfigurationFile
 
 # Import all services
 from data_labeling.api.core.service import core_ns  # noqa
+from data_labeling.api.scans.service import scans_ns  # noqa
 
 
 # Load configuration
