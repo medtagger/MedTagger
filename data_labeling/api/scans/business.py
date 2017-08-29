@@ -4,7 +4,7 @@ from random import randint
 
 from typing import List, Dict, Any
 
-from data_labeling.types import ScanID, LabelID, RectangleLabelPosition, RectangleLabelShape
+from data_labeling.types import ScanID, LabelID, CuboidLabelPosition, CuboidLabelShape
 
 
 def get_metadata(scan_id: ScanID) -> Dict[str, Any]:
@@ -58,12 +58,12 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> List[str]:
     return encoded_images
 
 
-def add_cuboid_label(scan_id: ScanID, position: RectangleLabelPosition, shape: RectangleLabelShape) -> LabelID:
+def add_cuboid_label(scan_id: ScanID, position: CuboidLabelPosition, shape: CuboidLabelShape) -> LabelID:
     """Add cuboid label to given scan
 
     :param scan_id: ID of a given scan
-    :param position: position (upper top left vertex) of rectangle label within range 0..1
-    :param shape: shape of rectangle label within range 0..1
+    :param position: position (upper top left vertex) of cuboid label within range 0..1
+    :param shape: shape of cuboid label within range 0..1
     """
     # pylint: disable=unused-argument
     return LabelID(randint(0, 10000))

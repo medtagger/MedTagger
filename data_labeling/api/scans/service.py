@@ -3,7 +3,7 @@ from typing import Any
 from flask import request
 from flask_restplus import Resource
 
-from data_labeling.types import ScanID, RectangleLabelPosition, RectangleLabelShape
+from data_labeling.types import ScanID, CuboidLabelPosition, CuboidLabelShape
 from data_labeling.api import api
 from data_labeling.api.scans import serializers
 from data_labeling.api.scans.business import get_metadata, get_random_scan, get_slices_for_scan, add_cuboid_label
@@ -68,8 +68,8 @@ class LabelCuboid(Resource):
         """Method responsible for saving new cuboid label for given scan"""
         payload = request.json
 
-        position = RectangleLabelPosition(x=payload['x'], y=payload['y'], z=payload['z'])
-        shape = RectangleLabelShape(width=payload['width'], height=payload['height'], depth=payload['depth'])
+        position = CuboidLabelPosition(x=payload['x'], y=payload['y'], z=payload['z'])
+        shape = CuboidLabelShape(width=payload['width'], height=payload['height'], depth=payload['depth'])
         label_id = add_cuboid_label(scan_id, position, shape)
 
         return {'label_id': label_id}, 201

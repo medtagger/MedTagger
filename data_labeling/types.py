@@ -5,5 +5,5 @@ from typing import NewType, NamedTuple
 ScanID = NewType('ScanID', int)
 LabelID = NewType('LabelID', int)
 
-RectangleLabelPosition = NamedTuple('RectangleLabelPosition', [('x', float), ('y', float), ('z', float)])
-RectangleLabelShape = NamedTuple('RectangleLabelShape', [('width', float), ('height', float), ('depth', float)])
+CuboidLabelPosition = NamedTuple('CuboidLabelPosition', [('x', float), ('y', float), ('z', float)])
+CuboidLabelShape = NamedTuple('CuboidLabelShape', [('width', float), ('height', float), ('depth', float)])
