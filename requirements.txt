@@ -1,5 +1,7 @@
 # App requirements
 flask-restplus>=0.10.1
+hdfs3>=0.2.0
+happybase>=1.1.0
 
 # Dev requirements - these should always be latest
 mypy
