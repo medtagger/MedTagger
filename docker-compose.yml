@@ -30,5 +30,3 @@ services:
       - 9095:9095
       - 2181:2181
       - 16010:16010
-    volumes:
-      - ./.hbase_data:/data

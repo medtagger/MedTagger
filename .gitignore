@@ -104,9 +104,6 @@ ENV/
 # Configuration files
 backend_api.conf
 
-# Hadoop
-.hbase_data
-
 # Tools
 .vagrant/
 

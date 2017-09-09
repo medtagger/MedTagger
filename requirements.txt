@@ -2,6 +2,8 @@
 flask-restplus>=0.10.1
 hdfs3>=0.2.0
 happybase>=1.1.0
+pydicom>=0.9.9
+numpy>=1.13.1
 
 # Dev requirements - these should always be latest
 mypy
