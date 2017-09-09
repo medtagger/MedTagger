@@ -4,8 +4,6 @@ from datetime import datetime
 from data_labeling.clients.hbase_client import HBaseClient
 
 
-DATA_SOURCE = 'example_data/kaggle'
-
 print('Connecting to HBase.')
 connection = HBaseClient()
 
@@ -27,8 +25,6 @@ data = ex_slice.pixel_array.tostring()
 
 print('Filling empty table with original Dicoms.')
 slices_table = connection.table('slices')
-# for scan_path in glob.iglob(DATA_SOURCE + '/**/*.dcm'):
-#     add...
 
 print('Adding ({})...'.format(datetime.now()))
 for i in range(100):
