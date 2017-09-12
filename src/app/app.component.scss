@@ -1,0 +1,22 @@
+// Default style for every page
+.defaultBackground {
+    position:fixed;
+    padding:0;
+    margin:0;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    color: white;
+
+    .mat-button, .mat-icon-button, .mat-raised-button {
+      color: black;
+    }
+}
+
+// Used in positioning elements
+.innerElement {
+  margin-left: auto;
+  margin-right: auto;
+}

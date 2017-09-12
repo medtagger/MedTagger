@@ -1,0 +1,13 @@
+app-marker-page {
+  $canvasSize: 30vw;
+
+  #taggerCanvas {
+    background-color: white;
+    width: $canvasSize;
+    height: $canvasSize;
+  }
+
+  .canvasInterface {
+    width: 50%;
+  }
+}
