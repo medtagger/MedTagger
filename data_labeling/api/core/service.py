@@ -1,6 +1,7 @@
 """Module responsible for definition of Core service"""
 from typing import Any
 from flask_restplus import Resource
+from flask_user import login_required
 
 from data_labeling.api import api
 from data_labeling.api.core import serializers
@@ -14,6 +15,7 @@ class Status(Resource):
     """Status endpoint that checks if everything is all right"""
 
     @staticmethod
+    @login_required
     @core_ns.marshal_with(serializers.status)
     @core_ns.doc(description='Checks if API is running properly.')
     @core_ns.doc(responses={200: 'Success'})

@@ -10,14 +10,19 @@ It is also a great entry point for running this app. To do so, you can use:
 """
 # pylint: disable=unused-import;  It's used by Flask
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_user import SQLAlchemyAdapter, UserManager
 
 from data_labeling.api import blueprint
+from data_labeling.api.database import db
+
+from data_labeling.api.database.models import User
 from data_labeling.config import ConfigurationFile
 
 # Import all services
 from data_labeling.api.core.service import core_ns  # noqa
 from data_labeling.api.scans.service import scans_ns  # noqa
-
+from data_labeling.api.user.service import user_ns  # noqa
 
 # Load configuration
 configuration = ConfigurationFile()
@@ -30,6 +35,15 @@ app.register_blueprint(blueprint)
 # Application config
 app.config['RESTPLUS_MASK_SWAGGER'] = False
 app.config['SWAGGER_UI_DOC_EXPANSION'] = 'list'
+app.config['SQLALCHEMY_DATABASE_URI'] = configuration.get('db', 'database_uri')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['USER_ENABLE_EMAIL'] = False
+app.config['RESTPLUS_VALIDATE'] = True
+
+db.init_app(app)
+db_adapter = SQLAlchemyAdapter(db, User)
+user_manager = UserManager(db_adapter, app)
+user_manager.
 
 if __name__ == '__main__':
     # Run the application

@@ -1,5 +1,8 @@
 # App requirements
+flask
 flask-restplus>=0.10.1
+flask-user==0.6.13
+psycopg2
 
 # Dev requirements - these should always be latest
 mypy

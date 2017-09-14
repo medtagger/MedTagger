@@ -5,7 +5,7 @@ from data_labeling.api import api
 
 
 random_scan = api.model('Random scan model', {
-    'scan_id': fields.Integer(description='Scan\'s ID'),
+    'scan_id': fields.Integer(description='Scan\'s Id'),
     'slices_begin': fields.Integer(description='First slice index (including) used for labeling'),
     'slices_count': fields.Integer(description='Number of slices that user should label'),
     'total_number_of_slices': fields.Integer(description='Total number of slices in given scan'),
