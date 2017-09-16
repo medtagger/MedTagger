@@ -1,7 +1,3 @@
-.vagrant/
-.gitignore.bak
-
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -107,3 +103,9 @@ ENV/
 
 # Configuration files
 backend_api.conf
+
+# Tools
+.vagrant/
+
+# Others
+.gitignore.bak

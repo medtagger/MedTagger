@@ -8,6 +8,8 @@ There are two ways to setup your environment:
  - virtual machine using Vagrant,
  - or natively on your host.
 
+You can also setup all services like Hadoop, HBase, etc. with Docker Compose.
+
 #### Vagrant
 Vagrant is the easiest way to prepare your dev environment. At first, please make sure that you've properly
  installed it on your OS with instructions from their
@@ -41,6 +43,19 @@ On Linux it's really easy to setup your environment:
  5. Run our application `python data_labeling/api/app.py`. 
 
 That's all! Now you can go to `http://localhost:51000/api/v1` and develop this application!
+
+#### Docker Compose
+Requirements:
+ - Docker Engine,
+ - Docker Compose - it is highly possible that it was part of Docker Engine. If needed, install it with
+   [this](https://docs.docker.com/compose/install/#install-compose) instruction.
+
+It's really easy to start all needed external dependencies:
+```bash
+$ docker-compose up
+```
+
+_**TIP!**_ Add `-d` (detach) option to run everything in the background.
 
 ### Testing your code
 Use `make test` to test your code. It will run PyLint, Flake8, MyPy and PyTest with all of our unit tests.
