@@ -8,6 +8,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "docker" do |d|
     d.pull_images "sequenceiq/hadoop-docker"
     d.pull_images "dajobe/hbase"
+    d.pull_images "rabbitmq"
     d.run "sequenceiq/hadoop-docker",
       args: "-p 0.0.0.0:50010:50010 \
              -p 0.0.0.0:50020:50020 \
@@ -33,5 +34,10 @@ Vagrant.configure("2") do |config|
              -p 0.0.0.0:9095:9095 \
              -p 0.0.0.0:2181:2181 \
              -p 0.0.0.0:16010:16010"
+    d.run "rabbitmq",
+      args: "-p 0.0.0.0:4369:4369 \
+             -p 0.0.0.0:5671:5671 \
+             -p 0.0.0.0:5672:5672 \
+             -p 0.0.0.0:25672:25672"
   end
 end

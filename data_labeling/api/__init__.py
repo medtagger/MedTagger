@@ -6,7 +6,7 @@ from typing import Tuple, Dict
 from flask import Blueprint
 from flask_restplus import Api
 
-from data_labeling.api.exceptions import InvalidArgumentsException
+from data_labeling.api.exceptions import InvalidArgumentsException, BusinessLogicException
 
 log = logging.getLogger(__name__)
 
@@ -25,6 +25,18 @@ def default_error_handler(exception: Exception) -> Tuple[Dict, int]:  # pylint: 
     message = 'An unhandled exception occurred.'
     log.exception(message)
     return {'message': message}, 500
+
+
+@api.errorhandler(BusinessLogicException)
+def business_logic_error_handler(exception: Exception) -> Tuple[Dict, int]:
+    """Handler for business logic errors
+
+    :param exception: Python Exception
+    :return: tuple with response and status code
+    """
+    log.warning(traceback.format_exc())
+    details = str(exception)
+    return {'message': 'Business logic error.', 'details': details}, 500
 
 
 @api.errorhandler(InvalidArgumentsException)
