@@ -6,10 +6,25 @@ from flask_restplus import Resource
 from data_labeling.types import ScanID, CuboidLabelPosition, CuboidLabelShape
 from data_labeling.api import api
 from data_labeling.api.scans import serializers
-from data_labeling.api.scans.business import get_metadata, get_random_scan, get_slices_for_scan, add_cuboid_label
+from data_labeling.api.scans.business import create_empty_scan, get_random_scan, get_slices_for_scan, add_cuboid_label,\
+    add_new_slice
 from data_labeling.api.exceptions import InvalidArgumentsException
 
 scans_ns = api.namespace('scans', 'Methods related with scans')
+
+
+@scans_ns.route('/')
+class Scans(Resource):
+    """Endpoint that can create new scan"""
+
+    @staticmethod
+    @scans_ns.marshal_with(serializers.new_scan)
+    @scans_ns.doc(description='Creates empty scan.')
+    @scans_ns.doc(responses={201: 'Success'})
+    def post() -> Any:
+        """Method responsible for creating empty scan"""
+        scan_id = create_empty_scan()
+        return {'scan_id': scan_id}, 201
 
 
 @scans_ns.route('/random')
@@ -25,7 +40,7 @@ class Random(Resource):
         return get_random_scan()
 
 
-@scans_ns.route('/<int:scan_id>/slices')
+@scans_ns.route('/<string:scan_id>/slices')
 @scans_ns.param('scan_id', 'Scan identifier')
 class Slices(Resource):
     """Endpoint that returns slices from given scan"""
@@ -41,9 +56,9 @@ class Slices(Resource):
         begin = args['begin']
         count = args['count']
 
-        metadata = get_metadata(scan_id)
+        number_of_slices = 20
         smaller_than_zero = (begin < 0 or count < 0)
-        out_of_range = (begin > metadata['number_of_slices'] or begin + count > metadata['number_of_slices'])
+        out_of_range = (begin > number_of_slices or begin + count > number_of_slices)
         if smaller_than_zero or out_of_range:
             raise InvalidArgumentsException('Indices out of bound.')
 
@@ -54,8 +69,21 @@ class Slices(Resource):
 
         return get_slices_for_scan(scan_id, begin, count)
 
+    @staticmethod
+    @scans_ns.marshal_with(serializers.accepted)
+    @scans_ns.doc(description='Creates empty scan.')
+    @scans_ns.doc(responses={201: 'Success'})
+    def post(scan_id: ScanID) -> Any:
+        """Method responsible for adding new Dicom slices to given Scan"""
+        dicom_image_file = request.files['dicom_image']
+        if not dicom_image_file.filename.endswith('.dcm'):
+            raise InvalidArgumentsException('Invalid file format.')
 
-@scans_ns.route('/<int:scan_id>/label/cuboid')
+        add_new_slice(scan_id, dicom_image_file)
+        return {'accepted': True}, 202
+
+
+@scans_ns.route('/<string:scan_id>/label/cuboid')
 @scans_ns.param('scan_id', 'Scan identifier')
 class LabelCuboid(Resource):
     """Endpoint that saves cuboid label for given scan"""

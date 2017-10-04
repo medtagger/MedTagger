@@ -24,7 +24,7 @@ configuration = ConfigurationFile()
 
 # Definition of application
 app = Flask(__name__)
-app.secret_key = configuration.get('api', 'secret_key')
+app.secret_key = configuration.get('api', 'secret_key', fallback='')
 app.register_blueprint(blueprint)
 
 # Application config

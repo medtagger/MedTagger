@@ -6,6 +6,11 @@ class BaseHTTPException(Exception):
     pass
 
 
+class BusinessLogicException(BaseHTTPException):
+    """Exception designed to use once there was an error during business logic processing"""
+    pass
+
+
 class InvalidArgumentsException(BaseHTTPException):
     """Exception designed to use with invalid arguments (400 status code)"""
     pass
