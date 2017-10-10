@@ -10,6 +10,7 @@ It is also a great entry point for running this app. To do so, you can use:
 """
 # pylint: disable=unused-import;  It's used by Flask
 from flask import Flask
+from flask_cors import CORS
 
 from data_labeling.api import blueprint
 from data_labeling.config import ConfigurationFile
@@ -24,6 +25,7 @@ configuration = ConfigurationFile()
 
 # Definition of application
 app = Flask(__name__)
+CORS(app)
 app.secret_key = configuration.get('api', 'secret_key', fallback='')
 app.register_blueprint(blueprint)
 

@@ -1,5 +1,6 @@
 # App requirements
 flask-restplus>=0.10.1
+flask-cors>=3.0.3
 hdfs3>=0.2.0
 starbase>=0.3.3
 happybase>=1.1.0
