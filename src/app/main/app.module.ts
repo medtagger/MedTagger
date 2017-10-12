@@ -2,8 +2,8 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
-import {LoginPageComponent} from './login-page/login-page.component';
-import {MarkerPageComponent} from './marker-page/marker-page.component';
+import {LoginPageComponent} from '../pages/login-page/login-page.component';
+import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
 
 import {MaterialModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';

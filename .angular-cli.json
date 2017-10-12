@@ -20,9 +20,9 @@
       "prefix": "app",
       "styles": [
         "styles.scss",
-        "app/login-page/login-page.component.scss",
-        "app/marker-page/marker-page.component.scss",
-        "app/app.component.scss"
+        "app/pages/login-page/login-page.component.scss",
+        "app/pages/marker-page/marker-page.component.scss",
+        "app/main/app.component.scss"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
