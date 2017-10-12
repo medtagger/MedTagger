@@ -10,6 +10,8 @@ import {LoginPageComponent} from '../pages/login-page/login-page.component';
 import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
 
+import {MarkerComponent} from '../components/marker/marker.component';
+
 import {MaterialModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterModule, Routes} from '@angular/router';
@@ -25,6 +27,8 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     LoginPageComponent,
+    MarkerPageComponent,
+    MarkerComponent
     MarkerPageComponent,
     UploadPageComponent,
   ],

@@ -1,13 +1,25 @@
-app-marker-page {
-  $canvasSize: 30vw;
-
-  #taggerCanvas {
-    background-color: white;
-    width: $canvasSize;
-    height: $canvasSize;
-  }
-
-  .canvasInterface {
-    width: 50%;
-  }
-}
+//app-marker-page {
+//  $canvasSize: 512px;
+//  $canvasPosition: (
+//    x: 100,
+//    y: 100);
+//
+//  #taggerCanvas {
+//    //background-color: white;
+//    width: $canvasSize;
+//    height: $canvasSize;
+//    position: absolute;
+//    left: map_get($canvasPosition, x);
+//    top: map_get($canvasPosition, y);
+//  }
+//
+//  #canvasBackgroundImage {
+//    @extend #taggerCanvas;
+//    background-color: grey;
+//    z-index: -1;
+//  }
+//
+//  .canvasInterface {
+//    width: 50%;
+//  }
+//}

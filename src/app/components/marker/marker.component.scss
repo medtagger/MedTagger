@@ -1,0 +1,16 @@
+app-marker-component {
+  $canvasSize: 512px;
+
+  #taggerCanvas {
+    width: $canvasSize;
+    height: $canvasSize;
+    position: absolute;
+    user-select: none;
+  }
+
+  #markerBackgroundImage {
+    @extend #taggerCanvas;
+    background-color: grey;
+    z-index: -1;
+  }
+}

@@ -22,7 +22,8 @@
         "styles.scss",
         "app/pages/login-page/login-page.component.scss",
         "app/pages/marker-page/marker-page.component.scss",
-        "app/main/app.component.scss"
+        "app/main/app.component.scss",
+        "app/components/marker/marker.component.scss"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
