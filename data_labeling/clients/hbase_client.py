@@ -42,3 +42,16 @@ class HBaseClient(happybase.Connection):
         table = self.table(table_name)
         for key, _ in table.scan(row_prefix=row_prefix, filter=str.encode('KeyOnlyFilter()')):
             yield key
+
+    def check_if_exists(self, table_name: str, key: str) -> bool:
+        """Scan database and check if given key exists
+
+        :param table_name: name of a table
+        :param key: HBase key
+        :return: boolean information if such key exists or not
+        """
+        hbase_key = str.encode(key)
+        table = self.table(table_name)
+        results = table.scan(row_start=hbase_key, row_stop=hbase_key,
+                             filter=str.encode('KeyOnlyFilter() AND FirstKeyOnlyFilter()'), limit=1)
+        return next(results, None) is not None

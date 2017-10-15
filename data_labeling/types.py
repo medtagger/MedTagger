@@ -3,6 +3,7 @@ from typing import NewType, NamedTuple
 
 
 ScanID = NewType('ScanID', str)
+SliceID = NewType('SliceID', str)
 LabelID = NewType('LabelID', int)
 
 PickledDicomImage = NewType('PickledDicomImage', str)

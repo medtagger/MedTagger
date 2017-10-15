@@ -6,8 +6,7 @@ from random import randint
 from typing import List, Dict, Any
 
 from data_labeling.types import ScanID, LabelID, CuboidLabelPosition, CuboidLabelShape
-from data_labeling.clients.hbase_client import HBaseClient
-from data_labeling.workers.storage import store_dicom
+from data_labeling.models.scan import Scan
 
 
 def create_empty_scan() -> ScanID:
@@ -15,12 +14,9 @@ def create_empty_scan() -> ScanID:
 
     :return: ID of a newly created scan
     """
-    scan_id = ScanID(str(uuid.uuid4()))
-
-    connection = HBaseClient()
-    scans_table = connection.table(HBaseClient.SCANS)
-    scans_table.put(scan_id, {})
-    return scan_id
+    scan = Scan()
+    scan.create_if_needed()
+    return scan.id
 
 
 def get_metadata(scan_id: ScanID) -> Dict[str, Any]:
@@ -29,11 +25,11 @@ def get_metadata(scan_id: ScanID) -> Dict[str, Any]:
     :param scan_id: ID of a given scan
     :return: dictionary with scan's metadata
     """
-    connection = HBaseClient()
-    entries = connection.get_all_keys(HBaseClient.ORIGINAL_SLICES_TABLE, starts_with=scan_id)
+    scan = Scan(scan_id)
+    number_of_slices = len(scan.get_list_of_slices_keys())
 
     return {
-        'number_of_slices': len(list(entries)),
+        'number_of_slices': number_of_slices,
     }
 
 
@@ -89,4 +85,5 @@ def add_new_slice(scan_id: ScanID, dicom_image_file: Any) -> None:
     :param scan_id: ID of a Scan for which it should add new slice
     :param dicom_image_file: Dicom file with a single slice
     """
-    store_dicom.delay(scan_id, dicom_image_file)
+    scan = Scan(scan_id)
+    scan.add_slice(dicom_image_file)

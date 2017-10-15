@@ -1,3 +1,12 @@
+"""Script that can benchmark your HBase setup
+
+How to use it?
+--------------
+Just run this script like this:
+
+    (venv) $ python scripts/hbase_benchmark.py
+
+"""
 import dicom
 from datetime import datetime
 
