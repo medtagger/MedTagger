@@ -26,7 +26,7 @@ run_api:
 	PYTHONPATH=`pwd` $(PYTHON) data_labeling/api/app.py
 
 run_worker:
- 	PYTHONPATH=`pwd` celery -A data_labeling.workers worker --loglevel=info
+	PYTHONPATH=`pwd` celery -A data_labeling.workers worker --loglevel=info
 
 #
 # Testing

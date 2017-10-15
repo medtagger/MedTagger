@@ -22,6 +22,8 @@ Then follow these steps:
     all entries that you need to provide.
  4. Setup your PyCharm's interpreter - make sure that it points to Vagrant's VM and it's python binaries.
     Use `data_labeling/api/app.py` as entry point and make sure that `/vagrant/` is your working directory.
+ 5. In parallel you can also run `make run_worker` (via `vagrant ssh`) which will set up your Celery worker
+    used for data processing (not needed if you don't want to add any new data to the storage).
 
 Then - everything should be fine and application should be available on `http://10.0.0.99:51000/api/v1`.
 
@@ -33,6 +35,7 @@ Requirements:
  - Python 3.6
  - Virtualenv
  - Make
+ - RabbitMQ, Hadoop and HBase (eg. in Docker containers)
 
 On Linux it's really easy to setup your environment:
  1. Clone this repository.
@@ -40,11 +43,12 @@ On Linux it's really easy to setup your environment:
  3. Activate your environment with `. venv/bin/activate`.
  4. Prepare your configuration file and name it `backend_api.conf`. Check `backend_api.example.conf` - it contains
     all entries that you need to provide.
- 5. Run our application `python data_labeling/api/app.py`. 
+ 5. Run our application with `python data_labeling/api/app.py` or `make run_api`.
+ 6. In another window/terminal run `make run_worker` to start Celery worker.
 
 That's all! Now you can go to `http://localhost:51000/api/v1` and develop this application!
 
-#### Docker Compose
+##### Docker Compose for all dependencies
 Requirements:
  - Docker Engine,
  - Docker Compose - it is highly possible that it was part of Docker Engine. If needed, install it with
