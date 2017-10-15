@@ -1,5 +1,17 @@
 <div id="markerWrapper">
   <img id="markerBackgroundImage" width="512" height="512"/>
-  <canvas id="taggerCanvas" width="512" height="512"></canvas>
+  <canvas id="markerCanvas" width="512" height="512"></canvas>
+  <md-slider id="markerSlider"
+  [disabled]="disabled"
+  [invert]="invert"
+  [max]="this.images.length"
+  [min]="0"
+  [step]="1"
+  [thumb-label]="true"
+  [tick-interval]="1"
+  [value]="this.currentImage"
+  [vertical]="true"
+  [color]="primary">
+</md-slider>
 </div>
 

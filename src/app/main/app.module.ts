@@ -10,6 +10,8 @@ import {LoginPageComponent} from '../pages/login-page/login-page.component';
 import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
 
+import {MockService} from '../services/mock.service';
+
 import {MarkerComponent} from '../components/marker/marker.component';
 
 import {MaterialModule} from '@angular/material';
@@ -44,7 +46,7 @@ const routes: Routes = [
     SocketIoModule,
     HttpModule,
   ],
-  providers: [],
+  providers: [MockService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

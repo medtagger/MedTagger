@@ -20,6 +20,7 @@
       "prefix": "app",
       "styles": [
         "styles.scss",
+        "app-theme.scss",
         "app/pages/login-page/login-page.component.scss",
         "app/pages/marker-page/marker-page.component.scss",
         "app/main/app.component.scss",

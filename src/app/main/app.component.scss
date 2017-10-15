@@ -1,14 +1,38 @@
 // Default style for every page
+$main-z-index: 1;
+$main-color: rgb(54, 53, 53);
+body {
+  margin: 0;
+}
+
+header {
+  position: relative;
+  height: 15vh;
+  background: $main-color;
+  z-index: $main-z-index;
+}
+
+footer {
+  position: relative;
+  height: 15vh;
+  background: $main-color;
+  z-index: $main-z-index;
+}
+
+.dynamicContent {
+  position: relative;
+  height: 70vh;
+}
+
 .defaultBackground {
-    position:fixed;
-    padding:0;
+    padding: 1% 0 1% 0;
     margin:0;
     top:0;
     left:0;
     width: 100%;
     height: 100%;
-    background-color: black;
-    color: white;
+    background-color: grey;
+    // color: white;
 
     .mat-button, .mat-icon-button, .mat-raised-button {
       color: black;
