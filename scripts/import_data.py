@@ -48,6 +48,6 @@ if __name__ == '__main__':
         scan.create_if_needed()
 
         for slice_name in glob.iglob(scan_directory + '/*.dcm'):
-            print('Adding new slice to scan {} based on {}.'.format(123, slice_name))
+            print('Adding new slice to scan {} based on {}.'.format(scan.id, slice_name))
             slice_dicom = dicom.read_file(slice_name)
             scan.add_slice(slice_dicom)

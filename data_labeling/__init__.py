@@ -5,4 +5,5 @@
 HBASE_SCHEMA = {
     'scans': ['metadata'],
     'original_slices': ['position', 'image'],
+    'converted_slices': ['position', 'image'],
 }

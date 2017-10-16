@@ -5,6 +5,7 @@ from typing import List, Any, cast
 from data_labeling.types import ScanID, SliceID
 from data_labeling.clients.hbase_client import HBaseClient
 from data_labeling.workers.storage import store_dicom
+from data_labeling.workers.conversion import convert_dicom_to_png
 
 
 class Scan(object):
@@ -40,13 +41,16 @@ class Scan(object):
         return cast(List[SliceID], list(keys))
 
     def add_slice(self, dicom_image_file: Any) -> None:
-        """Add new slice to this Scan
+        """Add new slice to this Scan and convert it to png format
 
-        This method will trigger Celery task that will add given Dicom to HBase asynchronously.
+        This method will trigger Celery task that will add given Dicom to HBase asynchronously, then another Celery
+        task will be triggered that will convert Dicom to png format and save it to HBase asynchronously.
 
         :param dicom_image_file: Dicom file with slice data
         """
-        store_dicom.delay(self.id, dicom_image_file)
+        slice_id = str(uuid.uuid4())
+        store_dicom.delay(self.id, slice_id, dicom_image_file)
+        convert_dicom_to_png.delay(self.id, slice_id, dicom_image_file)
 
     def _exists(self) -> bool:
         """Check if given Scan exists in HBase

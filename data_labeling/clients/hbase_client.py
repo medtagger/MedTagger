@@ -23,6 +23,7 @@ class HBaseClient(happybase.Connection):
 
     SCANS = 'scans'
     ORIGINAL_SLICES_TABLE = 'original_slices'
+    CONVERTED_SLICES_TABLE = 'converted_slices'
 
     def __init__(self) -> None:
         """Initializer for client"""

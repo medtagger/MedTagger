@@ -7,6 +7,7 @@ happybase>=1.1.0
 pydicom>=0.9.9
 numpy>=1.13.1
 celery>=4.1.0
+Pillow>=4.3.0
 
 # Dev requirements - these should always be latest
 mypy
@@ -15,3 +16,5 @@ flake8
 pytest
 pytest-cov
 pytest-mock
+jupyter
+matplotlib
