@@ -2,7 +2,6 @@
 import base64
 import uuid
 from random import randint
-
 from typing import List, Dict, Any
 
 from data_labeling.types import ScanID, LabelID, CuboidLabelPosition, CuboidLabelShape
