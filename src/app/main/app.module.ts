@@ -14,9 +14,11 @@ import {MockService} from '../services/mock.service';
 
 import {MarkerComponent} from '../components/marker/marker.component';
 
-import {MaterialModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterModule, Routes} from '@angular/router';
+
+import {MatCardModule, MatSliderModule} from '@angular/material';
+
 
 const routes: Routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full'},
@@ -30,8 +32,7 @@ const routes: Routes = [
     AppComponent,
     LoginPageComponent,
     MarkerPageComponent,
-    MarkerComponent
-    MarkerPageComponent,
+    MarkerComponent,
     UploadPageComponent,
   ],
   imports: [
@@ -39,8 +40,10 @@ const routes: Routes = [
       routes,
       {enableTracing: true} // do debugowania
     ),
+    MatCardModule,
+    MatSliderModule,
     BrowserModule,
-    MaterialModule,
+    BrowserAnimationsModule,
     BrowserAnimationsModule,
     FormsModule,
     SocketIoModule,

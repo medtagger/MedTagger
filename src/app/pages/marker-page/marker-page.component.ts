@@ -7,6 +7,7 @@ import {Scan, ScanService, Slice} from '../../services/scan.service'
   selector: 'app-marker-page',
   templateUrl: './marker-page.component.html',
   providers: [ScanService],
+  styleUrls: ['./marker-page.component.scss']
 })
 export class MarkerPageComponent implements OnInit {
   scan: Scan;

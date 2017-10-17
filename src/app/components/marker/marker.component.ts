@@ -1,48 +1,72 @@
-import {Component, Input, OnInit} from '@angular/core';
+///<reference path="../../../../node_modules/@angular/core/src/metadata/directives.d.ts"/>
+import {Component, ElementRef, forwardRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Slice} from '../../model/Slice';
+import {MockService} from '../../services/mock.service';
+import {MatSlider} from '@angular/material/slider';
 
 @Component({
   selector: 'app-marker-component',
   templateUrl: './marker.component.html',
-  // styleUrls: ['./marker.component.scss']
+  styleUrls: ['./marker.component.scss']
 })
 export class MarkerComponent implements OnInit {
-  private testImage: HTMLImageElement;
-  private canvas: HTMLCanvasElement;
+  testImage: HTMLImageElement;
+  @ViewChild('image')
+  set viewImage(viewElement: ElementRef) {
+    this.testImage = viewElement.nativeElement;
+  }
+
+  canvas: HTMLCanvasElement;
+  @ViewChild('canvas')
+  set viewCanvas(viewElement: ElementRef) {
+    this.canvas = viewElement.nativeElement;
+  }
+
+  @ViewChild('slider') slider: MatSlider;
+
   private canvasCtx: CanvasRenderingContext2D;
   private canvasPosition: ClientRect;
 
-  public images: ImageData[] = [];
+  public slices: Slice[] = [];
   public currentImage = 0;
 
   private selectedArea: { positionX: number, positionY: number, width: number, height: number };
   private mouseDrag = false;
 
-  constructor() {
-    this.images.push(new ImageData(10, 10));
-    this.images.push(new ImageData(10, 10));
-    this.images.push(new ImageData(10, 10));
-    this.images.push(new ImageData(10, 10));
-  }
-
-  public isMarkerConnected(): boolean {
-    return true;
+  constructor(private mockService: MockService) {
+    mockService.getMockSlicesURI().forEach((value: string, index: number) => {
+      this.slices.push(new Slice(index, value));
+    });
   }
 
   ngOnInit() {
     console.log('Marker init');
 
-    this.canvas = <HTMLCanvasElement>document.getElementById('markerCanvas');
+    // this.canvas = <HTMLCanvasElement>document.getElementById('markerCanvas');
+    console.log('View elements: image ', this.testImage, ', canvas ', this.canvas, ', slider ', this.slider);
     this.canvasCtx = this.canvas.getContext('2d');
+    this.canvasCtx.strokeStyle = '#ff0000';
 
     this.canvasPosition = this.canvas.getBoundingClientRect();
 
     this.selectedArea = {positionX: 0, positionY: 0, width: 0, height: 0};
 
-    this.testImage = <HTMLImageElement>document.getElementById('markerBackgroundImage');
     this.testImage.onload = (ev: Event) => {
       this.initCanvasSelectionTool();
     };
-    this.testImage.src = '../../assets/img/test_lung1.png';
+
+    this.setBackgroundImage();
+
+    this.slider.registerOnChange( (value: number) => {
+      console.log('Marker init | slider change: ', value);
+      this.currentImage = value;
+      this.setBackgroundImage();
+    });
+  }
+
+  //TODO: refactor nazw, lepszy pomysł na logike
+  private setBackgroundImage(): void {
+    this.testImage.src = this.slices[this.currentImage].source;
   }
 
   private initCanvasSelectionTool(): void {

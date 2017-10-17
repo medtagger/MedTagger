@@ -1,39 +1,37 @@
-app-login-page {
-  .decoration-side {
-    position: relative;
-    margin: 0;
-    float: left;
-    width: 100%;
-    height: 100%;
-    background: black url("../../../assets/img/login_pic.jpg");
-    background-size:contain;
-    background-position: bottom;
-    background-repeat: no-repeat;
-  }
+.decoration-side {
+  position: relative;
+  margin: 0;
+  float: left;
+  width: 100%;
+  height: 100%;
+  background: black url("../../../assets/img/login_pic.jpg");
+  background-size: contain;
+  background-position: bottom;
+  background-repeat: no-repeat;
+}
 
-  .login-side {
-    position: absolute;
-    margin: 0;
-    top: 25%;
-    right: 10%;
-    width: 40%;
+.login-side {
+  position: absolute;
+  margin: 0;
+  top: 25%;
+  right: 10%;
+  width: 40%;
 
-    .login-card {
-      height: 50%;
-      margin: 0 auto; /* Added */
-      float: none; /* Added */
-    }
+  .login-card {
+    height: 50%;
+    margin: 0 auto;
+    float: none;
   }
+}
 
-  .background {
-    position:fixed;
-    padding:0;
-    margin:0;
-    top:0;
-    left:0;
-    width: 100%;
-    height: 100%;
-    background: black url("../../../assets/img/tmp-background.svg") fixed no-repeat bottom right;
-    background-size: 30%;
-  }
+.background {
+  position: fixed;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black url("../../../assets/img/tmp-background.svg") fixed no-repeat bottom right;
+  background-size: 30%;
 }

@@ -1,22 +1,21 @@
 @import '../../../app-theme.scss';
-app-marker-component {
-  $canvas-size: 512px;
 
-  #markerCanvas {
-    width: $canvas-size;
-    height: $canvas-size;
-    position: absolute;
-    user-select: none;
-  }
+$canvas-size: 512px;
 
-  #markerBackgroundImage {
-    @extend #markerCanvas;
-    background-color: grey;
-  }
+#markerCanvas {
+  width: $canvas-size;
+  height: $canvas-size;
+  position: absolute;
+  user-select: none;
+}
 
-  #markerSlider {
-    position: absolute;
-    left: $canvas-size;
-    height: $canvas-size;
-  }
+#markerBackgroundImage {
+  @extend #markerCanvas;
+  background-color: grey;
+}
+
+#markerSlider {
+  position: absolute;
+  left: $canvas-size;
+  height: $canvas-size;
 }
