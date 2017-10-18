@@ -29,7 +29,7 @@ except Exception:
     })
 
 print('Reading example Dicom.')
-ex_slice = dicom.read_file('example_data/example_dicom.dcm')
+ex_slice = dicom.read_file('example_data/example_slice.dcm')
 data = ex_slice.pixel_array.tostring()
 
 print('Filling empty table with original Dicoms.')

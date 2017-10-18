@@ -1,22 +1,30 @@
 """Module responsible for definition of client for HBase database"""
-from typing import Iterable
+from typing import Iterable, List, Mapping, Tuple, Any
 
 import happybase
 
 from data_labeling.config import ConfigurationFile
 
 
-class HBaseClient(happybase.Connection):
-    """Client that wraps connection to the HBase
+configuration = ConfigurationFile()
+host = configuration.get('hbase', 'host', fallback='localhost')
+port = configuration.getint('hbase', 'port', fallback=9090)
+size = configuration.getint('hbase', 'connection_pool_size', fallback=10)
+HBASE_CONNECTION_POOL = happybase.ConnectionPool(size, host=host, port=port)
+
+
+class HBaseClient(object):
+    """Client for HBase
 
     How to use this client?
     -----------------------
-    It's just a wrapper for happybase.Connection so please follow docs (https://happybase.readthedocs.io/en/latest/).
+    This is a wrapper for HappyBase Connection. Client uses HappyBase's Connection Pool, so don't worry about closing
+    connection, etc. This client should do everything inside below methods.
 
     Example:
 
-        >>> database = HBaseClient()
-        >>> table = database.table('my_table_name')
+        >>> hbase_client = HBaseClient()
+        >>> data = hbase_client.get('my_table_name', 'row_key')
         >>> ...
 
     """
@@ -27,24 +35,66 @@ class HBaseClient(happybase.Connection):
 
     def __init__(self) -> None:
         """Initializer for client"""
-        configuration = ConfigurationFile()
-        host = configuration.get('hbase', 'host', fallback='localhost')
-        port = configuration.getint('hbase', 'port', fallback=9090)
-        super(HBaseClient, self).__init__(host, port)
+        pass
 
-    def get_all_keys(self, table_name: str, starts_with: str = None) -> Iterable[str]:
+    @staticmethod
+    def get_all_keys(table_name: str, starts_with: str = None) -> Iterable[str]:
         """Fetch all keys for given table
 
         :param table_name: name of a table
         :param starts_with: prefix for keys
         :return: iterator for table keys
         """
-        row_prefix = str.encode(starts_with) if starts_with else None
-        table = self.table(table_name)
-        for key, _ in table.scan(row_prefix=row_prefix, filter=str.encode('KeyOnlyFilter()')):
-            yield key
+        with HBASE_CONNECTION_POOL.connection() as connection:
+            row_prefix = str.encode(starts_with) if starts_with else None
+            table = connection.table(table_name)
+            for key, _ in table.scan(row_prefix=row_prefix, filter=str.encode('KeyOnlyFilter()')):
+                yield key.decode('utf-8')
 
-    def check_if_exists(self, table_name: str, key: str) -> bool:
+    @staticmethod
+    def get_all_rows(table_name: str, columns: List, starts_with: str = None) -> Iterable[Tuple[str, Any]]:
+        """Fetch all rows for given table
+
+        :param table_name: name of a table
+        :param starts_with: prefix for keys
+        :param columns: list of columns to fetch
+        :return: iterator for table keys
+        """
+        with HBASE_CONNECTION_POOL.connection() as connection:
+            row_prefix = str.encode(starts_with) if starts_with else None
+            table = connection.table(table_name)
+            for key, value in table.scan(row_prefix=row_prefix, columns=columns):
+                yield key.decode('utf-8'), value
+
+    @staticmethod
+    def get(table_name: str, key: str, columns: List[str] = None) -> Mapping:
+        """Fetch a single row from HBase table
+
+        :param table_name: name of a table
+        :param key: key representing a row
+        :param columns: columns which should be loaded (by default all)
+        :return: mapping returned by HBase
+        """
+        hbase_key = str.encode(key)
+        with HBASE_CONNECTION_POOL.connection() as connection:
+            table = connection.table(table_name)
+            return table.row(hbase_key, columns=columns)
+
+    @staticmethod
+    def put(table_name: str, key: str, value: Any) -> None:
+        """Add new entry into HBase table
+
+        :param table_name: name of a table
+        :param key: key under value should be stored
+        :param value: value which should be stored
+        """
+        hbase_key = str.encode(key)
+        with HBASE_CONNECTION_POOL.connection() as connection:
+            table = connection.table(table_name)
+            table.put(hbase_key, value)
+
+    @staticmethod
+    def check_if_exists(table_name: str, key: str) -> bool:
         """Scan database and check if given key exists
 
         :param table_name: name of a table
@@ -52,7 +102,8 @@ class HBaseClient(happybase.Connection):
         :return: boolean information if such key exists or not
         """
         hbase_key = str.encode(key)
-        table = self.table(table_name)
-        results = table.scan(row_start=hbase_key, row_stop=hbase_key,
-                             filter=str.encode('KeyOnlyFilter() AND FirstKeyOnlyFilter()'), limit=1)
-        return next(results, None) is not None
+        with HBASE_CONNECTION_POOL.connection() as connection:
+            table = connection.table(table_name)
+            results = table.scan(row_start=hbase_key, row_stop=hbase_key,
+                                 filter=str.encode('KeyOnlyFilter() AND FirstKeyOnlyFilter()'), limit=1)
+            return next(results, None) is not None

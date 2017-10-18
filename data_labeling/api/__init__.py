@@ -5,6 +5,7 @@ from typing import Tuple, Dict
 
 from flask import Blueprint
 from flask_restplus import Api
+from flask_socketio import SocketIO
 
 from data_labeling.api.exceptions import InvalidArgumentsException, BusinessLogicException
 
@@ -13,6 +14,7 @@ log = logging.getLogger(__name__)
 # Definition of the API
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 api = Api(blueprint, version='0.1', title='Backend API', description='Documentation for Backend API')
+web_socket = SocketIO(logger=True, engineio_logger=True)
 
 
 @api.errorhandler
