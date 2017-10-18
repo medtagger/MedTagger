@@ -19,3 +19,10 @@ $canvas-size: 512px;
   left: $canvas-size;
   height: $canvas-size;
 }
+
+#markerAcceptButton {
+  position: absolute;
+  left: $canvas-size / 2;
+  top: $canvas-size;
+}
+

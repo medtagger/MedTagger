@@ -2,7 +2,7 @@
 
 Repository contains Typescript+Angular 4 code building front side of the project. 
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.2.7.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.4.7.
 
 ## Project structure:
 
@@ -10,6 +10,10 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 - `src`: Main project source dir
   - `app`: Main application source dir
     - `page`: Directory connected with single page (logic + presentation)
+    - `components`: Components used in pages, feature components
+    - `model`: Data classes used in project
+    - `main`: Application definitions, app component
+    - `services`: Injectable services and providers
   - `assets`: Page assets
   - `environments`: Env declarations
 - `.angular-cli.json`: main project config file
@@ -24,7 +28,7 @@ Structure presented above is temporary. Watch out for updates.
 
 - NodeJS 6.10+ LTS [Download](https://nodejs.org/en/download)
 - Angular CLI 1.2.7   
-`npm install -g @angular/cli@1.2.7` (It will install CLI tool globally in 1.2.7 version.)
+`npm install -g @angular/cli@1.4.7` (It will install CLI tool globally in 1.2.7 version.)
 
 ### Running project
 

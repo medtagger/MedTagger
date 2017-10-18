@@ -17,7 +17,7 @@ import {MarkerComponent} from '../components/marker/marker.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterModule, Routes} from '@angular/router';
 
-import {MatCardModule, MatSliderModule} from '@angular/material';
+import {MatCardModule, MatSliderModule, MatButtonModule, MatIconModule} from '@angular/material';
 
 
 const routes: Routes = [
@@ -42,6 +42,8 @@ const routes: Routes = [
     ),
     MatCardModule,
     MatSliderModule,
+    MatButtonModule,
+    MatIconModule,
     BrowserModule,
     BrowserAnimationsModule,
     BrowserAnimationsModule,

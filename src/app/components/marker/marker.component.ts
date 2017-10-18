@@ -1,8 +1,8 @@
-///<reference path="../../../../node_modules/@angular/core/src/metadata/directives.d.ts"/>
-import {Component, ElementRef, forwardRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Slice} from '../../model/Slice';
 import {MockService} from '../../services/mock.service';
 import {MatSlider} from '@angular/material/slider';
+import {ROISelection2D} from '../../model/ROISelection2D';
 
 @Component({
   selector: 'app-marker-component',
@@ -10,13 +10,15 @@ import {MatSlider} from '@angular/material/slider';
   styleUrls: ['./marker.component.scss']
 })
 export class MarkerComponent implements OnInit {
-  testImage: HTMLImageElement;
+  currentImage: HTMLImageElement;
+
   @ViewChild('image')
   set viewImage(viewElement: ElementRef) {
-    this.testImage = viewElement.nativeElement;
+    this.currentImage = viewElement.nativeElement;
   }
 
   canvas: HTMLCanvasElement;
+
   @ViewChild('canvas')
   set viewCanvas(viewElement: ElementRef) {
     this.canvas = viewElement.nativeElement;
@@ -28,10 +30,12 @@ export class MarkerComponent implements OnInit {
   private canvasPosition: ClientRect;
 
   public slices: Slice[] = [];
-  public currentImage = 0;
+  private currentSlice = 0;
 
-  private selectedArea: { positionX: number, positionY: number, width: number, height: number };
+  private selectedArea: ROISelection2D;
+  private selections: ROISelection2D[] = [];
   private mouseDrag = false;
+
 
   constructor(private mockService: MockService) {
     mockService.getMockSlicesURI().forEach((value: string, index: number) => {
@@ -41,32 +45,55 @@ export class MarkerComponent implements OnInit {
 
   ngOnInit() {
     console.log('Marker init');
+    console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
 
-    // this.canvas = <HTMLCanvasElement>document.getElementById('markerCanvas');
-    console.log('View elements: image ', this.testImage, ', canvas ', this.canvas, ', slider ', this.slider);
-    this.canvasCtx = this.canvas.getContext('2d');
-    this.canvasCtx.strokeStyle = '#ff0000';
+    this.initializeCanvas();
 
-    this.canvasPosition = this.canvas.getBoundingClientRect();
-
-    this.selectedArea = {positionX: 0, positionY: 0, width: 0, height: 0};
-
-    this.testImage.onload = (ev: Event) => {
+    this.currentImage.onload = (event: Event) => {
       this.initCanvasSelectionTool();
     };
 
-    this.setBackgroundImage();
+    this.setCanvasImage();
 
-    this.slider.registerOnChange( (value: number) => {
-      console.log('Marker init | slider change: ', value);
-      this.currentImage = value;
-      this.setBackgroundImage();
+    this.slider.registerOnChange((sliderValue: number) => {
+      console.log('Marker init | slider change: ', sliderValue);
+      this.changeMarkerImage(sliderValue);
+      this.drawPreviousSelections();
     });
   }
 
-  //TODO: refactor nazw, lepszy pomysł na logike
-  private setBackgroundImage(): void {
-    this.testImage.src = this.slices[this.currentImage].source;
+  private initializeCanvas(): void {
+    this.canvasCtx = this.canvas.getContext('2d');
+    this.canvasPosition = this.canvas.getBoundingClientRect();
+  }
+
+  private changeMarkerImage(sliceID: number): void {
+    this.currentSlice = sliceID;
+    this.selections.push(this.selectedArea);
+    this.clearCanvasSelection();
+    this.setCanvasImage();
+  }
+
+  private clearCanvasSelection(): void {
+    this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawPreviousSelections();
+  }
+
+  private setCanvasImage(): void {
+    this.currentImage.src = this.slices[this.currentSlice].source;
+  }
+
+  private drawPreviousSelections(): void {
+    this.selections.forEach((selection: ROISelection2D) => {
+      this.drawSelection(selection, '#0022BB');
+    });
+  }
+
+  private drawSelection(selection: ROISelection2D, color: string): void {
+    this.canvasCtx.strokeStyle = color;
+    this.canvasCtx.setLineDash([6]);
+    this.canvasCtx.strokeRect(selection.positionX, selection.positionY,
+      selection.width, selection.height);
   }
 
   private initCanvasSelectionTool(): void {
@@ -75,29 +102,42 @@ export class MarkerComponent implements OnInit {
     console.log('Marker | initCanvasSelectionTool');
     console.log('Marker | initCanvasSelectionTool | canvas offsets: ', canvasX, canvasY);
 
-    this.canvas.onmousedown = (ev: MouseEvent) => {
-      console.log('Marker | initCanvasSelectionTool | onmousedown clienXY: ', ev.clientX, ev.clientY);
-      this.selectedArea.positionX = (ev.clientX) - canvasX;
-      this.selectedArea.positionY = (ev.clientY) - canvasY;
-      this.mouseDrag = true;
+    this.canvas.onmousedown = (mouseEvent: MouseEvent) => {
+      console.log('Marker | initCanvasSelectionTool | onmousedown clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
+      this.startMouseSelection(mouseEvent);
     };
 
-    this.canvas.onmouseup = (ev: MouseEvent) => {
+    this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
       this.mouseDrag = false;
-      // this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     };
 
-    this.canvas.onmousemove = (ev: MouseEvent) => {
-      if (this.mouseDrag) {
-        console.log('Marker | initCanvasSelectionTool | onmousemove clienXY: ', ev.clientX, ev.clientY);
-        this.selectedArea.width = (ev.clientX - canvasX) - this.selectedArea.positionX;
-        this.selectedArea.height = (ev.clientY - canvasY) - this.selectedArea.positionY;
-        this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.canvasCtx.setLineDash([6]);
-        this.canvasCtx.strokeRect(this.selectedArea.positionX, this.selectedArea.positionY,
-          this.selectedArea.width, this.selectedArea.height);
-      }
+    this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
+      this.drawSelectionRectangle(mouseEvent);
     };
+  }
 
+  private startMouseSelection(event: MouseEvent): void {
+    const selectionStartX = (event.clientX) - this.canvasPosition.left;
+    const selectionStartY = (event.clientY) - this.canvasPosition.top;
+    this.selectedArea = new ROISelection2D(selectionStartX, selectionStartY, this.currentSlice);
+    this.mouseDrag = true;
+  }
+
+  private drawSelectionRectangle(mouseEvent: MouseEvent): void {
+    if (this.mouseDrag) {
+      console.log('Marker | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
+      this.updateSelection(mouseEvent);
+      this.clearCanvasSelection();
+
+      this.drawSelection(this.selectedArea, '#ff0000');
+    }
+  }
+
+  private updateSelection(event: MouseEvent): void {
+    const newWidth = (event.clientX - this.canvasPosition.left) - this.selectedArea.positionX;
+    const newHeight = (event.clientY - this.canvasPosition.top) - this.selectedArea.positionY;
+
+    this.selectedArea.updateWidth(newWidth);
+    this.selectedArea.updateHeight(newHeight);
   }
 }
