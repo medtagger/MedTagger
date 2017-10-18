@@ -12,12 +12,15 @@ It is also a great entry point for running this app. To do so, you can use:
 from flask import Flask
 from flask_cors import CORS
 
-from data_labeling.api import blueprint
+from data_labeling.api import blueprint, web_socket
 from data_labeling.config import ConfigurationFile
 
-# Import all services
-from data_labeling.api.core.service import core_ns  # noqa
-from data_labeling.api.scans.service import scans_ns  # noqa
+# Import all REST services
+from data_labeling.api.core.service_rest import core_ns as core_rest_ns  # noqa
+from data_labeling.api.scans.service_rest import scans_ns as scans_rest_ns  # noqa
+
+# Import all WebSocket services
+from data_labeling.api.scans.service_web_socket import Slices as slices_websocket_ns  # noqa
 
 
 # Load configuration
@@ -28,6 +31,7 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = configuration.get('api', 'secret_key', fallback='')
 app.register_blueprint(blueprint)
+web_socket.init_app(app)
 
 # Application config
 app.config['RESTPLUS_MASK_SWAGGER'] = False
@@ -38,4 +42,4 @@ if __name__ == '__main__':
     host = configuration.get('api', 'host', fallback='localhost')
     port = configuration.getint('api', 'port', fallback=51000)
     debug = configuration.getboolean('api', 'debug', fallback=True)
-    app.run(host=host, port=port, debug=debug)
+    web_socket.run(app, host=host, port=port, debug=debug)

@@ -10,9 +10,7 @@ new_scan = api.model('New scan', {
 
 random_scan = api.model('Random scan model', {
     'scan_id': fields.String(description='Scan\'s ID'),
-    'slices_begin': fields.Integer(description='First slice index (including) used for labeling'),
-    'slices_count': fields.Integer(description='Number of slices that user should label'),
-    'total_number_of_slices': fields.Integer(description='Total number of slices in given scan'),
+    'number_of_slices': fields.Integer(description='Total number of slices in given scan'),
 })
 
 cuboid_label = api.model('Cuboid label for given scan', {

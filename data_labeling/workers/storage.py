@@ -26,7 +26,6 @@ def store_dicom(scan_id: ScanID, slice_id: SliceID, dicom_image: FileDataset) ->
     slice_key, slice_value = prepare_hbase_slice_entry(scan_id, slice_id, dicom_image)
     slice_value['image:value'] = pickled_dicom_image
 
-    connection = HBaseClient()
-    slices_table = connection.table(HBaseClient.ORIGINAL_SLICES_TABLE)
-    slices_table.put(slice_key, slice_value)
+    hbase_client = HBaseClient()
+    hbase_client.put(HBaseClient.ORIGINAL_SLICES_TABLE, slice_key, slice_value)
     print('Slice stored under "{}".'.format(slice_key))

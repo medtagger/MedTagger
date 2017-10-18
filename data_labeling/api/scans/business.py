@@ -1,9 +1,8 @@
 """Module responsible for business logic in all Scans endpoints"""
-import base64
-import uuid
-from random import randint
-from typing import List, Dict, Any
+from random import randint, choice
+from typing import Iterable, Dict, Any
 
+from data_labeling.clients.hbase_client import HBaseClient
 from data_labeling.types import ScanID, LabelID, CuboidLabelPosition, CuboidLabelShape
 from data_labeling.models.scan import Scan
 
@@ -25,7 +24,7 @@ def get_metadata(scan_id: ScanID) -> Dict[str, Any]:
     :return: dictionary with scan's metadata
     """
     scan = Scan(scan_id)
-    number_of_slices = len(scan.get_list_of_slices_keys())
+    number_of_slices = len(scan.slices_keys)
 
     return {
         'number_of_slices': number_of_slices,
@@ -35,22 +34,24 @@ def get_metadata(scan_id: ScanID) -> Dict[str, Any]:
 def get_random_scan() -> Dict[str, Any]:
     """Fetch random scan for labeling
 
+    WARNING: Temporary implementation!
+             This method may be highly inefficient as it queries HBase for all keys from Scans table!
+
     :return: dictionary with details about scan
     """
-    scan_id = ScanID(str(uuid.uuid4()))
-    begin = randint(0, 10)
-    count = randint(5, 10)
-    number_of_slices = 20
+    hbase_client = HBaseClient()
+    all_scans_keys = hbase_client.get_all_keys(HBaseClient.SCANS)
+    scan_id = ScanID(choice(list(all_scans_keys)))
+    scan = Scan(scan_id)
+    number_of_slices = len(scan.slices_keys)
 
     return {
         'scan_id': scan_id,
-        'slices_begin': begin,
-        'slices_count': count,
-        'total_number_of_slices': number_of_slices,
+        'number_of_slices': number_of_slices,
     }
 
 
-def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> List[str]:
+def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> Iterable[bytes]:
     """Fetch multiple slices for given scan
 
     WARNING: This will be replaced with query to HBase (once we will have converted data)!
@@ -60,11 +61,10 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> List[str]:
     :param count: number of slices that will be returned
     :return: list of slices (each encoded in base64)
     """
-    # pylint: disable=unused-argument
-    with open('example_data/example_slice.jpg', 'rb') as raw_data:
-        encoded_image = base64.b64encode(raw_data.read()).decode('utf-8')
-    encoded_images = [encoded_image] * count
-    return encoded_images
+    scan = Scan(scan_id)
+    sorted_slices = sorted(list(scan.slices), key=lambda _slice: _slice.location)
+    for _slice in sorted_slices[begin:begin + count]:
+        yield _slice.converted_image
 
 
 def add_cuboid_label(scan_id: ScanID, position: CuboidLabelPosition, shape: CuboidLabelShape) -> LabelID:

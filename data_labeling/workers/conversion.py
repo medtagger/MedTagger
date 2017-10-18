@@ -1,12 +1,11 @@
 """Module responsible for asynchronous data conversion"""
-import pickle
-from typing import cast
+from io import BytesIO
 
 from dicom.dataset import FileDataset
 from PIL import Image
 
 from data_labeling.clients.hbase_client import HBaseClient
-from data_labeling.types import ScanID, SliceID, PickledDicomImage
+from data_labeling.types import ScanID, SliceID
 from data_labeling.workers import celery_app
 from data_labeling.conversion import convert_to_normalized_8bit_array
 from data_labeling.workers.helpers import prepare_hbase_slice_entry
@@ -27,12 +26,13 @@ def convert_dicom_to_png(scan_id: ScanID, slice_id: SliceID, dicom_image: FileDa
     Converted dicoms file are then saved to Hbase
     """
     pixel_array = convert_to_normalized_8bit_array(dicom_image)
-    pickled_dicom_image = cast(PickledDicomImage, pickle.dumps(Image.fromarray(pixel_array).tobytes()))
+    png_image = BytesIO()
+    Image.fromarray(pixel_array, 'L').save(png_image, 'PNG')
+    png_image.seek(0)
 
     slice_key, slice_value = prepare_hbase_slice_entry(scan_id, slice_id, dicom_image)
-    slice_value['image:value'] = pickled_dicom_image
+    slice_value['image:value'] = png_image.getvalue()
 
-    connection = HBaseClient()
-    slices_table = connection.table(HBaseClient.CONVERTED_SLICES_TABLE)
-    slices_table.put(slice_key, slice_value)
+    hbase_client = HBaseClient()
+    hbase_client.put(HBaseClient.CONVERTED_SLICES_TABLE, slice_key, slice_value)
     print('Converted slice stored under "{}".'.format(slice_key))
