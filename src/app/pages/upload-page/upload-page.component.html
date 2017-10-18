@@ -1,0 +1,17 @@
+<!-- TODO: Refactor this template and do it properly -->
+<div class="defaultBackground">
+  <h2>Wyślij skan</h2>
+  <label><input type="radio" name="uploadMode" [(ngModel)]="uploadMode" [value]="UploadMode.SINGLE_SCAN"> Pojedynczy skan</label>
+  <label><input type="radio" name="uploadMode" [(ngModel)]="uploadMode" [value]="UploadMode.MULTIPLE_SCANS"> Wiele skanów</label>
+  <br>
+  <div *ngIf="uploadMode == UploadMode.SINGLE_SCAN">
+    <p>Zaznacz wszystkie pliki *.dcm z katalogu ze skanem.</p>
+    <input type="file" #dicomUpload multiple>
+  </div>
+  <div *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS">
+    <p>Zaznacz folder nadrzędny, w którym znajdują się foldery ze skanami. Jeszcze nie zaimplementowane...</p>
+    <p>Uwaga! Może działać jedynie na Google Chrome!</p>
+    <input type="file" #dicomUpload webkitdirectory multiple>
+  </div>
+  <button md-raised-button color="primary-color" (click)="uploadButton()">Wyślij!</button>
+</div>
