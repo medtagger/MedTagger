@@ -6,6 +6,11 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 
 
+export class Scan {
+  scanId: string;
+  numberOfSlices: number;
+}
+
 export class Slice {
   scanId: string;
   index: number;
@@ -21,7 +26,21 @@ export class ScanService {
 
   constructor(private http: Http) {
     // TODO: Move this URLs somewhere else!
-    this.websocket = new Socket({ url: 'http://localhost:51000/slices', options: {} });
+    this.websocket = new Socket({url: 'http://localhost:51000/slices', options: {}});
+  }
+
+  getRandomScan() {
+    return new Promise((resolve, reject) => {
+      this.http.get(this.SCANS_API_URL + '/random').toPromise().then(
+        response => {
+          let json = response.json();
+          resolve({scanId: json.scan_id, numberOfSlices: json.number_of_slices});
+        },
+        error => {
+          reject(error);
+        }
+      );
+    });
   }
 
   slicesObservable() {
