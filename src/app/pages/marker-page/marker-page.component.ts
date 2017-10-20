@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { ScanService, Slice } from '../../services/scan.service'
+import {Scan, ScanService, Slice} from '../../services/scan.service'
 
 
 @Component({
@@ -9,14 +9,11 @@ import { ScanService, Slice } from '../../services/scan.service'
   providers: [ScanService],
 })
 export class MarkerPageComponent implements OnInit {
-  public currentImageNr: number;
-  private slices: Slice[] = [];
-  scanId: string = 'abc-123';
+  scan: Scan;
+  slices: Slice[] = [];
   example_slice_as_b64: string;
 
   constructor(private scanService: ScanService) {
-    this.currentImageNr = 0;
-
     scanService.slicesObservable().subscribe(slice => {
       this.slices.push(slice);
 
@@ -35,8 +32,14 @@ export class MarkerPageComponent implements OnInit {
     console.log('MarkerPage init');
   }
 
-  requestExampleSliceButton() {
-    this.scanService.requestSlices(this.scanId, 5, 5);
+  requestExampleScanButton() {
+    this.scanService.getRandomScan().then((scan: Scan) => {
+      this.scan = scan;
+
+      let begin = 0;
+      let count = 1;
+      this.scanService.requestSlices(scan.scanId, begin, count);
+    });
   }
 
 }
