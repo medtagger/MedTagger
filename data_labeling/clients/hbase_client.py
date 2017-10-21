@@ -2,15 +2,20 @@
 from typing import Iterable, List, Mapping, Tuple, Any
 
 import happybase
+from thriftpy.transport import TTransportException
 
 from data_labeling.config import ConfigurationFile
+from data_labeling.clients.utils import retry_on_connection_error
 
 
 configuration = ConfigurationFile()
 host = configuration.get('hbase', 'host', fallback='localhost')
 port = configuration.getint('hbase', 'port', fallback=9090)
 size = configuration.getint('hbase', 'connection_pool_size', fallback=10)
-HBASE_CONNECTION_POOL = happybase.ConnectionPool(size, host=host, port=port)
+try:
+    HBASE_CONNECTION_POOL = happybase.ConnectionPool(size, host=host, port=port)
+except (TTransportException, BrokenPipeError):
+    print('WARNING! Could not connect to HBase. Is it down?')
 
 
 class HBaseClient(object):
@@ -38,6 +43,7 @@ class HBaseClient(object):
         pass
 
     @staticmethod
+    @retry_on_connection_error
     def get_all_keys(table_name: str, starts_with: str = None) -> Iterable[str]:
         """Fetch all keys for given table
 
@@ -52,6 +58,7 @@ class HBaseClient(object):
                 yield key.decode('utf-8')
 
     @staticmethod
+    @retry_on_connection_error
     def get_all_rows(table_name: str, columns: List, starts_with: str = None) -> Iterable[Tuple[str, Any]]:
         """Fetch all rows for given table
 
@@ -67,6 +74,7 @@ class HBaseClient(object):
                 yield key.decode('utf-8'), value
 
     @staticmethod
+    @retry_on_connection_error
     def get(table_name: str, key: str, columns: List[str] = None) -> Mapping:
         """Fetch a single row from HBase table
 
@@ -81,6 +89,7 @@ class HBaseClient(object):
             return table.row(hbase_key, columns=columns)
 
     @staticmethod
+    @retry_on_connection_error
     def put(table_name: str, key: str, value: Any) -> None:
         """Add new entry into HBase table
 
@@ -94,6 +103,7 @@ class HBaseClient(object):
             table.put(hbase_key, value)
 
     @staticmethod
+    @retry_on_connection_error
     def check_if_exists(table_name: str, key: str) -> bool:
         """Scan database and check if given key exists
 
