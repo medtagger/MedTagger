@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { ScanService, Slice } from '../../services/scan.service'
+import { ScanService } from '../../services/scan.service'
 
 
 enum UploadMode {
@@ -13,49 +14,67 @@ enum UploadMode {
   selector: 'app-upload-page',
   templateUrl: './upload-page.component.html',
   providers: [ScanService],
+  styleUrls: ['./upload-page.component.scss']
 })
 export class UploadPageComponent implements OnInit {
-  @ViewChild('dicomUpload') dicomUploadForm;
-  uploadMode: UploadMode = UploadMode.SINGLE_SCAN;
-  UploadMode = UploadMode;
 
-  constructor(private scanService: ScanService) {}
+  @ViewChild('stepper') stepper;
+
+  files: File[] = [];
+  filesSent = 0;
+  numberOfFiles = 0;
+  progress = 0.0;
+
+  UploadMode = UploadMode;  // Needed in template for comparison with Enum values
+  uploadMode: UploadMode = UploadMode.SINGLE_SCAN;
+  chooseModeFormGroup: FormGroup;
+  chooseFilesFormGroup: FormGroup;
+  sendingFilesFormGroup: FormGroup;
+  uploadCompletedFormGroup: FormGroup;
+
+  constructor(private scanService: ScanService, private formBuilder: FormBuilder) {}
 
   ngOnInit() {
-    console.log('Upload init');
+    this.chooseModeFormGroup = this.formBuilder.group({});
+    this.chooseFilesFormGroup = this.formBuilder.group({});
+    this.sendingFilesFormGroup = this.formBuilder.group({});
+    this.uploadCompletedFormGroup = this.formBuilder.group({});
+    this.scanService.acknowledgeObservable().subscribe(() => {
+      this.filesSent += 1;
+      this.progress = 100.0 * this.filesSent / this.numberOfFiles;
+      if (this.filesSent == this.numberOfFiles) {
+        this.stepper.next();
+      }
+    });
   }
 
-  uploadButton() {
-    let fileBrowser = this.dicomUploadForm.nativeElement;
-    if (fileBrowser.files && fileBrowser.files.length > 0) {
-      this.uploadFiles(fileBrowser.files);
-    } else {
-      console.warn('No scans selected!');
-    }
+  chooseFiles(files: File[]) {
+    this.files = files;
   }
 
-  uploadFiles(files: ArrayBuffer[]) {
+  uploadFiles() {
+    this.filesSent = 0;
+    this.progress = 0.0;
     if (this.uploadMode == UploadMode.SINGLE_SCAN) {
-      this.uploadSingleScan(files);
+      this.uploadSingleScan(this.files);
     } else if (this.uploadMode == UploadMode.MULTIPLE_SCANS) {
-      this.uploadMultipleScans(files);
+      this.uploadMultipleScans(this.files);
     } else {
       console.error('Unsupported upload mode!');
     }
   }
 
-  uploadSingleScan(files: ArrayBuffer[]) {
+  uploadSingleScan(files: File[]) {
+    this.numberOfFiles = this.files.length;
     this.scanService.createNewScan().then((scanId: string) => {
-      console.log('New Scan created with given ID:', scanId);
-      for (let slice of files) {
-        console.log('Sending...', slice);
-        this.scanService.uploadSlice(scanId, slice);
-      }
+      console.log('New Scan created with ID:', scanId);
+      this.scanService.uploadSlices(scanId, files);
     });
   }
 
-  uploadMultipleScans(files: ArrayBuffer[]) {
+  uploadMultipleScans(files: File[]) {
     console.warn('Not supported yet!');
+    this.numberOfFiles = this.files.length;  // TODO: Change the way we track number of files in multiple scans upload mode!
   }
 
 }

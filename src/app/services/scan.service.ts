@@ -21,12 +21,13 @@ export class Slice {
 @Injectable()
 export class ScanService {
 
+  // TODO: Move this URLs somewhere else!
   SCANS_API_URL: string = 'http://localhost:51000/api/v1/scans';
+  SLICES_WEBSOCKET: string = 'http://localhost:51000/slices';
   websocket: Socket;
 
   constructor(private http: Http) {
-    // TODO: Move this URLs somewhere else!
-    this.websocket = new Socket({url: 'http://localhost:51000/slices', options: {}});
+    this.websocket = new Socket({url: this.SLICES_WEBSOCKET, options: {}});
   }
 
   getRandomScan() {
@@ -40,6 +41,12 @@ export class ScanService {
           reject(error);
         }
       );
+    });
+  }
+
+  acknowledgeObservable() {
+    return this.websocket.fromEvent<any>('ack').map(() => {
+      return true;
     });
   }
 
@@ -67,8 +74,22 @@ export class ScanService {
     });
   }
 
-  uploadSlice(scanId: string, image: ArrayBuffer) {
-    this.websocket.emit('upload_slice', {scan_id: scanId, image: image});
+  uploadSlices(scanId: string, files: File[], currentFileUpload: number = 0) {
+    // Upload completed
+    if (currentFileUpload == files.length) {
+      return;
+    }
+
+    // Continue reading files from list
+    let fileReader = new FileReader();
+    fileReader.onload = () => {
+      let image = fileReader.result;
+      this.websocket.emit('upload_slice', {scan_id: scanId, image: image}, () => {
+        // Let's send another file from the list after completed upload
+        this.uploadSlices(scanId, files, currentFileUpload + 1);
+      });
+    };
+    fileReader.readAsArrayBuffer(files[currentFileUpload]);
   }
 
 }

@@ -1,6 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 
 import {SocketIoModule} from 'ng-socket-io';
@@ -13,11 +13,12 @@ import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
 import {MockService} from '../services/mock.service';
 
 import {MarkerComponent} from '../components/marker/marker.component';
+import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterModule, Routes} from '@angular/router';
 
-import {MatCardModule, MatSliderModule, MatButtonModule, MatIconModule} from '@angular/material';
+import {MatCardModule, MatProgressBarModule, MatProgressSpinnerModule, MatStepperModule, MatRadioModule, MatSliderModule, MatButtonModule, MatIconModule} from '@angular/material';
 
 
 const routes: Routes = [
@@ -33,6 +34,7 @@ const routes: Routes = [
     LoginPageComponent,
     MarkerPageComponent,
     MarkerComponent,
+    UploadScansSelectorComponent,
     UploadPageComponent,
   ],
   imports: [
@@ -41,6 +43,10 @@ const routes: Routes = [
       {enableTracing: true} // do debugowania
     ),
     MatCardModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatStepperModule,
+    MatRadioModule,
     MatSliderModule,
     MatButtonModule,
     MatIconModule,
@@ -48,6 +54,7 @@ const routes: Routes = [
     BrowserAnimationsModule,
     BrowserAnimationsModule,
     FormsModule,
+    ReactiveFormsModule,
     SocketIoModule,
     HttpModule,
   ],
