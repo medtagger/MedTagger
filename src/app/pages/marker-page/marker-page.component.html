@@ -1,11 +1,7 @@
 <div class="defaultBackground">
   <div class="innerElement canvasInterface">
     <!--<button md-raised-button color="primary-color">Poprzednie</button>-->
-    <app-marker-component></app-marker-component>
+    <app-marker-component #marker></app-marker-component>
     <!--<button md-raised-button color="primary-color">Następne</button>-->
   </div>
-  <h2>Przykład</h2>
-  <button md-raised-button color="primary-color" (click)="requestExampleScanButton()">Pokaż losowy skan</button>
-  <br/>
-  <img [src]="example_slice_as_b64" *ngIf="example_slice_as_b64">
 </div>

@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 
-import {Scan, ScanService, Slice} from '../../services/scan.service'
+import {ScanService} from '../../services/scan.service';
+import {MarkerComponent} from '../../components/marker/marker.component';
+import {ScanMetadata} from '../../model/ScanMetadata';
+import {MarkerSlice} from '../../model/MarkerSlice';
 
 
 @Component({
@@ -10,35 +13,30 @@ import {Scan, ScanService, Slice} from '../../services/scan.service'
   styleUrls: ['./marker-page.component.scss']
 })
 export class MarkerPageComponent implements OnInit {
-  scan: Scan;
-  slices: Slice[] = [];
-  example_slice_as_b64: string;
+  @ViewChild(MarkerComponent) marker: MarkerComponent;
+
+  scan: ScanMetadata;
 
   constructor(private scanService: ScanService) {
-    scanService.slicesObservable().subscribe(slice => {
-      this.slices.push(slice);
-
-      // Just for example purpose - can be removed!
-      // TODO: Let's figure out a better way to show images on UI
-      let bytes = new Uint8Array(slice.image);
-      let binary = '';
-      for (let i = 0; i < bytes.byteLength; i++) {
-          binary += String.fromCharCode(bytes[i]);
-      }
-      this.example_slice_as_b64 = 'data:image/png;base64,' + btoa(binary);
-    });
+    console.log('MarkerPage constructor', this.marker);
   }
 
   ngOnInit() {
-    console.log('MarkerPage init');
+    console.log('MarkerPage init', this.marker);
+    this.requestExampleScan();
+    this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
+      console.log('MarkerPage | ngOnInit | slicesObservable: ', slice);
+      this.marker.feedData(slice);
+    });
   }
 
-  requestExampleScanButton() {
-    this.scanService.getRandomScan().then((scan: Scan) => {
+  private requestExampleScan(): void {
+    this.scanService.getRandomScan().then((scan: ScanMetadata) => {
       this.scan = scan;
+      this.marker.setScanMetadata(this.scan);
 
-      let begin = 0;
-      let count = 1;
+      const begin = 0;
+      const count = 10;
       this.scanService.requestSlices(scan.scanId, begin, count);
     });
   }
