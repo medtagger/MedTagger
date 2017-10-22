@@ -5,42 +5,26 @@ body {
   margin: 0;
 }
 
-header {
-  position: relative;
-  height: 15vh;
-  background: $main-color;
-  z-index: $main-z-index;
-}
-
-footer {
-  position: relative;
-  height: 15vh;
-  background: $main-color;
-  z-index: $main-z-index;
-}
-
 .dynamicContent {
-  position: relative;
-  height: 70vh;
+  height: 100vh;
+  padding: 5em 0;
+  box-sizing: border-box;
 }
 
-.defaultBackground {
-    padding: 1% 0 1% 0;
-    margin:0;
-    top:0;
-    left:0;
-    width: 100%;
-    height: 100%;
-    background-color: grey;
-    // color: white;
-
-    .mat-button, .mat-icon-button, .mat-raised-button {
-      color: black;
-    }
+.toolbar-icon {
+  margin-right: 0.5em;
 }
 
-// Used in positioning elements
-.innerElement {
-  margin-left: auto;
-  margin-right: auto;
+.header {
+  position: fixed;
+  top: 0;
+  background: #353535;
+  z-index: 2;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  background: #353535;
+  z-index: 2;
 }

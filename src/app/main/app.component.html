@@ -1,5 +1,11 @@
-<header></header>
-<div class="dynamicContent">
-        <router-outlet></router-outlet>
+<div class="mat-typography">
+  <mat-toolbar class="mat-elevation-z5 header" color="primary">
+      <mat-icon class="toolbar-icon">label_outline</mat-icon>
+      <span>Narzędzie do etykietowania danych medycznych</span>
+  </mat-toolbar>
+  <div class="dynamicContent">
+    <router-outlet></router-outlet>
+  </div>
+  <mat-toolbar class="mat-elevation-z5 footer" color="primary"></mat-toolbar>
 </div>
-<footer></footer>
+

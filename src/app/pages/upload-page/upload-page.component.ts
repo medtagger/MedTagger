@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { ScanService } from '../../services/scan.service'
+import { ScanService } from '../../services/scan.service';
 
 
 enum UploadMode {
@@ -42,7 +42,7 @@ export class UploadPageComponent implements OnInit {
     this.scanService.acknowledgeObservable().subscribe(() => {
       this.filesSent += 1;
       this.progress = 100.0 * this.filesSent / this.numberOfFiles;
-      if (this.filesSent == this.numberOfFiles) {
+      if (this.filesSent === this.numberOfFiles) {
         this.stepper.next();
       }
     });
@@ -55,9 +55,9 @@ export class UploadPageComponent implements OnInit {
   uploadFiles() {
     this.filesSent = 0;
     this.progress = 0.0;
-    if (this.uploadMode == UploadMode.SINGLE_SCAN) {
+    if (this.uploadMode === UploadMode.SINGLE_SCAN) {
       this.uploadSingleScan(this.files);
-    } else if (this.uploadMode == UploadMode.MULTIPLE_SCANS) {
+    } else if (this.uploadMode === UploadMode.MULTIPLE_SCANS) {
       this.uploadMultipleScans(this.files);
     } else {
       console.error('Unsupported upload mode!');

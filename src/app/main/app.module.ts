@@ -18,8 +18,19 @@ import {UploadScansSelectorComponent} from '../components/upload-scans-selector/
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterModule, Routes} from '@angular/router';
 
-import {MatCardModule, MatProgressBarModule, MatProgressSpinnerModule, MatStepperModule, MatRadioModule, MatSliderModule, MatButtonModule, MatIconModule} from '@angular/material';
-
+import {
+  MatCardModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatStepperModule,
+  MatRadioModule,
+  MatSliderModule,
+  MatButtonModule,
+  MatIconModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatToolbarModule
+} from '@angular/material';
 
 const routes: Routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full'},
@@ -42,11 +53,14 @@ const routes: Routes = [
       routes,
       {enableTracing: true} // do debugowania
     ),
+    MatToolbarModule,
     MatCardModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatStepperModule,
     MatRadioModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatSliderModule,
     MatButtonModule,
     MatIconModule,
@@ -56,6 +70,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     SocketIoModule,
+    ReactiveFormsModule,
     HttpModule,
   ],
   providers: [MockService],
