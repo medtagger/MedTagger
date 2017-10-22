@@ -1,25 +1,36 @@
 <div class="decoration-side">
-
 </div>
-
 <div class="login-side">
-  <div layout="row" layout-align="center center">
-    <mat-card class="login-card">
-      <mat-card-header>
-        <mat-card-title>Logowanie</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-input-container>
-          <input mdInput placeholder="Login" type="text" value="" />
-        </mat-input-container>
-        <br>
-        <mat-input-container>
-          <input mdInput placeholder="Hasło" type="password" value="" />
-        </mat-input-container>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary-color" (click)="logIn()">Zaloguj</button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+  <mat-card class="login-card" class="login-card">
+    <mat-card-header>
+      <mat-card-title>Logowanie</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form class="example-form">
+        <table class="example-full-width" cellspacing="0">
+          <tr>
+          <td><mat-form-field class="example-full-width">
+            <input matInput type="text" placeholder="Login">
+          </mat-form-field></td>
+          </tr>
+          <tr>
+          <td><mat-form-field class="example-full-width">
+            <input matInput type="password" placeholder="Hasło">
+          </mat-form-field></td>
+          </tr>
+        </table>
+      </form>
+      <tr>
+      <table class="example-full-width" cellspacing="0">
+        <tr>
+          <td><mat-card-actions>
+            <button mat-raised-button color="primary-color" (click)="logIn()">Zaloguj się</button>
+          </mat-card-actions></td>
+          <td><mat-card-actions>
+            <button mat-raised-button color="primary-color" (click)="logIn()">Zarejestruj się</button>
+          </mat-card-actions></td>
+        </tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
 </div>

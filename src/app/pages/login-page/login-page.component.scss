@@ -4,34 +4,33 @@
   float: left;
   width: 100%;
   height: 100%;
-  background: black url("../../../assets/img/login_pic.jpg");
-  background-size: contain;
-  background-position: bottom;
+  background: white url("../../../assets/img/login_pic.jpg");
+  background-size: 100%;
+  background-position: center;
   background-repeat: no-repeat;
+}
+
+.mat-card-title {
+  font-size: 1.5em;
+}
+
+.mat-card-actions {
+  margin-left: 0;
+  margin-right: 1em;
 }
 
 .login-side {
   position: absolute;
   margin: 0;
   top: 25%;
-  right: 10%;
-  width: 40%;
+  right: 20%;
+  width: 20%;
+  min-width: 300px;
 
   .login-card {
-    height: 50%;
+    position: relative;
+    height: 60%;
     margin: 0 auto;
-    float: none;
   }
 }
 
-.background {
-  position: fixed;
-  padding: 0;
-  margin: 0;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: black url("../../../assets/img/tmp-background.svg") fixed no-repeat bottom right;
-  background-size: 30%;
-}
