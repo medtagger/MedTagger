@@ -11,20 +11,76 @@ body {
   box-sizing: border-box;
 }
 
-.toolbar-icon {
-  margin-right: 0.5em;
+.open-sidebar {
+  position: absolute;
+  right: 1em;
 }
 
 .header {
   position: fixed;
   top: 0;
-  background: #353535;
   z-index: 2;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .header-icon {
+    margin-right: 0.1em;
+    vertical-align: middle;
+  }
+
+  .header-name {
+    vertical-align: middle;
+  }
 }
 
 .footer {
   position: fixed;
   bottom: 0;
-  background: #353535;
   z-index: 2;
+  font-size: 0.9em;
+  font-weight: normal;
+}
+
+//
+// Sidebar related classes
+//
+
+.mat-drawer-container {
+  background: white;
+}
+
+mat-sidenav {
+  width: 300px;
+  z-index: 3 !important;
+
+  hr {
+    border-top: 1px solid #eeeeee;
+  }
+
+  .user-profile {
+    padding: 20px;
+  }
+
+  .user-avatar {
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+    margin-right: 1em;
+    float: left;
+  }
+
+  .user-name {
+    margin: 0;
+  }
+
+  .user-login {
+    margin: 0;
+    position: relative;
+    top: -0.3em;
+  }
+
 }

@@ -29,7 +29,9 @@ import {
   MatIconModule,
   MatFormFieldModule,
   MatInputModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatSidenavModule,
+  MatListModule,
 } from '@angular/material';
 
 const routes: Routes = [
@@ -64,6 +66,8 @@ const routes: Routes = [
     MatSliderModule,
     MatButtonModule,
     MatIconModule,
+    MatSidenavModule,
+    MatListModule,
     BrowserModule,
     BrowserAnimationsModule,
     BrowserAnimationsModule,

@@ -10,7 +10,7 @@
 <section *ngIf="multipleScans">
   <input type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden multiple webkitdirectory directory />
   <button type="button" mat-raised-button (click)="selectFile()">
-    <mat-icon>recent_actors</mat-icon>
+    <mat-icon>folder</mat-icon>
     <span *ngIf="!fileCount">Wybierz katalog</span>
     <span *ngIf="fileCount">Zaznaczono <span>{{fileCount}}</span> skanów</span>
   </button>

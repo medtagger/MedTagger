@@ -1,11 +1,11 @@
 .decoration-side {
   position: relative;
-  margin: -0.5em;  // Workaround for top navigation bar shadow
+  margin: -0.5em 0;  // Workaround for top navigation bar shadow
   float: left;
-  width: 110%;
+  width: 100%;
   height: 110%;
   background: white url("../../../assets/img/login_pic.jpg");
-  background-size: 100%;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -29,7 +29,7 @@ body {
   top: 25%;
   right: 20%;
   width: 20%;
-  min-width: 300px;
+  min-width: 340px;
 
   .login-card {
     position: relative;
