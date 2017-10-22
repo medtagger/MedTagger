@@ -20,10 +20,18 @@
   margin-right: 10px;
 }
 
+.uploading-header {
+  margin-top: 15px;
+}
+
 .success-message {
   background: #4caf50;
   color: white;
-  padding: 0.8em 1.6em;
+  padding: 1.6em;
+
+  p {
+    margin: 0;
+  }
 }
 
 .success-indicator {

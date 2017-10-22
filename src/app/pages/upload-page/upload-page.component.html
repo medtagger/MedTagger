@@ -75,8 +75,12 @@
   <mat-step [stepControl]="sendingFilesFormGroup" [editable]="false">
     <ng-template matStepLabel>Wysyłanie</ng-template>
     <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
-    <h1 *ngIf="uploadMode == UploadMode.SINGLE_SCAN"><mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Trwa wysyłanie skanu...</h1>
-    <h1 *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS"><mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Trwa wysyłanie skanów...</h1>
+    <h1 *ngIf="uploadMode == UploadMode.SINGLE_SCAN" class="uploading-header">
+      <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Trwa wysyłanie skanu...
+    </h1>
+    <h1 *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS" class="uploading-header">
+      <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Trwa wysyłanie skanów...
+    </h1>
     <h5>Nie wyłączaj swojej przeglądarki!</h5>
     <p *ngIf="uploadMode == UploadMode.SINGLE_SCAN">Wysłano {{filesSent}} z {{numberOfFiles}} obrazów Dicom.</p>
     <p *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS">Wysłano {{filesSent}} z {{numberOfFiles}} skanów.</p>
