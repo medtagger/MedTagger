@@ -14,6 +14,7 @@ class Register(Resource):
     @user_ns.doc(responses={201: 'User created', 400: 'Invalid arguments'})
     def post(self):
         new_user = request.json
+        print(new_user)
         create_user(new_user['username'], new_user['password'])
         return {'id': id}, 201
 

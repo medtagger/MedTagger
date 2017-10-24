@@ -10,13 +10,13 @@ It is also a great entry point for running this app. To do so, you can use:
 """
 # pylint: disable=unused-import;  It's used by Flask
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_user import SQLAlchemyAdapter, UserManager
+from flask_user import SQLAlchemyAdapter, UserMixin
 
 from data_labeling.api import blueprint
 from data_labeling.api.database import db
 
-from data_labeling.api.database.models import User
+# from data_labeling.api.database.models import User
+from data_labeling.api.user.business import user_manager
 from data_labeling.config import ConfigurationFile
 
 # Import all services
@@ -40,14 +40,28 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['USER_ENABLE_EMAIL'] = False
 app.config['RESTPLUS_VALIDATE'] = True
 
-db.init_app(app)
+
+class User(db.Model, UserMixin):
+    __tablename__ = 'Users'
+    id: int = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    username: str = db.Column(db.String(50), nullable=False, unique=False)
+    password: str = db.Column(db.String(255), nullable=False, server_default='')
+
+    def __init__(self, username: str, password_hash: str):
+        self.username = username
+        self.password = password_hash
 db_adapter = SQLAlchemyAdapter(db, User)
-user_manager = UserManager(db_adapter, app)
-user_manager.
+user_manager.db_adapter = db_adapter
+user_manager.init_app(app)
+
+with app.app_context():
+    db.init_app(app)
+    db.drop_all()
+    db.create_all()
 
 if __name__ == '__main__':
     # Run the application
     host = configuration.get('api', 'host', fallback='localhost')
     port = configuration.getint('api', 'port', fallback=51000)
     debug = configuration.getboolean('api', 'debug', fallback=True)
-    app.run(host=host, port=port, debug=debug)
+    app.run(host=host, port=port, debug=debug, use_reloader=False)
