@@ -15,6 +15,6 @@ class Register(Resource):
     def post(self):
         new_user = request.json
         print(new_user)
-        create_user(new_user['username'], new_user['password'])
-        return {'id': id}, 201
+        user_id = create_user(new_user['username'], new_user['password'])
+        return {'id': user_id}, 201
 
