@@ -2,8 +2,6 @@
   <mat-step [stepControl]="chooseModeFormGroup" [editable]="false">
     <form [formGroup]="chooseModeFormGroup">
       <ng-template matStepLabel>Wybierz tryb dodawania</ng-template>
-      <mat-grid-list cols="2" rowHeight="100px">
-        <mat-grid-tile>
           <mat-card class="upload-mode">
             <mat-card-header>
               <mat-card-title>Pojedynczy skan 3D</mat-card-title>
@@ -15,8 +13,6 @@
               <button mat-button matStepperNext (click)="uploadMode = UploadMode.SINGLE_SCAN">Wybierz</button>
             </mat-card-actions>
           </mat-card>
-        </mat-grid-tile>
-        <mat-grid-tile>
           <mat-card class="upload-mode">
             <mat-card-header>
               <mat-card-title>Wiele skanów 3D</mat-card-title>
@@ -28,8 +24,6 @@
               <button mat-button matStepperNext (click)="uploadMode = UploadMode.MULTIPLE_SCANS">Wybierz</button>
             </mat-card-actions>
           </mat-card>
-        </mat-grid-tile>
-      </mat-grid-list>
     </form>
   </mat-step>
   <mat-step [stepControl]="chooseFilesFormGroup" [editable]="false">

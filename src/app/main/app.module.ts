@@ -7,8 +7,10 @@ import {SocketIoModule} from 'ng-socket-io';
 
 import {AppComponent} from './app.component';
 import {LoginPageComponent} from '../pages/login-page/login-page.component';
+import {HomePageComponent} from '../pages/home-page/home-page.component';
 import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
+import {CategoryPageComponent} from '../pages/category-page/category-page.component';
 
 import {MockService} from '../services/mock.service';
 
@@ -32,11 +34,15 @@ import {
   MatToolbarModule,
   MatSidenavModule,
   MatListModule,
+  MatGridListModule,
 } from '@angular/material';
+
 
 const routes: Routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full'},
   {path: 'login', component: LoginPageComponent},
+  {path: 'home', component: HomePageComponent},
+  {path: 'category', component: CategoryPageComponent},
   {path: 'marker', component: MarkerPageComponent},
   {path: 'upload', component: UploadPageComponent}
 ];
@@ -46,6 +52,8 @@ const routes: Routes = [
     AppComponent,
     LoginPageComponent,
     MarkerPageComponent,
+    HomePageComponent,
+    CategoryPageComponent,
     MarkerComponent,
     UploadScansSelectorComponent,
     UploadPageComponent,
@@ -68,6 +76,7 @@ const routes: Routes = [
     MatIconModule,
     MatSidenavModule,
     MatListModule,
+    MatGridListModule,
     BrowserModule,
     BrowserAnimationsModule,
     BrowserAnimationsModule,
