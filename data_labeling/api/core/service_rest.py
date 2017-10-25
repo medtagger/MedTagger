@@ -1,7 +1,6 @@
 """Module responsible for definition of Core service"""
 from typing import Any
 from flask_restplus import Resource
-from flask_user import login_required
 
 from data_labeling.api import api
 from data_labeling.api.core import serializers
