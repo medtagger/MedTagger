@@ -15,7 +15,7 @@ export class LoginPageComponent implements OnInit {
   }
 
   public logIn(): void {
-    this.routerService.navigate(['marker']);
+    this.routerService.navigate(['home']);
   }
 
 }
