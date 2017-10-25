@@ -2,6 +2,7 @@
 PYTHON = python3.6
 MAIN_MODULE = data_labeling
 UNIT_TESTS_MODULE = tests
+SCRIPTS_DIRECTORY = scripts
 COVERAGE_LIMIT = 0
 
 # Third party configuration files
@@ -35,14 +36,14 @@ run_workers:
 test: test_pylint test_flake8 test_mypy test_pytest
 
 test_pylint:
-	pylint $(MAIN_MODULE) --rcfile=$(PYLINT_CONFIG_FILE)
+	pylint $(MAIN_MODULE) $(SCRIPTS_DIRECTORY) --rcfile=$(PYLINT_CONFIG_FILE)
 	pylint $(UNIT_TESTS_MODULE) --rcfile=$(PYLINT_UNIT_TESTS_CONFIG_FILE)
 
 test_flake8:
-	flake8 $(MAIN_MODULE) $(UNIT_TESTS_MODULE)
+	flake8 $(MAIN_MODULE) $(UNIT_TESTS_MODULE)  $(SCRIPTS_DIRECTORY)
 
 test_mypy:
-	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE)
+	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
 
 test_pytest:
 	CONFIG_FILE=$(UNIT_TESTS_CONFIG_FILE) pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TESTS_MODULE)

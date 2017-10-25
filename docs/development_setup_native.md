@@ -39,7 +39,7 @@ Your project is now ready to be run but your HBase database is still empty. Befo
 launch script that will create all tables in HBase.
 
 ```bash
-(venv) $ python3.6 migrate_hbase.py
+(venv) $ python3.6 scripts/migrate_hbase.py
 ```
 
 It will ask you a few questions and answer them with `y` or `yes` to create all needed entries.
