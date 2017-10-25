@@ -10,27 +10,33 @@ It is also a great entry point for running this app. To do so, you can use:
 """
 # pylint: disable=unused-import;  It's used by Flask
 from flask import Flask
+from flask_cors import CORS
 from flask_user import SQLAlchemyAdapter, UserMixin
 
-from data_labeling.api import blueprint
+from data_labeling.api import blueprint, web_socket
 from data_labeling.api.database import db
-
 from data_labeling.api.database.models import User
 from data_labeling.api.user.business import user_manager
 from data_labeling.config import ConfigurationFile
 
-# Import all services
-from data_labeling.api.core.service import core_ns  # noqa
-from data_labeling.api.scans.service import scans_ns  # noqa
+# Import all REST services
+from data_labeling.api.core.service_rest import core_ns as core_rest_ns  # noqa
+from data_labeling.api.scans.service_rest import scans_ns as scans_rest_ns  # noqa
 from data_labeling.api.user.service import user_ns  # noqa
+
+# Import all WebSocket services
+from data_labeling.api.scans.service_web_socket import Slices as slices_websocket_ns  # noqa
+
 
 # Load configuration
 configuration = ConfigurationFile()
 
 # Definition of application
 app = Flask(__name__)
-app.secret_key = configuration.get('api', 'secret_key')
+CORS(app)
+app.secret_key = configuration.get('api', 'secret_key', fallback='')
 app.register_blueprint(blueprint)
+web_socket.init_app(app)
 
 # Application config
 app.config['RESTPLUS_MASK_SWAGGER'] = False
@@ -56,4 +62,4 @@ if __name__ == '__main__':
     host = configuration.get('api', 'host', fallback='localhost')
     port = configuration.getint('api', 'port', fallback=51000)
     debug = configuration.getboolean('api', 'debug', fallback=True)
-    app.run(host=host, port=port, debug=debug, use_reloader=False)
+    web_socket.run(app, host=host, port=port, debug=debug)

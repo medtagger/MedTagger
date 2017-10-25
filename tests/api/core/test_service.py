@@ -4,21 +4,20 @@ from typing import Any
 
 import pytest
 
-from data_labeling.api.app import app
+from tests.api import get_test_application
 
 
 @pytest.fixture
 def success_fixture(mocker: Any) -> None:
     """Return fixture for success method used by status endpoint"""
-    mocked_success = mocker.patch('data_labeling.api.core.service.success')
+    mocked_success = mocker.patch('data_labeling.api.core.service_rest.success')
     mocked_success.return_value = {'success': True}
     return mocked_success
 
 
-def test_status_endpoint(success_fixture: Any) -> None:
+def test_status_endpoint(mocker: Any, success_fixture: Any) -> None:
     """Check if status endpoint return data that was returned from business logic"""
-    app.testing = True
-    client = app.test_client()
+    client = get_test_application(mocker)
 
     response = client.get('/api/v1/core/status')
     assert response.status_code == 200

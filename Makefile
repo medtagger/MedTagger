@@ -1,8 +1,9 @@
 # Global constants for whole Makefile
-PYTHON=python3.6
-MAIN_MODULE=data_labeling
-UNIT_TESTS_MODULE=tests
-COVERAGE_LIMIT=0
+PYTHON = python3.6
+MAIN_MODULE = data_labeling
+UNIT_TESTS_MODULE = tests
+SCRIPTS_DIRECTORY = scripts
+COVERAGE_LIMIT = 0
 
 # Third party configuration files
 PYLINT_CONFIG_FILE = .pylintrc
@@ -22,6 +23,12 @@ venv:
 install_packages:
 	$(PYTHON) -m pip install -r requirements.txt
 
+run_api:
+	PYTHONPATH=`pwd` $(PYTHON) data_labeling/api/app.py
+
+run_workers:
+	PYTHONPATH=`pwd` celery -A data_labeling.workers worker --loglevel=info
+
 #
 # Testing
 #
@@ -29,14 +36,14 @@ install_packages:
 test: test_pylint test_flake8 test_mypy test_pytest
 
 test_pylint:
-	pylint $(MAIN_MODULE) --rcfile=$(PYLINT_CONFIG_FILE)
+	pylint $(MAIN_MODULE) $(SCRIPTS_DIRECTORY) --rcfile=$(PYLINT_CONFIG_FILE)
 	pylint $(UNIT_TESTS_MODULE) --rcfile=$(PYLINT_UNIT_TESTS_CONFIG_FILE)
 
 test_flake8:
-	flake8 $(MAIN_MODULE) $(UNIT_TESTS_MODULE)
+	flake8 $(MAIN_MODULE) $(UNIT_TESTS_MODULE)  $(SCRIPTS_DIRECTORY)
 
 test_mypy:
-	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE)
+	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
 
 test_pytest:
 	CONFIG_FILE=$(UNIT_TESTS_CONFIG_FILE) pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TESTS_MODULE)
@@ -47,5 +54,6 @@ test_pytest:
 
 clean:
 	rm -rf venv
+	find . -name '*.pyc' -delete
 
-.PHONY: venv install_packages clean test test_pylint test_flake8 test_mypy test_pytest
+.PHONY: venv install_packages run_api run_workers clean test test_pylint test_flake8 test_mypy test_pytest
