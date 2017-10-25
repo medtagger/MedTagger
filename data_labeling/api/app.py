@@ -11,7 +11,7 @@ It is also a great entry point for running this app. To do so, you can use:
 # pylint: disable=unused-import;  It's used by Flask
 from flask import Flask
 from flask_cors import CORS
-from flask_user import SQLAlchemyAdapter, UserMixin
+from flask_user import SQLAlchemyAdapter
 
 from data_labeling.api import blueprint, web_socket
 from data_labeling.api.database import db

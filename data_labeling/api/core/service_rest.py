@@ -15,7 +15,6 @@ class Status(Resource):
     """Status endpoint that checks if everything is all right"""
 
     @staticmethod
-    @login_required
     @core_ns.marshal_with(serializers.status)
     @core_ns.doc(description='Checks if API is running properly.')
     @core_ns.doc(responses={200: 'Success'})
