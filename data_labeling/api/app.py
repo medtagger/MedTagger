@@ -47,17 +47,15 @@ app.config['USER_ENABLE_EMAIL'] = False
 app.config['RESTPLUS_VALIDATE'] = True
 
 
-
 db_adapter = SQLAlchemyAdapter(db, User)
 user_manager.db_adapter = db_adapter
 user_manager.init_app(app)
 
-with app.app_context():
-    db.init_app(app)
-    db.drop_all()
-    db.create_all()
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.init_app(app)
+
     # Run the application
     host = configuration.get('api', 'host', fallback='localhost')
     port = configuration.getint('api', 'port', fallback=51000)
