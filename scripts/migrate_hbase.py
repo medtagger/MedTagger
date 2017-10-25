@@ -7,7 +7,7 @@ from data_labeling.config import ConfigurationFile
 
 def ask_user_question(prompt_message: str) -> bool:
     """Ask user a question and ask him/her for True/False answer (default answer is False)
-        ABC
+
     :param prompt_message: message that will be prompted to user
     :return: boolean information if user agrees or not
     """
