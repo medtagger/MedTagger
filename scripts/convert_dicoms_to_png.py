@@ -7,16 +7,18 @@ https://www.kaggle.com/c/data-science-bowl-2017/data (look for 'sample_images.7z
 
 Then, place these data (unzipped) anywhere on your computer and run this script by:
 
-    (venv) $ python scripts/dicoms_to_png.py --input=./dir_with_scans/ --output=./dir_with_scans/converted/
+    (venv) $ python3.6 scripts/dicoms_to_png.py --input=./dir_with_scans/ --output=./dir_with_scans/converted/
 
 Name of the converted Dicom file is a position of the scan on the z axis.
 """
-
-import argparse
-import dicom
 import os
+import argparse
+
+import dicom
 from PIL import Image
+
 from data_labeling.conversion import convert_to_normalized_8bit_array
+
 
 parser = argparse.ArgumentParser(description='Convert dicoms to png format.')
 parser.add_argument('--input', type=str, required=True, help='Full path to directory where dicoms are located')

@@ -35,7 +35,7 @@ please connect with your VM over SSH (use `vagrant ssh` command). Then go to `/v
 that will create all tables in HBase.
 
 ```bash
-$ python3.6 migrate_hbase.py
+$ python3.6 scripts/migrate_hbase.py
 ```
 
 It will ask you a few questions and answer them with `y` or `yes` to create all needed entries.
