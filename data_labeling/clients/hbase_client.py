@@ -2,10 +2,10 @@
 from typing import Iterable, List, Mapping, Tuple, Any
 
 import happybase
+from retrying import retry
 from thriftpy.transport import TTransportException
 
 from data_labeling.config import ConfigurationFile
-from data_labeling.clients.utils import retry_on_connection_error
 
 
 configuration = ConfigurationFile()
@@ -43,7 +43,8 @@ class HBaseClient(object):
         pass
 
     @staticmethod
-    @retry_on_connection_error
+    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
+           wait_random_min=200, wait_random_max=1000)
     def get_all_keys(table_name: str, starts_with: str = None) -> Iterable[str]:
         """Fetch all keys for given table
 
@@ -58,7 +59,8 @@ class HBaseClient(object):
                 yield key.decode('utf-8')
 
     @staticmethod
-    @retry_on_connection_error
+    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
+           wait_random_min=200, wait_random_max=1000)
     def get_all_rows(table_name: str, columns: List, starts_with: str = None) -> Iterable[Tuple[str, Any]]:
         """Fetch all rows for given table
 
@@ -74,7 +76,8 @@ class HBaseClient(object):
                 yield key.decode('utf-8'), value
 
     @staticmethod
-    @retry_on_connection_error
+    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
+           wait_random_min=200, wait_random_max=1000)
     def get(table_name: str, key: str, columns: List[str] = None) -> Mapping:
         """Fetch a single row from HBase table
 
@@ -89,7 +92,8 @@ class HBaseClient(object):
             return table.row(hbase_key, columns=columns)
 
     @staticmethod
-    @retry_on_connection_error
+    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
+           wait_random_min=200, wait_random_max=1000)
     def put(table_name: str, key: str, value: Any) -> None:
         """Add new entry into HBase table
 
@@ -103,7 +107,8 @@ class HBaseClient(object):
             table.put(hbase_key, value)
 
     @staticmethod
-    @retry_on_connection_error
+    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
+           wait_random_min=200, wait_random_max=1000)
     def check_if_exists(table_name: str, key: str) -> bool:
         """Scan database and check if given key exists
 
