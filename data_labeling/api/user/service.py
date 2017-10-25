@@ -10,11 +10,10 @@ user_ns = api.namespace('users', 'User management methods')
 
 @user_ns.route('/register')
 class Register(Resource):
-    @api.expect(serializers.new_user, validate=True)
-    @user_ns.doc(responses={201: 'User created', 400: 'Invalid arguments'})
+    @api.expect(serializers.new_user)
+    @api.doc(responses={201: 'User created', 400: 'Invalid arguments'})
     def post(self):
         new_user = request.json
-        print(new_user)
         user_id = create_user(new_user['username'], new_user['password'])
         return {'id': user_id}, 201
 
