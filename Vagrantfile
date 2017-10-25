@@ -35,7 +35,7 @@ Vagrant.configure("2") do |config|
              -p 0.0.0.0:9095:9095 \
              -p 0.0.0.0:2181:2181 \
              -p 0.0.0.0:16010:16010"
-    d.run "rabbitmq:management",
+    d.run "rabbitmq",
       args: "-p 0.0.0.0:4369:4369 \
              -p 0.0.0.0:5671:5671 \
              -p 0.0.0.0:5672:5672 \

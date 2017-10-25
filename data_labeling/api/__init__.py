@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 # Definition of the API
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
-api = Api(blueprint, version='0.1', title='Backend API', description='Documentation for Backend API')
+api = Api(blueprint, version='0.1', title='Backend API', description='Documentation for Backend API', validate=True)
 web_socket = SocketIO(logger=True, engineio_logger=True)
 
 

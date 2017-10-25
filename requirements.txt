@@ -11,6 +11,8 @@ numpy>=1.13.1
 celery>=4.1.0
 Pillow>=4.3.0
 retrying>=1.3.3
+flask-user==0.6.13
+psycopg2
 
 # Dev requirements - these should always be latest
 mypy
