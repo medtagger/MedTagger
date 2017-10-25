@@ -10,6 +10,7 @@ pydicom>=0.9.9
 numpy>=1.13.1
 celery>=4.1.0
 Pillow>=4.3.0
+retrying>=1.3.3
 
 # Dev requirements - these should always be latest
 mypy

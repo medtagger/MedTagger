@@ -2,6 +2,9 @@
 from random import randint, choice
 from typing import Iterable, Dict, Any
 
+from retrying import retry
+
+from data_labeling.api.exceptions import NotFoundException
 from data_labeling.clients.hbase_client import HBaseClient
 from data_labeling.types import ScanID, LabelID, CuboidLabelPosition, CuboidLabelShape
 from data_labeling.models.scan import Scan
@@ -31,6 +34,7 @@ def get_metadata(scan_id: ScanID) -> Dict[str, Any]:
     }
 
 
+@retry(stop_max_attempt_number=5, retry_on_exception=(NotFoundException,))
 def get_random_scan() -> Dict[str, Any]:
     """Fetch random scan for labeling
 
@@ -44,6 +48,8 @@ def get_random_scan() -> Dict[str, Any]:
     scan_id = ScanID(choice(list(all_scans_keys)))
     scan = Scan(scan_id)
     number_of_slices = len(scan.slices_keys)
+    if not number_of_slices:
+        raise NotFoundException('Could not find any Scan that has at least one Slice!')
 
     return {
         'scan_id': scan_id,
