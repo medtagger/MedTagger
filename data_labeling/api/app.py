@@ -14,9 +14,9 @@ from flask_cors import CORS
 from flask_user import SQLAlchemyAdapter
 
 from data_labeling.api import blueprint, web_socket
-from data_labeling.api.database import db
-from data_labeling.api.database.models import User
 from data_labeling.api.user.business import user_manager
+from data_labeling.database import db
+from data_labeling.database.models import User
 from data_labeling.config import ConfigurationFile
 
 # Import all REST services
@@ -46,7 +46,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['USER_ENABLE_EMAIL'] = False
 app.config['RESTPLUS_VALIDATE'] = True
 
-
+# Prepare adapter for user management
 db_adapter = SQLAlchemyAdapter(db, User)
 user_manager.db_adapter = db_adapter
 user_manager.init_app(app)

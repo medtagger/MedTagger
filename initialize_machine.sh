@@ -7,11 +7,6 @@ apt install -y python3.6
 apt install -y python3.6-dev
 apt install -y python3-pip
 
-apt install -y postgresql-9.5
-sudo -u postgres createdb dev_db
-sudo -u postgres psql -c "CREATE USER dev WITH PASSWORD 'asdasd'"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE dev_db to dev"
-
 if [ -ne /opt/conda/ ]
 then
     # Install Miniconda
@@ -30,4 +25,13 @@ then
 fi
 
 cd /vagrant
+export PYTHONPATH=`pwd`
+
+echo "Installing all Python packages..."
 make install_packages
+
+echo "Migrating SQL database..."
+alembic upgrade head
+
+echo "Migrating HBase database..."
+python3.6 scripts/migrate_hbase.py --yes

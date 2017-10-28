@@ -41,3 +41,12 @@ services:
       - 15671:15671
       - 15672:15672
       - 25672:25672
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: data_labeling
+      POSTGRES_USER: backend_user
+      POSTGRES_PASSWORD: DataLabelingAPI!

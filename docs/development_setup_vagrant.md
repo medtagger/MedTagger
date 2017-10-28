@@ -30,19 +30,6 @@ entries.
 
 **_Tip!_** Running API inside of a Virtual Machine should be hosted on 0.0.0.0!
 
-Your project is now ready to be run but your HBase database is still empty. Before you start your journey with backend,
-please connect with your VM over SSH (use `vagrant ssh` command). Then go to `/vagrant` directory and launch script
-that will create all tables in HBase.
-
-```bash
-$ python3.6 scripts/migrate_hbase.py
-```
-
-It will ask you a few questions and answer them with `y` or `yes` to create all needed entries.
-
-**_Tip!_** This script may be useful one day to create new tables or delete a new one. Please check documentation
-inside of this script for more information.
-
 Now, your backend is ready to be used, so let's try to run it!
 
 Open two SSH connections (in separate windows) to our virtual machine and make sure that you're inside `/vagrant`
