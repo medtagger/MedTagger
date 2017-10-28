@@ -8,7 +8,7 @@ Run this script just by executing following line in the root directory of this p
 
 """
 from data_labeling import HBASE_SCHEMA
-from .utils import get_connection_to_hbase, user_agrees
+from utils import get_connection_to_hbase, user_agrees
 
 
 connection = get_connection_to_hbase()

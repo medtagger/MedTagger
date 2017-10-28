@@ -29,7 +29,7 @@ please run below make's entry and activate it:
 
 ```bash
 $ make venv
-$ . vevn/bin/activate
+$ . ./devenv.sh
 ```
 
 It's time to create a configuration file. Please create a new empty file and name it `backend_api.conf`. Base on
@@ -46,6 +46,12 @@ It will ask you a few questions and answer them with `y` or `yes` to create all 
 
 **_Tip!_** This script may be useful one day to create new tables or delete a new one. Please check documentation
 inside of this script for more information.
+
+Then, prepare your PostgreSQL database with:
+
+```bash
+(venv) $ alembic upgrade head
+```
 
 Now, your backend is ready to be used, so let's try to run it!
 

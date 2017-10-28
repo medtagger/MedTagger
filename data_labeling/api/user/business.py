@@ -1,8 +1,8 @@
 """Module responsible for business logic for user management"""
 from flask_user import UserManager
 
-from data_labeling.api.database import db
-from data_labeling.api.database.models import User
+from data_labeling.database import db_session
+from data_labeling.database.models import User
 
 user_manager = UserManager()
 
@@ -13,7 +13,6 @@ def create_user(username: str, password: str) -> int:
     """
     password_hash = user_manager.hash_password(password)
     new_user = User(username, password_hash)
-
-    db.session.add(new_user)
-    db.session.commit()
+    with db_session() as session:
+        session.add(new_user)
     return new_user.id

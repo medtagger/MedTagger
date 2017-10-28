@@ -40,7 +40,7 @@ test_pylint:
 	pylint $(UNIT_TESTS_MODULE) --rcfile=$(PYLINT_UNIT_TESTS_CONFIG_FILE)
 
 test_flake8:
-	flake8 $(MAIN_MODULE) $(UNIT_TESTS_MODULE)  $(SCRIPTS_DIRECTORY)
+	flake8 $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
 
 test_mypy:
 	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
