@@ -7,7 +7,8 @@ from flask_user import UserMixin
 from sqlalchemy import Column, Integer, Float, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from data_labeling.types import ScanID, SliceID, SliceLocation, SlicePosition
+from data_labeling.types import ScanID, SliceID, LabelID, SliceLocation, SlicePosition, CuboidLabelPosition, \
+    CuboidLabelShape
 from data_labeling.database import Base, db_session
 from data_labeling.clients.hbase_client import HBaseClient
 from data_labeling.workers.storage import store_dicom
@@ -41,6 +42,7 @@ class Scan(Base):  # pylint: disable=too-few-public-methods
     id: ScanID = Column(String, primary_key=True)
 
     slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
+    labels: List['Label'] = relationship('Label', back_populates='scan')
 
     def __init__(self) -> None:
         """Initializer for Scan"""
@@ -69,6 +71,20 @@ class Scan(Base):  # pylint: disable=too-few-public-methods
 
         store_dicom.delay(new_slice.id, dicom_image)
         convert_dicom_to_png.delay(new_slice.id, dicom_image)
+
+    def add_label(self, position: CuboidLabelPosition, shape: CuboidLabelShape) -> LabelID:
+        """Initializer for Label
+
+        :param position: position (x,y,z) of the label
+        :param shape: shape (width,height,depth) of the label
+        """
+
+        with db_session() as session:
+            new_label = Label(position, shape)
+            new_label.scan = self
+            session.add(new_label)
+
+        return new_label.id
 
 
 class Slice(Base):
@@ -116,3 +132,36 @@ class Slice(Base):
             self.hbase_client = HBaseClient()
         data = self.hbase_client.get(HBaseClient.CONVERTED_SLICES_TABLE, self.id, columns=['image'])
         return data[b'image:value']
+
+
+class Label(Base):  # pylint: disable=too-few-public-methods, too-many-instance-attributes
+    """Definition of a Label"""
+    __tablename__ = 'Labels'
+    id: LabelID = Column(String, primary_key=True)
+    position_x: float = Column(Float, nullable=False)
+    position_y: float = Column(Float, nullable=False)
+    position_z: float = Column(Float, nullable=False)
+    shape_width: float = Column(Float, nullable=False)
+    shape_height: float = Column(Float, nullable=False)
+    shape_depth: float = Column(Float, nullable=False)
+
+    scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
+    scan: Scan = relationship('Scan', back_populates='labels')
+
+    def __init__(self, position: CuboidLabelPosition, shape: CuboidLabelShape) -> None:
+        """Initializer for Label
+
+        :param position: position (x, y, z) of the label
+        :param shape: shape (width, height, depth) of the label
+        """
+        self.id = LabelID(str(uuid.uuid4()))
+        self.position_x = position.x
+        self.position_y = position.y
+        self.position_z = position.z
+        self.shape_width = shape.width
+        self.shape_height = shape.height
+        self.shape_depth = shape.depth
+
+    def __repr__(self) -> str:
+        """String representation for Label"""
+        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.scan_id)
