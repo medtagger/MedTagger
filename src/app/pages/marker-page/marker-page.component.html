@@ -2,7 +2,9 @@
   <div class="innerElement canvasInterface">
     <app-marker-component #marker></app-marker-component>
     <button mat-raised-button color="primary" (click)="skipScan()">Pomiń skan</button>
-    <button mat-raised-button color="primary" [disabled]="!this.marker.has2dSelection" (click)="remove2dSelection()">Usuń obecne oznaczenie</button>
-    <button mat-raised-button color="primary" [disabled]="!this.marker.has3dSelection" (click)="sendSelection()">Wyślij oznaczenie</button>
+    <button mat-raised-button color="warn" [disabled]="!this.marker.has2dSelection" (click)="remove2dSelection()">Usuń obecne oznaczenie</button>
+    <button mat-raised-button color="accent" [disabled]="!this.marker.has3dSelection" (click)="sendSelection()">Wyślij oznaczenie</button>
+    <button mat-raised-button color="primary" (click)="moreSlices()">Następne przekroje</button>
+    <button mat-raised-button color="primary" (click)="moreSlices(true)">Poprzednie przekroje</button>
   </div>
 </div>

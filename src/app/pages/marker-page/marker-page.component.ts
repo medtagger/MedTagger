@@ -4,6 +4,9 @@ import {ScanService} from '../../services/scan.service';
 import {MarkerComponent} from '../../components/marker/marker.component';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
+import {ROISelection3D} from '../../model/ROISelection3D';
+import {Response} from '@angular/http';
+import {count} from 'rxjs/operator/count';
 
 
 @Component({
@@ -16,6 +19,7 @@ export class MarkerPageComponent implements OnInit {
   @ViewChild(MarkerComponent) marker: MarkerComponent;
 
   scan: ScanMetadata;
+  lastSliceID = 0;
 
   constructor(private scanService: ScanService) {
     console.log('MarkerPage constructor', this.marker);
@@ -26,6 +30,9 @@ export class MarkerPageComponent implements OnInit {
     this.requestScan();
     this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
       console.log('MarkerPage | ngOnInit | slicesObservable: ', slice);
+      if (slice.index > this.lastSliceID) {
+        this.lastSliceID = slice.index;
+      }
       this.marker.feedData(slice);
     });
   }
@@ -35,7 +42,9 @@ export class MarkerPageComponent implements OnInit {
       this.scan = scan;
       this.marker.setScanMetadata(this.scan);
 
-      const begin = 0;
+      //TODO: ogarnięcie randomowego startu
+
+      const begin = Math.floor(Math.random() * scan.numberOfSlices);
       const count = 10;
       this.scanService.requestSlices(scan.scanId, begin, count);
     });
@@ -47,6 +56,12 @@ export class MarkerPageComponent implements OnInit {
   }
 
   public sendSelection() {
+    const roiSelection: ROISelection3D = this.marker.get3dSelection();
+    this.scanService.send3dSelection(this.scan.scanId, roiSelection).then((response: Response) => {
+      if (response.status === 200) {
+        console.log('MarkerPage | sendSelection | success!');
+      }
+    });
     return;
   }
 
@@ -54,7 +69,11 @@ export class MarkerPageComponent implements OnInit {
     this.marker.removeCurrentSelection();
   }
 
-  private formScanSelection() {
-
+  public moreSlices(previous?: boolean) {
+    if (previous) {
+      // this.currentSliceIds.sort()
+    }
+    this.scanService.requestSlices(this.scan.scanId, this.lastSliceID, 10);
   }
+
 }

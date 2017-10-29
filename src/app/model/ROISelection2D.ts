@@ -1,3 +1,5 @@
+import {SelectionData} from './SelectionData';
+
 export class ROISelection2D {
   _positionX: number;
   _positionY: number;
@@ -43,5 +45,19 @@ export class ROISelection2D {
 
   public updateHeight(newHeight: number): void {
     this._height = newHeight;
+  }
+
+  public toJSON(): SelectionData {
+    return new SelectionData(
+      this._depth,
+      this.normalize(this._positionX),
+      this.normalize(this._positionY),
+      this.normalize(this._width),
+      this.normalize(this._height)
+    );
+  }
+
+  private normalize(arg: number): number {
+    return arg / 512;
   }
 }

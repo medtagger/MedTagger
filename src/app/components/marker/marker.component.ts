@@ -4,6 +4,7 @@ import {MockService} from '../../services/mock.service';
 import {MatSlider} from '@angular/material/slider';
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {ScanMetadata} from '../../model/ScanMetadata';
+import {ROISelection3D} from '../../model/ROISelection3D';
 
 @Component({
   selector: 'app-marker-component',
@@ -30,8 +31,8 @@ export class MarkerComponent implements OnInit {
   private canvasCtx: CanvasRenderingContext2D;
   private canvasPosition: ClientRect;
 
-  private scanMetadata: ScanMetadata;
-  public slices: MarkerSlice[] = [];
+  public scanMetadata: ScanMetadata;
+  public slices: Map<number, MarkerSlice>;
   private currentSlice = 0;
 
   private selectedArea: ROISelection2D;
@@ -49,7 +50,7 @@ export class MarkerComponent implements OnInit {
   }
 
   public clearData(): void {
-    this.slices = [];
+    this.slices = new Map<number, MarkerSlice>();
     this.currentSlice = 0;
     this.selectedArea = undefined;
     this.selections = new Map<number, ROISelection2D>();
@@ -66,28 +67,51 @@ export class MarkerComponent implements OnInit {
 
   private updateSelectionState(): void {
     this.has2dSelection = !!this.selections.get(this.currentSlice) || !!this.selectedArea;
-    this.has3dSelection = this.selections.size === 2;
+    this.has3dSelection = this.selections.size >= 2 || (this.selections.size === 1 && !!this.selectedArea);
+  }
+
+  public get3dSelection(): ROISelection3D {
+    if (this.selectedArea) {
+      this.selections.set(this.currentSlice, this.selectedArea);
+      this.selectedArea = undefined;
+    }
+    return new ROISelection3D(Array.from(this.selections.values()));
   }
 
   public feedData(newSlice: MarkerSlice): void {
     console.log('Marker | feedData: ', newSlice);
     this.addSlice(newSlice);
+    this.updateSliderRange();
+  }
+
+  private updateSliderRange(): void {
+    const sortedKeys: number[] = Array.from(this.slices.keys()).sort( (a: number, b: number) => {
+      return a - b;
+    });
+    console.log('MarkerComponent | updateSliderRange | sortedKeys: ', sortedKeys);
+
+    this.slider.min = sortedKeys[0];
+    this.slider.max = sortedKeys[sortedKeys.length - 1];
   }
 
   private addSlice(newSlice: MarkerSlice) {
-    this.slices.push(newSlice);
-    if (this.slices.length === 1) {
+    this.slices.set(newSlice.index, newSlice);
+    if (this.slices.size === 1) {
       this.setCanvasImage();
     }
   }
 
   public setScanMetadata(scanMetadata: ScanMetadata): void {
     this.scanMetadata = scanMetadata;
+    // this.slider.max = scanMetadata.numberOfSlices;
   }
 
   ngOnInit() {
     console.log('Marker init');
     console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
+
+    this.selections = new Map<number, ROISelection2D>();
+    this.slices = new Map<number, MarkerSlice>();
 
     this.initializeCanvas();
 
@@ -96,8 +120,6 @@ export class MarkerComponent implements OnInit {
     };
 
     this.setCanvasImage();
-
-    this.selections = new Map<number, ROISelection2D>();
 
     this.slider.registerOnChange((sliderValue: number) => {
       console.log('Marker init | slider change: ', sliderValue);
@@ -129,8 +151,8 @@ export class MarkerComponent implements OnInit {
   }
 
   private setCanvasImage(): void {
-    if (this.slices[this.currentSlice]) {
-      this.currentImage.src = this.slices[this.currentSlice].source;
+    if (this.slices.has(this.currentSlice)) {
+      this.currentImage.src = this.slices.get(this.currentSlice).source;
     }
   }
 
@@ -153,6 +175,11 @@ export class MarkerComponent implements OnInit {
     this.canvasCtx.setLineDash([6]);
     this.canvasCtx.strokeRect(selection.positionX, selection.positionY,
       selection.width, selection.height);
+
+    const fontSize = 20;
+    this.canvasCtx.font = `${fontSize}px Arial`;
+    this.canvasCtx.fillStyle = color;
+    this.canvasCtx.fillText(selection.depth.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
   }
 
   private initCanvasSelectionTool(): void {
@@ -184,6 +211,7 @@ export class MarkerComponent implements OnInit {
     const selectionStartX = (event.clientX) - this.canvasPosition.left;
     const selectionStartY = (event.clientY) - this.canvasPosition.top;
     this.selectedArea = new ROISelection2D(selectionStartX, selectionStartY, this.currentSlice);
+    this.selections.delete(this.currentSlice);
     this.mouseDrag = true;
   }
 

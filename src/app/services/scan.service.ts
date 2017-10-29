@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Http} from '@angular/http';
+import {Http, Response} from '@angular/http';
 
 import {Socket} from 'ng-socket-io';
 import 'rxjs/add/operator/map';
@@ -7,6 +7,7 @@ import 'rxjs/add/operator/toPromise';
 import {Observable} from 'rxjs/Observable';
 import {ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
+import {ROISelection3D} from '../model/ROISelection3D';
 
 import { environment } from '../../environments/environment';
 
@@ -18,6 +19,19 @@ export class ScanService {
 
   constructor(private http: Http) {
     this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {}});
+  }
+
+  public send3dSelection(scanId: string, roiSelection: ROISelection3D): Promise<Response> {
+    console.log('ScanService | send3dSelection | sending ROI:', roiSelection, `for scanId: ${scanId}`);
+    return new Promise((resolve, reject) => {
+      this.http.post(this.SCANS_API_URL + `/${scanId}/label`, roiSelection.toJSON()).toPromise().then((response: Response) => {
+        console.log('ScanService | send3dSelection | response: ', response);
+        resolve(response);
+      }).catch((error: Response) => {
+        console.log('ScanService | send3dSelection | error: ', error);
+        reject(error);
+      });
+    });
   }
 
   getRandomScan(): Promise<ScanMetadata> {
@@ -49,6 +63,7 @@ export class ScanService {
   }
 
   requestSlices(scanId: string, begin: number, count: number) {
+    console.log('ScanService | requestSlices | begin:', begin);
     this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count});
   }
 
