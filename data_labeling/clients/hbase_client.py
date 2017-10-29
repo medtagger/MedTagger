@@ -26,6 +26,9 @@ class HBaseClient(object):
     This is a wrapper for HappyBase Connection. Client uses HappyBase's Connection Pool, so don't worry about closing
     connection, etc. This client should do everything inside below methods.
 
+    WATCH OUT: Script that migrates HBase schema may not work properly if you want to change column names!
+               In such case please run your migration manually!
+
     Example:
 
         >>> hbase_client = HBaseClient()
@@ -34,17 +37,21 @@ class HBaseClient(object):
 
     """
 
-    SCANS = 'scans'
     ORIGINAL_SLICES_TABLE = 'original_slices'
     CONVERTED_SLICES_TABLE = 'converted_slices'
+
+    HBASE_SCHEMA = {
+        ORIGINAL_SLICES_TABLE: ['image'],
+        CONVERTED_SLICES_TABLE: ['image'],
+    }
 
     def __init__(self) -> None:
         """Initializer for client"""
         pass
 
     @staticmethod
-    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
-           wait_random_min=200, wait_random_max=1000)
+    @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
+           retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def get_all_keys(table_name: str, starts_with: str = None) -> Iterable[str]:
         """Fetch all keys for given table
 
@@ -59,8 +66,8 @@ class HBaseClient(object):
                 yield key.decode('utf-8')
 
     @staticmethod
-    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
-           wait_random_min=200, wait_random_max=1000)
+    @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
+           retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def get_all_rows(table_name: str, columns: List, starts_with: str = None) -> Iterable[Tuple[str, Any]]:
         """Fetch all rows for given table
 
@@ -76,8 +83,8 @@ class HBaseClient(object):
                 yield key.decode('utf-8'), value
 
     @staticmethod
-    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
-           wait_random_min=200, wait_random_max=1000)
+    @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
+           retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def get(table_name: str, key: str, columns: List[str] = None) -> Mapping:
         """Fetch a single row from HBase table
 
@@ -92,8 +99,8 @@ class HBaseClient(object):
             return table.row(hbase_key, columns=columns)
 
     @staticmethod
-    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
-           wait_random_min=200, wait_random_max=1000)
+    @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
+           retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def put(table_name: str, key: str, value: Any) -> None:
         """Add new entry into HBase table
 
@@ -107,8 +114,8 @@ class HBaseClient(object):
             table.put(hbase_key, value)
 
     @staticmethod
-    @retry(stop_max_attempt_number=3, retry_on_exception=(TTransportException, BrokenPipeError),
-           wait_random_min=200, wait_random_max=1000)
+    @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
+           retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def check_if_exists(table_name: str, key: str) -> bool:
         """Scan database and check if given key exists
 
