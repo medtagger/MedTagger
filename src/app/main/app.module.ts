@@ -40,11 +40,11 @@ import {
 
 const routes: Routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full'},
-  {path: 'login', component: LoginPageComponent},
-  {path: 'home', component: HomePageComponent},
-  {path: 'category', component: CategoryPageComponent},
-  {path: 'marker', component: MarkerPageComponent},
-  {path: 'upload', component: UploadPageComponent}
+  {path: 'login', component: LoginPageComponent, data: {title: 'Logowanie'}},
+  {path: 'home', component: HomePageComponent, data: {title: 'Strona Główna'}},
+  {path: 'category', component: CategoryPageComponent, data: {title: 'Wybór kategorii'}},
+  {path: 'marker', component: MarkerPageComponent, data: {title: 'Etykietowanie'}},
+  {path: 'upload', component: UploadPageComponent, data: {title: 'Dodawanie skanów'}}
 ];
 
 @NgModule({
