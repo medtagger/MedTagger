@@ -7,7 +7,7 @@ from flask_socketio import Namespace, emit
 from data_labeling.api import web_socket
 from data_labeling.types import ScanID
 from data_labeling.api.exceptions import InvalidArgumentsException
-from data_labeling.api.scans.business import add_new_slice, get_slices_for_scan
+from data_labeling.api.scans.business import get_metadata, add_new_slice, get_slices_for_scan
 
 
 class Slices(Namespace):
@@ -22,7 +22,8 @@ class Slices(Namespace):
         begin = request.get('begin', 0)
         count = request.get('count', 1)
 
-        number_of_slices = 20
+        scan_metadata = get_metadata(scan_id)
+        number_of_slices = scan_metadata.get('number_of_slices', 0)
         smaller_than_zero = (begin < 0 or count < 0)
         out_of_range = (begin > number_of_slices or begin + count > number_of_slices)
         if smaller_than_zero or out_of_range:
