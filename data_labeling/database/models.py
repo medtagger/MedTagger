@@ -73,10 +73,10 @@ class Scan(Base):  # pylint: disable=too-few-public-methods
         convert_dicom_to_png.delay(new_slice.id, dicom_image)
 
     def add_label(self, position: CuboidLabelPosition, shape: CuboidLabelShape) -> LabelID:
-        """Initializer for Label
+        """Add new label into this Scan
 
-        :param position: position (x,y,z) of the label
-        :param shape: shape (width,height,depth) of the label
+        :param position: position (x, y, z) of the label
+        :param shape: shape (width, height, depth) of the label
         """
 
         with db_session() as session:
