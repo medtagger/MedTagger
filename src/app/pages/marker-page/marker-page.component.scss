@@ -1,0 +1,7 @@
+@import '../../components/marker/marker.component.scss';
+
+button {
+  position: relative;
+  top: $canvas-size;
+  margin: 1%;
+}

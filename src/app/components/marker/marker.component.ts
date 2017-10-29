@@ -35,14 +35,38 @@ export class MarkerComponent implements OnInit {
   private currentSlice = 0;
 
   private selectedArea: ROISelection2D;
-  private selections: ROISelection2D[] = [];
+  private selections: Map<number, ROISelection2D>;
   private mouseDrag = false;
+
+  public has3dSelection: boolean;
+  public has2dSelection: boolean;
 
 
   constructor(private mockService: MockService) {
     // mockService.getMockSlicesURI().forEach((value: string, index: number) => {
     //   this.slices.push(new MarkerSlice(index, value));
     // });
+  }
+
+  public clearData(): void {
+    this.slices = [];
+    this.currentSlice = 0;
+    this.selectedArea = undefined;
+    this.selections = new Map<number, ROISelection2D>();
+  }
+
+  public removeCurrentSelection(): void {
+    if (this.has2dSelection) {
+      this.selections.delete(this.currentSlice);
+      this.selectedArea = undefined;
+
+      this.clearCanvasSelection();
+    }
+  }
+
+  private updateSelectionState(): void {
+    this.has2dSelection = !!this.selections.get(this.currentSlice) || !!this.selectedArea;
+    this.has3dSelection = this.selections.size === 2;
   }
 
   public feedData(newSlice: MarkerSlice): void {
@@ -73,10 +97,14 @@ export class MarkerComponent implements OnInit {
 
     this.setCanvasImage();
 
+    this.selections = new Map<number, ROISelection2D>();
+
     this.slider.registerOnChange((sliderValue: number) => {
       console.log('Marker init | slider change: ', sliderValue);
       this.changeMarkerImage(sliderValue);
       this.drawPreviousSelections();
+
+      this.updateSelectionState();
     });
   }
 
@@ -86,10 +114,11 @@ export class MarkerComponent implements OnInit {
   }
 
   private changeMarkerImage(sliceID: number): void {
-    this.currentSlice = sliceID;
     if (this.selectedArea) {
-      this.selections.push(this.selectedArea);
+      this.selections.set(this.currentSlice, this.selectedArea);
+      this.selectedArea = undefined;
     }
+    this.currentSlice = sliceID;
     this.clearCanvasSelection();
     this.setCanvasImage();
   }
@@ -108,7 +137,13 @@ export class MarkerComponent implements OnInit {
   private drawPreviousSelections(): void {
     console.log('Marker | drawPreviousSelections | selection: ', this.selections);
     this.selections.forEach((selection: ROISelection2D) => {
-      this.drawSelection(selection, '#0022BB');
+      let color: string;
+      if (selection.depth === this.currentSlice) {
+        color = '#ff0000';
+      } else {
+        color = '#0022BB';
+      }
+      this.drawSelection(selection, color);
     });
   }
 
@@ -123,6 +158,7 @@ export class MarkerComponent implements OnInit {
   private initCanvasSelectionTool(): void {
     const canvasX = this.canvasPosition.left;
     const canvasY = this.canvasPosition.top;
+
     console.log('Marker | initCanvasSelectionTool');
     console.log('Marker | initCanvasSelectionTool | canvas offsets: ', canvasX, canvasY);
 
@@ -132,7 +168,10 @@ export class MarkerComponent implements OnInit {
     };
 
     this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
-      this.mouseDrag = false;
+      if (this.mouseDrag) {
+        this.mouseDrag = false;
+        this.updateSelectionState();
+      }
     };
 
     this.canvas.onmousemove = (mouseEvent: MouseEvent) => {

@@ -23,14 +23,14 @@ export class MarkerPageComponent implements OnInit {
 
   ngOnInit() {
     console.log('MarkerPage init', this.marker);
-    this.requestExampleScan();
+    this.requestScan();
     this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
       console.log('MarkerPage | ngOnInit | slicesObservable: ', slice);
       this.marker.feedData(slice);
     });
   }
 
-  private requestExampleScan(): void {
+  private requestScan(): void {
     this.scanService.getRandomScan().then((scan: ScanMetadata) => {
       this.scan = scan;
       this.marker.setScanMetadata(this.scan);
@@ -41,4 +41,20 @@ export class MarkerPageComponent implements OnInit {
     });
   }
 
+  private skipScan(): void {
+    this.marker.clearData();
+    this.requestScan();
+  }
+
+  public sendSelection() {
+    return;
+  }
+
+  private remove2dSelection(): void {
+    this.marker.removeCurrentSelection();
+  }
+
+  private formScanSelection() {
+
+  }
 }
