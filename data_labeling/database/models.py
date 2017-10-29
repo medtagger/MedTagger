@@ -1,4 +1,5 @@
 """Module responsible for defining all of the relational database models"""
+# pylint: disable=too-few-public-methods,too-many-instance-attributes
 import uuid
 from typing import List
 
@@ -7,8 +8,8 @@ from flask_user import UserMixin
 from sqlalchemy import Column, Integer, Float, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from data_labeling.types import ScanID, SliceID, LabelID, SliceLocation, SlicePosition, CuboidLabelPosition, \
-    CuboidLabelShape
+from data_labeling.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition,\
+    LabelPosition, LabelShape
 from data_labeling.database import Base, db_session
 from data_labeling.clients.hbase_client import HBaseClient
 from data_labeling.workers.storage import store_dicom
@@ -36,7 +37,7 @@ class User(Base, UserMixin):
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.username)
 
 
-class Scan(Base):  # pylint: disable=too-few-public-methods
+class Scan(Base):
     """Definition of a Scan"""
     __tablename__ = 'Scans'
     id: ScanID = Column(String, primary_key=True)
@@ -52,12 +53,13 @@ class Scan(Base):  # pylint: disable=too-few-public-methods
         """String representation for Scan"""
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
 
-    def add_slice(self, dicom_image: FileDataset) -> None:
+    def add_slice(self, dicom_image: FileDataset) -> SliceID:
         """Add new slice into this Scan
 
         It will also trigger Celery workers responsible for storage and conversion of a Dicom image.
 
         :param dicom_image: Dicom image that should be stored for this Scan
+        :return: ID of a Slice
         """
         location = SliceLocation(dicom_image.SliceLocation)
         position = SlicePosition(dicom_image.ImagePositionPatient[0],
@@ -71,20 +73,15 @@ class Scan(Base):  # pylint: disable=too-few-public-methods
 
         store_dicom.delay(new_slice.id, dicom_image)
         convert_dicom_to_png.delay(new_slice.id, dicom_image)
+        return new_slice.id
 
-    def add_label(self, position: CuboidLabelPosition, shape: CuboidLabelShape) -> LabelID:
-        """Add new label into this Scan
-
-        :param position: position (x, y, z) of the label
-        :param shape: shape (width, height, depth) of the label
-        """
-
+    def create_label(self) -> 'Label':
+        """Add new label into this Scan"""
         with db_session() as session:
-            new_label = Label(position, shape)
-            new_label.scan = self
-            session.add(new_label)
-
-        return new_label.id
+            label = Label()
+            label.scan = self
+            session.add(label)
+        return label
 
 
 class Slice(Base):
@@ -134,34 +131,60 @@ class Slice(Base):
         return data[b'image:value']
 
 
-class Label(Base):  # pylint: disable=too-few-public-methods, too-many-instance-attributes
+class Label(Base):
     """Definition of a Label"""
     __tablename__ = 'Labels'
     id: LabelID = Column(String, primary_key=True)
+
+    scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
+    scan: Scan = relationship('Scan', back_populates='labels')
+    selections: 'LabelSelection' = relationship('LabelSelection', back_populates='label')
+
+    def __init__(self) -> None:
+        """Initializer for Label"""
+        self.id = LabelID(str(uuid.uuid4()))
+
+    def __repr__(self) -> str:
+        """String representation for Label"""
+        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.scan_id)
+
+    def add_selection(self, position: LabelPosition, shape: LabelShape) -> LabelSelectionID:
+        """Add new selection for this label
+
+        :param position: position (x, y, slice_index) of the label
+        :param shape: shape (width, height, depth) of the label
+        :return: ID of a selection
+        """
+        with db_session() as session:
+            new_label_selection = LabelSelection(position, shape)
+            new_label_selection.label = self
+            session.add(new_label_selection)
+
+        return new_label_selection.id
+
+
+class LabelSelection(Base):
+    """Definition of a selection for Label"""
+    __tablename__ = 'LabelSelections'
+    id: LabelSelectionID = Column(String, primary_key=True)
     position_x: float = Column(Float, nullable=False)
     position_y: float = Column(Float, nullable=False)
     position_z: float = Column(Float, nullable=False)
     shape_width: float = Column(Float, nullable=False)
     shape_height: float = Column(Float, nullable=False)
-    shape_depth: float = Column(Float, nullable=False)
 
-    scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
-    scan: Scan = relationship('Scan', back_populates='labels')
+    label_id: LabelID = Column(String, ForeignKey('Labels.id'))
+    label: Label = relationship('Label', back_populates='selections')
 
-    def __init__(self, position: CuboidLabelPosition, shape: CuboidLabelShape) -> None:
-        """Initializer for Label
+    def __init__(self, position: LabelPosition, shape: LabelShape) -> None:
+        """Initializer for Label Selection
 
-        :param position: position (x, y, z) of the label
-        :param shape: shape (width, height, depth) of the label
+        :param position: position (x, y, slice_index) of the label
+        :param shape: shape (width, height) of the label
         """
-        self.id = LabelID(str(uuid.uuid4()))
+        self.id = LabelSelectionID(str(uuid.uuid4()))
         self.position_x = position.x
         self.position_y = position.y
-        self.position_z = position.z
+        self.position_z = position.slice_index
         self.shape_width = shape.width
         self.shape_height = shape.height
-        self.shape_depth = shape.depth
-
-    def __repr__(self) -> str:
-        """String representation for Label"""
-        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.scan_id)

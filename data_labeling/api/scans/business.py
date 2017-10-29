@@ -1,12 +1,12 @@
 """Module responsible for business logic in all Scans endpoints"""
-from typing import Iterable, Dict, Any
+from typing import Iterable, Dict, List, Any
 
 from retrying import retry
 from dicom.dataset import FileDataset
 from sqlalchemy.sql.expression import func
 
 from data_labeling.api.exceptions import NotFoundException
-from data_labeling.types import ScanID, LabelID, CuboidLabelPosition, CuboidLabelShape
+from data_labeling.types import ScanID, LabelID, LabelPosition, LabelShape
 from data_labeling.database import db_session
 from data_labeling.database.models import Scan
 
@@ -69,17 +69,23 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> Iterable[byt
         yield _slice.converted_image
 
 
-def add_cuboid_label(scan_id: ScanID, position: CuboidLabelPosition, shape: CuboidLabelShape) -> LabelID:
-    """Add cuboid label to given scan
+def add_label(scan_id: ScanID, selections: List[Dict]) -> LabelID:
+    """Add label to given scan
 
     :param scan_id: ID of a given scan
-    :param position: position (upper top left vertex) of cuboid label within range 0..1
-    :param shape: shape of cuboid label within range 0..1
+    :param selections: List of JSONs describing selections for a single label
     """
     with db_session() as session:
         scan = session.query(Scan).filter(Scan.id == scan_id).one()
-        label_id = scan.add_label(position, shape)
-    return label_id
+        label = scan.create_label()
+
+        for selection in selections:
+            position = LabelPosition(x=selection.get('x', 0.0), y=selection.get('y', 0.0),
+                                     slice_index=selection.get('slice_index', 0.0))
+            shape = LabelShape(width=selection.get('width', 0.0), height=selection.get('height', 0.0))
+            label.add_selection(position, shape)
+
+    return label.id
 
 
 def add_new_slice(scan_id: ScanID, dicom_image: FileDataset) -> None:

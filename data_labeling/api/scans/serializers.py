@@ -13,13 +13,16 @@ random_scan = api.model('Random scan model', {
     'number_of_slices': fields.Integer(description='Total number of slices in given scan'),
 })
 
-cuboid_label = api.model('Cuboid label for given scan', {
-    'x': fields.Float(description='Label\'s X position', min=0.0, max=1.0, required=True),
-    'y': fields.Float(description='Label\'s Y position', min=0.0, max=1.0, required=True),
-    'z': fields.Float(description='Label\'s Z position', min=0.0, max=1.0, required=True),
-    'width': fields.Float(description='Label\'s width', min=0.0, max=1.0, required=True),
-    'height': fields.Float(description='Label\'s height', min=0.0, max=1.0, required=True),
-    'depth': fields.Float(description='Label\'s depth', min=0.0, max=1.0, required=True),
+label_selection = api.model('User\'s Label Selection', {
+    'x': fields.Float(description='Selection\'s X position', min=0.0, max=1.0, required=True),
+    'y': fields.Float(description='Selection\'s Y position', min=0.0, max=1.0, required=True),
+    'slice_index': fields.Integer(description='Slice\'s order index', min=0, required=True),
+    'width': fields.Float(description='Selection\'s width', min=0.0, max=1.0, required=True),
+    'height': fields.Float(description='Selection\'s height', min=0.0, max=1.0, required=True),
+})
+
+label = api.model('Label for given scan', {
+    'selections': fields.List(fields.Nested(label_selection)),
 })
 
 accepted = api.model('Accepted for asynchronous processing', {
