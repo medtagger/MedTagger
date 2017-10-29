@@ -1,5 +1,4 @@
 """Module responsible for business logic in all Scans endpoints"""
-from random import randint
 from typing import Iterable, Dict, Any
 
 from retrying import retry
@@ -77,8 +76,10 @@ def add_cuboid_label(scan_id: ScanID, position: CuboidLabelPosition, shape: Cubo
     :param position: position (upper top left vertex) of cuboid label within range 0..1
     :param shape: shape of cuboid label within range 0..1
     """
-    # pylint: disable=unused-argument
-    return LabelID(randint(0, 10000))
+    with db_session() as session:
+        scan = session.query(Scan).filter(Scan.id == scan_id).one()
+        label_id = scan.add_label(position, shape)
+    return label_id
 
 
 def add_new_slice(scan_id: ScanID, dicom_image: FileDataset) -> None:
