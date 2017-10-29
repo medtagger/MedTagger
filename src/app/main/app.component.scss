@@ -35,6 +35,14 @@ body {
 
   .header-name {
     vertical-align: middle;
+    padding-right: 0.5em;
+  }
+
+  .header-page-name {
+    vertical-align: middle;
+    font-weight: 200;
+    padding-left: 0.5em;
+    border-left: 1px white solid;
   }
 }
 
