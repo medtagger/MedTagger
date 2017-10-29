@@ -30,7 +30,8 @@ import glob
 
 import dicom
 
-from data_labeling.models.scan import Scan
+from data_labeling.database import db_session
+from data_labeling.database.models import Scan
 
 
 parser = argparse.ArgumentParser(description='Import data to the HBase Database.')
@@ -45,8 +46,9 @@ if __name__ == '__main__':
             continue
 
         print('Adding new scan from {}.'.format(scan_directory))
-        scan = Scan()
-        scan.create_if_needed()
+        with db_session() as session:
+            scan = Scan()
+            session.add(scan)
 
         for slice_name in glob.iglob(scan_directory + '/*.dcm'):
             print('Adding new slice to scan {} based on {}.'.format(scan.id, slice_name))

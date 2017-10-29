@@ -9,7 +9,7 @@ Run this script just by executing following line in the root directory of this p
 """
 import argparse
 
-from data_labeling import HBASE_SCHEMA
+from data_labeling.clients.hbase_client import HBaseClient
 from utils import get_connection_to_hbase, user_agrees
 
 parser = argparse.ArgumentParser(description='HBase migration.')
@@ -17,6 +17,7 @@ parser.add_argument('-y', '--yes', dest='yes', action='store_const', const=True)
 args = parser.parse_args()
 
 
+HBASE_SCHEMA = HBaseClient.HBASE_SCHEMA
 connection = get_connection_to_hbase()
 existing_tables = set(connection.tables())
 schema_tables = set(HBASE_SCHEMA)

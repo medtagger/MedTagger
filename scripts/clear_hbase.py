@@ -7,10 +7,11 @@ Run this script just by executing following line in the root directory of this p
     (venv) $ python3.6 scripts/clear_hbase.py
 
 """
-from data_labeling import HBASE_SCHEMA
+from data_labeling.clients.hbase_client import HBaseClient
 from utils import get_connection_to_hbase, user_agrees
 
 
+HBASE_SCHEMA = HBaseClient.HBASE_SCHEMA
 connection = get_connection_to_hbase()
 existing_tables = set(connection.tables())
 
