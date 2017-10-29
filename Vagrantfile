@@ -16,7 +16,8 @@ Vagrant.configure("2") do |config|
              -p 0.0.0.0:9090:9090 \
              -p 0.0.0.0:9095:9095 \
              -p 0.0.0.0:2181:2181 \
-             -p 0.0.0.0:16010:16010"
+             -p 0.0.0.0:16010:16010 \
+             -v /vagrant_data/hbase_data:/data"
     d.run "rabbitmq",
       args: "-p 0.0.0.0:4369:4369 \
              -p 0.0.0.0:5671:5671 \
@@ -28,7 +29,8 @@ Vagrant.configure("2") do |config|
       args: "-p 0.0.0.0:5432:5432 \
              -e 'POSTGRES_DB=data_labeling' \
              -e 'POSTGRES_USER=backend_user' \
-             -e 'POSTGRES_PASSWORD=DataLabelingAPI!'"
+             -e 'POSTGRES_PASSWORD=DataLabelingAPI!' \
+             -v /vagrant_data/postgresql_data:/var/lib/postgresql/data"
   config.vm.provision "shell", path: "initialize_machine.sh"
   end
 end
