@@ -1,0 +1,111 @@
+<section class="main-content">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title><h1>Ustawienia konta</h1></mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-accordion class="align-accordion-descriptions">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Ustawienia podstawowe
+            </mat-panel-title>
+            <mat-panel-description>
+              Zmień dane dotyczące Twojego konta
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <mat-form-field>
+            <input matInput placeholder="Imię" type="text" [formControl]="userName" required>
+            <mat-error *ngIf="userName.invalid">{{getUserNameErrorMessage()}}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Nazwisko" type="text" [formControl]="userSurname" required>
+            <mat-error *ngIf="userSurname.invalid">{{getUserSurnameErrorMessage()}}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="E-mail" type="text" [formControl]="userEmail" required>
+            <mat-error *ngIf="userEmail.invalid">{{getUserEmailErrorMessage()}}</mat-error>
+          </mat-form-field>
+
+          <mat-action-row>
+            <button mat-raised-button color="primary" (click)="saveBasicData()">Zapisz</button>
+          </mat-action-row>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Zmiana hasła
+            </mat-panel-title>
+            <mat-panel-description>
+              Zmień swoje hasło
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <mat-form-field>
+            <input matInput placeholder="Wprowadź nowe hasło" type="password" [formControl]="userPassword" required>
+            <mat-error *ngIf="userPassword.invalid">{{getUserPasswordErrorMessage()}}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Potwierdź nowe hasło" type="password" [formControl]="userPasswordConfirmation" required>
+            <mat-error *ngIf="userPasswordConfirmation.invalid">{{getUserPasswordConfirmationErrorMessage()}}</mat-error>
+          </mat-form-field>
+
+          <mat-action-row>
+            <button mat-raised-button color="primary" (click)="savePasswords()">Zapisz</button>
+          </mat-action-row>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Zdjęcie profilowe
+            </mat-panel-title>
+            <mat-panel-description>
+              Zmień swoje zdjęcie profilowe
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <img src="../../assets/img/user_avatar.png" alt="Avatar" class="user-avatar">
+          <section class="user-avatar-settings">
+            <button mat-raised-button><mat-icon>face</mat-icon> Wybierz nowe zdjęcie</button>
+            <hr/>
+            <p>Maksymalny rozmiar obrazka to 200KB.</p>
+          </section>
+
+          <mat-action-row>
+            <button mat-raised-button color="primary">Zapisz</button>
+          </mat-action-row>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Uprawnienia
+            </mat-panel-title>
+            <mat-panel-description>
+              Poproś o zwiększenie swoich uprawnień
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <!-- TODO: Handle user permissions here -->
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Dodatkowe
+            </mat-panel-title>
+            <mat-panel-description>
+              Pozostałe dostępne ustawienia
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <button mat-raised-button color="warn">Usuń moje konto</button>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+    </mat-card-content>
+  </mat-card>
+</section>
