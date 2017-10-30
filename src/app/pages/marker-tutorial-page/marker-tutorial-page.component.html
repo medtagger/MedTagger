@@ -1,0 +1,73 @@
+<mat-horizontal-stepper [linear]="true">
+  <mat-step [stepControl]="formGroup">
+    <ng-template matStepLabel>Wybierz kategorię</ng-template>
+    <section class="step-content">
+      <img src="../../../assets/img/test_lung1.png">
+      <mat-card>
+        <mat-card-title>Wybierz kategorię</mat-card-title>
+        <mat-card-subtitle>Krok 1</mat-card-subtitle>
+        <p>W pierwszym kroku wybierz kategorię w ramach, której chcesz etykietować dane.</p>
+        <button class="nextPage" mat-raised-button matStepperNext color="primary">Dalej <mat-icon>navigate_next</mat-icon></button>
+        <div class="clearfix"></div>
+      </mat-card>
+    </section>
+  </mat-step>
+  <mat-step [stepControl]="formGroup">
+    <ng-template matStepLabel>Znajdź zmianę</ng-template>
+    <section class="step-content">
+      <img src="../../../assets/img/test_lung1.png">
+      <mat-card>
+        <mat-card-title>Znajdź zmienę</mat-card-title>
+        <mat-card-subtitle>Krok 2</mat-card-subtitle>
+        <p>Następnie, użyj suwaka, aby znaleźć interesującą Cię zmianę.</p>
+        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Wstecz</button>
+        <button class="nextPage" mat-raised-button matStepperNext color="primary">Dalej <mat-icon>navigate_next</mat-icon></button>
+        <div class="clearfix"></div>
+      </mat-card>
+    </section>
+  </mat-step>
+  <mat-step [stepControl]="formGroup">
+    <ng-template matStepLabel>Zaznacz fragment</ng-template>
+    <section class="step-content">
+      <img src="../../../assets/img/test_lung1.png">
+      <mat-card>
+        <mat-card-title>Zaznacz fragment</mat-card-title>
+        <mat-card-subtitle>Krok 3</mat-card-subtitle>
+        <p>Zaznacz fragment obrazu, który następnie stanie się częścią Twojego oznaczenia.</p>
+        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Wstecz</button>
+        <button class="nextPage" mat-raised-button matStepperNext color="primary">Dalej <mat-icon>navigate_next</mat-icon></button>
+        <div class="clearfix"></div>
+      </mat-card>
+    </section>
+  </mat-step>
+  <mat-step [stepControl]="formGroup">
+    <ng-template matStepLabel>Dokończ oznaczanie</ng-template>
+    <section class="step-content">
+      <img src="../../../assets/img/test_lung1.png">
+      <mat-card>
+        <mat-card-title>Dokończ oznaczanie</mat-card-title>
+        <mat-card-subtitle>Krok 4</mat-card-subtitle>
+        <p>Twoja etykieta będzie reprezentowana przez trójwymiarową figurą, definiowaną Twoimi zaznaczeniami.
+          Aby dodać kolejne fragmenty oznaczenia, przejdź do kolejnych obrazów skanu i zaznacz na nich zmiany.</p>
+        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Wstecz</button>
+        <button class="nextPage" mat-raised-button matStepperNext color="primary">Dalej <mat-icon>navigate_next</mat-icon></button>
+        <div class="clearfix"></div>
+      </mat-card>
+    </section>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Wyślij etykietę</ng-template>
+    <section class="step-content">
+      <img src="../../../assets/img/test_lung1.png">
+      <mat-card>
+        <mat-card-title>Wyślij etykietę</mat-card-title>
+        <mat-card-subtitle>Krok 5</mat-card-subtitle>
+        <p>Po wprowadzeniu oznaczenia, kliknij przycisk "Wyślij!". Pamiętaj, że za każdym razem wprowadzasz
+          jedną etykietę jednocześnie. Aby dodać kolejne oznaczenie dla tego samego skanu, użyj opcji "Dodaj kolejne".</p>
+        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Wstecz</button>
+        <button class="nextPage" mat-raised-button matStepperNext color="primary" routerLink="/category"><mat-icon>label_outline</mat-icon> Przejdź do etykietowania</button>
+        <div class="clearfix"></div>
+      </mat-card>
+    </section>
+  </mat-step>
+</mat-horizontal-stepper>
