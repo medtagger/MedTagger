@@ -8,22 +8,21 @@ import {Observable} from 'rxjs/Observable';
 import {ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
+import { environment } from '../../environments/environment';
+
 
 @Injectable()
 export class ScanService {
 
-  // TODO: Move this URLs somewhere else!
-  SCANS_API_URL = 'http://localhost:51000/api/v1/scans';
-  SLICES_WEBSOCKET = 'http://localhost:51000/slices';
   websocket: Socket;
 
   constructor(private http: Http) {
-    this.websocket = new Socket({url: this.SLICES_WEBSOCKET, options: {}});
+    this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {}});
   }
 
   getRandomScan(): Promise<ScanMetadata> {
     return new Promise((resolve, reject) => {
-      this.http.get(this.SCANS_API_URL + '/random').toPromise().then(
+      this.http.get(environment.API_URL + '/scans/random').toPromise().then(
         response => {
           console.log('ScanService | getRandomScan | response: ', response);
           const json = response.json();
@@ -56,7 +55,7 @@ export class ScanService {
   createNewScan() {
     return new Promise((resolve, reject) => {
       const payload = {};
-      this.http.post(this.SCANS_API_URL + '/', payload).toPromise().then(
+      this.http.post(environment.API_URL + '/scans/', payload).toPromise().then(
         response => {
           resolve(response.json().scan_id);
         },
