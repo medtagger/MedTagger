@@ -9,6 +9,7 @@ import {AppComponent} from './app.component';
 import {LoginPageComponent} from '../pages/login-page/login-page.component';
 import {HomePageComponent} from '../pages/home-page/home-page.component';
 import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
+import {MarkerTutorialPageComponent} from '../pages/marker-tutorial-page/marker-tutorial-page.component';
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
 import {CategoryPageComponent} from '../pages/category-page/category-page.component';
 
@@ -44,6 +45,7 @@ const routes: Routes = [
   {path: 'home', component: HomePageComponent, data: {title: 'Strona Główna'}},
   {path: 'category', component: CategoryPageComponent, data: {title: 'Wybór kategorii'}},
   {path: 'marker', component: MarkerPageComponent, data: {title: 'Etykietowanie'}},
+  {path: 'marker-tutorial', component: MarkerTutorialPageComponent, data: {title: 'Poradnik'}},
   {path: 'upload', component: UploadPageComponent, data: {title: 'Dodawanie skanów'}}
 ];
 
@@ -55,6 +57,7 @@ const routes: Routes = [
     HomePageComponent,
     CategoryPageComponent,
     MarkerComponent,
+    MarkerTutorialPageComponent,
     UploadScansSelectorComponent,
     UploadPageComponent,
   ],
