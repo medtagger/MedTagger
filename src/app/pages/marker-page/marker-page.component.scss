@@ -5,3 +5,17 @@ button {
   top: $canvas-size;
   margin: 1%;
 }
+
+.marker-page {
+  margin: 10px auto;
+}
+
+.canvasInterface {
+  position: relative;
+  margin: 0 auto;
+  width: $canvas-size;
+}
+
+.button-row {
+  text-align: center;
+}

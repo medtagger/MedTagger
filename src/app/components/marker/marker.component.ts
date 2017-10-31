@@ -1,10 +1,11 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild, HostListener} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {Subject} from 'rxjs/Subject';
+import {MatSliderChange} from "@angular/material/slider";
 
 @Component({
   selector: 'app-marker-component',
@@ -14,7 +15,7 @@ import {Subject} from 'rxjs/Subject';
 export class MarkerComponent implements OnInit {
 
   private static readonly STYLE = {
-    SELECTION_FONT_SIZE: 20,
+    SELECTION_FONT_SIZE: 14,
     SELECTION_LINE_DENSITY: [6],
     CURRENT_SELECTION_COLOR: '#ff0000',
     OTHER_SELECTION_COLOR: '#256fde',
@@ -50,6 +51,7 @@ export class MarkerComponent implements OnInit {
 
   public has3dSelection: boolean;
   public has2dSelection: boolean;
+  public hasArchivedSelections: boolean;
 
   private archivedSelections: Array<ROISelection2D>;
 
@@ -71,12 +73,14 @@ export class MarkerComponent implements OnInit {
     if (this.has2dSelection) {
       this.selections.delete(this.currentSlice);
       this.selectedArea = undefined;
+      this.updateSelectionState();
 
       this.clearCanvasSelection();
     }
   }
 
   private updateSelectionState(): void {
+    this.hasArchivedSelections = this.archivedSelections.length > 0;
     this.has2dSelection = !!this.selections.get(this.currentSlice) || !!this.selectedArea;
     this.has3dSelection = this.selections.size >= 2 || (this.selections.size === 1 && !!this.selectedArea);
   }
@@ -92,6 +96,7 @@ export class MarkerComponent implements OnInit {
 
     const coordinates: ROISelection2D[] = Array.from(this.selections.values());
     this.selections.clear();
+    this.updateSelectionState();
 
     this.drawPreviousSelections();
 
@@ -102,6 +107,7 @@ export class MarkerComponent implements OnInit {
     selectionMap.forEach((value: ROISelection2D) => {
       this.archivedSelections.push(value);
     });
+    this.updateSelectionState();
   }
 
   public feedData(newSlice: MarkerSlice): void {
@@ -191,6 +197,11 @@ export class MarkerComponent implements OnInit {
     this.canvasPosition = this.canvas.getBoundingClientRect();
   }
 
+  @HostListener('window:resize', [])
+  private updateCanvasPositionOnWindowResize(): void {
+    this.canvasPosition = this.canvas.getBoundingClientRect();
+  }
+
   private changeMarkerImage(sliceID: number): void {
     if (this.selectedArea) {
       this.selections.set(this.currentSlice, this.selectedArea);
@@ -250,7 +261,7 @@ export class MarkerComponent implements OnInit {
     console.log('Marker | initCanvasSelectionTool | canvas offsets: ', canvasX, canvasY);
 
     this.canvas.onmousedown = (mouseEvent: MouseEvent) => {
-      console.log('Marker | initCanvasSelectionTool | onmousedown clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
+      console.log('Marker | initCanvasSelectionTool | onmousedown clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
       this.startMouseSelection(mouseEvent);
     };
 

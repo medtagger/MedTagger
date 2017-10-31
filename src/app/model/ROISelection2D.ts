@@ -58,6 +58,6 @@ export class ROISelection2D {
   }
 
   private normalize(arg: number): number {
-    return arg / 512;
+    return arg / 600;
   }
 }
