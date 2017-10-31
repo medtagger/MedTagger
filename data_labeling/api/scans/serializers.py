@@ -4,8 +4,18 @@ from flask_restplus import reqparse, fields
 from data_labeling.api import api
 
 
-new_scan = api.model('New scan', {
+new_scan_request = api.model('New scan request', {
+    'category': fields.String(description='Scan\'s category')
+})
+
+new_scan_response = api.model('New scan response', {
     'scan_id': fields.String(description='Scan\'s ID'),
+})
+
+scan_category = api.model('New scan category model', {
+    'key': fields.String(),
+    'name': fields.String(),
+    'image_path': fields.String(),
 })
 
 random_scan = api.model('Random scan model', {
@@ -30,6 +40,5 @@ accepted = api.model('Accepted for asynchronous processing', {
 })
 
 
-slices_arguments = reqparse.RequestParser()
-slices_arguments.add_argument('begin', type=int, required=True, help='First slice index (included)')
-slices_arguments.add_argument('count', type=int, required=True, help='Number of slices that user wants to fetch')
+random_scan_arguments = reqparse.RequestParser()
+random_scan_arguments.add_argument('category', type=str, required=True, help='Scan\'s category')

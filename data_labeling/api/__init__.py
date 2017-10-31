@@ -7,7 +7,7 @@ from flask import Blueprint
 from flask_restplus import Api
 from flask_socketio import SocketIO, emit
 
-from data_labeling.api.exceptions import InvalidArgumentsException, BusinessLogicException
+from data_labeling.api.exceptions import InvalidArgumentsException, NotFoundException, BusinessLogicException
 
 log = logging.getLogger(__name__)
 
@@ -38,6 +38,18 @@ def rest_business_logic_error_handler(exception: Exception) -> Tuple[Dict, int]:
     log.warning(traceback.format_exc())
     details = str(exception)
     return {'message': 'Business logic error.', 'details': details}, 500
+
+
+@api.errorhandler(NotFoundException)
+def rest_not_found_error_handler(exception: Exception) -> Tuple[Dict, int]:
+    """Handler for not found errors
+
+    :param exception: Python Exception
+    :return: tuple with response and status code
+    """
+    log.warning(traceback.format_exc())
+    details = str(exception)
+    return {'message': 'Requested object does not exist.', 'details': details}, 404
 
 
 @api.errorhandler(InvalidArgumentsException)

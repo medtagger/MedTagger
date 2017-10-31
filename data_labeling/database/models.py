@@ -37,21 +37,52 @@ class User(Base, UserMixin):
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.username)
 
 
+class ScanCategory(Base):
+    """Definition of a Scan Category"""
+    __tablename__ = 'ScanCategories'
+    id: int = Column(Integer, autoincrement=True, primary_key=True)
+    key: str = Column(String(50), nullable=False, unique=True)
+    name: str = Column(String(100), nullable=False)
+    image_path: str = Column(String(100), nullable=False)
+
+    def __init__(self, key: str, name: str, image_path: str) -> None:
+        """Initializer for Scan Category
+
+        :param key: unique key representing Scan Category
+        :param name: name which describes this Category
+        :param image_path: path to the image which is located on the frontend
+        """
+        self.key = key
+        self.name = name
+        self.image_path = image_path
+
+    def __repr__(self) -> str:
+        """String representation for Scan Category"""
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
+
+
 class Scan(Base):
     """Definition of a Scan"""
     __tablename__ = 'Scans'
     id: ScanID = Column(String, primary_key=True)
 
+    category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
+    category: ScanCategory = relationship('ScanCategory')
+
     slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
     labels: List['Label'] = relationship('Label', back_populates='scan')
 
-    def __init__(self) -> None:
-        """Initializer for Scan"""
+    def __init__(self, category: ScanCategory) -> None:
+        """Initializer for Scan
+
+        :param category: Scan's category
+        """
         self.id = ScanID(str(uuid.uuid4()))
+        self.category = category
 
     def __repr__(self) -> str:
         """String representation for Scan"""
-        return '<{}: {}>'.format(self.__class__.__name__, self.id)
+        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key)
 
     def add_slice(self, dicom_image: FileDataset) -> SliceID:
         """Add new slice into this Scan
@@ -188,3 +219,7 @@ class LabelSelection(Base):
         self.position_z = position.slice_index
         self.shape_width = shape.width
         self.shape_height = shape.height
+
+    def __repr__(self) -> str:
+        """String representation for Label Selection"""
+        return '<{}: {}>'.format(self.__class__.__name__, self.id)
