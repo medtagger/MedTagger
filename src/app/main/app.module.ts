@@ -39,6 +39,7 @@ import {
   MatGridListModule,
   MatExpansionModule,
   MatSnackBarModule,
+  MatSelectModule,
 } from '@angular/material';
 
 
@@ -94,6 +95,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     MatExpansionModule,
     MatSnackBarModule,
+    MatSelectModule,
     HttpModule,
   ],
   providers: [MockService],

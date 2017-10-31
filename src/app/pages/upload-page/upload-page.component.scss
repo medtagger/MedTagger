@@ -1,3 +1,7 @@
+.pull-right {
+  float: right;
+}
+
 .upload-mode {
   width: 40%;
   max-width: 450px;
@@ -13,6 +17,14 @@
 
 .enable-card-border {
   margin: 5px;
+}
+
+.category-selection {
+  width: 60%;
+  min-width: 400px;
+  max-width: 600px;
+  margin: 5px auto;
+  display: block;
 }
 
 .progress-spinner {
@@ -36,4 +48,9 @@
 
 .success-indicator {
   vertical-align: middle !important;
+}
+
+.restart-button {
+  margin: 20px auto;
+  display: block;
 }

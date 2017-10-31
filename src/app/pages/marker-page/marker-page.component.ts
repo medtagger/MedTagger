@@ -1,4 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 
 import {ScanService} from '../../services/scan.service';
 import {MarkerComponent} from '../../components/marker/marker.component';
@@ -21,16 +22,20 @@ export class MarkerPageComponent implements OnInit {
   @ViewChild(MarkerComponent) marker: MarkerComponent;
 
   scan: ScanMetadata;
+  category: string;
   lastSliceID = 0;
 
-  constructor(private scanService: ScanService) {
+  constructor(private scanService: ScanService, private route: ActivatedRoute) {
     console.log('MarkerPage constructor', this.marker);
   }
 
   ngOnInit() {
     console.log('MarkerPage init', this.marker);
+    this.route.queryParamMap.subscribe(params => {
+      this.category = params.get('category') || '';
+      this.requestScan();
+    });
 
-    this.requestScan();
     this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
       console.log('MarkerPage | ngOnInit | slicesObservable: ', slice);
       if (slice.index > this.lastSliceID) {
@@ -58,7 +63,7 @@ export class MarkerPageComponent implements OnInit {
   }
 
   private requestScan(): void {
-    this.scanService.getRandomScan().then((scan: ScanMetadata) => {
+    this.scanService.getRandomScan(this.category).then((scan: ScanMetadata) => {
       this.scan = scan;
       this.marker.setScanMetadata(this.scan);
 
