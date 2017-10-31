@@ -31,15 +31,19 @@ import glob
 import dicom
 
 from data_labeling.database import db_session
-from data_labeling.database.models import Scan
+from data_labeling.database.models import Scan, ScanCategory
 
 
 parser = argparse.ArgumentParser(description='Import data to the HBase Database.')
-parser.add_argument('--source', type=str, required=True)
+parser.add_argument('--source', type=str, required=True, help='Source directory')
+parser.add_argument('--category', type=str, required=True, help='Category key for these scans')
 args = parser.parse_args()
 
 
 if __name__ == '__main__':
+    with db_session() as session:
+        category = session.query(ScanCategory).filter(ScanCategory.key == args.category).one()
+
     source = args.source.rstrip('/')
     for scan_directory in glob.iglob(source + '/*'):
         if not os.path.isdir(scan_directory):
@@ -47,7 +51,7 @@ if __name__ == '__main__':
 
         print('Adding new scan from {}.'.format(scan_directory))
         with db_session() as session:
-            scan = Scan()
+            scan = Scan(category)
             session.add(scan)
 
         for slice_name in glob.iglob(scan_directory + '/*.dcm'):
