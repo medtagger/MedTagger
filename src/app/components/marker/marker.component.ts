@@ -1,10 +1,10 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
-import {MockService} from '../../services/mock.service';
 import {MatSlider} from '@angular/material/slider';
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {ROISelection3D} from '../../model/ROISelection3D';
+import {Subject} from 'rxjs/Subject';
 
 @Component({
   selector: 'app-marker-component',
@@ -12,6 +12,15 @@ import {ROISelection3D} from '../../model/ROISelection3D';
   styleUrls: ['./marker.component.scss']
 })
 export class MarkerComponent implements OnInit {
+
+  private static readonly STYLE = {
+    SELECTION_FONT_SIZE: 20,
+    SELECTION_LINE_DENSITY: [6],
+    CURRENT_SELECTION_COLOR: '#ff0000',
+    OTHER_SELECTION_COLOR: '#256fde',
+    ARCHIVED_SELECTION_COLOR: '#5f27e5'
+  };
+
   currentImage: HTMLImageElement;
 
   @ViewChild('image')
@@ -33,7 +42,7 @@ export class MarkerComponent implements OnInit {
 
   public scanMetadata: ScanMetadata;
   public slices: Map<number, MarkerSlice>;
-  private currentSlice = 0;
+  private currentSlice;
 
   private selectedArea: ROISelection2D;
   private selections: Map<number, ROISelection2D>;
@@ -42,18 +51,20 @@ export class MarkerComponent implements OnInit {
   public has3dSelection: boolean;
   public has2dSelection: boolean;
 
+  private archivedSelections: Array<ROISelection2D>;
 
-  constructor(private mockService: MockService) {
-    // mockService.getMockSlicesURI().forEach((value: string, index: number) => {
-    //   this.slices.push(new MarkerSlice(index, value));
-    // });
-  }
+  public observableSliceRequest: Subject<number>;
+  private sliceBatchSize: number;
+
+  constructor() {}
 
   public clearData(): void {
     this.slices = new Map<number, MarkerSlice>();
-    this.currentSlice = 0;
+    this.currentSlice = undefined;
     this.selectedArea = undefined;
     this.selections = new Map<number, ROISelection2D>();
+    this.archivedSelections = [];
+    this.clearCanvasSelection();
   }
 
   public removeCurrentSelection(): void {
@@ -75,17 +86,35 @@ export class MarkerComponent implements OnInit {
       this.selections.set(this.currentSlice, this.selectedArea);
       this.selectedArea = undefined;
     }
-    return new ROISelection3D(Array.from(this.selections.values()));
+    this.archiveSelections(this.selections);
+
+    this.clearCanvasSelection();
+
+    const coordinates: ROISelection2D[] = Array.from(this.selections.values());
+    this.selections.clear();
+
+    this.drawPreviousSelections();
+
+    return new ROISelection3D(coordinates);
+  }
+
+  private archiveSelections(selectionMap: Map<number, ROISelection2D>) {
+    selectionMap.forEach((value: ROISelection2D) => {
+      this.archivedSelections.push(value);
+    });
   }
 
   public feedData(newSlice: MarkerSlice): void {
     console.log('Marker | feedData: ', newSlice);
+    if (!this.currentSlice) {
+      this.currentSlice = newSlice.index;
+    }
     this.addSlice(newSlice);
     this.updateSliderRange();
   }
 
   private updateSliderRange(): void {
-    const sortedKeys: number[] = Array.from(this.slices.keys()).sort( (a: number, b: number) => {
+    const sortedKeys: number[] = Array.from(this.slices.keys()).sort((a: number, b: number) => {
       return a - b;
     });
     console.log('MarkerComponent | updateSliderRange | sortedKeys: ', sortedKeys);
@@ -106,16 +135,25 @@ export class MarkerComponent implements OnInit {
     // this.slider.max = scanMetadata.numberOfSlices;
   }
 
+  public hookUpSliceObserver(sliceBatchSize: number): Promise<boolean> {
+    this.sliceBatchSize = sliceBatchSize;
+    return new Promise((resolve) => {
+      this.observableSliceRequest = new Subject<number>();
+      resolve(true);
+    });
+  }
+
   ngOnInit() {
     console.log('Marker init');
     console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
 
     this.selections = new Map<number, ROISelection2D>();
     this.slices = new Map<number, MarkerSlice>();
+    this.archivedSelections = [];
 
     this.initializeCanvas();
 
-    this.currentImage.onload = (event: Event) => {
+    this.currentImage.onload = () => {
       this.initCanvasSelectionTool();
     };
 
@@ -123,11 +161,29 @@ export class MarkerComponent implements OnInit {
 
     this.slider.registerOnChange((sliderValue: number) => {
       console.log('Marker init | slider change: ', sliderValue);
+
+      this.requestSlicesIfNeeded(sliderValue);
+
       this.changeMarkerImage(sliderValue);
       this.drawPreviousSelections();
 
       this.updateSelectionState();
     });
+  }
+
+  private requestSlicesIfNeeded(sliderValue: number): void {
+    console.log('Marker | requestSlicesIfNeeded sliderValue: ', sliderValue);
+    let requestSliceIndex;
+    if (this.slider.max === sliderValue) {
+      requestSliceIndex = sliderValue + 1;
+      console.log('Marker | requestSlicesIfNeeded more (higher indexes): ', requestSliceIndex);
+      this.observableSliceRequest.next(requestSliceIndex);
+    }
+    if (this.slider.min === sliderValue) {
+      requestSliceIndex = sliderValue - this.sliceBatchSize;
+      console.log('Marker | requestSlicesIfNeeded more (lower indexes): ', requestSliceIndex);
+      this.observableSliceRequest.next(requestSliceIndex);
+    }
   }
 
   private initializeCanvas(): void {
@@ -161,22 +217,26 @@ export class MarkerComponent implements OnInit {
     this.selections.forEach((selection: ROISelection2D) => {
       let color: string;
       if (selection.depth === this.currentSlice) {
-        color = '#ff0000';
+        color = MarkerComponent.STYLE.CURRENT_SELECTION_COLOR;
       } else {
-        color = '#0022BB';
+        color = MarkerComponent.STYLE.OTHER_SELECTION_COLOR;
       }
       this.drawSelection(selection, color);
+    });
+    console.log('Marker | drawPreviousSelections | archived: ', this.archivedSelections);
+    this.archivedSelections.forEach((selection: ROISelection2D) => {
+      this.drawSelection(selection, MarkerComponent.STYLE.ARCHIVED_SELECTION_COLOR);
     });
   }
 
   private drawSelection(selection: ROISelection2D, color: string): void {
     console.log('Marker | drawSelection | selection: ', selection);
     this.canvasCtx.strokeStyle = color;
-    this.canvasCtx.setLineDash([6]);
+    this.canvasCtx.setLineDash(MarkerComponent.STYLE.SELECTION_LINE_DENSITY);
     this.canvasCtx.strokeRect(selection.positionX, selection.positionY,
       selection.width, selection.height);
 
-    const fontSize = 20;
+    const fontSize = MarkerComponent.STYLE.SELECTION_FONT_SIZE;
     this.canvasCtx.font = `${fontSize}px Arial`;
     this.canvasCtx.fillStyle = color;
     this.canvasCtx.fillText(selection.depth.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
@@ -194,7 +254,7 @@ export class MarkerComponent implements OnInit {
       this.startMouseSelection(mouseEvent);
     };
 
-    this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
+    this.canvas.onmouseup = () => {
       if (this.mouseDrag) {
         this.mouseDrag = false;
         this.updateSelectionState();
@@ -221,7 +281,7 @@ export class MarkerComponent implements OnInit {
       this.updateSelection(mouseEvent);
       this.clearCanvasSelection();
 
-      this.drawSelection(this.selectedArea, '#ff0000');
+      this.drawSelection(this.selectedArea, MarkerComponent.STYLE.CURRENT_SELECTION_COLOR);
     }
   }
 

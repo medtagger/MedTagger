@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 
 import {ScanService} from '../../services/scan.service';
 import {MarkerComponent} from '../../components/marker/marker.component';
@@ -6,7 +6,6 @@ import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {Response} from '@angular/http';
-import {count} from 'rxjs/operator/count';
 
 
 @Component({
@@ -16,6 +15,9 @@ import {count} from 'rxjs/operator/count';
   styleUrls: ['./marker-page.component.scss']
 })
 export class MarkerPageComponent implements OnInit {
+
+  private static readonly SLICE_BATCH_SIZE = 10;
+
   @ViewChild(MarkerComponent) marker: MarkerComponent;
 
   scan: ScanMetadata;
@@ -27,6 +29,7 @@ export class MarkerPageComponent implements OnInit {
 
   ngOnInit() {
     console.log('MarkerPage init', this.marker);
+
     this.requestScan();
     this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
       console.log('MarkerPage | ngOnInit | slicesObservable: ', slice);
@@ -35,6 +38,23 @@ export class MarkerPageComponent implements OnInit {
       }
       this.marker.feedData(slice);
     });
+
+    this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
+      if (isObserverHooked) {
+        this.marker.observableSliceRequest.subscribe((sliceRequest: number) => {
+          console.log('MarkerPage | observable sliceRequest: ', sliceRequest);
+          let count = MarkerPageComponent.SLICE_BATCH_SIZE;
+          if (sliceRequest + count > this.scan.numberOfSlices) {
+            count = this.scan.numberOfSlices - sliceRequest;
+          }
+          if (sliceRequest < 0) {
+            count = count + sliceRequest;
+            sliceRequest = 0;
+          }
+          this.scanService.requestSlices(this.scan.scanId, sliceRequest, count);
+        });
+      }
+    });
   }
 
   private requestScan(): void {
@@ -42,15 +62,13 @@ export class MarkerPageComponent implements OnInit {
       this.scan = scan;
       this.marker.setScanMetadata(this.scan);
 
-      //TODO: ogarnięcie randomowego startu
-
       const begin = Math.floor(Math.random() * scan.numberOfSlices);
-      const count = 10;
+      const count = MarkerPageComponent.SLICE_BATCH_SIZE;
       this.scanService.requestSlices(scan.scanId, begin, count);
     });
   }
 
-  private skipScan(): void {
+  public skipScan(): void {
     this.marker.clearData();
     this.requestScan();
   }
@@ -65,15 +83,7 @@ export class MarkerPageComponent implements OnInit {
     return;
   }
 
-  private remove2dSelection(): void {
+  public remove2dSelection(): void {
     this.marker.removeCurrentSelection();
   }
-
-  public moreSlices(previous?: boolean) {
-    if (previous) {
-      // this.currentSliceIds.sort()
-    }
-    this.scanService.requestSlices(this.scan.scanId, this.lastSliceID, 10);
-  }
-
 }
