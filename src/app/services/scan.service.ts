@@ -58,7 +58,11 @@ export class ScanService {
         response => {
           console.log('ScanService | getAvailableCategories | response: ', response);
           const json = response.json();
-          resolve(new ScanCategory(json.key, json.name, json.image_path));
+          const categories = [];
+          for (let category of json) {
+            categories.push(new ScanCategory(category.key, category.name, category.image_path))
+          }
+          resolve(categories);
         },
         error => {
           console.log('ScanService | getAvailableCategories | error: ', error);

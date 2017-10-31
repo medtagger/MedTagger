@@ -7,6 +7,7 @@ import {ScanService} from "../../services/scan.service";
 @Component({
   selector: 'app-category-page',
   templateUrl: './category-page.component.html',
+  providers: [ScanService],
   styleUrls: ['./category-page.component.scss']
 })
 export class CategoryPageComponent implements OnInit {
@@ -19,6 +20,8 @@ export class CategoryPageComponent implements OnInit {
 
   ngOnInit() {
     this.scanService.getAvailableCategories().then((categories) => {
+      this.categories = categories;
+      console.log(categories);
       for (let category of categories) {
         this.iconRegistry.addSvgIcon(category.key, this.sanitizer.bypassSecurityTrustResourceUrl(category.imagePath));
       }
