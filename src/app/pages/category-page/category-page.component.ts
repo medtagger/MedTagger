@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {MatIconRegistry} from '@angular/material';
+import {MatSnackBar, MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
+
+import {ScanService} from "../../services/scan.service";
 
 @Component({
   selector: 'app-category-page',
@@ -10,13 +11,21 @@ import {DomSanitizer} from '@angular/platform-browser';
 })
 export class CategoryPageComponent implements OnInit {
 
-  constructor(private routerService: Router, iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
-    iconRegistry.addSvgIcon('kidneys', sanitizer.bypassSecurityTrustResourceUrl('../../../assets/icon/kidneys_category_icon.svg'));
-    iconRegistry.addSvgIcon('liver', sanitizer.bypassSecurityTrustResourceUrl('../../../assets/icon/liver_category_icon.svg'));
-    iconRegistry.addSvgIcon('hearth', sanitizer.bypassSecurityTrustResourceUrl('../../../assets/icon/hearth_category_icon.svg'));
-    iconRegistry.addSvgIcon('lungs', sanitizer.bypassSecurityTrustResourceUrl('../../../assets/icon/lungs_category_icon.svg'));
+  categories = [];
+
+  constructor(private iconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private scanService: ScanService,
+              public snackBar: MatSnackBar) {
   }
 
   ngOnInit() {
+    this.scanService.getAvailableCategories().then((categories) => {
+      for (let category of categories) {
+        this.iconRegistry.addSvgIcon(category.key, this.sanitizer.bypassSecurityTrustResourceUrl(category.imagePath));
+      }
+    }, () => {
+      this.snackBar.open("Błąd podczas pobierania kategorii", "Zamknij", {
+        duration: 5000,
+      });
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatHorizontalStepper, MatStep } from '@angular/material';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { ScanService } from '../../services/scan.service';
 
@@ -18,7 +19,11 @@ enum UploadMode {
 })
 export class UploadPageComponent implements OnInit {
 
-  @ViewChild('stepper') stepper;
+  @ViewChild('stepper') stepper: MatHorizontalStepper;
+  @ViewChild('chooseModeStep') chooseModeStep: MatStep;
+  @ViewChild('chooseFilesStep') chooseFilesStep: MatStep;
+  @ViewChild('sendingFilesStep') sendingFilesStep: MatStep;
+  @ViewChild('uploadCompletedStep') uploadCompletedStep: MatStep;
 
   files: File[] = [];
   filesSent = 0;
@@ -27,10 +32,13 @@ export class UploadPageComponent implements OnInit {
 
   UploadMode = UploadMode;  // Needed in template for comparison with Enum values
   uploadMode: UploadMode = UploadMode.SINGLE_SCAN;
+  category: string;
+  availableCategories = [];
   chooseModeFormGroup: FormGroup;
   chooseFilesFormGroup: FormGroup;
   sendingFilesFormGroup: FormGroup;
   uploadCompletedFormGroup: FormGroup;
+  chooseCategoryFormGroup: FormGroup;
 
   constructor(private scanService: ScanService, private formBuilder: FormBuilder) {}
 
@@ -39,12 +47,18 @@ export class UploadPageComponent implements OnInit {
     this.chooseFilesFormGroup = this.formBuilder.group({});
     this.sendingFilesFormGroup = this.formBuilder.group({});
     this.uploadCompletedFormGroup = this.formBuilder.group({});
+    this.chooseCategoryFormGroup = this.formBuilder.group({
+      'category': new FormControl(this.category, [Validators.required]),
+    });
     this.scanService.acknowledgeObservable().subscribe(() => {
       this.filesSent += 1;
       this.progress = 100.0 * this.filesSent / this.numberOfFiles;
       if (this.filesSent === this.numberOfFiles) {
         this.stepper.next();
       }
+    });
+    this.scanService.getAvailableCategories().then((availableCategories) => {
+      this.availableCategories = availableCategories;
     });
   }
 
@@ -65,8 +79,9 @@ export class UploadPageComponent implements OnInit {
   }
 
   uploadSingleScan(files: File[]) {
+    let category = this.chooseCategoryFormGroup.get('category').value;
     this.numberOfFiles = this.files.length;
-    this.scanService.createNewScan().then((scanId: string) => {
+    this.scanService.createNewScan(category).then((scanId: string) => {
       console.log('New Scan created with ID:', scanId);
       this.scanService.uploadSlices(scanId, files);
     });
@@ -75,6 +90,14 @@ export class UploadPageComponent implements OnInit {
   uploadMultipleScans(files: File[]) {
     console.warn('Not supported yet!');
     this.numberOfFiles = this.files.length;  // TODO: Change the way we track number of files in multiple scans upload mode!
+  }
+
+  restart() {
+    this.stepper.selectedIndex = 0;
+    this.chooseModeStep.completed = false;
+    this.chooseFilesStep.completed = false;
+    this.sendingFilesStep.completed = false;
+    this.uploadCompletedStep.completed = false;
   }
 
 }

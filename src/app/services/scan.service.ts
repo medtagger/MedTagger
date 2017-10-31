@@ -1,15 +1,15 @@
 import {Injectable} from '@angular/core';
-import {Http, Response} from '@angular/http';
+import {Http, URLSearchParams, Response} from '@angular/http';
 
 import {Socket} from 'ng-socket-io';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 import {Observable} from 'rxjs/Observable';
-import {ScanMetadata} from '../model/ScanMetadata';
+import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 import {ROISelection3D} from '../model/ROISelection3D';
 
-import { environment } from '../../environments/environment';
+import {environment} from '../../environments/environment';
 
 
 @Injectable()
@@ -34,9 +34,11 @@ export class ScanService {
     });
   }
 
-  getRandomScan(): Promise<ScanMetadata> {
+  getRandomScan(category: string): Promise<ScanMetadata> {
     return new Promise((resolve, reject) => {
-      this.http.get(environment.API_URL + '/scans/random').toPromise().then(
+      let params = new URLSearchParams();
+      params.set('category', category);
+      this.http.get(environment.API_URL + '/scans/random', { params: params }).toPromise().then(
         response => {
           console.log('ScanService | getRandomScan | response: ', response);
           const json = response.json();
@@ -44,6 +46,22 @@ export class ScanService {
         },
         error => {
           console.log('ScanService | getRandomScan | error: ', error);
+          reject(error);
+        }
+      );
+    });
+  }
+
+  getAvailableCategories(): Promise<ScanCategory[]> {
+    return new Promise((resolve, reject) => {
+      this.http.get(environment.API_URL + '/scans/categories').toPromise().then(
+        response => {
+          console.log('ScanService | getAvailableCategories | response: ', response);
+          const json = response.json();
+          resolve(new ScanCategory(json.key, json.name, json.image_path));
+        },
+        error => {
+          console.log('ScanService | getAvailableCategories | error: ', error);
           reject(error);
         }
       );
@@ -67,9 +85,11 @@ export class ScanService {
     this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count});
   }
 
-  createNewScan() {
+  createNewScan(category: string) {
     return new Promise((resolve, reject) => {
-      const payload = {};
+      const payload = {
+        category: category,
+      };
       this.http.post(environment.API_URL + '/scans/', payload).toPromise().then(
         response => {
           resolve(response.json().scan_id);
