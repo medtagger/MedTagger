@@ -1,11 +1,12 @@
 """Module responsible for defining all of the relational database models"""
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
+import enum
 import uuid
 from typing import List
 
 from dicom.dataset import FileDataset
 from flask_login import UserMixin
-from sqlalchemy import Column, Integer, Float, String, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from data_labeling.clients.hbase_client import HBaseClient
@@ -163,22 +164,34 @@ class Slice(Base):
         return data[b'image:value']
 
 
+class LabelStatus(enum.Enum):
+    """Defines available status for label"""
+    VALID = "VALID"
+    INVALID = "INVALID"
+    NOT_VERIFIED = "NOT_VERIFIED"
+
+
 class Label(Base):
     """Definition of a Label"""
     __tablename__ = 'Labels'
     id: LabelID = Column(String, primary_key=True)
 
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
+    status: LabelStatus = Column(Enum(LabelStatus), nullable=False, server_default=LabelStatus.NOT_VERIFIED.value)
     scan: Scan = relationship('Scan', back_populates='labels')
     selections: 'LabelSelection' = relationship('LabelSelection', back_populates='label')
 
     def __init__(self) -> None:
-        """Initializer for Label"""
+        """Initializer for Label
+
+        By default all of the labels are not verified
+        """
         self.id = LabelID(str(uuid.uuid4()))
+        self.status = LabelStatus.NOT_VERIFIED
 
     def __repr__(self) -> str:
         """String representation for Label"""
-        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.scan_id)
+        return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status)
 
     def add_selection(self, position: LabelPosition, shape: LabelShape) -> LabelSelectionID:
         """Add new selection for this label
@@ -201,7 +214,7 @@ class LabelSelection(Base):
     id: LabelSelectionID = Column(String, primary_key=True)
     position_x: float = Column(Float, nullable=False)
     position_y: float = Column(Float, nullable=False)
-    position_z: float = Column(Float, nullable=False)
+    slice_index: int = Column(Integer, nullable=False)
     shape_width: float = Column(Float, nullable=False)
     shape_height: float = Column(Float, nullable=False)
 
@@ -217,7 +230,7 @@ class LabelSelection(Base):
         self.id = LabelSelectionID(str(uuid.uuid4()))
         self.position_x = position.x
         self.position_y = position.y
-        self.position_z = position.slice_index
+        self.slice_index = position.slice_index
         self.shape_width = shape.width
         self.shape_height = shape.height
 

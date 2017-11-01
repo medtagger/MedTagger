@@ -19,6 +19,7 @@ from data_labeling.config import ConfigurationFile
 
 # Import all REST services
 from data_labeling.api.core.service_rest import core_ns as core_rest_ns  # noqa
+from data_labeling.api.labels.service_rest import labels_ns  # noqa
 from data_labeling.api.scans.service_rest import scans_ns as scans_rest_ns  # noqa
 from data_labeling.api.account.service import account_ns  # noqa
 
