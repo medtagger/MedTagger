@@ -14,3 +14,5 @@ PickledDicomImage = NewType('PickledDicomImage', str)
 
 LabelPosition = NamedTuple('LabelPosition', [('x', float), ('y', float), ('slice_index', int)])
 LabelShape = NamedTuple('LabelShape', [('width', float), ('height', float)])
+
+UserInfo = NamedTuple('UserInfo', [('email', str), ('first_name', str), ('last_name', str)])
