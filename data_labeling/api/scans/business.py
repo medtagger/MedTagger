@@ -123,6 +123,17 @@ def add_new_slice(scan_id: ScanID, dicom_image: FileDataset) -> None:
     :param scan_id: ID of a Scan for which it should add new slice
     :param dicom_image: Dicom file with a single slice
     """
-    with db_session() as session:
-        scan = session.query(Scan).filter(Scan.id == scan_id).one()
-        scan.add_slice(dicom_image)
+    scan = Scan.query.get(scan_id)
+    scan.add_slice(dicom_image)
+
+
+def get_scan(scan_id: ScanID) -> Dict[str, Any]:
+    """Returns scan for given scan_id
+
+    :param scan_id: ID of a Scan which should be returned
+    """
+    scan = Scan.query.get(scan_id)
+    return {
+        'scan_id': scan.id,
+        'number_of_slices': len(scan.slices),
+    }

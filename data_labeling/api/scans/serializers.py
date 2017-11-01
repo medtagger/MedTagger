@@ -18,7 +18,7 @@ scan_category = api.model('New scan category model', {
     'image_path': fields.String(),
 })
 
-random_scan = api.model('Random scan model', {
+scan = api.model('Scan model', {
     'scan_id': fields.String(description='Scan\'s ID'),
     'number_of_slices': fields.Integer(description='Total number of slices in given scan'),
 })

@@ -8,7 +8,7 @@ from data_labeling.api import api
 from data_labeling.api.exceptions import InvalidArgumentsException
 from data_labeling.api.scans import serializers
 from data_labeling.api.scans.business import create_empty_scan, get_available_scan_categories, create_scan_category, \
-    get_random_scan, add_label
+    get_random_scan, add_label, get_scan
 
 scans_ns = api.namespace('scans', 'Methods related with scans')
 
@@ -69,7 +69,7 @@ class Random(Resource):
 
     @staticmethod
     @scans_ns.expect(serializers.random_scan_arguments, validate=True)
-    @scans_ns.marshal_with(serializers.random_scan)
+    @scans_ns.marshal_with(serializers.scan)
     @scans_ns.doc(description='Returns random scan.')
     @scans_ns.doc(responses={200: 'Success'})
     def get() -> Any:
@@ -98,3 +98,17 @@ class Label(Resource):
         label_id = add_label(scan_id, selections)
 
         return {'label_id': label_id}, 201
+
+
+@scans_ns.route('/<string:scan_id>')
+@scans_ns.param('scan_id', 'Scan identifier')
+class Scan(Resource):
+    """Endpoint that returns scan for the given scan id"""
+
+    @staticmethod
+    @scans_ns.marshal_with(serializers.scan)
+    @scans_ns.doc(description='Returns scan with given scan_id.')
+    @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
+    def get(scan_id: ScanID) -> Any:
+        """Method responsible for returning scan for the given scan_id"""
+        return get_scan(scan_id)
