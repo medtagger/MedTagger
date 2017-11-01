@@ -21,12 +21,11 @@ export class CategoryPageComponent implements OnInit {
   ngOnInit() {
     this.scanService.getAvailableCategories().then((categories) => {
       this.categories = categories;
-      console.log(categories);
-      for (let category of categories) {
+      for (const category of categories) {
         this.iconRegistry.addSvgIcon(category.key, this.sanitizer.bypassSecurityTrustResourceUrl(category.imagePath));
       }
     }, () => {
-      this.snackBar.open("Błąd podczas pobierania kategorii", "Zamknij", {
+      this.snackBar.open('Błąd podczas pobierania kategorii', 'Zamknij', {
         duration: 5000,
       });
     });
