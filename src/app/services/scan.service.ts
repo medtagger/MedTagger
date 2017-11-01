@@ -38,9 +38,26 @@ export class ScanService {
     return new Promise((resolve, reject) => {
       let params = new URLSearchParams();
       params.set('category', category);
-      this.http.get(environment.API_URL + '/scans/random', { params: params }).toPromise().then(
+      this.http.get(environment.API_URL + '/scans/random', {params: params}).toPromise().then(
         response => {
           console.log('ScanService | getRandomScan | response: ', response);
+          const json = response.json();
+          resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
+        },
+        error => {
+          console.log('ScanService | getRandomScan | error: ', error);
+          reject(error);
+        }
+      );
+    });
+  }
+
+
+  getScanForScanId(scanId: string): Promise<ScanMetadata> {
+    return new Promise((resolve, reject) => {
+      this.http.get(environment.API_URL + '/scans/' + scanId).toPromise().then(
+        response => {
+          console.log('ScanService | getScanForScanId | response: ', response);
           const json = response.json();
           resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
         },

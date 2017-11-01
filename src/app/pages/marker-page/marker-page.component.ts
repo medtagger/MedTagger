@@ -67,7 +67,7 @@ export class MarkerPageComponent implements OnInit {
       this.scan = scan;
       this.marker.setScanMetadata(this.scan);
 
-      const begin = Math.floor(Math.random() * scan.numberOfSlices);
+      const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
       const count = MarkerPageComponent.SLICE_BATCH_SIZE;
       this.scanService.requestSlices(scan.scanId, begin, count);
     });

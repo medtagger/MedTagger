@@ -13,6 +13,7 @@ import {MarkerTutorialPageComponent} from '../pages/marker-tutorial-page/marker-
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
 import {CategoryPageComponent} from '../pages/category-page/category-page.component';
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
+import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
 import {MockService} from '../services/mock.service';
 
@@ -51,6 +52,7 @@ const routes: Routes = [
   {path: 'marker', component: MarkerPageComponent, data: {title: 'Etykietowanie'}},
   {path: 'upload', component: UploadPageComponent, data: {title: 'Dodawanie skanów'}},
   {path: 'settings', component: SettingsPageComponent, data: {title: 'Ustawienia'}},
+  {path: 'validation', component: ValidationPageComponent, data: {title: 'Walidacja'}},
   {path: 'marker-tutorial', component: MarkerTutorialPageComponent, data: {title: 'Poradnik'}}
 ];
 
@@ -66,6 +68,7 @@ const routes: Routes = [
     UploadScansSelectorComponent,
     UploadPageComponent,
     SettingsPageComponent,
+    ValidationPageComponent,
   ],
   imports: [
     RouterModule.forRoot(
