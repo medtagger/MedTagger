@@ -1,5 +1,7 @@
 """Module responsible for definition of Core service"""
 from typing import Any
+
+from flask_login import login_required
 from flask_restplus import Resource
 
 from data_labeling.api import api
@@ -20,3 +22,15 @@ class Status(Resource):
     def get() -> Any:
         """Return status of the API"""
         return success()
+
+
+@core_ns.route('/check-authentication')
+class CheckAuthentication(Resource):
+    """Endpoint gives the possibility to check authorization mechanism"""
+
+    @staticmethod
+    @login_required
+    @api.doc(responses={204: "User authenticated", 401: "Unauthorized"})
+    def get() -> Any:
+        """Checks if the user is authenticated"""
+        return {}, 204

@@ -4,37 +4,38 @@ import uuid
 from typing import List
 
 from dicom.dataset import FileDataset
-from flask_user import UserMixin
+from flask_login import UserMixin
 from sqlalchemy import Column, Integer, Float, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from data_labeling.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition,\
-    LabelPosition, LabelShape
-from data_labeling.database import Base, db_session
 from data_labeling.clients.hbase_client import HBaseClient
-from data_labeling.workers.storage import store_dicom
+from data_labeling.database import Base, db_session
+from data_labeling.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
+    LabelPosition, LabelShape
 from data_labeling.workers.conversion import convert_dicom_to_png
+from data_labeling.workers.storage import store_dicom
 
 
 class User(Base, UserMixin):
     """Defines model for the Users table entry"""
     __tablename__ = 'Users'
     id: int = Column(Integer, autoincrement=True, primary_key=True)
-    username: str = Column(String(50), nullable=False, unique=True)
-    password: str = Column(String(255), nullable=False, server_default='')
+    email: str = Column(String(50), nullable=False, unique=True)
+    password: str = Column(String(255), nullable=False)
+    first_name: str = Column(String(50), nullable=False)
+    last_name: str = Column(String(50), nullable=False)
 
-    def __init__(self, username: str, password_hash: str) -> None:
+    def __init__(self, email: str, password_hash: str, first_name: str, last_name: str) -> None:
         """Initializer for a User
-
-        :param username: user's name
-        :param password_hash: user's password (already hashed)
         """
-        self.username = username
+        self.email = email
         self.password = password_hash
+        self.first_name = first_name
+        self.last_name = last_name
 
     def __repr__(self) -> str:
         """String representation for User"""
-        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.username)
+        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.email)
 
 
 class ScanCategory(Base):
