@@ -30,7 +30,7 @@ export class LabelService {
   changeStatus(labelId: string, status: string) {
     return new Promise((resolve, reject) => {
       const payload = {'status': status};
-      this.http.post(environment.API_URL + '/labels/' + labelId + '/status', payload).toPromise().then(
+      this.http.put(environment.API_URL + '/labels/' + labelId + '/status', payload).toPromise().then(
         response => {
           resolve();
         },
