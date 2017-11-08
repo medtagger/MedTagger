@@ -5,7 +5,7 @@ import {ROISelection2D} from '../../model/ROISelection2D';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {Subject} from 'rxjs/Subject';
-import {MatSliderChange} from "@angular/material/slider";
+import {MatSliderChange} from '@angular/material/slider';
 
 @Component({
   selector: 'app-marker-component',
@@ -43,7 +43,7 @@ export class MarkerComponent implements OnInit {
 
   public scanMetadata: ScanMetadata;
   public slices: Map<number, MarkerSlice>;
-  private currentSlice;
+  private _currentSlice;
 
   private selectedArea: ROISelection2D;
   private selections: Map<number, ROISelection2D>;
@@ -60,9 +60,13 @@ export class MarkerComponent implements OnInit {
 
   constructor() {}
 
+  get currentSlice() {
+    return this._currentSlice;
+  }
+
   public clearData(): void {
     this.slices = new Map<number, MarkerSlice>();
-    this.currentSlice = undefined;
+    this._currentSlice = undefined;
     this.selectedArea = undefined;
     this.selections = new Map<number, ROISelection2D>();
     this.archivedSelections = [];
@@ -71,7 +75,7 @@ export class MarkerComponent implements OnInit {
 
   public removeCurrentSelection(): void {
     if (this.has2dSelection) {
-      this.selections.delete(this.currentSlice);
+      this.selections.delete(this._currentSlice);
       this.selectedArea = undefined;
       this.updateSelectionState();
 
@@ -81,13 +85,13 @@ export class MarkerComponent implements OnInit {
 
   private updateSelectionState(): void {
     this.hasArchivedSelections = this.archivedSelections.length > 0;
-    this.has2dSelection = !!this.selections.get(this.currentSlice) || !!this.selectedArea;
+    this.has2dSelection = !!this.selections.get(this._currentSlice) || !!this.selectedArea;
     this.has3dSelection = this.selections.size >= 2 || (this.selections.size === 1 && !!this.selectedArea);
   }
 
   public get3dSelection(): ROISelection3D {
     if (this.selectedArea) {
-      this.selections.set(this.currentSlice, this.selectedArea);
+      this.selections.set(this._currentSlice, this.selectedArea);
       this.selectedArea = undefined;
     }
     this.archiveSelections(this.selections);
@@ -112,8 +116,8 @@ export class MarkerComponent implements OnInit {
 
   public feedData(newSlice: MarkerSlice): void {
     console.log('Marker | feedData: ', newSlice);
-    if (!this.currentSlice) {
-      this.currentSlice = newSlice.index;
+    if (!this._currentSlice) {
+      this._currentSlice = newSlice.index;
     }
     this.addSlice(newSlice);
     this.updateSliderRange();
@@ -204,10 +208,10 @@ export class MarkerComponent implements OnInit {
 
   private changeMarkerImage(sliceID: number): void {
     if (this.selectedArea) {
-      this.selections.set(this.currentSlice, this.selectedArea);
+      this.selections.set(this._currentSlice, this.selectedArea);
       this.selectedArea = undefined;
     }
-    this.currentSlice = sliceID;
+    this._currentSlice = sliceID;
     this.clearCanvasSelection();
     this.setCanvasImage();
   }
@@ -218,8 +222,8 @@ export class MarkerComponent implements OnInit {
   }
 
   private setCanvasImage(): void {
-    if (this.slices.has(this.currentSlice)) {
-      this.currentImage.src = this.slices.get(this.currentSlice).source;
+    if (this.slices.has(this._currentSlice)) {
+      this.currentImage.src = this.slices.get(this._currentSlice).source;
     }
   }
 
@@ -227,7 +231,7 @@ export class MarkerComponent implements OnInit {
     console.log('Marker | drawPreviousSelections | selection: ', this.selections);
     this.selections.forEach((selection: ROISelection2D) => {
       let color: string;
-      if (selection.depth === this.currentSlice) {
+      if (selection.depth === this._currentSlice) {
         color = MarkerComponent.STYLE.CURRENT_SELECTION_COLOR;
       } else {
         color = MarkerComponent.STYLE.OTHER_SELECTION_COLOR;
@@ -281,8 +285,8 @@ export class MarkerComponent implements OnInit {
     console.log('Marker | startMouseSelection | event: ', event);
     const selectionStartX = (event.clientX) - this.canvasPosition.left;
     const selectionStartY = (event.clientY) - this.canvasPosition.top;
-    this.selectedArea = new ROISelection2D(selectionStartX, selectionStartY, this.currentSlice);
-    this.selections.delete(this.currentSlice);
+    this.selectedArea = new ROISelection2D(selectionStartX, selectionStartY, this._currentSlice);
+    this.selections.delete(this._currentSlice);
     this.mouseDrag = true;
   }
 

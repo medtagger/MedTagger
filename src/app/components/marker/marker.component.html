@@ -3,15 +3,13 @@
   <canvas #canvas id="markerCanvas" width="600" height="600"></canvas>
   <mat-slider #slider id="markerSlider"
               [disabled]="false"
-              [invert]="invert"
               [max]="10"
               [min]="0"
               [step]="1"
               [thumb-label]="true"
               [tick-interval]="1"
               [value]="this.currentSlice"
-              [vertical]="true"
-              [color]="primary">
+              [vertical]="true">
   </mat-slider>
 </div>
 
