@@ -21,6 +21,15 @@ Base = declarative_base()
 Base.query = session.query_property()
 
 
+def is_alive() -> bool:
+    """Return boolean information if database is alive or not"""
+    try:
+        session.execute('SELECT 1')
+        return True
+    except Exception:  # pylint: disable=broad-except
+        return False
+
+
 @contextmanager
 def db_session() -> Generator[Session, None, None]:
     """Provide a transactional scope around a series of operations."""

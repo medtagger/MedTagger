@@ -6,3 +6,13 @@ unit_tests:
     - make venv
     - . venv/bin/activate
     - make test
+
+build_api_container:
+  stage: build
+  script:
+    - docker login registry.gitlab.com
+    - docker-compose build data_labeling_api
+    - docker-compose push data_labeling_api
+  only:
+    - master
+

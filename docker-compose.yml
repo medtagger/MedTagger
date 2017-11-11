@@ -1,27 +1,5 @@
 version: '3'
 services:
-# TODO: Enable when needed!
-#  hadoop:
-#    image: sequenceiq/hadoop-docker
-#    ports:
-#      - 50010:50010
-#      - 50020:50020
-#      - 50070:50070
-#      - 50075:50075
-#      - 50090:50090
-#      - 9000:9000
-#      - 10020:10020
-#      - 19888:19888
-#      - 8030:8030
-#      - 8031:8031
-#      - 8032:8032
-#      - 8033:8033
-#      - 8040:8040
-#      - 8042:8042
-#      - 8088:8088
-#      - 49707:49707
-#      - 2122:2122
-
   hbase:
     image: dajobe/hbase
     ports:
@@ -50,3 +28,21 @@ services:
       POSTGRES_DB: data_labeling
       POSTGRES_USER: backend_user
       POSTGRES_PASSWORD: DataLabelingAPI!
+
+  data_labeling_web:
+    image: registry.gitlab.com/praca-inzynierska/frontend/data_labeling_web
+    ports:
+      - 80:80
+
+  data_labeling_api:
+    image: registry.gitlab.com/praca-inzynierska/backend-api/data_labeling_api
+    build:
+      context: .
+      dockerfile: Dockerfile_api
+
+  data_labeling_worker:
+    image: registry.gitlab.com/praca-inzynierska/backend-api/data_labeling_worker
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+
