@@ -35,3 +35,17 @@ unit_tests:
     - . venv/bin/activate
     - make test
 
+deploy_staging:
+  stage: deploy
+  script:
+    - ssh user@demo.voicelab.pl -p 22333 "cd EnvironmentConfiguration && \
+      docker-compose -f staging/docker-compose.yml pull data_labeling_api && \
+      docker-compose -f staging/docker-compose.yml pull data_labeling_worker && \
+      docker-compose -f staging/docker-compose.yml up -d data_labeling_api && \
+      docker-compose -f staging/docker-compose.yml up -d data_labeling_worker"
+  environment:
+    name: staging
+    url: http://demo.voicelab.pl:22433
+  only:
+    - master
+
