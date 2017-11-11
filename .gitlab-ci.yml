@@ -4,6 +4,8 @@ build_api_container:
     - docker:dind
   stage: build
   script:
+    - apk add --no-cache py-pip
+    - pip install docker-compose
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker-compose build data_labeling_api
     - docker-compose push data_labeling_api
