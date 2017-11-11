@@ -6,21 +6,14 @@ import {ScanMetadata} from '../../model/ScanMetadata';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {Subject} from 'rxjs/Subject';
 import {MatSliderChange} from '@angular/material/slider';
+import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 
 @Component({
   selector: 'app-marker-component',
   templateUrl: './marker.component.html',
   styleUrls: ['./marker.component.scss']
 })
-export class MarkerComponent implements OnInit {
-
-  private static readonly STYLE = {
-    SELECTION_FONT_SIZE: 14,
-    SELECTION_LINE_DENSITY: [6],
-    CURRENT_SELECTION_COLOR: '#ff0000',
-    OTHER_SELECTION_COLOR: '#256fde',
-    ARCHIVED_SELECTION_COLOR: '#5f27e5'
-  };
+export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
   currentImage: HTMLImageElement;
 
@@ -38,27 +31,17 @@ export class MarkerComponent implements OnInit {
 
   @ViewChild('slider') slider: MatSlider;
 
-  private canvasCtx: CanvasRenderingContext2D;
-  private canvasPosition: ClientRect;
-
-  public scanMetadata: ScanMetadata;
-  public slices: Map<number, MarkerSlice>;
-  private _currentSlice;
-
-  private selectedArea: ROISelection2D;
-  private selections: Map<number, ROISelection2D>;
   private mouseDrag = false;
 
   public has3dSelection: boolean;
   public has2dSelection: boolean;
   public hasArchivedSelections: boolean;
 
-  private archivedSelections: Array<ROISelection2D>;
-
   public observableSliceRequest: Subject<number>;
-  private sliceBatchSize: number;
 
-  constructor() {}
+  constructor() {
+    super();
+  }
 
   get currentSlice() {
     return this._currentSlice;
@@ -114,45 +97,6 @@ export class MarkerComponent implements OnInit {
     this.updateSelectionState();
   }
 
-  public feedData(newSlice: MarkerSlice): void {
-    console.log('Marker | feedData: ', newSlice);
-    if (!this._currentSlice) {
-      this._currentSlice = newSlice.index;
-    }
-    this.addSlice(newSlice);
-    this.updateSliderRange();
-  }
-
-  private updateSliderRange(): void {
-    const sortedKeys: number[] = Array.from(this.slices.keys()).sort((a: number, b: number) => {
-      return a - b;
-    });
-    console.log('MarkerComponent | updateSliderRange | sortedKeys: ', sortedKeys);
-
-    this.slider.min = sortedKeys[0];
-    this.slider.max = sortedKeys[sortedKeys.length - 1];
-  }
-
-  private addSlice(newSlice: MarkerSlice) {
-    this.slices.set(newSlice.index, newSlice);
-    if (this.slices.size === 1) {
-      this.setCanvasImage();
-    }
-  }
-
-  public setScanMetadata(scanMetadata: ScanMetadata): void {
-    this.scanMetadata = scanMetadata;
-    // this.slider.max = scanMetadata.numberOfSlices;
-  }
-
-  public hookUpSliceObserver(sliceBatchSize: number): Promise<boolean> {
-    this.sliceBatchSize = sliceBatchSize;
-    return new Promise((resolve) => {
-      this.observableSliceRequest = new Subject<number>();
-      resolve(true);
-    });
-  }
-
   ngOnInit() {
     console.log('Marker init');
     console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
@@ -179,82 +123,6 @@ export class MarkerComponent implements OnInit {
 
       this.updateSelectionState();
     });
-  }
-
-  private requestSlicesIfNeeded(sliderValue: number): void {
-    console.log('Marker | requestSlicesIfNeeded sliderValue: ', sliderValue);
-    let requestSliceIndex;
-    if (this.slider.max === sliderValue) {
-      requestSliceIndex = sliderValue + 1;
-      console.log('Marker | requestSlicesIfNeeded more (higher indexes): ', requestSliceIndex);
-      this.observableSliceRequest.next(requestSliceIndex);
-    }
-    if (this.slider.min === sliderValue) {
-      requestSliceIndex = sliderValue - this.sliceBatchSize;
-      console.log('Marker | requestSlicesIfNeeded more (lower indexes): ', requestSliceIndex);
-      this.observableSliceRequest.next(requestSliceIndex);
-    }
-  }
-
-  private initializeCanvas(): void {
-    this.canvasCtx = this.canvas.getContext('2d');
-    this.canvasPosition = this.canvas.getBoundingClientRect();
-  }
-
-  @HostListener('window:resize', [])
-  private updateCanvasPositionOnWindowResize(): void {
-    this.canvasPosition = this.canvas.getBoundingClientRect();
-  }
-
-  private changeMarkerImage(sliceID: number): void {
-    if (this.selectedArea) {
-      this.selections.set(this._currentSlice, this.selectedArea);
-      this.selectedArea = undefined;
-    }
-    this._currentSlice = sliceID;
-    this.clearCanvasSelection();
-    this.setCanvasImage();
-  }
-
-  private clearCanvasSelection(): void {
-    this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawPreviousSelections();
-  }
-
-  private setCanvasImage(): void {
-    if (this.slices.has(this._currentSlice)) {
-      this.currentImage.src = this.slices.get(this._currentSlice).source;
-    }
-  }
-
-  private drawPreviousSelections(): void {
-    console.log('Marker | drawPreviousSelections | selection: ', this.selections);
-    this.selections.forEach((selection: ROISelection2D) => {
-      let color: string;
-      if (selection.depth === this._currentSlice) {
-        color = MarkerComponent.STYLE.CURRENT_SELECTION_COLOR;
-      } else {
-        color = MarkerComponent.STYLE.OTHER_SELECTION_COLOR;
-      }
-      this.drawSelection(selection, color);
-    });
-    console.log('Marker | drawPreviousSelections | archived: ', this.archivedSelections);
-    this.archivedSelections.forEach((selection: ROISelection2D) => {
-      this.drawSelection(selection, MarkerComponent.STYLE.ARCHIVED_SELECTION_COLOR);
-    });
-  }
-
-  private drawSelection(selection: ROISelection2D, color: string): void {
-    console.log('Marker | drawSelection | selection: ', selection);
-    this.canvasCtx.strokeStyle = color;
-    this.canvasCtx.setLineDash(MarkerComponent.STYLE.SELECTION_LINE_DENSITY);
-    this.canvasCtx.strokeRect(selection.positionX, selection.positionY,
-      selection.width, selection.height);
-
-    const fontSize = MarkerComponent.STYLE.SELECTION_FONT_SIZE;
-    this.canvasCtx.font = `${fontSize}px Arial`;
-    this.canvasCtx.fillStyle = color;
-    this.canvasCtx.fillText(selection.depth.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
   }
 
   private initCanvasSelectionTool(): void {
@@ -296,7 +164,7 @@ export class MarkerComponent implements OnInit {
       this.updateSelection(mouseEvent);
       this.clearCanvasSelection();
 
-      this.drawSelection(this.selectedArea, MarkerComponent.STYLE.CURRENT_SELECTION_COLOR);
+      this.drawSelection(this.selectedArea, this.STYLE.CURRENT_SELECTION_COLOR);
     }
   }
 

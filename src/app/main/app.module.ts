@@ -42,6 +42,7 @@ import {
   MatSnackBarModule,
   MatSelectModule,
 } from '@angular/material';
+import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 
 
 const routes: Routes = [
@@ -64,6 +65,7 @@ const routes: Routes = [
     HomePageComponent,
     CategoryPageComponent,
     MarkerComponent,
+    ScanViewerComponent,
     MarkerTutorialPageComponent,
     UploadScansSelectorComponent,
     UploadPageComponent,

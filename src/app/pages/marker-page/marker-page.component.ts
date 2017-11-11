@@ -7,6 +7,7 @@ import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {Response} from '@angular/http';
+import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
 
 
 @Component({
