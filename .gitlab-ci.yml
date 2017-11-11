@@ -1,13 +1,5 @@
-image: python:3.6
-
-unit_tests:
-  script:
-    - pip install virtualenv
-    - make venv
-    - . venv/bin/activate
-    - make test
-
 build_api_container:
+  image: docker:latest
   stage: build
   script:
     - docker login registry.gitlab.com
@@ -15,4 +7,13 @@ build_api_container:
     - docker-compose push data_labeling_api
   only:
     - master
+
+unit_tests:
+  stage: test
+  image: python:3.6  
+  script:
+    - pip install virtualenv
+    - make venv
+    - . venv/bin/activate
+    - make test
 
