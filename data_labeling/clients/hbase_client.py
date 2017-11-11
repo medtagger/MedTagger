@@ -18,6 +18,15 @@ except (TTransportException, BrokenPipeError):
     print('WARNING! Could not connect to HBase. Is it down?')
 
 
+def is_alive() -> bool:
+    """Return boolean information if HBase is alive or not"""
+    try:
+        happybase.ConnectionPool(1, host=host, port=port)
+        return True
+    except (TTransportException, BrokenPipeError):
+        return False
+
+
 class HBaseClient(object):
     """Client for HBase
 
