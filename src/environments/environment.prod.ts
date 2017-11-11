@@ -5,6 +5,6 @@
 
 export const environment = {
   production: true,
-  API_URL: 'http://DATA_LABELING_HOSTNAME/api/v1',
-  WEBSOCKET_URL: 'http://DATA_LABELING_HOSTNAME',
+  API_URL: 'http://demo.voicelab.pl:22433/api/v1',
+  WEBSOCKET_URL: 'http://demo.voicelab.pl:22433',
 };

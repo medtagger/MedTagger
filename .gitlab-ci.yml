@@ -1,0 +1,12 @@
+build_container:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: build
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/praca-inzynierska/frontend/data_labeling_web .
+    - docker push registry.gitlab.com/praca-inzynierska/frontend/data_labeling_web
+  only:
+    - master
+
