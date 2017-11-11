@@ -1,39 +1,39 @@
-build_api_container:
-  image: docker:latest
-  services:
-    - docker:dind
-  stage: build
-  script:
-    - apk add --no-cache py-pip
-    - pip install docker-compose
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
-    - docker-compose build data_labeling_api
-    - docker-compose push data_labeling_api
-  only:
-    - master
+#build_api_container:
+#  image: docker:latest
+#  services:
+#    - docker:dind
+#  stage: build
+#  script:
+#    - apk add --no-cache py-pip
+#    - pip install docker-compose
+#    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+#    - docker-compose build data_labeling_api
+#    - docker-compose push data_labeling_api
+#  only:
+#    - master
 
-build_worker_container:
-  image: docker:latest
-  services:
-    - docker:dind
-  stage: build
-  script:
-    - apk add --no-cache py-pip
-    - pip install docker-compose
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
-    - docker-compose build data_labeling_worker
-    - docker-compose push data_labeling_worker
-  only:
-    - master
+#build_worker_container:
+#  image: docker:latest
+#  services:
+#    - docker:dind
+#  stage: build
+#  script:
+#    - apk add --no-cache py-pip
+#    - pip install docker-compose
+#    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+#    - docker-compose build data_labeling_worker
+#    - docker-compose push data_labeling_worker
+#  only:
+#    - master
 
-unit_tests:
-  stage: test
-  image: python:3.6  
-  script:
-    - pip install virtualenv
-    - make venv
-    - . venv/bin/activate
-    - make test
+#unit_tests:
+#  stage: test
+#  image: python:3.6  
+#  script:
+#    - pip install virtualenv
+#    - make venv
+#    - . venv/bin/activate
+#    - make test
 
 deploy_staging:
   stage: deploy
@@ -44,11 +44,7 @@ deploy_staging:
     - mkdir -p ~/.ssh
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
-    - ssh user@demo.voicelab.pl -p 22333 "cd EnvironmentConfiguration && \
-      docker-compose -f staging/docker-compose.yml pull data_labeling_api && \
-      docker-compose -f staging/docker-compose.yml pull data_labeling_worker && \
-      docker-compose -f staging/docker-compose.yml up -d data_labeling_api && \
-      docker-compose -f staging/docker-compose.yml up -d data_labeling_worker"
+    - ssh user@demo.voicelab.pl -p 22333 "cd EnvironmentConfiguration && docker-compose -f staging/docker-compose.yml pull data_labeling_api && docker-compose -f staging/docker-compose.yml pull data_labeling_worker && docker-compose -f staging/docker-compose.yml up -d data_labeling_api && docker-compose -f staging/docker-compose.yml up -d data_labeling_worker"
   environment:
     name: staging
     url: http://demo.voicelab.pl:22433
