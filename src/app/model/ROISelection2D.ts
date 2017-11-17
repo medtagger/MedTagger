@@ -1,6 +1,7 @@
 import {SelectionData} from './SelectionData';
+import {SliceSelection} from '../components/SliceSelection';
 
-export class ROISelection2D {
+export class ROISelection2D implements SliceSelection {
   _positionX: number;
   _positionY: number;
   _width: number;
