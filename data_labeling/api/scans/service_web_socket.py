@@ -48,7 +48,7 @@ class Slices(Namespace):
         image_bytes = io.BytesIO(image)
         dicom_image_file = dicom.read_file(image_bytes, force=True)
         add_new_slice(scan_id, dicom_image_file)
-        emit('ack')
+        emit('ack', {'success': True})
 
 
 # Register above namespace
