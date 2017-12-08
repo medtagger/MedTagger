@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from tests.api import get_test_application
+from tests.unit_tests.api import get_test_application
 
 
 @pytest.fixture

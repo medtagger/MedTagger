@@ -26,9 +26,9 @@ build_worker_container:
   only:
     - master
 
-unit_tests:
+tests:
   stage: test
-  image: python:3.6  
+  image: python:3.6
   script:
     - pip install virtualenv
     - make venv
