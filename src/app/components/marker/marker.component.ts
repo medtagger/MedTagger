@@ -3,7 +3,7 @@ import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs/Subject';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
-import {SliceSelection} from '../SliceSelection';
+import {SliceSelection} from '../../model/SliceSelection';
 
 @Component({
   selector: 'app-marker-component',

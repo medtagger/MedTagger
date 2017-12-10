@@ -1,4 +1,4 @@
-import {ROISelection2D} from '../model/ROISelection2D';
+import {ROISelection2D} from '../../model/ROISelection2D';
 import {Selector} from './Selector';
 
 export class RectROISelector implements Selector<ROISelection2D> {
@@ -35,11 +35,20 @@ export class RectROISelector implements Selector<ROISelection2D> {
     return Array.from(this.selections.values());
   }
 
+  public formArchivedSelections(selectionMap: ROISelection2D[]): ROISelection2D[] {
+    selectionMap.forEach((selection: ROISelection2D) => {
+      selection.scaleToView(this.canvasSize.height);
+      this.drawSelection(selection, this.STYLE.ARCHIVED_SELECTION_COLOR);
+      console.log('RectROISelector | scaleToView selection: ', selection);
+    });
+    return selectionMap;
+  }
+
   public drawPreviousSelections(): void {
     console.log('RectROISelector | drawPreviousSelections | selection: ', this.selections);
     this.selections.forEach((selection: ROISelection2D) => {
       let color: string;
-      if (selection.depth === this.currentSlice) {
+      if (selection.sliceIndex === this.currentSlice) {
         color = this.STYLE.CURRENT_SELECTION_COLOR;
       } else {
         color = this.STYLE.OTHER_SELECTION_COLOR;
@@ -62,7 +71,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
     const fontSize = this.STYLE.SELECTION_FONT_SIZE;
     this.canvasCtx.font = `${fontSize}px Arial`;
     this.canvasCtx.fillStyle = color;
-    this.canvasCtx.fillText(selection.depth.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
+    this.canvasCtx.fillText(selection.sliceIndex.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
   }
 
   public onMouseDown(event: MouseEvent): void {
@@ -138,9 +147,9 @@ export class RectROISelector implements Selector<ROISelection2D> {
     return !!this.selections.get(this.currentSlice) || !!this.selectedArea;
   }
 
-  public archiveSelections(selectionMap?: Map<number, ROISelection2D>): void {
+  public archiveSelections(selectionMap?: Array<ROISelection2D>): void {
     if (!selectionMap) {
-      selectionMap = this.selections;
+      selectionMap = Array.from(this.selections.values());
     }
     selectionMap.forEach((value: ROISelection2D) => {
       this.archivedSelections.push(value);

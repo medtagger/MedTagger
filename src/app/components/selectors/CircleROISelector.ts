@@ -1,4 +1,4 @@
-import {ROISelection2D} from '../model/ROISelection2D';
+import {ROISelection2D} from '../../model/ROISelection2D';
 import {Selector} from './Selector';
 import {RectROISelector} from './RectROISelector';
 
@@ -18,6 +18,6 @@ export class CircleROISelector extends RectROISelector implements Selector<ROISe
     const fontSize = this.STYLE.SELECTION_FONT_SIZE;
     this.canvasCtx.font = `${fontSize}px Arial`;
     this.canvasCtx.fillStyle = color;
-    this.canvasCtx.fillText(selection.depth.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
+    this.canvasCtx.fillText(selection.sliceIndex.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
   }
 }

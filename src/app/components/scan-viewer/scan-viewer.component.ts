@@ -3,8 +3,8 @@ import {MarkerSlice} from '../../model/MarkerSlice';
 import {Subject} from 'rxjs/Subject';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
-import {Selector} from '../Selector';
-import {SliceSelection} from '../SliceSelection';
+import {Selector} from '../selectors/Selector';
+import {SliceSelection} from '../../model/SliceSelection';
 
 @Component({
   selector: 'app-scan-viewer',
@@ -35,7 +35,6 @@ export class ScanViewerComponent implements OnInit {
 
   public hasArchivedSelections: boolean;
 
-
   public observableSliceRequest: Subject<number>;
   protected sliceBatchSize: number;
 
@@ -46,6 +45,12 @@ export class ScanViewerComponent implements OnInit {
 
   public setSelector(newSelector: Selector<SliceSelection>) {
     this.selector = newSelector;
+  }
+
+  public setArchivedSelections(selections: Array<SliceSelection>): void {
+    console.log('ScanViewer | setArchivedSelections: ', selections);
+    const normalizedSelections: Array<SliceSelection> = this.selector.formArchivedSelections(selections);
+    this.selector.archiveSelections(normalizedSelections);
   }
 
   public getCanvas(): HTMLCanvasElement {

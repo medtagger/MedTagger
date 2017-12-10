@@ -1,6 +1,6 @@
 import {ROISelection2D} from './ROISelection2D';
 import {SelectionData} from './SelectionData';
-import {ScanSelection} from '../components/ScanSelection';
+import {ScanSelection} from './ScanSelection';
 
 export class ROISelection3D implements ScanSelection<ROISelection2D> {
   _selections: ROISelection2D[];
@@ -18,10 +18,12 @@ export class ROISelection3D implements ScanSelection<ROISelection2D> {
   }
 
   public toJSON(): { selections: SelectionData[] } {
+    // TODO: w jakiś elegancki sposób wyciągnięcie tego z widoku
+    const canvasSize = 600;
     const jsonObject: { selections: SelectionData[] } = {selections: undefined};
     jsonObject.selections = [];
     this._selections.forEach((selection: ROISelection2D) => {
-      jsonObject.selections.push(selection.toJSON());
+      jsonObject.selections.push(selection.toJSON(canvasSize));
     });
 
     return jsonObject;

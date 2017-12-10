@@ -1,4 +1,4 @@
-import {SliceSelection} from './SliceSelection';
+import {SliceSelection} from '../../model/SliceSelection';
 
 export interface Selector<SliceSelection> {
 
@@ -30,7 +30,9 @@ export interface Selector<SliceSelection> {
 
   getSelections(): SliceSelection[];
 
-  archiveSelections(selectionMap?: Map<number, SliceSelection>): any;
+  formArchivedSelections(selectionMap: Array<SliceSelection>): Array<SliceSelection>;
+
+  archiveSelections(selectionMap?: Array<SliceSelection>): any;
 
   removeCurrentSelection(): any;
 

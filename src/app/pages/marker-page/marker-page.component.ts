@@ -8,10 +8,10 @@ import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {Response} from '@angular/http';
 import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
-import {RectROISelector} from '../../components/RectROISelector';
+import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
-import {Selector} from '../../components/Selector';
-import {CircleROISelector} from '../../components/CircleROISelector';
+import {Selector} from '../../components/selectors/Selector';
+import {CircleROISelector} from '../../components/selectors/CircleROISelector';
 
 
 @Component({
@@ -37,8 +37,7 @@ export class MarkerPageComponent implements OnInit {
   ngOnInit() {
     console.log('MarkerPage init', this.marker);
 
-
-    // this.marker.setSelector(new RectROISelector(this.marker.getCanvaas()));
+    this.marker.setSelector(new RectROISelector(this.marker.getCanvas()));
 
     this.route.queryParamMap.subscribe(params => {
       this.category = params.get('category') || '';
@@ -69,9 +68,6 @@ export class MarkerPageComponent implements OnInit {
         });
       }
     });
-
-    const selector: Selector<ROISelection2D> = new CircleROISelector(this.marker.getCanvas());
-    this.marker.setSelector(selector);
   }
 
   private requestScan(): void {
