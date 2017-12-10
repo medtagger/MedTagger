@@ -1,0 +1,28 @@
+build_container:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: build
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/praca-inzynierska/frontend/data_labeling_web .
+    - docker push registry.gitlab.com/praca-inzynierska/frontend/data_labeling_web
+  only:
+    - master
+
+deploy_staging:
+  stage: deploy
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  script:
+    - ssh user@demo.voicelab.pl -p 22333 "cd EnvironmentConfiguration && docker-compose -f staging/docker-compose.yml pull data_labeling_web && docker-compose -f staging/docker-compose.yml up -d data_labeling_web"
+  environment:
+    name: staging
+    url: http://demo.voicelab.pl:22433
+  only:
+    - master
+
