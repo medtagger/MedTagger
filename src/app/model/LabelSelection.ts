@@ -5,7 +5,6 @@ export class LabelSelection {
   shapeWidth: number;
   shapeHeight: number;
 
-
   constructor(positionX: number, positionY: number, sliceIndex: number, shapeWidth: number, shapeHeight: number) {
     this.positionX = positionX;
     this.positionY = positionY;

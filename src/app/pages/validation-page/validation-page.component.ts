@@ -1,10 +1,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {LabelService} from '../../services/label.service';
 import {Label} from '../../model/Label';
-import {MarkerComponent} from '../../components/marker/marker.component';
 import {ScanService} from '../../services/scan.service';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ScanMetadata} from "../../model/ScanMetadata";
+import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
+import {RectROISelector} from '../../components/selectors/RectROISelector';
+import {ROISelection2D} from '../../model/ROISelection2D';
 
 
 @Component({
@@ -16,7 +18,7 @@ import {ScanMetadata} from "../../model/ScanMetadata";
 export class ValidationPageComponent implements OnInit {
 
   private static readonly SLICE_BATCH_SIZE = 10;
-  @ViewChild(MarkerComponent) marker: MarkerComponent;
+  @ViewChild(ScanViewerComponent) scanViewer: ScanViewerComponent;
   label: Label;
   scan: ScanMetadata;
 
@@ -25,14 +27,17 @@ export class ValidationPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('ValidationPage init', this.marker);
+    console.log('ValidationPage init', this.scanViewer);
+
+    this.scanViewer.setSelector(new RectROISelector(this.scanViewer.getCanvas()));
+
     this.requestSlicesWithLabel();
     this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
-      this.marker.feedData(slice);
+      this.scanViewer.feedData(slice);
 
-      this.marker.hookUpSliceObserver(ValidationPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
+      this.scanViewer.hookUpSliceObserver(ValidationPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
         if (isObserverHooked) {
-          this.marker.observableSliceRequest.subscribe((sliceRequest: number) => {
+          this.scanViewer.observableSliceRequest.subscribe((sliceRequest: number) => {
             console.log('ValidationPage | observable sliceRequest: ', sliceRequest);
             let count = ValidationPageComponent.SLICE_BATCH_SIZE;
             if (sliceRequest + count > this.scan.numberOfSlices) {
@@ -49,9 +54,18 @@ export class ValidationPageComponent implements OnInit {
     });
   }
 
+  private rect2DROIConverter(selections: any): Array<ROISelection2D> {
+    const roiSelections: Array<ROISelection2D> = [];
+    selections.forEach((selection: any) => {
+      roiSelections.push(new ROISelection2D(selection.x, selection.y, selection.slice_index, selection.width, selection.height));
+      });
+    return roiSelections;
+  }
+
   private requestSlicesWithLabel(): void {
-    this.labelService.getRandomLabel().then((label: Label) => {
+    this.labelService.getRandomLabel(this.rect2DROIConverter).then((label: Label) => {
       this.label = label;
+      this.scanViewer.setArchivedSelections(this.label.labelSelections);
 
       this.scanService.getScanForScanId(this.label.scanId).then((scan: ScanMetadata) => {
         this.scan = scan;
@@ -83,7 +97,7 @@ export class ValidationPageComponent implements OnInit {
   }
 
   public skipScan(): void {
-    this.marker.clearData();
+    this.scanViewer.clearData();
     this.requestSlicesWithLabel();
   }
 }

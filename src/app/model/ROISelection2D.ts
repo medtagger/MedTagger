@@ -1,18 +1,19 @@
 import {SelectionData} from './SelectionData';
+import {SliceSelection} from './SliceSelection';
 
-export class ROISelection2D {
+export class ROISelection2D implements SliceSelection {
   _positionX: number;
   _positionY: number;
   _width: number;
   _height: number;
-  _depth: number;
+  sliceIndex: number;
 
-  constructor(x: number, y: number, depth: number) {
+  constructor(x: number, y: number, depth: number, width?: number, height?: number) {
     this._positionX = x;
     this._positionY = y;
-    this._width = 0;
-    this._height = 0;
-    this._depth = depth;
+    this._width = width ? width : 0;
+    this._height = height ? height : 0;
+    this.sliceIndex = depth;
   }
 
   public get positionX() {
@@ -31,12 +32,8 @@ export class ROISelection2D {
     return this._height;
   }
 
-  public get depth() {
-    return this._depth;
-  }
-
   public get coordinates() {
-    return {x: this._positionX, y: this._positionY, z: this._depth};
+    return {x: this._positionX, y: this._positionY, z: this.sliceIndex};
   }
 
   public updateWidth(newWidth: number): void {
@@ -47,17 +44,28 @@ export class ROISelection2D {
     this._height = newHeight;
   }
 
-  public toJSON(): SelectionData {
+  public toJSON(scalar: number): SelectionData {
     return new SelectionData(
-      this._depth,
-      this.normalize(this._positionX),
-      this.normalize(this._positionY),
-      this.normalize(this._width),
-      this.normalize(this._height)
+      this.sliceIndex,
+      this.normalize(this._positionX, scalar),
+      this.normalize(this._positionY, scalar),
+      this.normalize(this._width, scalar),
+      this.normalize(this._height, scalar)
     );
   }
 
-  private normalize(arg: number): number {
-    return arg / 600;
+  private normalize(arg: number, scalar: number): number {
+    return arg / scalar;
+  }
+
+  public scaleToView(scalar: number): void {
+    this._positionX = this.scale(this._positionX, scalar);
+    this._positionY = this.scale(this._positionY, scalar);
+    this._width = this.scale(this._width, scalar);
+    this._height = this.scale(this._height, scalar);
+  }
+
+  private scale(arg: number, scalar: number): number {
+    return arg * scalar;
   }
 }
