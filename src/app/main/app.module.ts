@@ -43,6 +43,7 @@ import {
   MatSelectModule,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
+import { AuthenticationHeader } from '../services/authentication-header';
 
 
 const routes: Routes = [
@@ -101,9 +102,12 @@ const routes: Routes = [
     MatExpansionModule,
     MatSnackBarModule,
     MatSelectModule,
-    HttpModule,
+    HttpModule
   ],
-  providers: [MockService],
+  providers: [
+    MockService,
+    AuthenticationHeader
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

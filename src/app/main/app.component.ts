@@ -4,6 +4,7 @@ import 'rxjs/add/operator/mergeMap';
 
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { UserInfo } from '../model/UserInfo';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +14,14 @@ import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 export class AppComponent implements OnInit {
 
   pageTitle = '';
+  private currentUser: UserInfo;
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {};
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) {
+    router.events.subscribe(() => {
+      this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));
+    })
+    
+  };
 
   ngOnInit() {
     this.router.events
@@ -33,4 +40,9 @@ export class AppComponent implements OnInit {
     return this.router.url === '/login';
   }
 
+  public logOut(): void {
+    sessionStorage.removeItem('authenticationToken');
+    sessionStorage.removeItem('userInfo');
+    this.router.navigate(['login']);
+  }
 }

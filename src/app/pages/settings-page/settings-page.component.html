@@ -8,88 +8,25 @@
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
-              Ustawienia podstawowe
+              Dane użytkownika
             </mat-panel-title>
             <mat-panel-description>
-              Zmień dane dotyczące Twojego konta
+              Podstawowe informacje o użytkowniku
             </mat-panel-description>
           </mat-expansion-panel-header>
 
           <mat-form-field>
-            <input matInput placeholder="Imię" type="text" [formControl]="userName" required>
+            <input matInput placeholder="Imię" type="text" [formControl]="userName" required readonly>
             <mat-error *ngIf="userName.invalid">{{getUserNameErrorMessage()}}</mat-error>
           </mat-form-field>
           <mat-form-field>
-            <input matInput placeholder="Nazwisko" type="text" [formControl]="userSurname" required>
+            <input matInput placeholder="Nazwisko" type="text" [formControl]="userSurname" required readonly>
             <mat-error *ngIf="userSurname.invalid">{{getUserSurnameErrorMessage()}}</mat-error>
           </mat-form-field>
           <mat-form-field>
-            <input matInput placeholder="E-mail" type="text" [formControl]="userEmail" required>
+            <input matInput placeholder="E-mail" type="text" [formControl]="userEmail" required readonly>
             <mat-error *ngIf="userEmail.invalid">{{getUserEmailErrorMessage()}}</mat-error>
           </mat-form-field>
-
-          <mat-action-row>
-            <button mat-raised-button color="primary" (click)="saveBasicData()">Zapisz</button>
-          </mat-action-row>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Zmiana hasła
-            </mat-panel-title>
-            <mat-panel-description>
-              Zmień swoje hasło
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-
-          <mat-form-field>
-            <input matInput placeholder="Wprowadź nowe hasło" type="password" [formControl]="userPassword" required>
-            <mat-error *ngIf="userPassword.invalid">{{getUserPasswordErrorMessage()}}</mat-error>
-          </mat-form-field>
-          <mat-form-field>
-            <input matInput placeholder="Potwierdź nowe hasło" type="password" [formControl]="userPasswordConfirmation" required>
-            <mat-error *ngIf="userPasswordConfirmation.invalid">{{getUserPasswordConfirmationErrorMessage()}}</mat-error>
-          </mat-form-field>
-
-          <mat-action-row>
-            <button mat-raised-button color="primary" (click)="savePasswords()">Zapisz</button>
-          </mat-action-row>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Zdjęcie profilowe
-            </mat-panel-title>
-            <mat-panel-description>
-              Zmień swoje zdjęcie profilowe
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-
-          <img src="../../assets/img/user_avatar.png" alt="Avatar" class="user-avatar">
-          <section class="user-avatar-settings">
-            <button mat-raised-button><mat-icon>face</mat-icon> Wybierz nowe zdjęcie</button>
-            <hr/>
-            <p>Maksymalny rozmiar obrazka to 200KB.</p>
-          </section>
-
-          <mat-action-row>
-            <button mat-raised-button color="primary">Zapisz</button>
-          </mat-action-row>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              Uprawnienia
-            </mat-panel-title>
-            <mat-panel-description>
-              Poproś o zwiększenie swoich uprawnień
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-
-          <!-- TODO: Handle user permissions here -->
         </mat-expansion-panel>
 
         <mat-expansion-panel>
@@ -101,8 +38,32 @@
               Pozostałe dostępne ustawienia
             </mat-panel-description>
           </mat-expansion-panel-header>
-
+          
           <button mat-raised-button color="warn">Usuń moje konto</button>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel *ngIf="currentUser.role === 'admin'">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Wszyscy użytkownicy
+            </mat-panel-title>
+            <mat-panel-description>
+              Przeglądaj użytkowników i zmień ich uprawnienia
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <mat-list>
+            <mat-list-item *ngFor="let user of allUsers">
+              <mat-icon matListIcon *ngIf="user.role === 'volunteer'">person</mat-icon>
+              <mat-icon matListIcon *ngIf="user.role === 'doctor'">healing</mat-icon>
+              <mat-icon matListIcon *ngIf="user.role === 'admin'">build</mat-icon>
+              <span>{{user.firstName}} {{user.lastName}} ({{user.email}})</span>
+              <button *ngIf="user.role === 'volunteer'" mat-button color="primary" (click)="promoteToDoctor(user)">
+                <mat-icon matListIcon>add_circle_outline</mat-icon>
+                Rola doktora
+              </button>
+            </mat-list-item>
+          </mat-list>
         </mat-expansion-panel>
       </mat-accordion>
 

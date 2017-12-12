@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {passwordValidator} from '../validators/password-validator.directive';
+import { AccountService } from '../../services/account.service';
 
 enum LoginPageMode {
   LOG_IN,
@@ -12,38 +13,37 @@ enum LoginPageMode {
   selector: 'app-login-page',
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.scss'],
+  providers: [AccountService]
 })
+
 export class LoginPageComponent implements OnInit {
   LoginPageMode = LoginPageMode;  // Needed in template for comparison with Enum values
   loginPageMode: LoginPageMode = LoginPageMode.LOG_IN;
-  firstName = '';
-  lastName = '';
-  email = '';
-  password = '';
-  confirmPassword = '';
   userForm: FormGroup;
 
-
-  constructor(private routerService: Router) {
+  constructor(private routerService: Router, private accountService: AccountService) {
   }
 
   ngOnInit() {
     this.userForm = new FormGroup({
-      'firstName': new FormControl(this.firstName, [
-        Validators.required]),
-      'lastName': new FormControl(this.lastName, [
-        Validators.required]),
-      'email': new FormControl(this.email, [
-        Validators.required, Validators.email]),
-      'password': new FormControl(this.password, [
-        Validators.required]),
-      'confirmPassword': new FormControl(this.confirmPassword, [
-        Validators.required, passwordValidator()])
+      firstName: new FormControl(null, [Validators.required]),
+      lastName: new FormControl(null, [Validators.required]),
+      email: new FormControl(null, [Validators.required, Validators.email]),
+      password: new FormControl(null, [Validators.required]),
+      confirmPassword: new FormControl(null, [Validators.required, passwordValidator()])
     });
   }
 
   public logIn(): void {
-    this.routerService.navigate(['home']);
+    this.accountService.logIn(this.userForm.value['email'], this.userForm.value['password'])
+      .then(token => {
+        sessionStorage.setItem('authenticationToken', token);
+        return this.accountService.getCurrentUserInfo();
+      })
+      .then(userInfo => {
+        sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+        this.routerService.navigate(['home']);
+      });
   }
 
   public changePageMode(): void {
@@ -87,7 +87,9 @@ export class LoginPageComponent implements OnInit {
         '';
   }
 
-  public userRegistration(): void {
-    // TODO: registration
+  public register(): void {
+    let formValue = this.userForm.value;
+    this.accountService.register(formValue['email'], formValue['password'], formValue['firstName'], formValue['lastName'])
+      .then(() => this.changePageMode());
   }
 }
