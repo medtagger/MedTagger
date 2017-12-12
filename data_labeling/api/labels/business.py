@@ -1,31 +1,33 @@
 """Module responsible for business logic in all Labels endpoints"""
-from typing import Dict, Any
-
-from sqlalchemy.sql.expression import func
+from sqlalchemy.orm.exc import NoResultFound
 
 from data_labeling.types import LabelID
-from data_labeling.database import db_session
+from data_labeling.api.exceptions import NotFoundException
 from data_labeling.database.models import Label, LabelStatus
+from data_labeling.repositories.labels import LabelsRepository
 
 
-def change_label_status(label_id: LabelID, status: str) -> Label:
+def change_label_status(label_id: LabelID, status: LabelStatus) -> Label:
     """Change status of the label
 
     :param label_id: ID of a label for which the status should be changed
-    :param status: new status for the label
+    :param status: new Label Status that should be set
     """
-    with db_session() as session:
-        label = session.query(Label).filter(Label.id == label_id).one()
-        label.status = status
+    try:
+        label = LabelsRepository.get_label_by_id(label_id)
+    except NoResultFound:
+        raise NotFoundException('Label "{}" not found.'.format(label_id))
+
+    label.update_status(status)
     return label
 
 
-def get_random_label() -> Dict[str, Any]:
+def get_random_label() -> Label:
     """Fetch random label that has the NOT_VERIFIED status
 
     :return: dictionary with details about label
     """
-    with db_session() as session:
-        label = session.query(Label).filter(Label.status == LabelStatus.NOT_VERIFIED).order_by(func.random()).first()
-
-    return label
+    try:
+        return LabelsRepository.get_random_label(LabelStatus.NOT_VERIFIED)
+    except NoResultFound:
+        raise NotFoundException('No Labels not found.')

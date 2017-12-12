@@ -6,13 +6,12 @@ ScanID = NewType('ScanID', str)
 SliceID = NewType('SliceID', str)
 LabelID = NewType('LabelID', str)
 LabelSelectionID = NewType('LabelSelectionID', str)
+ScanMetadata = NamedTuple('ScanMetadata', [('scan_id', ScanID), ('number_of_slices', int)])
 
 SliceLocation = NewType('SliceLocation', float)
 SlicePosition = NamedTuple('SlicePosition', [('x', float), ('y', float), ('z', float)])
 
-PickledDicomImage = NewType('PickledDicomImage', str)
-
 LabelPosition = NamedTuple('LabelPosition', [('x', float), ('y', float), ('slice_index', int)])
 LabelShape = NamedTuple('LabelShape', [('width', float), ('height', float)])
 
-UserInfo = NamedTuple('UserInfo', [('email', str), ('first_name', str), ('last_name', str)])
+UserInfo = NamedTuple('UserInfo', [('id', int), ('email', str), ('first_name', str), ('last_name', str), ('role', str)])

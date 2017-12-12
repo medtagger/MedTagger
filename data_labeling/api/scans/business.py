@@ -1,13 +1,17 @@
 """Module responsible for business logic in all Scans endpoints"""
-from typing import Iterable, Dict, List, Any
+from typing import Iterable, Dict, List, Tuple
 
-from dicom.dataset import FileDataset
-from sqlalchemy.sql.expression import func
+from sqlalchemy.orm.exc import NoResultFound
 
 from data_labeling.api.exceptions import NotFoundException
-from data_labeling.types import ScanID, LabelID, LabelPosition, LabelShape
-from data_labeling.database import db_session
-from data_labeling.database.models import Scan, ScanCategory
+from data_labeling.repositories.labels import LabelsRepository
+from data_labeling.repositories.slices import SlicesRepository
+from data_labeling.types import ScanID, LabelPosition, LabelShape, ScanMetadata
+from data_labeling.database.models import ScanCategory, Scan, Slice, Label
+from data_labeling.repositories.scans import ScansRepository
+from data_labeling.repositories.scan_categories import ScanCategoriesRepository
+from data_labeling.workers.conversion import convert_dicom_to_png
+from data_labeling.workers.storage import store_dicom
 
 
 def get_available_scan_categories() -> List[ScanCategory]:
@@ -15,9 +19,20 @@ def get_available_scan_categories() -> List[ScanCategory]:
 
     :return: list of Scan Categories
     """
-    with db_session() as session:
-        categories = session.query(ScanCategory).order_by(ScanCategory.id).all()
-    return categories
+    return ScanCategoriesRepository.get_all_categories()
+
+
+def scan_category_is_valid(category_key: str) -> bool:
+    """Check if Scan Category for such key exists
+
+    :param category_key: key representing Scan Category
+    :return: boolean information if Scan Category key is valid
+    """
+    try:
+        ScanCategoriesRepository.get_category_by_key(category_key)
+        return True
+    except NoResultFound:
+        return False
 
 
 def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
@@ -28,112 +43,91 @@ def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
     :param image_path: path to the image which is located on the frontend
     :return: Scan Category object
     """
-    with db_session() as session:
-        category = ScanCategory(key, name, image_path)
-        session.add(category)
-    return category
+    return ScanCategoriesRepository.add_new_category(key, name, image_path)
 
 
-def create_empty_scan(category_key: str) -> ScanID:
+def create_empty_scan(category_key: str) -> Scan:
     """Create new empty scan
 
     :param category_key: string with category key
-    :return: ID of a newly created scan
+    :return: Newly created Scan object
     """
-    with db_session() as session:
-        category = session.query(ScanCategory).filter(ScanCategory.key == category_key).one()
-        scan = Scan(category)
-        session.add(scan)
-    return scan.id
+    category = ScanCategoriesRepository.get_category_by_key(category_key)
+    return ScansRepository.add_new_scan(category)
 
 
-def get_metadata(scan_id: ScanID) -> Dict[str, Any]:
+def get_metadata(scan_id: ScanID) -> ScanMetadata:
     """Fetch metadata for given scan
 
     :param scan_id: ID of a given scan
-    :return: dictionary with scan's metadata
+    :return: Scan Metadata object
     """
-    with db_session() as session:
-        scan = session.query(Scan).filter(Scan.id == scan_id).one()
-    number_of_slices = len(scan.slices)
-
-    return {
-        'number_of_slices': number_of_slices,
-    }
+    scan = ScansRepository.get_scan_by_id(scan_id)
+    return ScanMetadata(scan_id=scan.id, number_of_slices=len(scan.slices))
 
 
-def get_random_scan(category_key: str) -> Dict[str, Any]:
+def get_random_scan(category_key: str) -> ScanMetadata:
     """Fetch random scan for labeling
 
     :param category_key: unique key identifying category
-    :return: dictionary with details about scan
+    :return: Scan Metadata object
     """
-    with db_session() as session:
-        query = session.query(Scan)
-        query = query.join(ScanCategory)
-        query = query.filter(ScanCategory.key == category_key)
-        query = query.filter(Scan.slices.any())  # type: ignore  # Could not find `any()` method.
-        query = query.order_by(func.random())
-        scan = query.first()
+    category = ScanCategoriesRepository.get_category_by_key(category_key)
+    scan = ScansRepository.get_random_scan(category)
     if not scan:
         raise NotFoundException('Could not find any Scan for this category!')
 
-    return {
-        'scan_id': scan.id,
-        'number_of_slices': len(scan.slices),
-    }
+    return ScanMetadata(scan_id=scan.id, number_of_slices=len(scan.slices))
 
 
-def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> Iterable[bytes]:
+def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> Iterable[Tuple[Slice, bytes]]:
     """Fetch multiple slices for given scan
 
     :param scan_id: ID of a given scan
     :param begin: first slice index (included)
     :param count: number of slices that will be returned
-    :return: list of slices (each encoded in base64)
+    :return: generator for Slices
     """
-    with db_session() as session:
-        scan = session.query(Scan).filter(Scan.id == scan_id).one()
+    scan = ScansRepository.get_scan_by_id(scan_id)
     for _slice in scan.slices[begin:begin + count]:
-        yield _slice.converted_image
+        image = SlicesRepository.get_slice_converted_image(_slice.id)
+        yield _slice, image
 
 
-def add_label(scan_id: ScanID, selections: List[Dict]) -> LabelID:
+def add_label(scan_id: ScanID, selections: List[Dict]) -> Label:
     """Add label to given scan
 
     :param scan_id: ID of a given scan
     :param selections: List of JSONs describing selections for a single label
+    :return: Label object
     """
-    with db_session() as session:
-        scan = session.query(Scan).filter(Scan.id == scan_id).one()
-        label = scan.create_label()
-
-        for selection in selections:
-            position = LabelPosition(x=selection.get('x', 0.0), y=selection.get('y', 0.0),
-                                     slice_index=selection.get('slice_index', 0.0))
-            shape = LabelShape(width=selection.get('width', 0.0), height=selection.get('height', 0.0))
-            label.add_selection(position, shape)
-
-    return label.id
+    label = LabelsRepository.add_new_label(scan_id)
+    for selection in selections:
+        position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
+        shape = LabelShape(width=selection['width'], height=selection['height'])
+        label.add_selection(position, shape)
+    return label
 
 
-def add_new_slice(scan_id: ScanID, dicom_image: FileDataset) -> None:
+def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     """Add new slice for given Scan
 
     :param scan_id: ID of a Scan for which it should add new slice
-    :param dicom_image: Dicom file with a single slice
+    :param image: bytes representing Dicom image
+    :return: Slice object
     """
-    scan = Scan.query.get(scan_id)
-    scan.add_slice(dicom_image)
+    scan = ScansRepository.get_scan_by_id(scan_id)
+    _slice = scan.add_slice()
+    store_dicom.delay(_slice.id, image)
+    convert_dicom_to_png.delay(_slice.id, image)
+    return _slice
 
 
-def get_scan(scan_id: ScanID) -> Dict[str, Any]:
+def get_scan(scan_id: ScanID) -> ScanMetadata:
     """Returns scan for given scan_id
 
     :param scan_id: ID of a Scan which should be returned
+    :return: Scan Metadata object
     """
-    scan = Scan.query.get(scan_id)
-    return {
-        'scan_id': scan.id,
-        'number_of_slices': len(scan.slices),
-    }
+    scan = ScansRepository.get_scan_by_id(scan_id)
+    return ScanMetadata(scan_id=scan.id, number_of_slices=len(scan.slices))

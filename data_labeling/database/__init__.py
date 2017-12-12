@@ -10,6 +10,15 @@ from flask_sqlalchemy import SQLAlchemy
 from data_labeling.config import ConfigurationFile
 
 
+class DataLabelingBase(object):  # pylint: disable=too-few-public-methods
+    """Base class for all of the models"""
+
+    def save(self) -> None:
+        """Save the model into the database after changes"""
+        with db_session() as _session:
+            _session.add(self)
+
+
 db = SQLAlchemy()
 
 configuration = ConfigurationFile()
@@ -17,7 +26,7 @@ db_uri = configuration.get('db', 'database_uri')
 engine = create_engine(db_uri, convert_unicode=True)
 session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
-Base = declarative_base()
+Base = declarative_base(cls=DataLabelingBase)
 Base.query = session.query_property()
 
 

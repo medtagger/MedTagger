@@ -1,4 +1,4 @@
-"""Module containg serializers for user endpoints"""
+"""Module containg serializers for iser's account endpoints"""
 from flask_restplus import fields
 
 from data_labeling.api import api
@@ -16,7 +16,9 @@ sign_in = api.model('Sign in model', {
 })
 
 user_info = api.model('User info model', {
+    'id': fields.Integer(attribute='id', description='User\'s id'),
     'email': fields.String(attribute='email', description='Email address'),
     'firstName': fields.String(attribute='first_name', description='First name'),
-    'lastName': fields.String(attribute='last_name', description='Last name')
+    'lastName': fields.String(attribute='last_name', description='Last name'),
+    'role': fields.String(attribute='role', description='User\'s role')
 })

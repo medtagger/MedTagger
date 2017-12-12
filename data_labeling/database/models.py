@@ -4,35 +4,48 @@ import enum
 import uuid
 from typing import List
 
-from dicom.dataset import FileDataset
-from flask_login import UserMixin
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Enum
+from flask_security import UserMixin, RoleMixin
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
 from sqlalchemy.orm import relationship
 
-from data_labeling.clients.hbase_client import HBaseClient
-from data_labeling.database import Base, db_session
+from data_labeling.database import Base, db_session, db
 from data_labeling.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape
-from data_labeling.workers.conversion import convert_dicom_to_png
-from data_labeling.workers.storage import store_dicom
+
+
+users_roles = db.Table('Users_Roles', Base.metadata,
+                       Column('user_id', Integer, ForeignKey('Users.id')),
+                       Column('role_id', Integer, ForeignKey('Roles.id')))
+
+
+class Role(Base, RoleMixin):
+    """Defines model for the Roles table"""
+    __tablename__ = 'Roles'
+    id: int = Column(Integer, autoincrement=True, primary_key=True)
+    name: str = Column(String(50), unique=True)
+
+    def __init__(self, name: str) -> None:
+        self.name = name
 
 
 class User(Base, UserMixin):
-    """Defines model for the Users table entry"""
+    """Defines model for the Users table"""
     __tablename__ = 'Users'
     id: int = Column(Integer, autoincrement=True, primary_key=True)
     email: str = Column(String(50), nullable=False, unique=True)
     password: str = Column(String(255), nullable=False)
     first_name: str = Column(String(50), nullable=False)
     last_name: str = Column(String(50), nullable=False)
+    roles = db.relationship('Role', secondary=users_roles)
+    active = Column(Boolean, nullable=False)
 
     def __init__(self, email: str, password_hash: str, first_name: str, last_name: str) -> None:
-        """Initializer for a User
-        """
+        """Initializer for a User"""
         self.email = email
         self.password = password_hash
         self.first_name = first_name
         self.last_name = last_name
+        self.active = False
 
     def __repr__(self) -> str:
         """String representation for User"""
@@ -86,89 +99,82 @@ class Scan(Base):
         """String representation for Scan"""
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key)
 
-    def add_slice(self, dicom_image: FileDataset) -> SliceID:
+    def add_slice(self) -> 'Slice':
         """Add new slice into this Scan
 
-        It will also trigger Celery workers responsible for storage and conversion of a Dicom image.
-
-        :param dicom_image: Dicom image that should be stored for this Scan
         :return: ID of a Slice
         """
-        location = SliceLocation(dicom_image.SliceLocation)
-        position = SlicePosition(dicom_image.ImagePositionPatient[0],
-                                 dicom_image.ImagePositionPatient[1],
-                                 dicom_image.ImagePositionPatient[2])
-
         with db_session() as session:
-            new_slice = Slice(location, position)
+            new_slice = Slice()
             new_slice.scan = self
             session.add(new_slice)
-
-        store_dicom.delay(new_slice.id, dicom_image)
-        convert_dicom_to_png.delay(new_slice.id, dicom_image)
-        return new_slice.id
-
-    def create_label(self) -> 'Label':
-        """Add new label into this Scan"""
-        with db_session() as session:
-            label = Label()
-            label.scan = self
-            session.add(label)
-        return label
+        return new_slice
 
 
 class Slice(Base):
     """Definition of a Slice"""
     __tablename__ = 'Slices'
     id: SliceID = Column(String, primary_key=True)
-    location: float = Column(Float, nullable=False)
-    position_x: float = Column(Float, nullable=False)
-    position_y: float = Column(Float, nullable=False)
-    position_z: float = Column(Float, nullable=False)
+    location: float = Column(Float, nullable=True)
+    position_x: float = Column(Float, nullable=True)
+    position_y: float = Column(Float, nullable=True)
+    position_z: float = Column(Float, nullable=True)
+    stored: bool = Column(Boolean, default=False)
+    converted: bool = Column(Boolean, default=False)
 
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     scan: Scan = relationship('Scan', back_populates='slices')
 
-    def __init__(self, location: SliceLocation, position: SlicePosition) -> None:
+    def __init__(self, location: SliceLocation = None, position: SlicePosition = None) -> None:
         """Initializer for Slice
 
         :param location: location of a Slice (useful for sorting)
         :param position: position of a Slice inside of a patient body
         """
         self.id = SliceID(str(uuid.uuid4()))
-        self.location = location
-        self.position_x = position.x
-        self.position_y = position.y
-        self.position_z = position.z
-
-        self.hbase_client = HBaseClient()
+        if location:
+            self.location = location
+        if position:
+            self.position_x = position.x
+            self.position_y = position.y
+            self.position_z = position.z
 
     def __repr__(self) -> str:
         """String representation for Slice"""
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.location)
 
-    @property
-    def original_image(self) -> bytes:
-        """Return original Dicom image as bytes"""
-        if not hasattr(self, 'hbase_client'):
-            self.hbase_client = HBaseClient()
-        data = self.hbase_client.get(HBaseClient.ORIGINAL_SLICES_TABLE, self.id, columns=['image'])
-        return data[b'image:value']
+    def update_location(self, new_location: SliceLocation) -> 'Label':
+        """Update location in the Slice"""
+        self.location = new_location
+        self.save()
+        return self
 
-    @property
-    def converted_image(self) -> bytes:
-        """Return converted image as bytes"""
-        if not hasattr(self, 'hbase_client'):
-            self.hbase_client = HBaseClient()
-        data = self.hbase_client.get(HBaseClient.CONVERTED_SLICES_TABLE, self.id, columns=['image'])
-        return data[b'image:value']
+    def update_position(self, new_position: SlicePosition) -> 'Label':
+        """Update position in the Slice"""
+        self.position_x = new_position.x
+        self.position_y = new_position.y
+        self.position_z = new_position.z
+        self.save()
+        return self
+
+    def mark_as_stored(self) -> 'Label':
+        """Mark Slice as stored in HBase"""
+        self.stored = True
+        self.save()
+        return self
+
+    def mark_as_converted(self) -> 'Label':
+        """Mark Slice as converted in HBase"""
+        self.converted = True
+        self.save()
+        return self
 
 
 class LabelStatus(enum.Enum):
     """Defines available status for label"""
-    VALID = "VALID"
-    INVALID = "INVALID"
-    NOT_VERIFIED = "NOT_VERIFIED"
+    VALID = 'VALID'
+    INVALID = 'INVALID'
+    NOT_VERIFIED = 'NOT_VERIFIED'
 
 
 class Label(Base):
@@ -206,6 +212,16 @@ class Label(Base):
             session.add(new_label_selection)
 
         return new_label_selection.id
+
+    def update_status(self, status: LabelStatus) -> 'Label':
+        """Update Label's status
+
+        :param status: new status for this Label
+        :return: Label object
+        """
+        self.status = status
+        self.save()
+        return self
 
 
 class LabelSelection(Base):
