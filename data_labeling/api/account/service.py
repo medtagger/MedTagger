@@ -1,9 +1,9 @@
-"""Module responsible for defining endpoints for user management"""
+"""Module responsible for defining endpoints for user's account"""
 from typing import Any
 
 from flask import request
-from flask_login import login_required
 from flask_restplus import Resource
+from flask_security import login_required
 
 from data_labeling.api import api
 from data_labeling.api.account import serializers
@@ -32,12 +32,12 @@ class SignIn(Resource):
 
     @staticmethod
     @api.expect(serializers.sign_in)
-    @api.doc(responses={204: 'Signed in', 400: 'User does not exist or wrong password'})
+    @api.doc(responses={200: 'Signed in', 400: 'User does not exist or wrong password'})
     def post() -> Any:
         """Sign in the user"""
         sign_in = request.json
-        sign_in_user(sign_in['email'], sign_in['password'])
-        return {}, 204
+        token = sign_in_user(sign_in['email'], sign_in['password'])
+        return {"token": token}, 200
 
 
 @account_ns.route('/sign-out')
@@ -53,7 +53,7 @@ class SignOut(Resource):
         return {}, 204
 
 
-@account_ns.route('/get-user-info')
+@account_ns.route('/user-info')
 class GetUserInfo(Resource):
     """Get user info endpoint"""
 

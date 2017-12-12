@@ -6,9 +6,7 @@ from flask_restplus import Resource
 from data_labeling.types import ScanID
 from data_labeling.api import api
 from data_labeling.api.exceptions import InvalidArgumentsException
-from data_labeling.api.scans import serializers
-from data_labeling.api.scans.business import create_empty_scan, get_available_scan_categories, create_scan_category, \
-    get_random_scan, add_label, get_scan
+from data_labeling.api.scans import business, serializers
 
 scans_ns = api.namespace('scans', 'Methods related with scans')
 
@@ -18,22 +16,19 @@ class Scans(Resource):
     """Endpoint that can create new scan"""
 
     @staticmethod
-    @scans_ns.expect(serializers.new_scan_request, validate=True)
-    @scans_ns.marshal_with(serializers.new_scan_response)
+    @scans_ns.expect(serializers.in__new_scan)
+    @scans_ns.marshal_with(serializers.out__new_scan)
     @scans_ns.doc(description='Creates empty scan.')
     @scans_ns.doc(responses={201: 'Success'})
     def post() -> Any:
         """Method responsible for creating empty scan"""
         payload = request.json
-        category_key = payload.get('category', '')
-
-        # Category validation cannot be done during request parsing, because Enums in serializers load on
-        #  application boot-up
-        if category_key not in [category.key for category in get_available_scan_categories()]:
+        category_key = payload['category']
+        if not business.scan_category_is_valid(category_key):
             raise InvalidArgumentsException('Category "{}" is not available.'.format(category_key))
 
-        scan_id = create_empty_scan(category_key)
-        return {'scan_id': scan_id}, 201
+        scan = business.create_empty_scan(category_key)
+        return scan, 201
 
 
 @scans_ns.route('/categories')
@@ -41,26 +36,26 @@ class ScanCategories(Resource):
     """Endpoint that manages categories"""
 
     @staticmethod
-    @scans_ns.marshal_with(serializers.scan_category)
+    @scans_ns.marshal_with(serializers.inout__scan_category)
     @scans_ns.doc(description='Returns all available scan categories.')
     @scans_ns.doc(responses={200: 'Success'})
     def get() -> Any:
         """Method responsible for returning all available scan categories"""
-        return get_available_scan_categories()
+        return business.get_available_scan_categories()
 
     @staticmethod
-    @scans_ns.expect(serializers.scan_category, validate=True)
-    @scans_ns.marshal_with(serializers.scan_category)
+    @scans_ns.expect(serializers.inout__scan_category)
+    @scans_ns.marshal_with(serializers.inout__scan_category)
     @scans_ns.doc(description='Returns all available scan categories.')
-    @scans_ns.doc(responses={200: 'Success'})
+    @scans_ns.doc(responses={201: 'Success'})
     def post() -> Any:
         """Method responsible for creating empty scan"""
         payload = request.json
-        key = payload.get('key', '')
-        name = payload.get('name', '')
-        image_path = payload.get('image_path', '')
+        key = payload['key']
+        name = payload['name']
+        image_path = payload['image_path']
 
-        return create_scan_category(key, name, image_path)
+        return business.create_scan_category(key, name, image_path), 201
 
 
 @scans_ns.route('/random')
@@ -68,18 +63,18 @@ class Random(Resource):
     """Endpoint that returns random scan for labeling"""
 
     @staticmethod
-    @scans_ns.expect(serializers.random_scan_arguments, validate=True)
-    @scans_ns.marshal_with(serializers.scan)
+    @scans_ns.expect(serializers.args__random_scan)
+    @scans_ns.marshal_with(serializers.out__scan)
     @scans_ns.doc(description='Returns random scan.')
-    @scans_ns.doc(responses={200: 'Success'})
+    @scans_ns.doc(responses={200: 'Success', 400: 'Invalid arguments', 404: 'No Scans available'})
     def get() -> Any:
         """Method responsible for returning random scan's metadata"""
-        args = serializers.random_scan_arguments.parse_args(request)
+        args = serializers.args__random_scan.parse_args(request)
         category_key = args.category
-        if category_key not in [category.key for category in get_available_scan_categories()]:
+        if not business.scan_category_is_valid(category_key):
             raise InvalidArgumentsException('Category "{}" is not available.'.format(category_key))
 
-        return get_random_scan(category_key)
+        return business.get_random_scan(category_key)._asdict()
 
 
 @scans_ns.route('/<string:scan_id>/label')
@@ -88,16 +83,17 @@ class Label(Resource):
     """Endpoint that stores label for given scan"""
 
     @staticmethod
-    @scans_ns.expect(serializers.label, validate=True)
+    @scans_ns.expect(serializers.in__label)
+    @scans_ns.marshal_with(serializers.out__label)
     @scans_ns.doc(description='Stores label and assigns it to given scan.')
     @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan'})
     def post(scan_id: ScanID) -> Any:
         """Method responsible for saving new label for given scan"""
         payload = request.json
-        selections = payload.get('selections', [])
-        label_id = add_label(scan_id, selections)
+        selections = payload['selections']
 
-        return {'label_id': label_id}, 201
+        label = business.add_label(scan_id, selections)
+        return label, 201
 
 
 @scans_ns.route('/<string:scan_id>')
@@ -106,9 +102,9 @@ class Scan(Resource):
     """Endpoint that returns scan for the given scan id"""
 
     @staticmethod
-    @scans_ns.marshal_with(serializers.scan)
+    @scans_ns.marshal_with(serializers.out__scan)
     @scans_ns.doc(description='Returns scan with given scan_id.')
     @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
     def get(scan_id: ScanID) -> Any:
         """Method responsible for returning scan for the given scan_id"""
-        return get_scan(scan_id)
+        return business.get_scan(scan_id)

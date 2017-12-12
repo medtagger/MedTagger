@@ -2,8 +2,7 @@
 from sqlalchemy import exists
 
 from data_labeling.database import db_session
-from data_labeling.database.models import ScanCategory
-
+from data_labeling.database.models import ScanCategory, Role
 
 CATEGORIES = [{
     'key': 'KIDNEYS',
@@ -23,6 +22,18 @@ CATEGORIES = [{
     'image_path': '../../../assets/icon/lungs_category_icon.svg',
 }]
 
+ROLES = [
+    {
+        'name': 'admin'
+    },
+    {
+        'name': 'doctor'
+    },
+    {
+        'name': 'volunteer'
+    }
+]
+
 
 def insert_scan_categories() -> None:
     """Insert all default Scan Categories if don't exist"""
@@ -39,6 +50,23 @@ def insert_scan_categories() -> None:
             print('Scan Category added for key "{}"'.format(category_key))
 
 
+def insert_user_roles() -> None:
+    """Inserts default user Roles"""
+    with db_session() as session:
+        for row in ROLES:
+            role_name = row.get('name', '')
+            role_exists = session.query(exists().where(Role.name == role_name)).scalar()
+            if role_exists:
+                print('Role exists with name "{}"'.format(role_name))
+                continue
+
+            role = Role(**row)
+            session.add(role)
+            print('Role added for name "{}"'.format(role_name))
+
+
 if __name__ == '__main__':
     print('Applying fixtures for Scan Categories...')
     insert_scan_categories()
+    print('Applying fixtures for user Roles...')
+    insert_user_roles()

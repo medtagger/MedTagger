@@ -4,26 +4,11 @@ from flask_restplus import reqparse, fields
 from data_labeling.api import api
 
 
-new_scan_request = api.model('New scan request', {
+in__new_scan = api.model('New Scan model', {
     'category': fields.String(description='Scan\'s category')
 })
 
-new_scan_response = api.model('New scan response', {
-    'scan_id': fields.String(description='Scan\'s ID'),
-})
-
-scan_category = api.model('New scan category model', {
-    'key': fields.String(),
-    'name': fields.String(),
-    'image_path': fields.String(),
-})
-
-scan = api.model('Scan model', {
-    'scan_id': fields.String(description='Scan\'s ID'),
-    'number_of_slices': fields.Integer(description='Total number of slices in given scan'),
-})
-
-label_selection = api.model('User\'s Label Selection', {
+in__label_selection = api.model('Label\'s Selection model', {
     'x': fields.Float(description='Selection\'s X position', min=0.0, max=1.0, required=True),
     'y': fields.Float(description='Selection\'s Y position', min=0.0, max=1.0, required=True),
     'slice_index': fields.Integer(description='Slice\'s order index', min=0, required=True),
@@ -31,14 +16,28 @@ label_selection = api.model('User\'s Label Selection', {
     'height': fields.Float(description='Selection\'s height', min=0.0, max=1.0, required=True),
 })
 
-label = api.model('Label for given scan', {
-    'selections': fields.List(fields.Nested(label_selection)),
+in__label = api.model('Label model', {
+    'selections': fields.List(fields.Nested(in__label_selection)),
 })
 
-accepted = api.model('Accepted for asynchronous processing', {
-    'accepted': fields.Boolean(description='Should be True if everything is all right'),
+inout__scan_category = api.model('Scan Category model', {
+    'key': fields.String(),
+    'name': fields.String(),
+    'image_path': fields.String(),
 })
 
+out__scan = api.model('Scan model', {
+    'scan_id': fields.String(description='Scan\'s ID'),
+    'number_of_slices': fields.Integer(description='Total number of slices in given scan'),
+})
 
-random_scan_arguments = reqparse.RequestParser()
-random_scan_arguments.add_argument('category', type=str, required=True, help='Scan\'s category')
+out__label = api.model('Newly created Label model', {
+    'label_id': fields.String(description='Label\'s ID', attribute='id'),
+})
+
+out__new_scan = api.model('Newly created Scan model', {
+    'scan_id': fields.String(description='Scan\'s ID', attribute='id'),
+})
+
+args__random_scan = reqparse.RequestParser()
+args__random_scan.add_argument('category', type=str, required=True, help='Scan\'s category')

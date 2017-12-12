@@ -4,6 +4,6 @@ from flask_restplus import fields
 from data_labeling.api import api
 
 
-status = api.model('Status model', {
+out__status = api.model('Status model', {
     'success': fields.Boolean(description='Should be True if everything is all right.'),
 })
