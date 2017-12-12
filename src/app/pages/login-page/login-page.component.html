@@ -6,16 +6,16 @@
       <mat-card-title>Logowanie</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <form class="example-form">
+      <form class="example-form" [formGroup]="userForm" (keyup.enter)="logIn()">
         <table class="example-full-width" cellspacing="0">
           <tr>
           <td><mat-form-field class="example-full-width">
-            <input matInput type="text" placeholder="Login">
+            <input matInput type="text" placeholder="E-mail" id="email" formControlName="email" required>
           </mat-form-field></td>
           </tr>
           <tr>
           <td><mat-form-field class="example-full-width">
-            <input matInput type="password" placeholder="Hasło">
+            <input matInput type="password" placeholder="Hasło" id="password" formControlName="password" required>
           </mat-form-field></td>
           </tr>
         </table>
@@ -41,7 +41,7 @@
       <mat-card-title>Rejestracja</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <form [formGroup]="userForm">
+      <form [formGroup]="userForm" (keyup.enter)="register()">
         <table class="example-full-width" cellspacing="0">
           <tr>
             <td><mat-form-field class="example-full-width">
@@ -82,7 +82,7 @@
               <button mat-raised-button color="primary-color" (click)="changePageMode()"><mat-icon>arrow_back</mat-icon> Wstecz</button>
             </mat-card-actions></td>
             <td><mat-card-actions>
-              <button mat-raised-button color="primary" (click)="userRegistration()">Zarejestruj się</button>
+              <button mat-raised-button color="primary" (click)="register()">Zarejestruj się</button>
             </mat-card-actions></td>
           </tr>
         </table>

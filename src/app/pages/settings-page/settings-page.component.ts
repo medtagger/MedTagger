@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { FormControl, Validators } from '@angular/forms';
+import { UserInfo } from '../../model/UserInfo';
+import { UsersService } from '../../services/users.service';
+import {MatListModule} from '@angular/material/list';
 
 
 @Component({
   selector: 'app-settings-page',
   templateUrl: './settings-page.component.html',
-  styleUrls: ['./settings-page.component.scss']
+  styleUrls: ['./settings-page.component.scss'],
+  providers: [UsersService]
 })
 export class SettingsPageComponent implements OnInit {
 
@@ -16,42 +20,29 @@ export class SettingsPageComponent implements OnInit {
   userPassword = new FormControl('', [Validators.required]);
   userPasswordConfirmation = new FormControl('', [Validators.required]);
 
-  constructor(public snackBar: MatSnackBar) {
+  private currentUser: UserInfo;
+  private allUsers: Array<UserInfo>;
+
+  constructor(public snackBar: MatSnackBar, private usersService: UsersService) {
+    this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));
+    if (this.currentUser.role === 'admin') {
+      this.usersService.getAllUsers().then(users => this.allUsers = users);
+    }
   }
 
   ngOnInit() {
-    this.userName.setValue('Jan');
-    this.userSurname.setValue('Kowalski');
-    this.userEmail.setValue('jan.kowalski@gmail.com');
+    this.userName.setValue(this.currentUser.firstName);
+    this.userSurname.setValue(this.currentUser.lastName);
+    this.userEmail.setValue(this.currentUser.email);
   }
 
-  //
-  // Functions related to data saving
-  //
-
-  saveBasicData() {
-    if (!this.userName.valid || !this.userSurname.valid || !this.userEmail.valid) {
-      this.showInvalidFormMessage();
-      return;
-    }
-    this.snackBar.open("Zapisano!", "Zamknij", {
-        duration: 5000,
-      });
+  private promoteToDoctor(user: UserInfo): void {
+    this.usersService.setRole(user.id, 'doctor')
+      .then(() => {
+        user.role = 'doctor';
+      })
   }
 
-  savePasswords() {
-    if (!this.userPassword.valid || !this.userPasswordConfirmation.valid) {
-      this.showInvalidFormMessage();
-      return;
-    }
-    this.snackBar.open("Zapisano!", "Zamknij", {
-      duration: 5000,
-    });
-  }
-
-  //
-  // Functions related to error handling
-  //
   showInvalidFormMessage() {
     this.snackBar.open("Nieprawidłowe dane formularza!", "Zamknij", {
       duration: 5000,
@@ -78,5 +69,4 @@ export class SettingsPageComponent implements OnInit {
   getUserPasswordConfirmationErrorMessage() {
     return this.userPasswordConfirmation.hasError('required') ? 'Potwierdzenie hasła jest wymagane!' : '';
   }
-
 }
