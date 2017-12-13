@@ -8,7 +8,7 @@ import { UserInfo } from '../../model/UserInfo';
   styleUrls: ['./home-page.component.scss']
 })
 export class HomePageComponent implements OnInit {
-  private user: UserInfo;
+  public user: UserInfo;
 
   constructor(private routerService: Router) {
     this.user = JSON.parse(sessionStorage.getItem('userInfo'));

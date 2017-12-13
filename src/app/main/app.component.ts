@@ -14,13 +14,13 @@ import { UserInfo } from '../model/UserInfo';
 export class AppComponent implements OnInit {
 
   pageTitle = '';
-  private currentUser: UserInfo;
+  public currentUser: UserInfo;
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute) {
     router.events.subscribe(() => {
       this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));
     })
-    
+
   };
 
   ngOnInit() {

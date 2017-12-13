@@ -20,7 +20,7 @@ export class SettingsPageComponent implements OnInit {
   userPassword = new FormControl('', [Validators.required]);
   userPasswordConfirmation = new FormControl('', [Validators.required]);
 
-  private currentUser: UserInfo;
+  public currentUser: UserInfo;
   private allUsers: Array<UserInfo>;
 
   constructor(public snackBar: MatSnackBar, private usersService: UsersService) {
