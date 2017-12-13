@@ -107,4 +107,4 @@ class Scan(Resource):
     @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
     def get(scan_id: ScanID) -> Any:
         """Method responsible for returning scan for the given scan_id"""
-        return business.get_scan(scan_id)
+        return business.get_scan(scan_id)._asdict()
