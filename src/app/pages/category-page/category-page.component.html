@@ -1,0 +1,14 @@
+<div class="categories">
+  <div class="button-row" *ngIf="categories?.length > 0">
+    <button mat-fab *ngFor="let category of categories" routerLink="/marker" [queryParams]="{category: category.key}">
+      <mat-icon svgIcon="{{category.key}}"></mat-icon>
+      <div>{{category.name}}</div>
+    </button>
+  </div>
+  <div class="button-row" *ngIf="!categories || categories?.length === 0">
+    <h1>Brak dostępnych kategorii</h1>
+  </div>
+  <div class="title-row">
+    <span>Wybierz kategorię badań</span>
+  </div>
+</div>

@@ -1,0 +1,118 @@
+<mat-horizontal-stepper [linear]="true" #stepper>
+  <mat-step [stepControl]="chooseCategoryFormGroup">
+    <form [formGroup]="chooseCategoryFormGroup">
+      <ng-template matStepLabel>Wybierz kategorię</ng-template>
+      <mat-card class="category-selection">
+        <mat-card-header>
+          <mat-card-title>Wybierz kategorię</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-form-field>
+            <mat-select placeholder="Wybierz kategorię" formControlName="category" required>
+              <mat-option *ngFor="let availableCategory of availableCategories" [value]="availableCategory.key">
+                {{availableCategory.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </mat-card-content>
+        <mat-card-actions>
+          <button class="pull-right" mat-raised-button matStepperNext color="primary">Wybierz</button>
+          <div class="clearfix"></div>
+        </mat-card-actions>
+      </mat-card>
+    </form>
+  </mat-step>
+
+  <mat-step [stepControl]="chooseModeFormGroup" #chooseModeStep>
+    <form [formGroup]="chooseModeFormGroup">
+      <ng-template matStepLabel>Wybierz tryb dodawania</ng-template>
+          <mat-card class="upload-mode">
+            <mat-card-header>
+              <mat-card-title>Pojedynczy skan 3D</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p>Wybierz tą opcję w celu dodania pojedynczego skanu do bazy.</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button class="pull-right" mat-raised-button matStepperNext color="primary" (click)="uploadMode = UploadMode.SINGLE_SCAN">Wybierz</button>
+              <div class="clearfix"></div>
+            </mat-card-actions>
+          </mat-card>
+          <mat-card class="upload-mode">
+            <mat-card-header>
+              <mat-card-title>Wiele skanów 3D</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p>Wybierz tą opcję, jeżeli chcesz udostępnić wiele skanów jednocześnie.</p>
+            </mat-card-content>
+            <mat-card-actions>
+              <button class="pull-right" mat-raised-button matStepperNext color="primary" (click)="uploadMode = UploadMode.MULTIPLE_SCANS">Wybierz</button>
+              <div class="clearfix"></div>
+            </mat-card-actions>
+          </mat-card>
+    </form>
+  </mat-step>
+
+  <mat-step [stepControl]="chooseFilesFormGroup" #chooseFilesStep>
+    <form [formGroup]="chooseFilesFormGroup">
+      <section *ngIf="uploadMode == UploadMode.SINGLE_SCAN">
+        <ng-template matStepLabel>Wybierz skan</ng-template>
+        <mat-card class="enable-card-border">
+          <mat-card-header>
+            <mat-card-title>Pojedynczy skan 3D</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>W trybie pojedynczego skanu 3D należy przejść do katalogu ze wybranym skanem CT/MRI, a następnie zaznaczyć wszystkie pliki Dicom (.dcm).</p>
+            <!-- TODO: Move this image into a dialog popup -->
+            <!--<img src="../../../assets/img/example_upload_single_scan.png">-->
+          </mat-card-content>
+          <mat-card-actions>
+            <upload-scans-selector (onFileSelect)="chooseFiles($event)" [multipleScans]="false" style="float: left;"></upload-scans-selector>  <!-- TODO: Change to pull-left once we'll have Bootstrap -->
+            <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" matStepperNext>Wyślij!</button>  <!-- TODO: Change to pull-right once we'll have Bootstrap -->
+            <div class="clearfix"></div>
+          </mat-card-actions>
+        </mat-card>
+      </section>
+      <section *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS">
+        <ng-template matStepLabel>Wybierz skany</ng-template>
+        <mat-card class="enable-card-border">
+          <mat-card-header>
+            <mat-card-title>Wiele skanów 3D</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>W trybie udostępniania wielu skanów 3D należy wybrać <strong>katalog nadrzędny</strong> zawierający katalogi ze skanami CT/MRI.</p>
+            <!-- TODO: Move this image into a dialog popup -->
+            <!--<img src="../../../assets/img/example_upload_multiple_scans.png">-->
+          </mat-card-content>
+          <mat-card-actions>
+            <upload-scans-selector (onFileSelect)="chooseFiles($event)" [multipleScans]="true" style="float: left;"></upload-scans-selector>  <!-- TODO: Change to pull-left once we'll have Bootstrap -->
+            <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" matStepperNext>Wyślij!</button>  <!-- TODO: Change to pull-right once we'll have Bootstrap -->
+            <div class="clearfix"></div>
+          </mat-card-actions>
+        </mat-card>
+      </section>
+    </form>
+  </mat-step>
+
+  <mat-step [stepControl]="sendingFilesFormGroup" [editable]="false" #sendingFilesStep>
+    <ng-template matStepLabel>Wysyłanie</ng-template>
+    <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+    <h1 *ngIf="uploadMode == UploadMode.SINGLE_SCAN" class="uploading-header">
+      <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Trwa wysyłanie skanu...
+    </h1>
+    <h1 *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS" class="uploading-header">
+      <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Trwa wysyłanie skanów...
+    </h1>
+    <h5>Nie wyłączaj swojej przeglądarki!</h5>
+    <p *ngIf="uploadMode == UploadMode.SINGLE_SCAN">Wysłano {{filesSent}} z {{numberOfFiles}} obrazów Dicom.</p>
+    <p *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS">Wysłano {{filesSent}} z {{numberOfFiles}} skanów.</p>
+  </mat-step>
+
+  <mat-step [stepControl]="uploadCompletedFormGroup" [editable]="false" #uploadCompletedStep>
+    <ng-template matStepLabel>Gotowe</ng-template>
+    <section class="success-message">
+      <p><mat-icon class="success-indicator">check</mat-icon> Wysyłanie zakończone sukcesem!</p>
+    </section>
+    <button mat-raised-button class="restart-button" color="primary-color" (click)="restart()"><mat-icon>replay</mat-icon> Dodaj kolejny skan</button>
+  </mat-step>
+</mat-horizontal-stepper>

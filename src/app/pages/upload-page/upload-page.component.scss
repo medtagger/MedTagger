@@ -1,0 +1,56 @@
+.pull-right {
+  float: right;
+}
+
+.upload-mode {
+  width: 40%;
+  max-width: 450px;
+  float: left;
+  margin: 1.5em;
+}
+
+.mat-card-title {
+  width: 100%;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+.enable-card-border {
+  margin: 5px;
+}
+
+.category-selection {
+  width: 60%;
+  min-width: 400px;
+  max-width: 600px;
+  margin: 5px auto;
+  display: block;
+}
+
+.progress-spinner {
+  float: left;
+  margin-right: 10px;
+}
+
+.uploading-header {
+  margin-top: 15px;
+}
+
+.success-message {
+  background: #4caf50;
+  color: white;
+  padding: 1.6em;
+
+  p {
+    margin: 0;
+  }
+}
+
+.success-indicator {
+  vertical-align: middle !important;
+}
+
+.restart-button {
+  margin: 20px auto;
+  display: block;
+}
