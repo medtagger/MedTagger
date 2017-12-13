@@ -28,7 +28,7 @@ class LabelsRepository(object):
             if status:
                 query = query.filter(Label.status == status)
             query = query.order_by(func.random())
-            label = query.one()
+            label = query.first()
         return label
 
     @staticmethod
