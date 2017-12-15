@@ -10,11 +10,8 @@ args = parser.parse_args()
 print(args.directory)
 
 logging.basicConfig(level=logging.INFO)
-commit_range = os.environ.get('TRAVIS_COMMIT_RANGE', '').replace('...', '..')
-print(commit_range)
-if not commit_range:
-    logging.warn('Could not find a commit range, not doing anything.')
-else:
+if os.environ.get('TRAVIS_PULL_REQUEST', False):
+    commit_range = 'master..' + os.environ.get('TRAVIS_COMMIT', '')
     logging.info('Finding all containers that changed in %s', commit_range)
     diff_lines = subprocess.check_output(['git', 'diff', '--name-only', commit_range]).split()
     print(diff_lines)
@@ -25,4 +22,7 @@ else:
         exit(0)
     else:
         exit(1)
+else:
+    logging.info('Running all tests as it is not a Pull Request.')
+    exit(0)
 
