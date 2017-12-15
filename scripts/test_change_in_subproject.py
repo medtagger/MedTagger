@@ -24,12 +24,7 @@ def run(command):
         print(stdout_line, end="") 
     p.stdout.close()
     return_code = p.wait()
-    exit(returncode)
-#    try:
-#        subprocess.check_output(command, shell=True)
-#    except Exception as e:
-#        logging.error(str(e))
-#        exit(1)
+    exit(return_code)
 
 def do_not_run():
     logging.info('This subproject does not contain changes.')
