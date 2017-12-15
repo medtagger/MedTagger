@@ -4,6 +4,9 @@ language: python
 services:
   - docker
 
+before_install:
+  - git fetch origin master
+
 jobs:
   include:
     # Building
