@@ -14,7 +14,7 @@ jobs:
     - stage: build docker image
       script: 
        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-       - ./scripts/is_change_in_subproject.py backend "cd backend && docker-compose build && docker-compose push"
+       - ./scripts/is_change_in_subproject.py backend && cd backend && docker-compose build && docker-compose push || echo "Skipping..."
          #- stage: build docker image
          #script:
          # - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
@@ -22,5 +22,5 @@ jobs:
 
     # Testing inside of the Docker
     - stage: test
-      script: ./scripts/is_change_in_subproject.py backend "cd backend && docker-compose run data_labeling_api make test"
+      script: ./scripts/is_change_in_subproject.py backend && cd backend && docker-compose run data_labeling_api make test || echo "Skipping..."
 
