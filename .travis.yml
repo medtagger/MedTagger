@@ -14,10 +14,10 @@ jobs:
     - stage: build docker image
       script: 
        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-       - ./scripts/is_change_in_subproject.py backend && \
-          cd backend && \
-          docker -f Dockerfile_api build -t backend_test . && \
-          dockre tag backend_test $DOCKER_USERNAME/backend_test && \
+       - ./scripts/is_change_in_subproject.py backend &&
+          cd backend &&
+          docker -f Dockerfile_api build -t backend_test . &&
+          dockre tag backend_test $DOCKER_USERNAME/backend_test &&
           docker push $DOCKER_USERNAME/backend_test
          || echo "Skipping..."
 
@@ -25,8 +25,8 @@ jobs:
     - stage: test
       script:
        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-       - ./scripts/is_change_in_subproject.py backend && \
-          cd backend && \
-          docker run $DOCKER_USERNAME/backend/data_labeling_api make test \
+       - ./scripts/is_change_in_subproject.py backend &&
+          cd backend &&
+          docker run $DOCKER_USERNAME/backend/data_labeling_api make test
          || echo "Skipping..."
 
