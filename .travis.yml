@@ -19,5 +19,5 @@ jobs:
     - stage: test frontend
       script:
        - ./scripts/test_change_in_subproject.py frontend --command="cd frontend &&
-          docker build -t ."   
+          docker build ."   
 
