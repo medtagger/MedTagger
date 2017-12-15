@@ -7,5 +7,5 @@ jobs:
   include:
     # Building
     - stage: build
-      script: ./scripts/change_in_subproject.py backend && cd backend && docker-compose build
+      script: ./scripts/is_change_in_subproject.py backend && cd backend && docker-compose build
 
