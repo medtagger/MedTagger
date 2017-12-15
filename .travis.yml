@@ -7,6 +7,7 @@ services:
 before_install:
   - git remote set-branches --add origin master
   - git fetch
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
 jobs:
   include:
@@ -14,13 +15,13 @@ jobs:
     - stage: build docker image
       script: 
        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-       - ./scripts/is_change_in_subproject.py backend && cd backend && docker-compose build && docker-compose push || echo "Skipping..."
-         #- stage: build docker image
-         #script:
-         # - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-         #- ./scripts/is_change_in_subproject.py frontend "cd frontend && docker-compose build && docker-compose push"
+       - ./scripts/is_change_in_subproject.py backend \
+         && cd backend \
+         && docker -f Dockerfile_api build -t backend_test . \
+         && dockre tag backend_test $DOCKER_USERNAME/backend_test \
+         && docker push $DOCKER_USERNAME/backend_test || echo "Skipping..."
 
     # Testing inside of the Docker
     - stage: test
-      script: ./scripts/is_change_in_subproject.py backend && cd backend && docker-compose run data_labeling_api make test || echo "Skipping..."
+      script: ./scripts/is_change_in_subproject.py backend && cd backend && docker run $DOCKER_USERNAME/backend/data_labeling_api make test || echo "Skipping..."
 
