@@ -17,7 +17,7 @@ jobs:
        - ./scripts/is_change_in_subproject.py backend &&
           cd backend &&
           docker build -f Dockerfile_api -t backend_test . &&
-          dockre tag backend_test $DOCKER_USERNAME/backend_test &&
+          docker tag backend_test $DOCKER_USERNAME/backend_test &&
           docker push $DOCKER_USERNAME/backend_test
          || echo "Skipping..."
 
