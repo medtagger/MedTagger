@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import logging
 import os
-from subprocess import Popen, PIPE
 import argparse
+import subprocess
+from subprocess import Popen, PIPE
 
 
 logging.basicConfig(level=logging.INFO)
