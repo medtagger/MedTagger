@@ -8,7 +8,7 @@ import argparse
 logging.basicConfig(level=logging.INFO)
 parser = argparse.ArgumentParser(description='Checks if directory contains any change.')
 parser.add_argument('subproject_name', type=str, help='Directory in which should be changes.')
-parser.add_argument('command', type=str, help='Command to be executed if there was a change.')
+parser.add_argument('--command', dest='command', type=str, help='Command to be executed if there was a change.')
 args = parser.parse_args()
 
 
