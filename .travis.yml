@@ -16,7 +16,7 @@ jobs:
        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
        - ./scripts/is_change_in_subproject.py backend &&
           cd backend &&
-          docker -f Dockerfile_api build -t backend_test . &&
+          docker build -f Dockerfile_api -t backend_test . &&
           dockre tag backend_test $DOCKER_USERNAME/backend_test &&
           docker push $DOCKER_USERNAME/backend_test
          || echo "Skipping..."
