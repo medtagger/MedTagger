@@ -9,9 +9,11 @@ def get_root_dir(path):
     return os.path.dirname(path).split('/')[0]
 
 def run():
+    logging.info('Let\'s run the CI!')
     exit(0)
 
 def do_not_run():
+    logging.info('This subproject does not contain changes.')
     exit(1)
 
 

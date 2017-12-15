@@ -10,7 +10,13 @@ before_install:
 
 jobs:
   include:
-    # Building
+    # Building Docker
     - stage: build
       script: ./scripts/is_change_in_subproject.py backend && cd backend && docker-compose build
+    - stage: build
+      script: ./scripts/is_change_in_subproject.py frontend && cd frontend && docker-compose build
+
+    # Testing inside of the Docker
+    - stage: test
+      script: ./scripts/is_change_in_subproject.py backend && cd backend && docker-compose run data_labeling_api make test
 

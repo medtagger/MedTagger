@@ -1,7 +1,5 @@
 FROM python:3.6
 
-COPY requirements.txt .
-
 COPY . /data_labeling
 WORKDIR /data_labeling
 

@@ -1,14 +1,12 @@
 FROM python:3.6
 
-COPY requirements.txt .
-
 COPY . /data_labeling
 WORKDIR /data_labeling
 
 ENV PYTHONPATH /data_labeling
-ENV C_FORCE_ROOT true
 
 RUN pip install -r requirements.txt
 
+ENV C_FORCE_ROOT true
 CMD ["celery", "-A", "data_labeling.workers", "worker", "--loglevel=info"]
 

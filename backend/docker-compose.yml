@@ -30,18 +30,18 @@ services:
       POSTGRES_PASSWORD: DataLabelingAPI!
 
   data_labeling_web:
-    image: registry.gitlab.com/praca-inzynierska/frontend/data_labeling_web
+    image: frontend/data_labeling_web
     ports:
       - 80:80
 
   data_labeling_api:
-    image: registry.gitlab.com/praca-inzynierska/backend-api/data_labeling_api
+    image: backend/data_labeling_api
     build:
       context: .
       dockerfile: Dockerfile_api
 
   data_labeling_worker:
-    image: registry.gitlab.com/praca-inzynierska/backend-api/data_labeling_worker
+    image: backend/data_labeling_worker
     build:
       context: .
       dockerfile: Dockerfile_worker
