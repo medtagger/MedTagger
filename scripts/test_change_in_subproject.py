@@ -17,7 +17,7 @@ def get_root_dir(path):
 
 def run(command):
     logging.info('Let\'s run the CI!')
-    subprocess.run(command, shell=True)
+    subprocess.call(command, shell=True)
 
 def do_not_run():
     logging.info('This subproject does not contain changes.')
