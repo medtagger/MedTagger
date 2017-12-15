@@ -18,7 +18,7 @@ def get_root_dir(path):
 
 def run(command):
     logging.info('Let\'s run the CI!')
-    p = Popen(command.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     output, err = p.communicate(b"input data that is passed to subprocess' stdin")
     exit(p.returncode)
 #    try:
