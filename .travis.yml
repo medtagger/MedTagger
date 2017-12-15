@@ -1,0 +1,23 @@
+sudo: true
+dist: trusty
+language: python
+
+services:
+  - docker
+
+before_install:
+  - git remote set-branches --add origin master
+  - git fetch
+
+jobs:
+  include:
+    - stage: test backend
+      script: 
+       - ./scripts/test_change_in_subproject.py backend --command="cd backend &&
+          docker-compose build &&
+          docker-compose run data_labeling_api make test"
+    - stage: test frontend
+      script:
+       - ./scripts/test_change_in_subproject.py frontend --command="cd frontend &&
+          docker build ."   
+
