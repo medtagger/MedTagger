@@ -11,12 +11,16 @@ before_install:
 jobs:
   include:
     # Building Docker
-    - stage: build
-      script: ./scripts/is_change_in_subproject.py backend && cd backend && docker-compose build
-    - stage: build
-      script: ./scripts/is_change_in_subproject.py frontend && cd frontend && docker-compose build
+    - stage: build docker image
+      script: 
+       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+       - ./scripts/is_change_in_subproject.py backend "cd backend && docker-compose build && docker-compose push"
+         #- stage: build docker image
+         #script:
+         # - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+         #- ./scripts/is_change_in_subproject.py frontend "cd frontend && docker-compose build && docker-compose push"
 
     # Testing inside of the Docker
     - stage: test
-      script: ./scripts/is_change_in_subproject.py backend && cd backend && docker-compose run data_labeling_api make test
+      script: ./scripts/is_change_in_subproject.py backend "cd backend && docker-compose run data_labeling_api make test"
 
