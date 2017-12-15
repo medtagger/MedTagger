@@ -11,23 +11,9 @@ before_install:
 
 jobs:
   include:
-    # Building Docker
-    - stage: build docker image
+    - stage: test backend
       script: 
-       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-       - ./scripts/is_change_in_subproject.py backend &&
-          cd backend &&
-          docker build -f Dockerfile_api -t backend_test . &&
-          docker tag backend_test $DOCKER_USERNAME/backend_test &&
-          docker push $DOCKER_USERNAME/backend_test
-         || echo "Skipping..."
-
-    # Testing inside of the Docker
-    - stage: test
-      script:
-       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-       - ./scripts/is_change_in_subproject.py backend &&
-          cd backend &&
-          docker run $DOCKER_USERNAME/backend/data_labeling_api make test
-         || echo "Skipping..."
+       - ./scripts/test_change_in_subproject.py backend --command="cd backend &&
+          docker-compose build &&
+          docker-composr run data_labeling_api make test"
 
