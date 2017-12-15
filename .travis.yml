@@ -5,7 +5,8 @@ services:
   - docker
 
 before_install:
-  - git fetch origin master
+  - git remote set-branches --add origin master
+  - git fetch
 
 jobs:
   include:
