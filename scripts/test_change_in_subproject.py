@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import logging
 import os
-import subprocess
+from subprocess import Popen, PIPE
 import argparse
 
 
@@ -17,11 +17,14 @@ def get_root_dir(path):
 
 def run(command):
     logging.info('Let\'s run the CI!')
-    try:
-        subprocess.check_output(command, shell=True)
-    except Exception as e:
-        logging.error(str(e))
-        exit(1)
+    p = Popen(command.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    output, err = p.communicate(b"input data that is passed to subprocess' stdin")
+    exit(p.returncode)
+#    try:
+#        subprocess.check_output(command, shell=True)
+#    except Exception as e:
+#        logging.error(str(e))
+#        exit(1)
 
 def do_not_run():
     logging.info('This subproject does not contain changes.')
