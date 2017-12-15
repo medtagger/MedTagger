@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import logging
 import os
 import argparse
@@ -19,8 +20,11 @@ def get_root_dir(path):
 def run(command):
     logging.info('Let\'s run the CI!')
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    output, err = p.communicate(b"input data that is passed to subprocess' stdin")
-    exit(p.returncode)
+    for stdout_line in iter(p.stdout.readline, ""):
+        print(stdout_line, end="") 
+    p.stdout.close()
+    return_code = p.wait()
+    exit(returncode)
 #    try:
 #        subprocess.check_output(command, shell=True)
 #    except Exception as e:
