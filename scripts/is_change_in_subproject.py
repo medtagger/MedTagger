@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 if os.environ.get('TRAVIS_PULL_REQUEST', False):
     commit_range = 'master..' + os.environ.get('TRAVIS_COMMIT', '')
     logging.info('Finding all containers that changed in %s', commit_range)
-    diff_lines = subprocess.check_output(['git', 'diff', '--name-only', commit_range]).split()
+    diff_lines = subprocess.check_output(['git', 'diff', '--name-only', 'origin/master']).split()
     print(diff_lines)
     changed_folders = {os.path.dirname(line) for line in diff_lines if os.path.dirname(line)}
     print(changed_folders)
