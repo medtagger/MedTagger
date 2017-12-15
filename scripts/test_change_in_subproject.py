@@ -17,7 +17,11 @@ def get_root_dir(path):
 
 def run(command):
     logging.info('Let\'s run the CI!')
-    subprocess.check_output(subprocess.call(command, shell=True))
+    try:
+        subprocess.check_output(command, shell=True)
+    except Exception as e:
+        logging.error(str(e))
+        exit(1)
 
 def do_not_run():
     logging.info('This subproject does not contain changes.')
