@@ -31,8 +31,9 @@ def do_not_run():
     exit(0)
 
 
-if os.environ.get('TRAVIS_PULL_REQUEST', False):
-    logging.info('This is a Pull Request, so we will run CI only for changed subprojects.')
+logging.info('This is a %s event.', os.environ.get('TRAVIS_EVENT_TYPE'))
+if os.environ.get('TRAVIS_EVENT_TYPE') == 'pull_request':
+    logging.info('This is a Pull Request event, so we will run CI only for changed subprojects.')
     diff_lines = subprocess.check_output(['git', 'diff', '--name-only', 'origin/master']).split()
     changed_subprojects = {get_root_dir(line) for line in diff_lines if os.path.dirname(line)}
     logging.info('The following subprojects contain changes: %s', changed_subprojects)
