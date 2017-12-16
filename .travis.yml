@@ -20,7 +20,7 @@ jobs:
       build ."
 deploy:
   provider: script
-  script: eval $(ssh-agent -s) && ssh-add .travis/staging.key && ssh $SSH_DESTINATION_HOST__STAGING -p $SSH_DESTINATION_PORT__STAGING "echo Hello"
+  script: eval "$(ssh-agent -s)" && ssh-add .travis/staging.key && ssh $SSH_DESTINATION_HOST__STAGING -p $SSH_DESTINATION_PORT__STAGING "echo Hello"
   on:
     branch: master
 env:
