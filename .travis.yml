@@ -5,7 +5,7 @@ services:
 - docker
 before_install:
 - openssl aes-256-cbc -K $encrypted_9953cb5dbc4f_key -iv $encrypted_9953cb5dbc4f_iv
-  -in .travis/staging.key.enc -out .travis/staging.key -d
+  -in .travis/staging.key.enc -out /tmp/.travis/staging.key -d
 - git remote set-branches --add origin master
 - git fetch
 jobs:
@@ -18,11 +18,9 @@ jobs:
     script:
     - ./.travis/test_change_in_subproject.py frontend --command="cd frontend && docker
       build ."
-deploy:
-  provider: script
-  script: ./.travis/deployment.sh staging
-  on:
-    branch: master
+  - stage: deploy to staging
+    if: branch = master
+    script: ./.travis/deployment.sh staging
 env:
   global:
   - secure: aR1iDiGgOQvXVAJ/lFIDsQn5PNAAss7Q4OvLrjxhzCJyJUE/DwLWos6cgvOAiIo+ArD6mKbFAR0FgdbXVYHlyhc4bgUlylqkP3OumRrKVNDAXUYADwPEMY2rkacyZVqLTnMleG+iprIyeTSAUCyZnXo4tPRkPGF/9wKbf+NWkhgb9iaASkt8xv9puK6+IufeY7hi2IXMavTk9s6FM4gWSJcvDgxbg3cwagIA6Qn3bbEOBnEFhHPkIrm4pKetTpHabYAliKME/CXQZ3ZKHN/nqH+UqXGEZvCyokMoTCNzBv92gfWtVRf5ij0owjXXgnP332TnYWsO7XlZZb7WMmti/9DfxnKpVZB8zh8hEw8dVkTMLrIpFFUOlMHnhAcBTwh+VbX68bV+UzC6VvRauJjk9wWjnwUsoHpN9RhIPqto6opFY73e6y8qpsS0REV1dldr2/Ufa70mYtSUW3K37Ds6Qf5XL2Q9SC14Fbasb7z7mQnys5qhWsxWNV1DyAihnnKmYURSo+scP24LT0bpLugowUvNKkOvGYrH5NvQIfgOfSVcre8/hsd2jdpFESv1mwff6sDFOvUjEwapXna1KUPTUH9ObFSWJwfdnKWkp1ERBCMdx2zBX1Eef/QgmfMuWTdAevYU5pzZ6IdmPHrpHHo8FXIk1R7VHNXXxwOT0plJN68=
