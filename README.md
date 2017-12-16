@@ -1,7 +1,5 @@
 # MedTagger
 
-[![Build Status](https://travis-ci.com/jpowie01/MedTagger.svg?token=L7HTUx9jsBXG6tqCCqWJ&branch=master)](https://travis-ci.com/jpowie01/MedTagger)
-
 **MedTagger** is a collaborative framework for annotating **medical datasets**.
 
 Main goal of this project was to design and develop software environment,
@@ -9,6 +7,8 @@ which helps in **aggregation and labeling** huge datasets of medical scans,
 powered by idea of **crowdsourcing**. Platform also provides mechanism for
 label **validation**, thus making produced datasets of labels more reliable
 for the future use.
+
+[![Build Status](https://travis-ci.com/jpowie01/MedTagger.svg?token=L7HTUx9jsBXG6tqCCqWJ&branch=master)](https://travis-ci.com/jpowie01/MedTagger)
 
 ## What is currently done?
  - [x] User Interface with dynamic 3D scans manipulation
