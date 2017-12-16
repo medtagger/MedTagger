@@ -31,6 +31,7 @@ def do_not_run():
     exit(0)
 
 
+print(os.environ.get('TRAVIS_PULL_REQUEST'))
 if os.environ.get('TRAVIS_PULL_REQUEST', 'false') == 'true':
     logging.info('This is a Pull Request, so we will run CI only for changed subprojects.')
     diff_lines = subprocess.check_output(['git', 'diff', '--name-only', 'origin/master']).split()

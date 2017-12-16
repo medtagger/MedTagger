@@ -1,4 +1,7 @@
 # MedTagger
+
+[![Build Status](https://travis-ci.com/jpowie01/MedTagger.svg?token=L7HTUx9jsBXG6tqCCqWJ&branch=master)](https://travis-ci.com/jpowie01/MedTagger)
+
 **MedTagger** is a collaborative framework for annotating **medical datasets**.
 
 Main goal of this project was to design and develop software environment,
