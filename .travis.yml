@@ -1,23 +1,33 @@
 sudo: true
 dist: trusty
 language: python
-
 services:
-  - docker
-
+- docker
 before_install:
-  - git remote set-branches --add origin master
-  - git fetch
-
+- openssl aes-256-cbc -K $encrypted_9953cb5dbc4f_key -iv $encrypted_9953cb5dbc4f_iv
+  -in .travis/staging.key.enc -out .travis/staging.key -d
+- git remote set-branches --add origin master
+- git fetch
 jobs:
   include:
-    - stage: test backend
-      script: 
-       - ./scripts/test_change_in_subproject.py backend --command="cd backend &&
-          docker-compose build &&
-          docker-compose run data_labeling_api make test"
-    - stage: test frontend
-      script:
-       - ./scripts/test_change_in_subproject.py frontend --command="cd frontend &&
-          docker build ."   
-
+  - stage: test backend
+    script:
+    - ./.travis/test_change_in_subproject.py backend --command="cd backend && docker-compose
+      build && docker-compose run data_labeling_api make test"
+  - stage: test frontend
+    script:
+    - ./.travis/test_change_in_subproject.py frontend --command="cd frontend && docker
+      build ."
+deploy:
+  provider: script
+  script:
+  - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+  - eval $(ssh-agent -s)
+  - ssh-add .travis/staging.key
+  - ssh $SSH_DESTINATION_HOST__STAGING -p $SSH_DESTINATION_PORT__STAGING "echo Hello"
+  on:
+    branch: master
+env:
+  global:
+  - secure: aR1iDiGgOQvXVAJ/lFIDsQn5PNAAss7Q4OvLrjxhzCJyJUE/DwLWos6cgvOAiIo+ArD6mKbFAR0FgdbXVYHlyhc4bgUlylqkP3OumRrKVNDAXUYADwPEMY2rkacyZVqLTnMleG+iprIyeTSAUCyZnXo4tPRkPGF/9wKbf+NWkhgb9iaASkt8xv9puK6+IufeY7hi2IXMavTk9s6FM4gWSJcvDgxbg3cwagIA6Qn3bbEOBnEFhHPkIrm4pKetTpHabYAliKME/CXQZ3ZKHN/nqH+UqXGEZvCyokMoTCNzBv92gfWtVRf5ij0owjXXgnP332TnYWsO7XlZZb7WMmti/9DfxnKpVZB8zh8hEw8dVkTMLrIpFFUOlMHnhAcBTwh+VbX68bV+UzC6VvRauJjk9wWjnwUsoHpN9RhIPqto6opFY73e6y8qpsS0REV1dldr2/Ufa70mYtSUW3K37Ds6Qf5XL2Q9SC14Fbasb7z7mQnys5qhWsxWNV1DyAihnnKmYURSo+scP24LT0bpLugowUvNKkOvGYrH5NvQIfgOfSVcre8/hsd2jdpFESv1mwff6sDFOvUjEwapXna1KUPTUH9ObFSWJwfdnKWkp1ERBCMdx2zBX1Eef/QgmfMuWTdAevYU5pzZ6IdmPHrpHHo8FXIk1R7VHNXXxwOT0plJN68=
+  - secure: h/n7Ng2qs+8Kd4uGReD+Gc4wmFgnsf8tVRIko7cJsVrIDMEDdSIW+dTnUQZueAVWF9T9pjtSh0DnqSWHABCr2vWN0m/TyKtD+tHWfJWr4uPyJGsOGTGs5zc/u4u7QPkB+wvJOhwEFUqf5plyQIn7KhHvMUpk8qMBz/vfsS7MOiS5Ju4NqQyAAAhsRfPvwg+Bi1+T9kowKX5NEYe+iPP9Ti07ojkB3VJE02vkGsmLRP/AYYj+ODt8Ahvl+5gjOFqNbWOsA7dQ8be1mJHKVa6L6xJ7/mxwpIaxlKfJlHqw3CVygiVDUphy2QQvHZ35AvpkeQ51dPyokROL58Z/weYOI24mujbiHiB4whr8VOIW+X6yjNmxEEUnzHB0bidW8kJqXGZxMspZbexgdENtTVX/ru7pHEY6ZKiygLTXm0ahD+5GTUNj3vA8BEto3jN5kJ8I/mbrNbGpruDg85sDPotrEkYJHqf5XlGlyMwmXpI6Xr72z0xtHwxwOvuuQs1oyTiuO9LUW4FIrQglPD6GzDgc+qCYBJHU1ncKXXBFnSBsH3TxnTpkcFe3cFOzF9znDcz0miQIp5o2wfn7ZEQX5nN5thQDYXJdCjSFjAJGMD8gcE+Shr/75JdTjG7enjPXDizRcB3PetS+vIdw7i9yBU1f6HVHLOGApDyClyviI91VnGk=
