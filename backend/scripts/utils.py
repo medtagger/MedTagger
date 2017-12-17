@@ -1,6 +1,6 @@
 """Storage for all utility functions"""
 from starbase import Connection
-from data_labeling.config import ConfigurationFile
+from data_labeling.config import AppConfiguration
 
 
 def get_connection_to_hbase() -> Connection:
@@ -8,7 +8,7 @@ def get_connection_to_hbase() -> Connection:
 
     :return: connection to HBase using Starbase library
     """
-    configuration = ConfigurationFile()
+    configuration = AppConfiguration()
     host = configuration.get('hbase', 'host', fallback='localhost')
     port = configuration.getint('hbase', 'rest_port', fallback=8080)
     return Connection(host=host, port=port)

@@ -3,7 +3,6 @@
 # That's needed for Python to understand where is the root directory for parsing
 export PYTHONPATH=`pwd`
 
-# Enable virtualenv if exists
 if [ -e venv ]
 then
     echo "Using virtualenv from ./venv."
@@ -11,3 +10,7 @@ then
 else
     echo "Could not find any virtualenv. Skipping..."
 fi
+
+echo "Applying default development configuration entries..."
+. ./scripts/dev__configuration.sh
+

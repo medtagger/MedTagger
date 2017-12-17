@@ -2,7 +2,7 @@
 import os
 from typing import List
 
-from data_labeling.config import ConfigurationFile
+from data_labeling.config import AppConfiguration
 
 
 def get_all_modules_with_tasks() -> List[str]:
@@ -16,7 +16,7 @@ def get_all_modules_with_tasks() -> List[str]:
     return [module_prefix + os.path.splitext(filename)[0] for filename in python_files]
 
 
-configuration = ConfigurationFile()
+configuration = AppConfiguration()
 broker_url = configuration.get('celery', 'broker', fallback='pyamqp://guest:guest@localhost//')
 imports = get_all_modules_with_tasks()
 

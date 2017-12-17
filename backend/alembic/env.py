@@ -3,7 +3,7 @@ from alembic import context
 from sqlalchemy import create_engine, pool
 from logging.config import fileConfig
 
-from data_labeling.config import ConfigurationFile
+from data_labeling.config import AppConfiguration
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -22,7 +22,7 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-configuration = ConfigurationFile()
+configuration = AppConfiguration()
 url = configuration.get('db', 'database_uri')
 
 
@@ -60,6 +60,7 @@ def run_migrations_online():
 
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

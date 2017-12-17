@@ -1,0 +1,33 @@
+version: '3'
+services:
+  hbase:
+    image: dajobe/hbase
+
+  rabbitmq:
+    image: rabbitmq:management
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: data_labeling
+      POSTGRES_USER: backend_user
+      POSTGRES_PASSWORD: DataLabelingAPI!
+
+  functional_tests:
+    image: medtagger/functional_tests
+    environment:
+      - MEDTAGGER__API_HOST=0.0.0.0
+      - MEDTAGGER__API_PORT=51000
+      - MEDTAGGER__API_DEBUG=1
+      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
+      - MEDTAGGER__DB_DATABASE_URI=postgresql://backend_user:DataLabelingAPI!@postgres:5432/data_labeling
+      - MEDTAGGER__HBASE_HOST=hbase
+      - MEDTAGGER__HBASE_PORT=9090
+      - MEDTAGGER__HBASE_REST_PORT=8080
+      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10
+      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    build:
+      context: ../..
+      dockerfile: Dockerfile_api
+    command: make functional_tests
+

@@ -11,10 +11,6 @@ COVERAGE_LIMIT = 0
 PYLINT_CONFIG_FILE = .pylintrc
 PYLINT_UNIT_TESTS_CONFIG_FILE = .test.pylintrc
 
-# Our application configuration files
-UNIT_TESTS_CONFIG_FILE = tests/backend_api.unit.conf
-FUNCTIONAL_TESTS_CONFIG_FILE = tests/backend_api.functional.conf
-
 #
 # Development
 #
@@ -50,19 +46,11 @@ test_mypy:
 	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(FUNCTIONAL_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
 
 unit_tests:
-	CONFIG_FILE=$(UNIT_TESTS_CONFIG_FILE) pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TESTS_MODULE)
+	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TESTS_MODULE)
 
 functional_tests:
-	docker-compose up -d hbase rabbitmq postgres
-	sh $(FUNCTIONAL_TESTS_MODULE)/wait_for_dependencies.sh
-	CONFIG_FILE=$(FUNCTIONAL_TESTS_CONFIG_FILE) pytest $(FUNCTIONAL_TESTS_MODULE) && make _functional_tests_passed || make _functional_tests_failed
-
-_functional_tests_passed:
-	docker-compose down
-
-_functional_tests_failed:
-	docker-compose down
-	exit 1
+	./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
+	pytest $(FUNCTIONAL_TESTS_MODULE)
 
 #
 # Utilities
