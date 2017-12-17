@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 from starbase import Connection
 
-from data_labeling.config import ConfigurationFile
+from data_labeling.config import AppConfiguration
 from data_labeling.database import Base, engine, session
 from data_labeling.database.fixtures import insert_scan_categories
 from data_labeling.clients.hbase_client import HBaseClient
@@ -14,7 +14,7 @@ from data_labeling.clients.hbase_client import HBaseClient
 def prepare_environment() -> Any:
     """Prepare environment for testing purpose (setup DBs, fixtures) and clean up after the tests"""
     print('Getting needed entries')
-    configuration = ConfigurationFile()
+    configuration = AppConfiguration()
     host = configuration.get('hbase', 'host', fallback='localhost')
     port = configuration.getint('hbase', 'rest_port', fallback=8080)
 

@@ -1,0 +1,75 @@
+version: '3'
+services:
+  hbase:
+    image: dajobe/hbase
+    ports:
+      - 8080:8080
+      - 8085:8085
+      - 9090:9090
+      - 9095:9095
+      - 2181:2181
+      - 16010:16010
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - 4369:4369
+      - 5671:5671
+      - 5672:5672
+      - 15671:15671
+      - 15672:15672
+      - 25672:25672
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: data_labeling
+      POSTGRES_USER: backend_user
+      POSTGRES_PASSWORD: DataLabelingAPI!
+
+  medtagger_web:
+    image: medtagger_frontend/web
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+
+  medtagger_api:
+    image: medtagger_backend/api
+    environment:
+      - MEDTAGGER__API_HOST=0.0.0.0
+      - MEDTAGGER__API_PORT=51000
+      - MEDTAGGER__API_DEBUG=1
+      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
+      - MEDTAGGER__DB_DATABASE_URI=postgresql://backend_user:DataLabelingAPI!@postgres:5432/data_labeling
+      - MEDTAGGER__HBASE_HOST=hbase
+      - MEDTAGGER__HBASE_PORT=9090
+      - MEDTAGGER__HBASE_REST_PORT=8080
+      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10
+      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    build:
+      context: backend
+      dockerfile: Dockerfile_api
+    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && python3.6 data_labeling/api/app.py"
+
+  medtagger_worker:
+    image: medtagger_backend/worker
+    environment:
+      - MEDTAGGER__API_HOST=0.0.0.0
+      - MEDTAGGER__API_PORT=51000
+      - MEDTAGGER__API_DEBUG=1
+      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
+      - MEDTAGGER__DB_DATABASE_URI=postgresql://backend_user:DataLabelingAPI!@postgres:5432/data_labeling
+      - MEDTAGGER__HBASE_HOST=hbase
+      - MEDTAGGER__HBASE_PORT=9090
+      - MEDTAGGER__HBASE_REST_PORT=8080
+      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10
+      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@localhost//
+    build:
+      context: backend
+      dockerfile: Dockerfile_worker
+    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && celery -A data_labeling.workers worker --loglevel=info"
+

@@ -5,10 +5,10 @@ import happybase
 from retrying import retry
 from thriftpy.transport import TTransportException
 
-from data_labeling.config import ConfigurationFile
+from data_labeling.config import AppConfiguration
 
 
-configuration = ConfigurationFile()
+configuration = AppConfiguration()
 host = configuration.get('hbase', 'host', fallback='localhost')
 port = configuration.getint('hbase', 'port', fallback=9090)
 size = configuration.getint('hbase', 'connection_pool_size', fallback=10)

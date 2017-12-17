@@ -15,7 +15,7 @@ from flask_cors import CORS
 from data_labeling.api import blueprint, web_socket
 from data_labeling.api.account.business import security, user_datastore
 from data_labeling.database import db
-from data_labeling.config import ConfigurationFile
+from data_labeling.config import AppConfiguration
 
 # Import all REST services
 from data_labeling.api.core.service import core_ns as core_rest_ns  # noqa
@@ -29,7 +29,7 @@ from data_labeling.api.scans.service_web_socket import Slices as slices_websocke
 
 
 # Load configuration
-configuration = ConfigurationFile()
+configuration = AppConfiguration()
 
 # Definition of application
 app = Flask(__name__)

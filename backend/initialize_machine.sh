@@ -28,14 +28,5 @@ export PYTHONPATH=`pwd`
 echo "Installing all Python packages..."
 make install_packages
 
-echo "Migrating SQL database..."
-alembic upgrade head
-
-echo "Migrating HBase database..."
-python3.6 scripts/migrate_hbase.py --yes
-
-echo "Apply database fixtures..."
-python3.6 data_labeling/database/fixtures.py
-
-echo "Populate database with default user accounts..."
-python3.6 scripts/add_default_dev_accounts.py
+echo "Preparing backend..."
+./scripts/dev__prepare_backend.sh
