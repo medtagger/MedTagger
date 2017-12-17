@@ -10,4 +10,4 @@ def test_get_default_values_for_api() -> None:
     assert config.getint('api', 'port') == 51000
     assert not config.getboolean('api', 'debug')
     assert config.get('api', 'secret_key') == 'SECRET_KEY'
-    assert config.get('db', 'database_uri') == 'sqlite:///:memory:' 
+    assert config.get('db', 'database_uri') == 'sqlite:///:memory:'
