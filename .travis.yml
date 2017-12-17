@@ -10,9 +10,9 @@ jobs:
   include:
   - stage: test backend
     script:
-    - ./.travis/test_change_in_subproject.py backend --command="cd backend &&
-       docker-compose build &&
-       docker-compose run data_labeling_api make test"
+    - ./.travis/test_change_in_subproject.py backend --command="
+       docker-compose build medtagger_api medtagger_worker &&
+       docker-compose run medtagger_api make test"
   - stage: test backend
     if: branch = master
     script:
@@ -22,5 +22,5 @@ jobs:
        docker-compose down"
   - stage: test frontend
     script:
-    - ./.travis/test_change_in_subproject.py frontend --command="cd frontend &&
-       docker build ."
+    - ./.travis/test_change_in_subproject.py frontend --command="
+       docker-compose build medtagger_web"
