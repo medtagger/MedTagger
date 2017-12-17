@@ -16,9 +16,9 @@ jobs:
   - stage: test backend
     script:
     - ./.travis/test_change_in_subproject.py backend --command="cd backend &&
-      add-apt-repository ppa:jonathonf/python-3.6 &&
-      apt-get update &&
-      apt install -y python3.6 &&
+      sudo add-apt-repository ppa:jonathonf/python-3.6 &&
+      sudo apt-get update &&
+      sudo apt install -y python3.6 &&
       make venv &&
       ./devenv.sh &&
       make functional_tests"
