@@ -16,14 +16,9 @@ jobs:
   - stage: test backend
     script:
     - ./.travis/test_change_in_subproject.py backend --command="cd backend &&
-      sudo add-apt-repository ppa:jonathonf/python-3.6 &&
-      sudo apt-get update &&
-      sudo apt install -y python3.6 &&
-      sudo apt install -y python3.6-dev &&
-      sudo apt install -y python3-pip &&
-      make venv &&
-      ./devenv.sh &&
-      make functional_tests"
+       docker-compose -f backend/tests/functional_tests/docker-compose.yml up -d hbase postgres rabbitmq &&
+       docker-compose -f backend/tests/functional_tests/docker-compose.yml run functional_tests &&
+       docker-compose down"
       # - stage: test frontend
       # script:
       # - ./.travis/test_change_in_subproject.py frontend --command="cd frontend && docker
