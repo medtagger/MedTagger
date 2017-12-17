@@ -50,6 +50,10 @@ unit_tests:
 
 functional_tests:
 	docker-compose -f ../docker-compose.yml up -d hbase rabbitmq postgres
+	echo $(FUNCTIONAL_TESTS_MODULE)
+	ls $(FUNCTIONAL_TESTS_MODULE)
+	echo $(SCRIPTS_DIRECTORY)
+	ls $(SCRIPTS_DIRECTORY)
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && sh $(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && pytest $(FUNCTIONAL_TESTS_MODULE) && make _functional_tests_passed || make _functional_tests_failed
 
