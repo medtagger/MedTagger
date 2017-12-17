@@ -19,6 +19,8 @@ jobs:
       sudo add-apt-repository ppa:jonathonf/python-3.6 &&
       sudo apt-get update &&
       sudo apt install -y python3.6 &&
+      sudo apt install -y python3.6-dev &&
+      sudo apt install -y python3-pip &&
       make venv &&
       ./devenv.sh &&
       make functional_tests"
