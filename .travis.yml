@@ -16,7 +16,7 @@ jobs:
     script:
     - ./.travis/test_change_in_subproject.py frontend --command="cd frontend && docker
       build ."
-  - stage: deploy to staging
+  - stage: deploy
     if: branch = master
     script: "./.travis/deployment.sh staging"
 env:
