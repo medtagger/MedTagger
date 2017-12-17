@@ -49,7 +49,7 @@ unit_tests:
 	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TESTS_MODULE)
 
 functional_tests:
-	docker-compose -f ../docker-compose.yml up -d hbase rabbitmq postgres
+	docker-compose -f ../docker-compose.yml up -d hbase rabbitmq postgres 2>&1
 	echo $(FUNCTIONAL_TESTS_MODULE)
 	ls $(FUNCTIONAL_TESTS_MODULE)
 	echo $(SCRIPTS_DIRECTORY)
