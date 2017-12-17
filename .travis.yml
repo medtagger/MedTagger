@@ -15,7 +15,7 @@ jobs:
       #docker-compose run data_labeling_api make test"
   - stage: test backend
     script:
-    - ./.travis/test_change_in_subproject.py backend --command="cd backend &&
+    - ./.travis/test_change_in_subproject.py backend --command="
        docker-compose -f backend/tests/functional_tests/docker-compose.yml up -d hbase postgres rabbitmq &&
        docker-compose -f backend/tests/functional_tests/docker-compose.yml run functional_tests &&
        docker-compose down"
