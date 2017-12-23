@@ -18,7 +18,7 @@ jobs:
     script:
     - ./.travis/test_change_in_subproject.py backend --command="
        docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml up -d hbase postgres rabbitmq &&
-       docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run functional_tests_docker &&
+       docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run functional_tests &&
        docker-compose down"
   - stage: test frontend
     script:
