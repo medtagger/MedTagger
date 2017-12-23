@@ -1,5 +1,5 @@
 """Unit tests for data_labeling/config.py."""
-from data_labeling.config import AppConfiguration
+from medtagger.config import AppConfiguration
 
 
 def test_get_default_values_for_api() -> None:

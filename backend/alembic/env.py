@@ -3,7 +3,7 @@ from alembic import context
 from sqlalchemy import create_engine, pool
 from logging.config import fileConfig
 
-from data_labeling.config import AppConfiguration
+from medtagger.config import AppConfiguration
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -15,7 +15,7 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from data_labeling.database.models import *
+from medtagger.database.models import *
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

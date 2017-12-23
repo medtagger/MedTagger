@@ -2,7 +2,7 @@
 import json
 from typing import Any
 
-from data_labeling.database.models import LabelStatus
+from medtagger.database.models import LabelStatus
 
 from tests.functional_tests import get_api_client, get_web_socket_client
 

@@ -14,7 +14,7 @@ def get_test_application(mocker: Any) -> FlaskClient:
     # IMPORTANT: Mock HBase ConnectionPool BEFORE(!) importing Flask application
     mocker.patch.object(happybase, 'ConnectionPool')
 
-    from data_labeling.api.app import app
+    from medtagger.api.app import app
 
     app.testing = True
     return app.test_client()

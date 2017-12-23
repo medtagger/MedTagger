@@ -1,6 +1,6 @@
 # Global constants for whole Makefile
 PYTHON = python3.6
-MAIN_MODULE = data_labeling
+MAIN_MODULE = medtagger
 UNIT_TESTS_MODULE = tests/unit_tests
 FUNCTIONAL_TESTS_MODULE = tests/functional_tests
 DOCKER_COMPOSE_FILE = docker-compose.yml
@@ -23,10 +23,10 @@ install_packages:
 	$(PYTHON) -m pip install -r requirements.txt
 
 run_api:
-	PYTHONPATH=`pwd` $(PYTHON) data_labeling/api/app.py
+	PYTHONPATH=`pwd` $(PYTHON) medtagger/api/app.py
 
 run_workers:
-	PYTHONPATH=`pwd` celery -A data_labeling.workers worker --loglevel=info
+	PYTHONPATH=`pwd` celery -A medtagger.workers worker --loglevel=info
 
 #
 # Testing

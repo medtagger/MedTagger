@@ -3,7 +3,7 @@ export MEDTAGGER__API_PORT=51000
 export MEDTAGGER__API_DEBUG=1
 export MEDTAGGER__API_SECRET_KEY="SECRET_KEY"
 
-export MEDTAGGER__DB_DATABASE_URI="postgresql://backend_user:DataLabelingAPI!@localhost/data_labeling"
+export MEDTAGGER__DB_DATABASE_URI="postgresql://medtagger_user:MedTa99er!@localhost/medtagger"
 
 export MEDTAGGER__HBASE_HOST="localhost"
 export MEDTAGGER__HBASE_PORT=9090

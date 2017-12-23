@@ -17,7 +17,7 @@ import argparse
 import dicom
 from PIL import Image
 
-from data_labeling.conversion import convert_to_normalized_8bit_array
+from medtagger.conversion import convert_to_normalized_8bit_array
 
 
 parser = argparse.ArgumentParser(description='Convert dicoms to png format.')

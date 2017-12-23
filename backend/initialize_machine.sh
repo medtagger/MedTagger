@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 
 apt install -y make
-apt install -y python3.6
-apt install -y python3.6-dev
-apt install -y python3-pip
+if [ ! -e /usr/bin/python3.6 ]
+then
+    add-apt-repository ppa:jonathonf/python-3.6
+    apt-get update
+    apt install -y python3.6
+    apt install -y python3.6-dev
+    apt install -y python3-pip
+fi
 
-if [ -ne /opt/conda/ ]
+if [ ! -e /opt/conda/ ]
 then
     # Install Miniconda
     apt install -y -q curl bzip2
@@ -22,8 +27,15 @@ then
     cp -p /lib/x86_64-linux-gnu/libreadline.so.6 /opt/conda/lib/libreadline.so.6
 fi
 
-cd /vagrant
+cd /vagrant/backend
 export PYTHONPATH=`pwd`
+
+if [ ! -e /usr/local/bin/docker-compose ]
+then
+    curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+fi
+docker-compose -f /vagrant/docker-compose.yml up -d hbase postgres rabbitmq
 
 echo "Installing all Python packages..."
 make install_packages

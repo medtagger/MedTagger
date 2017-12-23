@@ -25,9 +25,9 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_DB: data_labeling
-      POSTGRES_USER: backend_user
-      POSTGRES_PASSWORD: DataLabelingAPI!
+      POSTGRES_DB: medtagger
+      POSTGRES_USER: medtagger_user
+      POSTGRES_PASSWORD: MedTa99er!
 
   medtagger_web:
     image: medtagger_frontend/web
@@ -44,7 +44,7 @@ services:
       - MEDTAGGER__API_PORT=51000
       - MEDTAGGER__API_DEBUG=1
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://backend_user:DataLabelingAPI!@postgres:5432/data_labeling
+      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
       - MEDTAGGER__HBASE_HOST=hbase
       - MEDTAGGER__HBASE_PORT=9090
       - MEDTAGGER__HBASE_REST_PORT=8080
@@ -53,7 +53,7 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_api
-    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && python3.6 data_labeling/api/app.py"
+    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && python3.6 medtagger/api/app.py"
 
   medtagger_worker:
     image: medtagger_backend/worker
@@ -62,7 +62,7 @@ services:
       - MEDTAGGER__API_PORT=51000
       - MEDTAGGER__API_DEBUG=1
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://backend_user:DataLabelingAPI!@postgres:5432/data_labeling
+      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
       - MEDTAGGER__HBASE_HOST=hbase
       - MEDTAGGER__HBASE_PORT=9090
       - MEDTAGGER__HBASE_REST_PORT=8080
@@ -71,5 +71,5 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_worker
-    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && celery -A data_labeling.workers worker --loglevel=info"
+    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && celery -A medtagger.workers worker --loglevel=info"
 

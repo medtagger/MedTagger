@@ -28,10 +28,10 @@ import os
 import argparse
 import glob
 
-from data_labeling.database import db_session
-from data_labeling.database.models import Scan, ScanCategory
-from data_labeling.workers.conversion import convert_dicom_to_png
-from data_labeling.workers.storage import store_dicom
+from medtagger.database import db_session
+from medtagger.database.models import Scan, ScanCategory
+from medtagger.workers.conversion import convert_dicom_to_png
+from medtagger.workers.storage import store_dicom
 
 
 parser = argparse.ArgumentParser(description='Import data to the HBase Database.')
