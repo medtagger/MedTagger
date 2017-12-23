@@ -25,7 +25,7 @@
         </a>
         <a mat-list-item routerLink="/validation" (click)="sidenav.close()" *ngIf="currentUser.role !== 'volunteer'">
           <mat-icon matListIcon>assignment_turned_in</mat-icon>
-          <h3 matLine>Scans validation</h3>
+          <h3 matLine>Validation</h3>
         </a>
       </mat-nav-list>
       <hr/>
@@ -36,7 +36,7 @@
         </a>
         <a mat-list-item routerLink="/login" (click)="sidenav.close(); logOut();">
           <mat-icon matListIcon>exit_to_app</mat-icon>
-          <h3 matLine>Log out</h3>
+          <h3 matLine>Sign out</h3>
         </a>
       </mat-nav-list>
     </div>
