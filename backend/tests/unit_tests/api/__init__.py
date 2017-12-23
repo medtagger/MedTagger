@@ -1,4 +1,4 @@
-"""Module for global methods that may be useful during application testing"""
+"""Module for global methods that may be useful during application testing."""
 from typing import Any
 
 import happybase
@@ -6,7 +6,7 @@ from flask.testing import FlaskClient
 
 
 def get_test_application(mocker: Any) -> FlaskClient:
-    """Method that should be used to get Flask application for unit testing
+    """Return Flask application for unit testing.
 
     :param mocker: mocker object from PyTest
     :return: application for testing purpose

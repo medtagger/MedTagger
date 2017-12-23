@@ -1,4 +1,4 @@
-"""Module responsible for business logic for user's acocunt management"""
+"""Module responsible for business logic for user's acocunt management."""
 from flask_login import current_user
 from flask_security import SQLAlchemyUserDatastore, Security, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,6 +14,7 @@ security = Security()
 
 def create_user(email: str, password: str, first_name: str, last_name: str) -> int:
     """Create user with the given user information. Password is being hashed.
+
     :return: id of the new user
     """
     user_with_email = User.query.filter_by(email=email).first()
@@ -30,6 +31,7 @@ def create_user(email: str, password: str, first_name: str, last_name: str) -> i
 
 def sign_in_user(email: str, password: str) -> str:
     """Sign in user using given username and password.
+
     :return: authentication token
     """
     user = User.query.filter_by(email=email).first()
@@ -43,7 +45,7 @@ def sign_in_user(email: str, password: str) -> str:
 
 
 def sign_out_user() -> None:
-    """Sign out the current user"""
+    """Sign out the current user."""
     logout_user()
 
 
@@ -54,7 +56,7 @@ def get_current_user_info() -> UserInfo:
 
 
 def user_to_user_info(user: User) -> UserInfo:
-    """Maps user entity to UserInfo tuple."""
+    """Map user entity to UserInfo tuple."""
     role = user.roles[0].name
     return UserInfo(id=user.id,
                     email=user.email,

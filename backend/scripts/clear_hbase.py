@@ -1,4 +1,4 @@
-"""Script that can clear existing HBase tables
+"""Script that can clear existing HBase tables.
 
 How to use it?
 --------------

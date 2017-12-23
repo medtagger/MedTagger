@@ -1,4 +1,4 @@
-"""Script that can migrate existing HBase schema or prepare empty database with given schema
+"""Script that can migrate existing HBase schema or prepare empty database with given schema.
 
 How to use it?
 --------------

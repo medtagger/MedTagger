@@ -1,4 +1,4 @@
-"""Module responsible for defining Celery application"""
+"""Module responsible for defining Celery application."""
 from celery import Celery
 
 

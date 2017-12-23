@@ -1,4 +1,4 @@
-"""Module responsible for definition of Celery configuration"""
+"""Module responsible for definition of Celery configuration."""
 import os
 from typing import List
 
@@ -6,7 +6,7 @@ from data_labeling.config import AppConfiguration
 
 
 def get_all_modules_with_tasks() -> List[str]:
-    """Generate list of all modules with Celery tasks
+    """Generate list of all modules with Celery tasks.
 
     :return: list of all modules with tasks
     """

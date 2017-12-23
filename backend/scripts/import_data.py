@@ -1,4 +1,4 @@
-"""Script that will fill your HBase database with data
+"""Script that will fill your HBase database with data.
 
 How to use it?
 --------------

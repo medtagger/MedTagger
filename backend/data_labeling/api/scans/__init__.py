@@ -1,1 +1,1 @@
-"""Module responsible for endpoints returning scans for labeling"""
+"""Module responsible for endpoints returning scans for labeling."""

@@ -1,4 +1,4 @@
-"""Module responsible for definition of Scans service available via WebSockets"""
+"""Module responsible for definition of Scans service available via WebSockets."""
 from typing import Dict
 
 from flask_socketio import Namespace, emit
@@ -10,12 +10,12 @@ from data_labeling.api.scans import business
 
 
 class Slices(Namespace):
-    """WebSocket handler for /slices namespace"""
+    """WebSocket handler for /slices namespace."""
 
     MAX_NUMBER_OF_SLICES_PER_REQUEST = 10
 
     def on_request_slices(self, request: Dict) -> None:
-        """Handler for slices request triggered  by `request_slices` event"""
+        """Handle slices request triggered  by `request_slices` event."""
         assert request.get('scan_id'), 'ScanID is required!'
         scan_id = ScanID(str(request['scan_id']))
         begin = request.get('begin', 0)
@@ -27,7 +27,7 @@ class Slices(Namespace):
 
     @staticmethod
     def on_upload_slice(request: Dict) -> None:
-        """Handler for uploading new slices triggered by `upload_slice` event"""
+        """Handle uploading new slices triggered by `upload_slice` event."""
         assert request.get('scan_id'), 'ScanID is required!'
         assert request.get('image'), 'Image is required!'
         scan_id = ScanID(str(request['scan_id']))
@@ -37,7 +37,7 @@ class Slices(Namespace):
         emit('ack', {'success': True})
 
     def _raise_on_invalid_request_slices(self, scan_id: ScanID, begin: int, count: int) -> None:
-        """Validate incoming request and raise an exception if there are issues with given arguments
+        """Validate incoming request and raise an exception if there are issues with given arguments.
 
         :param scan_id: ID of a Scan
         :param begin: beginning of the requested window

@@ -1,1 +1,1 @@
-"""Module responsible for defining clients to external systems"""
+"""Module responsible for defining clients to external systems."""

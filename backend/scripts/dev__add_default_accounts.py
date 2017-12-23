@@ -1,4 +1,4 @@
-"""Script for populating dev database with default user accounts"""
+"""Script for populating dev database with default user accounts."""
 from sqlalchemy import exists
 from werkzeug.security import generate_password_hash
 
@@ -7,7 +7,7 @@ from data_labeling.database.models import User, Role
 
 
 def insert_admin_account() -> None:
-    """Inserts default admin account"""
+    """Insert default admin account."""
     with db_session() as session:
         user_email = 'admin@medtagger.com'
         user_exists = session.query(exists().where(User.email == user_email)).scalar()

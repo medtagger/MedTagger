@@ -1,4 +1,4 @@
-"""Module responsible for business logic in all Labels endpoints"""
+"""Module responsible for business logic in all Labels endpoints."""
 from sqlalchemy.orm.exc import NoResultFound
 
 from data_labeling.types import LabelID
@@ -8,7 +8,7 @@ from data_labeling.repositories.labels import LabelsRepository
 
 
 def change_label_status(label_id: LabelID, status: LabelStatus) -> Label:
-    """Change status of the label
+    """Change status of the label.
 
     :param label_id: ID of a label for which the status should be changed
     :param status: new Label Status that should be set
@@ -23,7 +23,7 @@ def change_label_status(label_id: LabelID, status: LabelStatus) -> Label:
 
 
 def get_random_label() -> Label:
-    """Fetch random label that has the NOT_VERIFIED status
+    """Fetch random label that has the NOT_VERIFIED status.
 
     :return: dictionary with details about label
     """

@@ -1,11 +1,11 @@
-"""Module responsible for storage of serializers used in Scans endpoints"""
+"""Module responsible for storage of serializers used in Scans endpoints."""
 from flask_restplus import reqparse, fields
 
 from data_labeling.api import api
 
 
 in__new_scan = api.model('New Scan model', {
-    'category': fields.String(description='Scan\'s category')
+    'category': fields.String(description='Scan\'s category'),
 })
 
 in__label_selection = api.model('Label\'s Selection model', {

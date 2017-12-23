@@ -1,4 +1,4 @@
-"""Module responsible for definition of Scan Categories' Repository"""
+"""Module responsible for definition of Scan Categories' Repository."""
 from typing import List
 
 from data_labeling.database import db_session
@@ -6,18 +6,18 @@ from data_labeling.database.models import ScanCategory
 
 
 class ScanCategoriesRepository(object):
-    """Repository for Scan Categories"""
+    """Repository for Scan Categories."""
 
     @staticmethod
     def get_all_categories() -> List[ScanCategory]:
-        """Return list of all Scan Categories"""
+        """Return list of all Scan Categories."""
         with db_session() as session:
             categories = session.query(ScanCategory).order_by(ScanCategory.id).all()
         return categories
 
     @staticmethod
     def get_category_by_key(key: str) -> ScanCategory:
-        """Fetch Scan Category from database
+        """Fetch Scan Category from database.
 
         :param key: key for a Scan Category
         :return: Scan Category object
@@ -28,7 +28,7 @@ class ScanCategoriesRepository(object):
 
     @staticmethod
     def add_new_category(key: str, name: str, image_path: str) -> ScanCategory:
-        """Add new Scan Category to the database
+        """Add new Scan Category to the database.
 
         :param key: key that will identify such Scan Category
         :param name: name that will be used in the Use Interface for such Scan Category

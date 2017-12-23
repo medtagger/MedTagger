@@ -1,4 +1,4 @@
-"""Module containing all custom types"""
+"""Module containing all custom types."""
 from typing import NewType, NamedTuple
 
 

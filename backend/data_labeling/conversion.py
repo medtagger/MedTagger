@@ -1,10 +1,10 @@
-"""Module responsible for conversion of Dicom files"""
+"""Module responsible for conversion of Dicom files."""
 import numpy as np
 from dicom.dataset import FileDataset
 
 
 def convert_to_normalized_8bit_array(dicom_file: FileDataset) -> np.ndarray:
-    """Convert Dicom file to 8bit pixel array
+    """Convert Dicom file to 8bit pixel array.
 
     :param: dicom_file: Dicom file that will be converted to a pixel array
     :return numpy array of pixels
@@ -19,7 +19,7 @@ def convert_to_normalized_8bit_array(dicom_file: FileDataset) -> np.ndarray:
 
 
 def get_hu_units(dicom_file: FileDataset) -> np.ndarray:
-    """Extract HU (Hounsfield units) from Dicom file
+    """Extract HU (Hounsfield units) from Dicom file.
 
     :param dicom_file: Dicom file with a single slice
     :return: numpy array of Hounsfield units for the Dicom file
@@ -44,7 +44,7 @@ def get_hu_units(dicom_file: FileDataset) -> np.ndarray:
 
 
 def normalize(hu_array: np.ndarray, min_bound: int = -1000, max_bound: int = 400) -> np.ndarray:
-    """Normalizing values of the Hounsfield units array
+    """Normalize values of the Hounsfield units array.
 
     :param hu_array: numpy array of Hounsfield units for the Dicom file
     :param min_bound: minimal Hounsfield units value

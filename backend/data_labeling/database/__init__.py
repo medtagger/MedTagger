@@ -1,4 +1,4 @@
-"""Module responsible for defining ORM layer"""
+"""Module responsible for defining ORM layer."""
 from typing import Generator
 from contextlib import contextmanager
 
@@ -11,10 +11,10 @@ from data_labeling.config import AppConfiguration
 
 
 class DataLabelingBase(object):  # pylint: disable=too-few-public-methods
-    """Base class for all of the models"""
+    """Base class for all of the models."""
 
     def save(self) -> None:
-        """Save the model into the database after changes"""
+        """Save the model into the database after changes."""
         with db_session() as _session:
             _session.add(self)
 
@@ -31,7 +31,7 @@ Base.query = session.query_property()
 
 
 def is_alive() -> bool:
-    """Return boolean information if database is alive or not"""
+    """Return boolean information if database is alive or not."""
     try:
         session.execute('SELECT 1')
         return True

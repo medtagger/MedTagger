@@ -1,1 +1,1 @@
-"""Module responsible for all Core endpoints"""
+"""Module responsible for all Core endpoints."""

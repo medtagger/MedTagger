@@ -1,1 +1,1 @@
-"""Module defining whole application"""
+"""Module defining whole application."""
