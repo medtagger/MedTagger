@@ -1,4 +1,4 @@
-"""Module responsible for definition of client for HBase database"""
+"""Module responsible for definition of client for HBase database."""
 from typing import Iterable, List, Mapping, Tuple, Any
 
 import happybase
@@ -19,7 +19,7 @@ except (TTransportException, BrokenPipeError):
 
 
 def is_alive() -> bool:
-    """Return boolean information if HBase is alive or not"""
+    """Return boolean information if HBase is alive or not."""
     try:
         happybase.ConnectionPool(1, host=host, port=port)
         return True
@@ -28,7 +28,7 @@ def is_alive() -> bool:
 
 
 class HBaseClient(object):
-    """Client for HBase
+    """Client for HBase.
 
     How to use this client?
     -----------------------
@@ -55,14 +55,14 @@ class HBaseClient(object):
     }
 
     def __init__(self) -> None:
-        """Initializer for client"""
+        """Initialize client."""
         pass
 
     @staticmethod
     @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
            retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def get_all_keys(table_name: str, starts_with: str = None) -> Iterable[str]:
-        """Fetch all keys for given table
+        """Fetch all keys for given table.
 
         :param table_name: name of a table
         :param starts_with: prefix for keys
@@ -78,7 +78,7 @@ class HBaseClient(object):
     @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
            retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def get_all_rows(table_name: str, columns: List, starts_with: str = None) -> Iterable[Tuple[str, Any]]:
-        """Fetch all rows for given table
+        """Fetch all rows for given table.
 
         :param table_name: name of a table
         :param starts_with: prefix for keys
@@ -95,7 +95,7 @@ class HBaseClient(object):
     @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
            retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def get(table_name: str, key: str, columns: List[str] = None) -> Mapping:
-        """Fetch a single row from HBase table
+        """Fetch a single row from HBase table.
 
         :param table_name: name of a table
         :param key: key representing a row
@@ -111,7 +111,7 @@ class HBaseClient(object):
     @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
            retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def put(table_name: str, key: str, value: Any) -> None:
-        """Add new entry into HBase table
+        """Add new entry into HBase table.
 
         :param table_name: name of a table
         :param key: key under value should be stored
@@ -126,7 +126,7 @@ class HBaseClient(object):
     @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
            retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def check_if_exists(table_name: str, key: str) -> bool:
-        """Scan database and check if given key exists
+        """Scan database and check if given key exists.
 
         :param table_name: name of a table
         :param key: HBase key

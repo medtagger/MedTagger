@@ -1,4 +1,4 @@
-"""Module responsible for definition of Scans service available via HTTP REST API"""
+"""Module responsible for definition of Scans service available via HTTP REST API."""
 from typing import Any
 from flask import request
 from flask_restplus import Resource
@@ -13,7 +13,7 @@ scans_ns = api.namespace('scans', 'Methods related with scans')
 
 @scans_ns.route('/')
 class Scans(Resource):
-    """Endpoint that can create new scan"""
+    """Endpoint that can create new scan."""
 
     @staticmethod
     @scans_ns.expect(serializers.in__new_scan)
@@ -21,7 +21,7 @@ class Scans(Resource):
     @scans_ns.doc(description='Creates empty scan.')
     @scans_ns.doc(responses={201: 'Success'})
     def post() -> Any:
-        """Method responsible for creating empty scan"""
+        """Create empty scan."""
         payload = request.json
         category_key = payload['category']
         if not business.scan_category_is_valid(category_key):
@@ -33,14 +33,14 @@ class Scans(Resource):
 
 @scans_ns.route('/categories')
 class ScanCategories(Resource):
-    """Endpoint that manages categories"""
+    """Endpoint that manages categories."""
 
     @staticmethod
     @scans_ns.marshal_with(serializers.inout__scan_category)
     @scans_ns.doc(description='Returns all available scan categories.')
     @scans_ns.doc(responses={200: 'Success'})
     def get() -> Any:
-        """Method responsible for returning all available scan categories"""
+        """Return all available scan categories."""
         return business.get_available_scan_categories()
 
     @staticmethod
@@ -49,7 +49,7 @@ class ScanCategories(Resource):
     @scans_ns.doc(description='Returns all available scan categories.')
     @scans_ns.doc(responses={201: 'Success'})
     def post() -> Any:
-        """Method responsible for creating empty scan"""
+        """Create empty scan."""
         payload = request.json
         key = payload['key']
         name = payload['name']
@@ -60,7 +60,7 @@ class ScanCategories(Resource):
 
 @scans_ns.route('/random')
 class Random(Resource):
-    """Endpoint that returns random scan for labeling"""
+    """Endpoint that returns random scan for labeling."""
 
     @staticmethod
     @scans_ns.expect(serializers.args__random_scan)
@@ -68,7 +68,7 @@ class Random(Resource):
     @scans_ns.doc(description='Returns random scan.')
     @scans_ns.doc(responses={200: 'Success', 400: 'Invalid arguments', 404: 'No Scans available'})
     def get() -> Any:
-        """Method responsible for returning random scan's metadata"""
+        """Return random scan's metadata."""
         args = serializers.args__random_scan.parse_args(request)
         category_key = args.category
         if not business.scan_category_is_valid(category_key):
@@ -80,7 +80,7 @@ class Random(Resource):
 @scans_ns.route('/<string:scan_id>/label')
 @scans_ns.param('scan_id', 'Scan identifier')
 class Label(Resource):
-    """Endpoint that stores label for given scan"""
+    """Endpoint that stores label for given scan."""
 
     @staticmethod
     @scans_ns.expect(serializers.in__label)
@@ -88,7 +88,7 @@ class Label(Resource):
     @scans_ns.doc(description='Stores label and assigns it to given scan.')
     @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan'})
     def post(scan_id: ScanID) -> Any:
-        """Method responsible for saving new label for given scan"""
+        """Save new label for given scan."""
         payload = request.json
         selections = payload['selections']
 
@@ -99,12 +99,12 @@ class Label(Resource):
 @scans_ns.route('/<string:scan_id>')
 @scans_ns.param('scan_id', 'Scan identifier')
 class Scan(Resource):
-    """Endpoint that returns scan for the given scan id"""
+    """Endpoint that returns scan for the given scan id."""
 
     @staticmethod
     @scans_ns.marshal_with(serializers.out__scan)
     @scans_ns.doc(description='Returns scan with given scan_id.')
     @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
     def get(scan_id: ScanID) -> Any:
-        """Method responsible for returning scan for the given scan_id"""
+        """Return scan for the given scan_id."""
         return business.get_scan(scan_id)._asdict()

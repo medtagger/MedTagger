@@ -1,4 +1,4 @@
-"""Script that will convert multiple dicoms to png format
+"""Script that will convert multiple dicoms to PNG format.
 
 How to use it?
 --------------

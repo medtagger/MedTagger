@@ -1,4 +1,4 @@
-"""Tests for basic flow of the system"""
+"""Tests for basic flow of the system."""
 import json
 from typing import Any
 
@@ -8,7 +8,7 @@ from tests.functional_tests import get_api_client, get_web_socket_client
 
 
 def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:  # pylint: disable=too-many-statements
-    """Test application with basic flow"""
+    """Test application with basic flow."""
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')
 

@@ -27,7 +27,7 @@ services:
       - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
-      context: ../..
+      context: backend
       dockerfile: Dockerfile_api
-    command: make functional_tests
+    command: make functional_tests_docker
 

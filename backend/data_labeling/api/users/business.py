@@ -1,4 +1,4 @@
-"""Module responseble for business logic for users administration"""
+"""Module responseble for business logic for users administration."""
 from typing import List
 
 from data_labeling.api import InvalidArgumentsException
@@ -9,7 +9,7 @@ from data_labeling.types import UserInfo
 
 
 def get_all_users() -> List[UserInfo]:
-    """Returns list of all users."""
+    """Return list of all users."""
     users = User.query.all()
     user_infos = list(map(user_to_user_info, users))
     return user_infos

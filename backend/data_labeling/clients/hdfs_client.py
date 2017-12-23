@@ -1,11 +1,11 @@
-"""Module responsible for definition of client for Hadoop Distributed File System"""
+"""Module responsible for definition of client for Hadoop Distributed File System."""
 from hdfs3 import HDFileSystem
 
 from data_labeling.config import AppConfiguration
 
 
 class HDFSClient(HDFileSystem):
-    """Client for Hadoop Distributed File System
+    """Client for Hadoop Distributed File System.
 
     How to use this client?
     -----------------------
@@ -20,7 +20,7 @@ class HDFSClient(HDFileSystem):
     """
 
     def __init__(self) -> None:
-        """Initializer for client"""
+        """Initialize client."""
         configuration = AppConfiguration()
         host = configuration.get('hadoop', 'host', fallback='localhost')
         port = configuration.getint('hadoop', 'namenode_port', fallback=9000)

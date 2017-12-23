@@ -1,4 +1,4 @@
-"""Module responsible for definition of whole application
+"""Module responsible for definition of whole application.
 
 It is also a great entry point for running this app. To do so, you can use:
 

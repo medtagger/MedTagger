@@ -1,4 +1,4 @@
-"""Module responsible for defining API"""
+"""Module responsible for defining API."""
 import logging
 import traceback
 from typing import Tuple, Dict
@@ -19,7 +19,7 @@ web_socket = SocketIO(logger=True, engineio_logger=True)
 
 @api.errorhandler
 def rest_default_error_handler(exception: Exception) -> Tuple[Dict, int]:  # pylint: disable=unused-argument
-    """Handler for all unhandled exceptions
+    """Handle all unhandled exceptions.
 
     :param exception: Python Exception
     :return: tuple with response and status code
@@ -30,7 +30,7 @@ def rest_default_error_handler(exception: Exception) -> Tuple[Dict, int]:  # pyl
 
 @api.errorhandler(BusinessLogicException)
 def rest_business_logic_error_handler(exception: Exception) -> Tuple[Dict, int]:
-    """Handler for business logic errors
+    """Handle business logic errors.
 
     :param exception: Python Exception
     :return: tuple with response and status code
@@ -42,7 +42,7 @@ def rest_business_logic_error_handler(exception: Exception) -> Tuple[Dict, int]:
 
 @api.errorhandler(NotFoundException)
 def rest_not_found_error_handler(exception: Exception) -> Tuple[Dict, int]:
-    """Handler for not found errors
+    """Handle not found errors.
 
     :param exception: Python Exception
     :return: tuple with response and status code
@@ -54,7 +54,7 @@ def rest_not_found_error_handler(exception: Exception) -> Tuple[Dict, int]:
 
 @api.errorhandler(InvalidArgumentsException)
 def rest_invalid_arguments_error_handler(exception: Exception) -> Tuple[Dict, int]:
-    """Handler for invalid arguments errors
+    """Handle invalid arguments errors.
 
     :param exception: Python Exception
     :return: tuple with response and status code
@@ -66,7 +66,7 @@ def rest_invalid_arguments_error_handler(exception: Exception) -> Tuple[Dict, in
 
 @web_socket.on_error_default
 def web_socket_default_error_handler(exception: Exception) -> None:  # pylint: disable=unused-argument
-    """Handler for all unhandled exceptions
+    """Handle all unhandled exceptions.
 
     :param exception: Python Exception
     """

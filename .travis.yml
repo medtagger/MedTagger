@@ -17,8 +17,8 @@ jobs:
     if: branch = master
     script:
     - ./.travis/test_change_in_subproject.py backend --command="
-       docker-compose -f backend/tests/functional_tests/docker-compose.yml up -d hbase postgres rabbitmq &&
-       docker-compose -f backend/tests/functional_tests/docker-compose.yml run functional_tests &&
+       docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml up -d hbase postgres rabbitmq &&
+       docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run functional_tests_docker &&
        docker-compose down"
   - stage: test frontend
     script:

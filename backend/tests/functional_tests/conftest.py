@@ -1,4 +1,4 @@
-"""Module for global fixtures that may be useful during application testing"""
+"""Module for global fixtures that may be useful during application testing."""
 from typing import Any
 
 import pytest
@@ -12,7 +12,7 @@ from data_labeling.clients.hbase_client import HBaseClient
 
 @pytest.fixture
 def prepare_environment() -> Any:
-    """Prepare environment for testing purpose (setup DBs, fixtures) and clean up after the tests"""
+    """Prepare environment for testing purpose (setup DBs, fixtures) and clean up after the tests."""
     print('Getting needed entries')
     configuration = AppConfiguration()
     host = configuration.get('hbase', 'host', fallback='localhost')
@@ -43,5 +43,5 @@ def prepare_environment() -> Any:
 
 @pytest.fixture
 def synchronous_celery(mocker: Any) -> Any:
-    """Setup celery to executing tasks eagerly (each time tasks are called/delayed)"""
+    """Set Celery to executing tasks eagerly (each time tasks are called/delayed)."""
     mocker.patch('data_labeling.workers.celery_configuration.task_always_eager', True, create=True)

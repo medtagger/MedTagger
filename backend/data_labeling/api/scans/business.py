@@ -1,4 +1,4 @@
-"""Module responsible for business logic in all Scans endpoints"""
+"""Module responsible for business logic in all Scans endpoints."""
 from typing import Iterable, Dict, List, Tuple
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -15,7 +15,7 @@ from data_labeling.workers.storage import store_dicom
 
 
 def get_available_scan_categories() -> List[ScanCategory]:
-    """Fetch list of all available Scan Categories
+    """Fetch list of all available Scan Categories.
 
     :return: list of Scan Categories
     """
@@ -23,7 +23,7 @@ def get_available_scan_categories() -> List[ScanCategory]:
 
 
 def scan_category_is_valid(category_key: str) -> bool:
-    """Check if Scan Category for such key exists
+    """Check if Scan Category for such key exists.
 
     :param category_key: key representing Scan Category
     :return: boolean information if Scan Category key is valid
@@ -36,7 +36,7 @@ def scan_category_is_valid(category_key: str) -> bool:
 
 
 def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
-    """Create new Scan Category
+    """Create new Scan ScanCategory.
 
     :param key: unique key representing Scan Category
     :param name: name which describes this Category
@@ -47,7 +47,7 @@ def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
 
 
 def create_empty_scan(category_key: str) -> Scan:
-    """Create new empty scan
+    """Create new empty scan.
 
     :param category_key: string with category key
     :return: Newly created Scan object
@@ -57,7 +57,7 @@ def create_empty_scan(category_key: str) -> Scan:
 
 
 def get_metadata(scan_id: ScanID) -> ScanMetadata:
-    """Fetch metadata for given scan
+    """Fetch metadata for given scan.
 
     :param scan_id: ID of a given scan
     :return: Scan Metadata object
@@ -67,7 +67,7 @@ def get_metadata(scan_id: ScanID) -> ScanMetadata:
 
 
 def get_random_scan(category_key: str) -> ScanMetadata:
-    """Fetch random scan for labeling
+    """Fetch random scan for labeling.
 
     :param category_key: unique key identifying category
     :return: Scan Metadata object
@@ -81,7 +81,7 @@ def get_random_scan(category_key: str) -> ScanMetadata:
 
 
 def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> Iterable[Tuple[Slice, bytes]]:
-    """Fetch multiple slices for given scan
+    """Fetch multiple slices for given scan.
 
     :param scan_id: ID of a given scan
     :param begin: first slice index (included)
@@ -95,7 +95,7 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> Iterable[Tup
 
 
 def add_label(scan_id: ScanID, selections: List[Dict]) -> Label:
-    """Add label to given scan
+    """Add label to given scan.
 
     :param scan_id: ID of a given scan
     :param selections: List of JSONs describing selections for a single label
@@ -110,7 +110,7 @@ def add_label(scan_id: ScanID, selections: List[Dict]) -> Label:
 
 
 def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
-    """Add new slice for given Scan
+    """Add new slice for given Scan.
 
     :param scan_id: ID of a Scan for which it should add new slice
     :param image: bytes representing Dicom image
@@ -124,7 +124,7 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
 
 
 def get_scan(scan_id: ScanID) -> ScanMetadata:
-    """Returns scan for given scan_id
+    """Return scan for given scan_id.
 
     :param scan_id: ID of a Scan which should be returned
     :return: Scan Metadata object

@@ -1,4 +1,4 @@
-"""Module responsible for asynchronous data conversion"""
+"""Module responsible for asynchronous data conversion."""
 import io
 
 import dicom
@@ -12,7 +12,7 @@ from data_labeling.repositories.slices import SlicesRepository
 
 @celery_app.task
 def convert_dicom_to_png(slice_id: SliceID, image: bytes) -> None:
-    """Store Dicom in HBase database
+    """Store Dicom in HBase database.
 
     :param slice_id: ID of a slice
     :param image: bytes representing Dicom file

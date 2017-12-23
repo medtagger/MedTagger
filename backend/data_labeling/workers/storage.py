@@ -1,4 +1,4 @@
-"""Module responsible for asynchronous data storage"""
+"""Module responsible for asynchronous data storage."""
 import io
 import dicom
 
@@ -9,7 +9,7 @@ from data_labeling.repositories.slices import SlicesRepository
 
 @celery_app.task
 def store_dicom(slice_id: SliceID, image: bytes) -> None:
-    """Store Dicom in HBase database
+    """Store Dicom in HBase database.
 
     Key is a combination of a ScanID followed by unique SliceID. It also fetch from Dicom information about
      patient position together with slice location that might be helpful while sorting and fetching slices

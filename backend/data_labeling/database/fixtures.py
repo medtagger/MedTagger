@@ -1,4 +1,4 @@
-"""Insert all database fixtures"""
+"""Insert all database fixtures."""
 from sqlalchemy import exists
 
 from data_labeling.database import db_session
@@ -24,19 +24,19 @@ CATEGORIES = [{
 
 ROLES = [
     {
-        'name': 'admin'
+        'name': 'admin',
     },
     {
-        'name': 'doctor'
+        'name': 'doctor',
     },
     {
-        'name': 'volunteer'
-    }
+        'name': 'volunteer',
+    },
 ]
 
 
 def insert_scan_categories() -> None:
-    """Insert all default Scan Categories if don't exist"""
+    """Insert all default Scan Categories if don't exist."""
     with db_session() as session:
         for row in CATEGORIES:
             category_key = row.get('key', '')
@@ -51,7 +51,7 @@ def insert_scan_categories() -> None:
 
 
 def insert_user_roles() -> None:
-    """Inserts default user Roles"""
+    """Insert default user Roles."""
     with db_session() as session:
         for row in ROLES:
             role_name = row.get('name', '')
