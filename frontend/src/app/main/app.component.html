@@ -13,30 +13,30 @@
       <mat-nav-list>
         <a mat-list-item routerLink="/home" (click)="sidenav.close()">
           <mat-icon matListIcon>apps</mat-icon>
-          <h3 matLine>Strona Główna</h3>
+          <h3 matLine>Homepage</h3>
         </a>
         <a mat-list-item routerLink="/marker-tutorial" (click)="sidenav.close()">
           <mat-icon matListIcon>label_outline</mat-icon>
-          <h3 matLine>Etykietowanie</h3>
+          <h3 matLine>Labelling</h3>
         </a>
         <a mat-list-item routerLink="/upload" (click)="sidenav.close()" *ngIf="currentUser.role !== 'volunteer'">
           <mat-icon matListIcon>add</mat-icon>
-          <h3 matLine>Dodawanie skanów</h3>
+          <h3 matLine>Adding new scans</h3>
         </a>
         <a mat-list-item routerLink="/validation" (click)="sidenav.close()" *ngIf="currentUser.role !== 'volunteer'">
           <mat-icon matListIcon>assignment_turned_in</mat-icon>
-          <h3 matLine>Walidacja</h3>
+          <h3 matLine>Scans validation</h3>
         </a>
       </mat-nav-list>
       <hr/>
       <mat-nav-list>
         <a mat-list-item routerLink="/settings" (click)="sidenav.close()">
           <mat-icon matListIcon>settings</mat-icon>
-          <h3 matLine>Ustawienia</h3>
+          <h3 matLine>Settings</h3>
         </a>
         <a mat-list-item routerLink="/login" (click)="sidenav.close(); logOut();">
           <mat-icon matListIcon>exit_to_app</mat-icon>
-          <h3 matLine>Wyloguj</h3>
+          <h3 matLine>Log out</h3>
         </a>
       </mat-nav-list>
     </div>
