@@ -3,7 +3,7 @@ Running backend in Vagrant
 
 ### Requirements 
 
-Please follow the documentation about setting up Vagrant [here](docs/development_setup_vagrant.md).
+Please follow the documentation about setting up Vagrant [here](/docs/development_setup_vagrant.md).
 
 ### How to run backend?
 

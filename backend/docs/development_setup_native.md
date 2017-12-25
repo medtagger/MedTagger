@@ -16,7 +16,7 @@ Here is a list of things that you need to run our backend natively:
 ### How to do this?
 
 **Important:** Before following below steps, please make sure that you've got access to the Rabbit, HBase and other
-dependencies. To do so, please follow steps from the docs [here](docs/dependencies_via_docker_compose.md)!
+dependencies. To do so, please follow steps from the docs [here](/docs/dependencies_via_docker_compose.md)!
 
 Let's start! At first, please clone this repository somewhere on your computer:
 

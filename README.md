@@ -32,20 +32,20 @@ development process can be found in each of the projects itself. In case
 of questions don't hesitate to contact with authors.
 
 MedTagger consists of two main parts:
- - `frontend` - User Interface application written in Angular 4 ([more](frontend)),
- - `backend` - backend system's architecture written in Python ([more](backend)).
+ - `frontend` - User Interface application written in Angular 4 ([more](/frontend)),
+ - `backend` - backend system's architecture written in Python ([more](/backend)).
 
 You can develop whole platform natively (recommended) or using Vagrant
- virtual machine. More information can be found inside of our [docs](docs).
+ virtual machine. More information can be found inside of our [docs](/docs).
 
 ## User Interface
 Below screenshots shows how MedTagger looks like.
 
 #### Main Page
-![Main Page](docs/assets/main_page.png)
+![Main Page](/docs/assets/main_page.png)
 
 #### Labeling Page
-![Labeling Page](docs/assets/labeling_page.png)
+![Labeling Page](/docs/assets/labeling_page.png)
 
 #### Validation Page
 ![Validation Page](docs/assets/validation_page.png)
