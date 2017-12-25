@@ -1,5 +1,5 @@
-Native setup
-------------
+Running backend natively
+------------------------
 
 Native setup may be a good idea for machines that won't be able to handle heavy virtual machine. Native setup consumes
 less RAM, which may be needed if your PC has eg. 4GB of RAM.
@@ -16,24 +16,23 @@ Here is a list of things that you need to run our backend natively:
 ### How to do this?
 
 **Important:** Before following below steps, please make sure that you've got access to the Rabbit, HBase and other
-dependencies. To do so, please follow steps from the docs [here](dependencies_via_docker_compose.md)!
+dependencies. To do so, please follow steps from the docs [here](docs/dependencies_via_docker_compose.md)!
 
 Let's start! At first, please clone this repository somewhere on your computer:
 
 ```bash
-$ git clone git@gitlab.com:praca-inzynierska/Backend-API.git
+$ git clone git@github.com:jpowie01/MedTagger.git
+$ cd MedTagger
 ```
 
 Then, you'll be able to create a virtual environment which may be helpful to manage your dependencies locally. To do so,
 please run below make's entry and activate it:
 
 ```bash
+$ cd backend
 $ make venv
 $ . ./devenv.sh
 ```
-
-It's time to create a configuration file. Please create a new empty file and name it `backend_api.conf`. Base on
-an example file (`backend_api.example.conf`) and fill your configuration with all needed entries.
 
 Your project is now ready to be run but your HBase database is still empty. Before you start your journey with backend,
 launch script that will create all tables in HBase.
