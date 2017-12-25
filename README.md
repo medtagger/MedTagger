@@ -39,7 +39,7 @@ You can develop whole platform natively (recommended) or using Vagrant
  virtual machine. More information can be found inside of our [docs](/docs).
 
 ## User Interface
-Below screenshots shows how MedTagger looks like.
+Below screenshots show how MedTagger looks like.
 
 #### Main Page
 ![Main Page](/docs/assets/main_page.png)
