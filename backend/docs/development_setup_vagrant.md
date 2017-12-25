@@ -1,38 +1,13 @@
-Development setup with Vagrant
-------------------------------
-
-Vagrant is the easiest way to prepare your dev environment. It will automatically create a VirtualBox virtual machine,
- which will have all of our dependencies inside of it.
+Running backend in Vagrant
+--------------------------
 
 ### Requirements 
 
-Here is a list of things that you've got to install:
-- [VirtualBox](https://www.virtualbox.org),
-- [Vagrant](https://www.vagrantup.com).
+Please follow the documentation about setting up Vagrant [here](/docs/development_setup_vagrant.md).
 
-### How to do this?
+### How to run backend?
 
-Once you've install your VirtualBox with Vagrant, it's time to clone this repository.
-
-```bash
-$ git clone git@gitlab.com:praca-inzynierska/Backend-API.git
-```
-
-Then you will be able to open it inside PyCharm and use Vagrant plugin to boot up your machine. To do this
-you can choose `Tools > Vagrant > Up` or use CLI and run `vagrant up`.   
-
-**Important:** It may take a while, because Vagrant needs to download box with Ubuntu image and then install
-all dependencies like Python and Docker with all needed containers.
-
-Once your machine is now running, it's time to create a configuration file. Please create a new empty file and name it
-`backend_api.conf`. Base on an example file (`backend_api.example.conf`) and fill your configuration with all needed
-entries.
-
-**_Tip!_** Running API inside of a Virtual Machine should be hosted on 0.0.0.0!
-
-Now, your backend is ready to be used, so let's try to run it!
-
-Open two SSH connections (in separate windows) to our virtual machine and make sure that you're inside `/vagrant`
+Open two SSH connections (in separate windows) to your virtual machine and make sure that you're inside `/vagrant/backend`
 directory. In the first one we'll run Celery workers which are responsible for adding and converting Dicoms to our
 HBase. To run it, please execute such command:
 

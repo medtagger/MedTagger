@@ -10,7 +10,7 @@ To do so, you can use Alembic's autogeneration feature:
 
 ```bash
 $ . ./devenv.sh
-$ alembic revision --autogenerate -m "Your short description message"
+(venv) $ alembic revision --autogenerate -m "Your short description message"
 ```
 
 Then you can check what's happened inside of your generated migration inside of `alembic/versions`
@@ -26,20 +26,20 @@ Once you've prepared a database schema migration file, it's time to run it on yo
 below command to do so:
 
 ```bash
-$ alembic upgrade head
+(venv) $ alembic upgrade head
 ```
 
 This will upgrade your database to the newest version of the schema. But you can always move only
 one step into the future by:
 
 ```bash
-$ alembic upgrade +1
+(venv) $ alembic upgrade +1
 ```
 
 And the same goes if you want to go one step back:
 
 ```bash
-$ alembic downgrade -1
+(venv) $ alembic downgrade -1
 ```
 
 ### Where am I?
@@ -47,11 +47,11 @@ $ alembic downgrade -1
 You can always check which version of the schema you're using by:
 
 ```bash
-$ alembic current
+(venv) $ alembic current
 ```
 
 And keep in mind that you can check all available migrations with:
 
 ```bash
-$ alembic history
+(venv) $ alembic history
 ```
