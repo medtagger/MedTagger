@@ -3,7 +3,7 @@
     <app-marker-component #marker></app-marker-component>
     <div class="button-row">
       <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="!this.marker.hasArchivedSelections">Skip scan</button>
-      <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="this.marker.hasArchivedSelections">Next skan</button>
+      <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="this.marker.hasArchivedSelections">Next scan</button>
       <button mat-raised-button color="warn" [disabled]="!this.marker.has2dSelection" (click)="remove2dSelection()">Delete current label</button>
       <button mat-raised-button color="accent" [disabled]="!this.marker.has3dSelection" (click)="sendSelection()">Send label</button>
     </div>
