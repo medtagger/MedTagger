@@ -29,5 +29,5 @@ services:
     build:
       context: ../backend
       dockerfile: Dockerfile_api
-    command: make install_dev_packages && make functional_tests_docker
+    command: /bin/bash -c "make install_dev_packages && make functional_tests_docker"
 
