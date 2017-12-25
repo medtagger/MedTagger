@@ -7,6 +7,9 @@ Backend can be configured using environment variables. All of them follow below 
 MEDTAGGER__[NAMESPACE]_[ENTRY-NAME]
 ```
 
+**Note:** `MEDTAGGER` prefix follows by **two** underscores but after the namespace there
+ is only **one** underscore!
+
 ### Current variables
 
 Current configuration variables are:
