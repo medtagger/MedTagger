@@ -12,7 +12,7 @@ jobs:
     script:
     - ./.travis/run_tests_if_subproject_changed.py backend --command="
        docker-compose build medtagger_api medtagger_worker &&
-       docker-compose run medtagger_api make test"
+       docker-compose run medtagger_api /bin/bash -c \"make install_dev_packages && make test\""
   - stage: test backend
     if: branch = master
     script:
