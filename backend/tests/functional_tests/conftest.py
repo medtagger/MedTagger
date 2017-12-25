@@ -4,10 +4,10 @@ from typing import Any
 import pytest
 from starbase import Connection
 
-from data_labeling.config import AppConfiguration
-from data_labeling.database import Base, engine, session
-from data_labeling.database.fixtures import insert_scan_categories
-from data_labeling.clients.hbase_client import HBaseClient
+from medtagger.config import AppConfiguration
+from medtagger.database import Base, engine, session
+from medtagger.database.fixtures import insert_scan_categories
+from medtagger.clients.hbase_client import HBaseClient
 
 
 @pytest.fixture
@@ -44,4 +44,4 @@ def prepare_environment() -> Any:
 @pytest.fixture
 def synchronous_celery(mocker: Any) -> Any:
     """Set Celery to executing tasks eagerly (each time tasks are called/delayed)."""
-    mocker.patch('data_labeling.workers.celery_configuration.task_always_eager', True, create=True)
+    mocker.patch('medtagger.workers.celery_configuration.task_always_eager', True, create=True)

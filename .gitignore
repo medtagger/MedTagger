@@ -116,3 +116,11 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Tools
+.vagrant/
+
+# Others
+*.log
+*.swp
+.gitignore.bak
+

@@ -1,4 +1,4 @@
-"""Unit tests for data_labeling/api/core/service.py."""
+"""Unit tests for medtagger/api/core/service.py."""
 import json
 from typing import Any
 
@@ -10,7 +10,7 @@ from tests.unit_tests.api import get_test_application
 @pytest.fixture
 def success_fixture(mocker: Any) -> None:
     """Return fixture for success method used by status endpoint."""
-    mocked_success = mocker.patch('data_labeling.api.core.business.success')
+    mocked_success = mocker.patch('medtagger.api.core.business.success')
     mocked_success.return_value = {'success': True}
     return mocked_success
 

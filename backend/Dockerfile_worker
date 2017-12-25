@@ -1,12 +1,11 @@
 FROM python:3.6
 
-COPY . /data_labeling
-WORKDIR /data_labeling
+COPY . /medtagger
+WORKDIR /medtagger
 
-ENV PYTHONPATH /data_labeling
+ENV PYTHONPATH /medtagger
 
 RUN pip install -r requirements.txt
 
 ENV C_FORCE_ROOT true
-CMD ["celery", "-A", "data_labeling.workers", "worker", "--loglevel=info"]
-
+CMD ["celery", "-A", "medtagger.workers", "worker", "--loglevel=info"]

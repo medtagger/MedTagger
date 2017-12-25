@@ -1,5 +1,5 @@
-"""Unit tests for data_labeling/api/core/business.py."""
-from data_labeling.api.core.business import success
+"""Unit tests for medtagger/api/core/business.py."""
+from medtagger.api.core.business import success
 
 
 def test_success() -> None:

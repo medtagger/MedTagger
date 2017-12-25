@@ -7,7 +7,7 @@ Run this script just by executing following line in the root directory of this p
     (venv) $ python3.6 scripts/clear_hbase.py
 
 """
-from data_labeling.clients.hbase_client import HBaseClient
+from medtagger.clients.hbase_client import HBaseClient
 from utils import get_connection_to_hbase, user_agrees
 
 

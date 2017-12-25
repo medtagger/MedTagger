@@ -2,8 +2,8 @@
 from sqlalchemy import exists
 from werkzeug.security import generate_password_hash
 
-from data_labeling.database import db_session
-from data_labeling.database.models import User, Role
+from medtagger.database import db_session
+from medtagger.database.models import User, Role
 
 
 def insert_admin_account() -> None:

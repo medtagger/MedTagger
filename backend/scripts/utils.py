@@ -1,6 +1,6 @@
 """Storage for all utility functions."""
 from starbase import Connection
-from data_labeling.config import AppConfiguration
+from medtagger.config import AppConfiguration
 
 
 def get_connection_to_hbase() -> Connection:

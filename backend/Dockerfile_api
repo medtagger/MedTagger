@@ -1,12 +1,12 @@
 FROM python:3.6
 
-COPY . /data_labeling
-WORKDIR /data_labeling
+COPY . /medtagger
+WORKDIR /medtagger
 
-ENV PYTHONPATH /data_labeling
+ENV PYTHONPATH /medtagger
 
 RUN pip install -r requirements.txt
 
-CMD ["python3.6", "data_labeling/api/app.py"]
+CMD ["python3.6", "medtagger/api/app.py"]
 
 EXPOSE 51000
