@@ -16,7 +16,7 @@ Here is a list of things that you've got to install:
 
 ### How to do this?
 
-Once you've install your VirtualBox with Vagrant, it's time to clone this repository.
+Once you've install your VirtualBox with Vagrant, it's time to clone this repository:
 
 ```bash
 $ git clone git@github.com:jpowie01/MedTagger.git
@@ -36,6 +36,6 @@ Once Vagrant completed whole initialization try to SSH into the machine with `va
 Now, you can go further with development of the MedTagger. For more information, follow up with documentation
  inside of each projects:
 
- - [backend](/backend/docs/development_setup_vagrant.md),
- - frontend - does not support setup with Vagrant yet.
+ - [Backend](/backend/docs/development_setup_vagrant.md),
+ - Frontend - does not support setup with Vagrant yet.
 

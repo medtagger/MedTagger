@@ -58,13 +58,13 @@ Open two separate windows with activated virtual environment. In the first one w
 responsible for adding and converting Dicoms to our HBase. To run it, please execute such command:
 
 ```bash
-$ make run_workers
+(venv) $ make run_workers
 ```
 
 In the second window we'll open our Flask REST API with WebSockets server. To do so, please execute:
 
 ```bash
-$ make run_api
+(venv) $ make run_api
 ```
 
 And that's all! Everything should be fine and Swagger for our REST API should be available on
