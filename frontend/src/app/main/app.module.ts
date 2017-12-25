@@ -48,14 +48,14 @@ import { AuthenticationHeader } from '../services/authentication-header';
 
 const routes: Routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full'},
-  {path: 'login', component: LoginPageComponent, data: {title: 'Logowanie'}},
-  {path: 'home', component: HomePageComponent, data: {title: 'Strona Główna'}},
-  {path: 'category', component: CategoryPageComponent, data: {title: 'Wybór kategorii'}},
-  {path: 'marker', component: MarkerPageComponent, data: {title: 'Etykietowanie'}},
-  {path: 'upload', component: UploadPageComponent, data: {title: 'Dodawanie skanów'}},
-  {path: 'settings', component: SettingsPageComponent, data: {title: 'Ustawienia'}},
-  {path: 'validation', component: ValidationPageComponent, data: {title: 'Walidacja'}},
-  {path: 'marker-tutorial', component: MarkerTutorialPageComponent, data: {title: 'Poradnik'}}
+  {path: 'login', component: LoginPageComponent, data: {title: 'Welcome'}},
+  {path: 'home', component: HomePageComponent, data: {title: 'Home page'}},
+  {path: 'category', component: CategoryPageComponent, data: {title: 'Choosing category'}},
+  {path: 'marker', component: MarkerPageComponent, data: {title: 'Labelling'}},
+  {path: 'upload', component: UploadPageComponent, data: {title: 'Adding new scans'}},
+  {path: 'settings', component: SettingsPageComponent, data: {title: 'Settings'}},
+  {path: 'validation', component: ValidationPageComponent, data: {title: 'Validation'}},
+  {path: 'marker-tutorial', component: MarkerTutorialPageComponent, data: {title: 'Tutorial'}}
 ];
 
 @NgModule({
