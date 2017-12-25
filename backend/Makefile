@@ -18,9 +18,13 @@ PYLINT_UNIT_TESTS_CONFIG_FILE = .test.pylintrc
 venv:
 	virtualenv -p $(PYTHON) venv
 	venv/bin/pip install -r requirements.txt
+	venv/bin/pip install -r requirements.dev.txt
 
 install_packages:
 	$(PYTHON) -m pip install -r requirements.txt
+
+install_dev_packages:
+	$(PYTHON) -m pip install -r requirements.dev.txt
 
 run_api:
 	PYTHONPATH=`pwd` $(PYTHON) medtagger/api/app.py
@@ -62,6 +66,8 @@ functional_tests_docker:
 
 clean:
 	rm -rf venv
+	find . -name '*.swp' -delete
 	find . -name '*.pyc' -delete
+	find . -name '*.log' -delete
 
 .PHONY: venv install_packages run_api run_workers clean test test_pylint test_flake8 test_mypy unit_tests functional_tests

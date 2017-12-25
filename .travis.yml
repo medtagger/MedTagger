@@ -10,17 +10,17 @@ jobs:
   include:
   - stage: test backend
     script:
-    - ./.travis/test_change_in_subproject.py backend --command="
+    - ./.travis/run_tests_if_subproject_changed.py backend --command="
        docker-compose build medtagger_api medtagger_worker &&
        docker-compose run medtagger_api make test"
   - stage: test backend
     if: branch = master
     script:
-    - ./.travis/test_change_in_subproject.py backend --command="
+    - ./.travis/run_tests_if_subproject_changed.py backend --command="
        docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml up -d hbase postgres rabbitmq &&
        docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run functional_tests &&
        docker-compose down"
   - stage: test frontend
     script:
-    - ./.travis/test_change_in_subproject.py frontend --command="
+    - ./.travis/run_tests_if_subproject_changed.py frontend --command="
        docker-compose build medtagger_web"

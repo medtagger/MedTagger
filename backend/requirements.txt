@@ -20,18 +20,3 @@ flask-login>=0.4.0
 flask-security>=3.0.0
 psycopg2>=2.7.3.2
 
-# Dev requirements - these should always be latest
-mypy
-pylint
-flake8
-flake8-docstrings
-flake8-logging-format
-flake8-pep257
-flake8-print
-flake8-single-quotes
-flake8-commas
-pytest
-pytest-cov
-pytest-mock
-jupyter
-matplotlib
