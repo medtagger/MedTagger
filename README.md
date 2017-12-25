@@ -19,7 +19,7 @@ for the future use.
  - [x] Dockerized and virtualized (with Vagrant) environment   
 
 ## What needs to be done?
- - [ ] New CI flow after migration from GitLab to GitHub
+ - [x] New CI flow after migration from GitLab to GitHub
  - [ ] Internationalization of the whole platform
  - [ ] Extended labeling mechanism using magic lasso
  - [ ] Extended labeling mechanism using additional views for 3D scans
@@ -32,20 +32,23 @@ development process can be found in each of the projects itself. In case
 of questions don't hesitate to contact with authors.
 
 MedTagger consists of two main parts:
- - `frontend` - User Interface application written in Angular 4,
- - `backend` - backend system's architecture written in Python.
+ - `frontend` - User Interface application written in Angular 4 ([more](frontend)),
+ - `backend` - backend system's architecture written in Python ([more](backend)).
+
+You can develop whole platform natively (recommended) or using Vagrant
+ virtual machine. More information can be found inside of our [docs](docs).
 
 ## User Interface
 Below screenshots shows how MedTagger looks like.
 
 #### Main Page
-![Main Page](./docs/assets/main_page.png)
+![Main Page](docs/assets/main_page.png)
 
 #### Labeling Page
-![Labeling Page](./docs/assets/labeling_page.png)
+![Labeling Page](docs/assets/labeling_page.png)
 
 #### Validation Page
-![Validation Page](./docs/assets/validation_page.png)
+![Validation Page](docs/assets/validation_page.png)
 
 #### Upload Page
-![Upload Page](./docs/assets/upload_page.png)
+![Upload Page](docs/assets/upload_page.png)
