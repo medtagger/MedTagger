@@ -12,6 +12,7 @@ There are two ways to setup your environment:
 ### Good to know about development
 
 Here you can find good practices and tips for development:
+ - [Backend configuration](/backend/docs/configuration.md),
  - [Changing database models](/backend/docs/changing_database_models.md).
 
 ### Testing your code
