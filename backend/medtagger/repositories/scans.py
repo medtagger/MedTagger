@@ -36,13 +36,14 @@ class ScansRepository(object):
         return scan
 
     @staticmethod
-    def add_new_scan(category: ScanCategory) -> Scan:
+    def add_new_scan(category: ScanCategory, number_of_slices: int) -> Scan:
         """Add new Scan to the database.
 
         :param category: Scan's Category object
+        :param number_of_slices: number of Slices that will be uploaded
         :return: Scan object
         """
         with db_session() as session:
-            scan = Scan(category)
+            scan = Scan(category, number_of_slices)
             session.add(scan)
         return scan

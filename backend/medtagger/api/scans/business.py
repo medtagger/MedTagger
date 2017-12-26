@@ -10,7 +10,7 @@ from medtagger.types import ScanID, LabelPosition, LabelShape, ScanMetadata
 from medtagger.database.models import ScanCategory, Scan, Slice, Label
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
-from medtagger.workers.conversion import convert_dicom_to_png
+from medtagger.workers.conversion import convert_scan_to_png
 from medtagger.workers.storage import store_dicom
 
 
@@ -46,14 +46,15 @@ def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
     return ScanCategoriesRepository.add_new_category(key, name, image_path)
 
 
-def create_empty_scan(category_key: str) -> Scan:
+def create_empty_scan(category_key: str, number_of_slices: int) -> Scan:
     """Create new empty scan.
 
     :param category_key: string with category key
+    :param number_of_slices: number of Slices that will be uploaded
     :return: Newly created Scan object
     """
     category = ScanCategoriesRepository.get_category_by_key(category_key)
-    return ScansRepository.add_new_scan(category)
+    return ScansRepository.add_new_scan(category, number_of_slices)
 
 
 def get_metadata(scan_id: ScanID) -> ScanMetadata:
@@ -119,12 +120,22 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     scan = ScansRepository.get_scan_by_id(scan_id)
     _slice = scan.add_slice()
     store_dicom.delay(_slice.id, image)
-    convert_dicom_to_png.delay(_slice.id, image)
+    if scan.number_of_slices == len(scan.slices):
+        convert_scan_to_png.delay(scan_id)
     return _slice
 
 
-def get_scan(scan_id: ScanID) -> ScanMetadata:
-    """Return scan for given scan_id.
+def get_scan(scan_id: ScanID) -> Scan:
+    """Return Scan for given scan_id.
+
+    :param scan_id: ID of a Scan which should be returned
+    :return: Scan object
+    """
+    return ScansRepository.get_scan_by_id(scan_id)
+
+
+def get_scan_metadata(scan_id: ScanID) -> ScanMetadata:
+    """Return ScanMetadata for given scan_id.
 
     :param scan_id: ID of a Scan which should be returned
     :return: Scan Metadata object
