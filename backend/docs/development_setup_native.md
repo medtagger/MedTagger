@@ -9,6 +9,7 @@ less RAM, which may be needed if your PC has eg. 4GB of RAM.
 Here is a list of things that you need to run our backend natively:
  - Linux (recommended Ubuntu) / macOS,
  - Python 3.6,
+ - Python 3.6-dev,
  - Virtualenv,
  - Make,
  - RabbitMQ, Hadoop and HBase (can be set up using Docker Compose).
@@ -50,6 +51,13 @@ Then, prepare your PostgreSQL database with:
 
 ```bash
 (venv) $ alembic upgrade head
+```
+
+After schema is prepared, fill database with fixtures and default Dev accounts:
+
+```bash
+(venv) $ python3.6 medtagger/database/fixtures.py
+(venv) $ python3.6 scripts/dev__add_default_accounts.py
 ```
 
 Now, your backend is ready to be used, so let's try to run it!

@@ -38,6 +38,7 @@ Structure presented above is temporary. Watch out for updates.
 
 - Run the dev server by `ng serve` command
 
+Note: If you want to run project locally, please run `ng serve --env=local`
 
 ## Development server
 
