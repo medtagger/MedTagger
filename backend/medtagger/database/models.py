@@ -81,7 +81,7 @@ class ScanCategory(Base):
 
 
 class SliceOrientation(enum.Enum):
-    """Defines available status for Slice orientation."""
+    """Defines available Slice orientation."""
 
     X = 'X'
     Y = 'Y'
@@ -230,7 +230,7 @@ class Label(Base):
         """Return string representation for Label."""
         return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status)
 
-    def add_selection(self, position: LabelPosition, shape: LabelShape) -> LabelSelection:
+    def add_selection(self, position: LabelPosition, shape: LabelShape) -> 'LabelSelection':
         """Add new selection for this label.
 
         :param position: position (x, y, slice_index) of the label

@@ -4,11 +4,10 @@ import numpy as np
 
 import dicom
 from PIL import Image
-from scipy import ndimage
 
 from medtagger.types import ScanID
 from medtagger.workers import celery_app
-from medtagger.conversion import convert_to_normalized_8bit_array
+from medtagger.conversion import convert_slice_to_normalized_8bit_array, convert_scan_to_normalized_8bit_array
 from medtagger.database.models import SliceOrientation, Slice
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.slices import SlicesRepository
@@ -20,57 +19,56 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
     :param scan_id: ID of a Scan
     """
-    # At first, collect all Dicom images for given Scan and correlate them with Slices
-    all_dicom_images = []
+    scan = ScansRepository.get_scan_by_id(scan_id)
     slices = SlicesRepository.get_slices_by_scan_id(scan_id)
+
+    # At first, collect all Dicom images for given Scan
+    dicom_images = []
     for _slice in slices:
         image = SlicesRepository.get_slice_original_image(_slice.id)
         image_bytes = io.BytesIO(image)
         dicom_image = dicom.read_file(image_bytes, force=True)
-        all_dicom_images.append(dicom_image)
+        dicom_images.append(dicom_image)
 
-    # Convert all Slices in Z orientation (these were created previously during upload)
-    for dicom_image, _slice in zip(all_dicom_images, slices):
-        slice_pixels = convert_to_normalized_8bit_array(dicom_image)
-        _convert_and_store(_slice, slice_pixels)
+    # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
+    for dicom_image, _slice in zip(dicom_images, slices):
+        slice_pixels = convert_slice_to_normalized_8bit_array(dicom_image)
+        _convert_to_png_and_store(_slice, slice_pixels)
 
-    # Now, let's sort all Dicoms with their locations and scale it down to be smaller
-    all_dicom_images = sorted(all_dicom_images, key=lambda _slice: _slice.SliceLocation)
-    raw_scan = np.array(convert_to_normalized_8bit_array(_slice) for _slice in all_dicom_images)
-    raw_scan = np.array(ndimage.zoom(raw_scan, 0.5))  # Scale all images down by a factor of 2
-    scan = ScansRepository.get_scan_by_id(scan_id)
-
-    # Prepare Slices in the X orientation
-    for i in range(raw_scan.shape[0]):  # TODO: Fix iteration!
-        slice_pixels = raw_scan[i, :, :]
-        _slice = scan.add_slice(SliceOrientation.X)
-        _convert_and_store(_slice, slice_pixels)
+    # Prepare a preview size and convert 3D scan to fit its max X's axis shape
+    max_preview_x_size = 256
+    normalized_scan = convert_scan_to_normalized_8bit_array(dicom_images, output_x_size=max_preview_x_size)
 
     # Prepare Slices in the Y orientation
-    for i in range(raw_scan.shape[1]):  # TODO: Fix iteration!
-        slice_pixels = raw_scan[:, i, :]
+    for y in range(normalized_scan.shape[1]):
+        slice_pixels = normalized_scan[:, y, :]
         _slice = scan.add_slice(SliceOrientation.Y)
-        _convert_and_store(_slice, slice_pixels)
+        _convert_to_png_and_store(_slice, slice_pixels)
+
+    # Prepare Slices in the X orientation
+    for x in range(normalized_scan.shape[2]):
+        slice_pixels = normalized_scan[:, :, x]
+        _slice = scan.add_slice(SliceOrientation.X)
+        _convert_to_png_and_store(_slice, slice_pixels)
 
 
-def _convert_and_store(_slice: Slice, slice_pixels: np.ndarray) -> None:
+def _convert_to_png_and_store(_slice: Slice, slice_pixels: np.ndarray) -> None:
+    """Convert given Slice's pixel array and store in databases.
+
+    :param _slice: Slice database object
+    :param slice_pixels: numpy array with Slice data
     """
-
-    :param _slice:
-    :param slice_pixels:
-    :return:
-    """
-    converted_image = _convert_slice_pixels(slice_pixels)
+    converted_image = _convert_slice_pixels_to_png(slice_pixels)
     SlicesRepository.store_converted_image(_slice.id, converted_image)
     _slice.mark_as_converted()
     print('{} converted and stored.'.format(_slice))
 
 
-def _convert_slice_pixels(slice_pixels: np.ndarray) -> bytes:
-    """
+def _convert_slice_pixels_to_png(slice_pixels: np.ndarray) -> bytes:
+    """Convert given Slice's pixel array to the PNG format in bytes.
 
-    :param slice_pixels:
-    :return:
+    :param slice_pixels: Slice's pixel array
+    :return: bytes with Slice formatted in PNG
     """
     png_image = io.BytesIO()
     Image.fromarray(slice_pixels, 'L').save(png_image, 'PNG')

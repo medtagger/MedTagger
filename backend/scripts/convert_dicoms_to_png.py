@@ -17,7 +17,7 @@ import argparse
 import dicom
 from PIL import Image
 
-from medtagger.conversion import convert_to_normalized_8bit_array
+from medtagger.conversion import convert_slice_to_normalized_8bit_array
 
 
 parser = argparse.ArgumentParser(description='Convert dicoms to png format.')
@@ -37,6 +37,6 @@ if not os.path.exists(converted_dicoms_folder_path):
     os.mkdir(converted_dicoms_folder_path)
 
 for single_dicom in dicoms:
-    image_bytes = convert_to_normalized_8bit_array(single_dicom)
+    image_bytes = convert_slice_to_normalized_8bit_array(single_dicom)
     converted_dicom_name = '{0:.2f}'.format(single_dicom.ImagePositionPatient[2] + min_position)
     Image.fromarray(image_bytes, 'L').save(converted_dicoms_folder_path + converted_dicom_name + '.png')
