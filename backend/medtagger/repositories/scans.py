@@ -28,9 +28,7 @@ class ScansRepository(object):
             query = query.join(ScanCategory)
             if category:
                 query = query.filter(ScanCategory.key == category.key)
-            # All slices has to be stored and converted
-            query = query.filter(~Scan.slices.any(Slice.stored.is_(False)))  # type: ignore  # No attribute `any()`
-            query = query.filter(~Scan.slices.any(Slice.converted.is_(False)))  # type: ignore  # No attribute `any()`
+            query = query.filter(Scan.converted)
             query = query.order_by(func.random())
             scan = query.first()
         return scan

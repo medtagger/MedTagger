@@ -51,6 +51,9 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         _slice = scan.add_slice(SliceOrientation.X)
         _convert_to_png_and_store(_slice, slice_pixels)
 
+    print('Marking whole Scan as converted.')
+    scan.mark_as_converted()
+
 
 def _convert_to_png_and_store(_slice: Slice, slice_pixels: np.ndarray) -> None:
     """Convert given Slice's pixel array and store in databases.

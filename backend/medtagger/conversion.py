@@ -16,7 +16,7 @@ def convert_slice_to_normalized_8bit_array(dicom_file: FileDataset) -> np.ndarra
     intercept = dicom_file.RescaleIntercept
     slope = dicom_file.RescaleSlope
 
-    hu_units_array = get_hu_units(pixel_array, intercept, slope)
+    hu_units_array = convert_to_hounsfield_units(pixel_array, intercept, slope)
     normalized_hu_array = normalize(hu_units_array)
 
     pixel_array = normalized_hu_array * 255
@@ -28,9 +28,9 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[FileDataset], output
         -> np.ndarray:
     """Convert list of Dicom files to 8bit pixel array with output X axis size.
 
-    :param dicom_files:
-    :param output_x_size:
-    :return:
+    :param dicom_files: list of Dicom files related with given Scan
+    :param output_x_size: (optional) X axis size for output shape
+    :return: 3D numpy array with normalized pixels
     """
     dicom_files = sorted(dicom_files, key=lambda _slice: _slice.SliceLocation, reverse=True)
     thickness = abs(dicom_files[0].SliceLocation - dicom_files[1].SliceLocation)
@@ -49,7 +49,7 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[FileDataset], output
     scale_factor = after_rescale / pixel_array.shape  # Calculate how much each of the axis should be scaled up/down
     pixel_array = ndimage.zoom(pixel_array, scale_factor)  # Scale all images up/down
 
-    hu_units_array = get_hu_units(pixel_array, intercept, slope)
+    hu_units_array = convert_to_hounsfield_units(pixel_array, intercept, slope)
     normalized_hu_array = normalize(hu_units_array)
 
     pixel_array = normalized_hu_array * 255
@@ -57,24 +57,24 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[FileDataset], output
     return pixel_array
 
 
-def get_hu_units(dicom_pixel_array: np.ndarray, intercept: float, slope: float) -> np.ndarray:
-    """Extract HU (Hounsfield units) from Dicom file.
+def convert_to_hounsfield_units(pixel_array: np.ndarray, intercept: float, slope: float) -> np.ndarray:
+    """Convert given Slice's pixel array to Hounsfield units.
 
-    :param dicom_pixel_array:
-    :param intercept:
-    :param slope:
-    :return:
+    :param pixel_array: Slice's pixel array (taken from Dicom file)
+    :param intercept: intercept for linear function taken from Dicom file
+    :param slope: slope for linear function taken from Dicom file
+    :return: numpy array with Slice's pixel array
     """
     # Set outside-of-scan pixels to 0
-    dicom_pixel_array[dicom_pixel_array == -2000] = 0
+    pixel_array[pixel_array == -2000] = 0
 
     # If slope equals 1 the instructions below would be unnecessary
     if slope != 1:
-        dicom_pixel_array = slope * dicom_pixel_array.astype(np.float64)  # pylint: disable=no-member; bug
-        dicom_pixel_array = dicom_pixel_array.astype(np.int16)
+        pixel_array = slope * pixel_array.astype(np.float64)  # pylint: disable=no-member; bug
+        pixel_array = pixel_array.astype(np.int16)
 
-    dicom_pixel_array += np.int16(intercept)
-    return dicom_pixel_array
+    pixel_array += np.int16(intercept)
+    return pixel_array
 
 
 def normalize(hu_array: np.ndarray, min_bound: int = -1000, max_bound: int = 400) -> np.ndarray:

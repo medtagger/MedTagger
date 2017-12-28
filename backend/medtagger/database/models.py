@@ -139,8 +139,7 @@ class Slice(Base):
 
     __tablename__ = 'Slices'
     id: SliceID = Column(String, primary_key=True)
-    orientation: SliceOrientation = Column(Enum(SliceOrientation), nullable=False,
-                                           server_default=SliceOrientation.Z.value)
+    orientation: SliceOrientation = Column(Enum(SliceOrientation), nullable=False, default=SliceOrientation.Z)
     location: float = Column(Float, nullable=True)
     position_x: float = Column(Float, nullable=True)
     position_y: float = Column(Float, nullable=True)
