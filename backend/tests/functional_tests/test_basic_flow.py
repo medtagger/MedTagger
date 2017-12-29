@@ -33,7 +33,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None: 
     assert len(scan_id) >= 1
 
     # Step 3. Send slices through Web Socket
-    with open('example_data/example_slice.dcm', 'rb') as image:
+    with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
         binary_image = image.read()
     web_socket_client.emit('upload_slice', {'scan_id': scan_id, 'image': binary_image}, namespace='/slices')
     responses = web_socket_client.get_received(namespace='/slices')
