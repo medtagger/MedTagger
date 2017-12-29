@@ -23,7 +23,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None: 
     assert len(category_key) > 1
 
     # Step 2. Add Scan to the system
-    payload = {'category': category_key}
+    payload = {'category': category_key, 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload), headers={'content-type': 'application/json'})
     assert response.status_code == 201
     json_response = json.loads(response.data)

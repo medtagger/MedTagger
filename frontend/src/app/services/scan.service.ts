@@ -106,10 +106,11 @@ export class ScanService {
     this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count});
   }
 
-  createNewScan(category: string) {
+  createNewScan(category: string, numberOfSlices: number) {
     return new Promise((resolve, reject) => {
       const payload = {
         category: category,
+        number_of_slices: numberOfSlices,
       };
       this.http.post(environment.API_URL + '/scans/', payload).toPromise().then(
         response => {

@@ -3,9 +3,9 @@ export MEDTAGGER__API_PORT=51000
 export MEDTAGGER__API_DEBUG=1
 export MEDTAGGER__API_SECRET_KEY="SECRET_KEY"
 
-export MEDTAGGER__DB_DATABASE_URI="postgresql://medtagger_user:MedTa99er!@localhost:5432/medtagger"
+export MEDTAGGER__DB_DATABASE_URI="postgresql://medtagger_user:MedTa99er!@127.0.0.1:5432/medtagger"
 
-export MEDTAGGER__HBASE_HOST="localhost"
+export MEDTAGGER__HBASE_HOST="127.0.0.1"
 export MEDTAGGER__HBASE_PORT=9090
 export MEDTAGGER__HBASE_REST_PORT=8080
 export MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10

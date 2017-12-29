@@ -33,7 +33,7 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[FileDataset], output
     :return: 3D numpy array with normalized pixels
     """
     dicom_files = sorted(dicom_files, key=lambda _slice: _slice.SliceLocation, reverse=True)
-    thickness = abs(dicom_files[0].SliceLocation - dicom_files[1].SliceLocation)
+    thickness = _get_scan_slice_thickness(dicom_files)
     spacing = float(dicom_files[0].PixelSpacing.pop())
     intercept = dicom_files[0].RescaleIntercept
     slope = dicom_files[0].RescaleSlope
@@ -70,10 +70,10 @@ def convert_to_hounsfield_units(pixel_array: np.ndarray, intercept: float, slope
 
     # If slope equals 1 the instructions below would be unnecessary
     if slope != 1:
-        pixel_array = slope * pixel_array.astype(np.float64)  # pylint: disable=no-member; bug
-        pixel_array = pixel_array.astype(np.int16)
+        pixel_array = slope * pixel_array
+        pixel_array = pixel_array
 
-    pixel_array += np.int16(intercept)
+    pixel_array = pixel_array + intercept
     return pixel_array
 
 
@@ -89,3 +89,15 @@ def normalize(hu_array: np.ndarray, min_bound: int = -1000, max_bound: int = 400
     hu_array[hu_array > 1] = 1.
     hu_array[hu_array < 0] = 0.
     return hu_array
+
+
+def _get_scan_slice_thickness(dicom_files: List[FileDataset]) -> float:
+    """Calculate Scan's Slice thickness
+
+    :param dicom_files: list of all Dicom files related to given Scan
+    :return: float value with Scan's Slice thickness
+    """
+    try:
+        return abs(dicom_files[0].SliceLocation - dicom_files[1].SliceLocation)
+    except IndexError:
+        return 1.0  # It seems that there is only one Slice. Thickness >=1.0 will be fine for all of the computations.
