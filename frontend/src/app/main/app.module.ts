@@ -41,6 +41,7 @@ import {
   MatExpansionModule,
   MatSnackBarModule,
   MatSelectModule,
+  MatTooltipModule,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import { AuthenticationHeader } from '../services/authentication-header';
@@ -52,10 +53,10 @@ const routes: Routes = [
   {path: 'home', component: HomePageComponent, data: {title: 'Home page'}},
   {path: 'category', component: CategoryPageComponent, data: {title: 'Choosing category'}},
   {path: 'marker', component: MarkerPageComponent, data: {title: 'Labelling'}},
-  {path: 'upload', component: UploadPageComponent, data: {title: 'Adding new scans'}},
+  {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new scans'}},
   {path: 'settings', component: SettingsPageComponent, data: {title: 'Settings'}},
   {path: 'validation', component: ValidationPageComponent, data: {title: 'Validation'}},
-  {path: 'marker-tutorial', component: MarkerTutorialPageComponent, data: {title: 'Tutorial'}}
+  {path: 'marker-tutorial', component: MarkerTutorialPageComponent, data: {title: 'Marker tutorial'}}
 ];
 
 @NgModule({
@@ -76,7 +77,7 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(
       routes,
-      {enableTracing: true} // do debugowania
+      {enableTracing: true} // for debugging
     ),
     MatToolbarModule,
     MatCardModule,
@@ -92,6 +93,7 @@ const routes: Routes = [
     MatSidenavModule,
     MatListModule,
     MatGridListModule,
+    MatTooltipModule,
     BrowserModule,
     BrowserAnimationsModule,
     BrowserAnimationsModule,
