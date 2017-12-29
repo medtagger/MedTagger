@@ -36,14 +36,11 @@ Structure presented above is temporary. Watch out for updates.
 - Go to root directory of repository (where `package.json` is located) and run `npm install`.  
  All of the project dependencies should fetched via npm. (this can take a while...)
 
-- Run the dev server by `ng serve` command
+- Run `ng serve --env=local` for a dev server. Navigate to `http://localhost:4200/`. 
 
-
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. In case you want to use custom host and port, use `--host` and `--port` flags.  
-Example: `ng serve --host 0.0.0.0 --port 4201`   
-The app will automatically reload if you change any of the source files.
+- In case you want to use custom host and port, use `--host` and `--port` flags.  
+ Example: `ng serve --env=local --host 0.0.0.0 --port 4201`   
+ The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 
