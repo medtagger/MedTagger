@@ -13,6 +13,7 @@ from medtagger.repositories.slices import SlicesRepository
 from tests.functional_tests import get_api_client, get_web_socket_client
 
 
+# pylint: disable=too-many-locals
 def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application for Scan upload and conversion."""
     api_client = get_api_client()

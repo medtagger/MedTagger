@@ -2,7 +2,7 @@
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, Scan, Slice
+from medtagger.database.models import ScanCategory, Scan
 from medtagger.types import ScanID
 
 

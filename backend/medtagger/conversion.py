@@ -92,7 +92,7 @@ def normalize(hu_array: np.ndarray, min_bound: int = -1000, max_bound: int = 400
 
 
 def _get_scan_slice_thickness(dicom_files: List[FileDataset]) -> float:
-    """Calculate Scan's Slice thickness
+    """Calculate Scan's Slice thickness.
 
     :param dicom_files: list of all Dicom files related to given Scan
     :return: float value with Scan's Slice thickness
