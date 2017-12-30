@@ -6,19 +6,19 @@ from medtagger.database.models import ScanCategory, Role
 
 CATEGORIES = [{
     'key': 'KIDNEYS',
-    'name': 'Nerki',
+    'name': 'Kidneys',
     'image_path': '../../../assets/icon/kidneys_category_icon.svg',
 }, {
     'key': 'LIVER',
-    'name': 'Wątroba',
+    'name': 'Liver',
     'image_path': '../../../assets/icon/liver_category_icon.svg',
 }, {
     'key': 'HEART',
-    'name': 'Serce',
+    'name': 'Hearth',
     'image_path': '../../../assets/icon/heart_category_icon.svg',
 }, {
     'key': 'LUNGS',
-    'name': 'Płuca',
+    'name': 'Lungs',
     'image_path': '../../../assets/icon/lungs_category_icon.svg',
 }]
 

@@ -50,7 +50,7 @@ import { AuthenticationHeader } from '../services/authentication-header';
 const routes: Routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full'},
   {path: 'login', component: LoginPageComponent, data: {title: 'Welcome'}},
-  {path: 'home', component: HomePageComponent, data: {title: 'Home page'}},
+  {path: 'home', component: HomePageComponent, data: {title: 'Home'}},
   {path: 'category', component: CategoryPageComponent, data: {title: 'Choosing category'}},
   {path: 'marker', component: MarkerPageComponent, data: {title: 'Labelling'}},
   {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new scans'}},

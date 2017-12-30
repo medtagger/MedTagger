@@ -2,8 +2,8 @@
   <input [accept]="'.dcm'" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden multiple />
   <button type="button" mat-raised-button (click)="selectFile()">
     <mat-icon>recent_actors</mat-icon>
-    <span *ngIf="!fileCount">Wybierz obrazy Dicom</span>
-    <span *ngIf="fileCount">Zaznaczono <span>{{fileCount}}</span> obrazów Dicom</span>
+    <span *ngIf="!fileCount">Select Dicom images</span>
+    <span *ngIf="fileCount">Selected <span>{{fileCount}}</span> Dicom images</span>
   </button>
 </section>
 
@@ -11,7 +11,7 @@
   <input type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden multiple webkitdirectory directory />
   <button type="button" mat-raised-button (click)="selectFile()">
     <mat-icon>folder</mat-icon>
-    <span *ngIf="!fileCount">Wybierz katalog</span>
-    <span *ngIf="fileCount">Zaznaczono <span>{{fileCount}}</span> skanów</span>
+    <span *ngIf="!fileCount">Select directory</span>
+    <span *ngIf="fileCount">Selected <span>{{fileCount}}</span> scans</span>
   </button>
 </section>

@@ -20,7 +20,7 @@ for the future use.
 
 ## What needs to be done?
  - [x] New CI flow after migration from GitLab to GitHub
- - [ ] Internationalization of the whole platform
+ - [x] Internationalization of the whole platform
  - [ ] Extended labeling mechanism using magic lasso
  - [ ] Extended labeling mechanism using additional views for 3D scans
  - [ ] Extended validation mechanism with looking for similar labels
