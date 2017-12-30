@@ -45,7 +45,7 @@ Below screenshots show how MedTagger looks like.
 ![Main Page](/docs/assets/main_page.png)
 
 #### Labeling Page
-![Labeling Page](/docs/assets/labeling_page.png)
+![Labeling Page](/docs/assets/labelling_page.png)
 
 #### Validation Page
 ![Validation Page](docs/assets/validation_page.png)
