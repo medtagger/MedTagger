@@ -1,4 +1,4 @@
-"""Module responseble for business logic for users administration."""
+"""Module responsible for business logic for users administration."""
 from typing import List
 
 from medtagger.api import InvalidArgumentsException

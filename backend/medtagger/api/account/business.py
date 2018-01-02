@@ -1,4 +1,4 @@
-"""Module responsible for business logic for user's acocunt management."""
+"""Module responsible for business logic for user's account management."""
 from flask_login import current_user
 from flask_security import SQLAlchemyUserDatastore, Security, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash

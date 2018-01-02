@@ -1,4 +1,4 @@
-"""Module containg serializers for users endpoints."""
+"""Module containing serializers for users endpoints."""
 from flask_restplus import fields
 
 from medtagger.api import api
