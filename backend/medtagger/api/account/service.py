@@ -32,7 +32,7 @@ class SignIn(Resource):
 
     @staticmethod
     @api.expect(serializers.sign_in)
-    @api.doc(responses={200: 'Signed in', 400: 'User does not exist or wrong password'})
+    @api.doc(responses={200: 'Signed in', 400: 'User does not exist or wrong password was provided'})
     def post() -> Any:
         """Sign in the user."""
         sign_in = request.json
