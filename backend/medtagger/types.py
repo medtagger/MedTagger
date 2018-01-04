@@ -13,5 +13,6 @@ SlicePosition = NamedTuple('SlicePosition', [('x', float), ('y', float), ('z', f
 
 LabelPosition = NamedTuple('LabelPosition', [('x', float), ('y', float), ('slice_index', int)])
 LabelShape = NamedTuple('LabelShape', [('width', float), ('height', float)])
+LabelBinaryMask = NewType('LabelBinaryMask', bytes)
 
 UserInfo = NamedTuple('UserInfo', [('id', int), ('email', str), ('first_name', str), ('last_name', str), ('role', str)])

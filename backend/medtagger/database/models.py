@@ -207,20 +207,6 @@ class Label(Base):
         """Return string representation for Label."""
         return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status)
 
-    def add_selection(self, position: LabelPosition, shape: LabelShape) -> LabelSelectionID:
-        """Add new selection for this label.
-
-        :param position: position (x, y, slice_index) of the label
-        :param shape: shape (width, height, depth) of the label
-        :return: ID of a selection
-        """
-        with db_session() as session:
-            new_label_selection = LabelSelection(position, shape)
-            new_label_selection.label = self
-            session.add(new_label_selection)
-
-        return new_label_selection.id
-
     def update_status(self, status: LabelStatus) -> 'Label':
         """Update Label's status.
 
