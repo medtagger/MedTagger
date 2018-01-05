@@ -7,7 +7,7 @@ from medtagger.database.models import LabelStatus
 from tests.functional_tests import get_api_client, get_web_socket_client
 
 
-def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:  # pylint: disable=too-many-statements
+def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application with basic flow."""
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')
@@ -93,6 +93,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None: 
         'slice_index': 0,
         'width': 0.1,
         'height': 0.1,
+        'binary_mask': None,
     }]
 
     # Step 8. Verify such label

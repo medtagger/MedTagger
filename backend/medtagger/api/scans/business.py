@@ -1,12 +1,12 @@
 """Module responsible for business logic in all Scans endpoints."""
-from typing import Iterable, Dict, List, Tuple, Optional
+from typing import Iterable, Dict, List, Tuple
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api.exceptions import NotFoundException
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelBinaryMask, ScanMetadata
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata
 from medtagger.database.models import ScanCategory, Scan, Slice, Label
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
@@ -105,7 +105,7 @@ def add_label(scan_id: ScanID, selections: List[Dict]) -> Label:
     for selection in selections:
         position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
         shape = LabelShape(width=selection['width'], height=selection['height'])
-        binary_mask = _get_label_selection_binary_mask(selection.get('binary_mask'))
+        binary_mask = LabelSelectionBinaryMask(selection['binary_mask']) if selection.get('binary_mask') else None
         LabelsRepository.add_new_label_selection(label.id, position, shape, binary_mask)
     return label
 
@@ -132,11 +132,3 @@ def get_scan(scan_id: ScanID) -> ScanMetadata:
     """
     scan = ScansRepository.get_scan_by_id(scan_id)
     return ScanMetadata(scan_id=scan.id, number_of_slices=len(scan.slices))
-
-
-def _get_label_selection_binary_mask(binary_mask: Optional[str]) -> Optional[LabelBinaryMask]:
-    if not binary_mask:
-        return None
-
-    # TODO: Prepare conversion from base64 to bytes!
-    return LabelBinaryMask(binary_mask)
