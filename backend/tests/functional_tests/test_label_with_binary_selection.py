@@ -27,7 +27,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
     assert len(responses) == 1
 
     # Step 3. Label it
-    payload = {  # type: ignore
+    payload = {
         'selections': [{
             'x': 0.5,
             'y': 0.5,
