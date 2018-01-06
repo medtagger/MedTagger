@@ -24,10 +24,11 @@ class Scans(Resource):
         """Create empty scan."""
         payload = request.json
         category_key = payload['category']
+        number_of_slices = payload['number_of_slices']
         if not business.scan_category_is_valid(category_key):
             raise InvalidArgumentsException('Category "{}" is not available.'.format(category_key))
 
-        scan = business.create_empty_scan(category_key)
+        scan = business.create_empty_scan(category_key, number_of_slices)
         return scan, 201
 
 
@@ -107,4 +108,4 @@ class Scan(Resource):
     @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
     def get(scan_id: ScanID) -> Any:
         """Return scan for the given scan_id."""
-        return business.get_scan(scan_id)._asdict()
+        return business.get_scan_metadata(scan_id)._asdict()

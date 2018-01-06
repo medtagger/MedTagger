@@ -80,11 +80,21 @@ class ScanCategory(Base):
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
 
 
+class SliceOrientation(enum.Enum):
+    """Defines available Slice orientation."""
+
+    X = 'X'
+    Y = 'Y'
+    Z = 'Z'
+
+
 class Scan(Base):
     """Definition of a Scan."""
 
     __tablename__ = 'Scans'
     id: ScanID = Column(String, primary_key=True)
+    converted: bool = Column(Boolean, default=False)
+    number_of_slices: int = Column(Integer, nullable=False)
 
     category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
     category: ScanCategory = relationship('ScanCategory')
@@ -92,28 +102,36 @@ class Scan(Base):
     slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
     labels: List['Label'] = relationship('Label', back_populates='scan')
 
-    def __init__(self, category: ScanCategory) -> None:
+    def __init__(self, category: ScanCategory, number_of_slices: int) -> None:
         """Initialize Scan.
 
         :param category: Scan's category
+        :param number_of_slices: number of Slices that will be uploaded later
         """
         self.id = ScanID(str(uuid.uuid4()))
         self.category = category
+        self.number_of_slices = number_of_slices
 
     def __repr__(self) -> str:
         """Return string representation for Scan."""
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key)
 
-    def add_slice(self) -> 'Slice':
+    def add_slice(self, orientation: SliceOrientation = SliceOrientation.Z) -> 'Slice':
         """Add new slice into this Scan.
 
         :return: ID of a Slice
         """
         with db_session() as session:
-            new_slice = Slice()
+            new_slice = Slice(orientation)
             new_slice.scan = self
             session.add(new_slice)
         return new_slice
+
+    def mark_as_converted(self) -> 'Scan':
+        """Mark Scan as 3D converted."""
+        self.converted = True
+        self.save()
+        return self
 
 
 class Slice(Base):
@@ -121,6 +139,7 @@ class Slice(Base):
 
     __tablename__ = 'Slices'
     id: SliceID = Column(String, primary_key=True)
+    orientation: SliceOrientation = Column(Enum(SliceOrientation), nullable=False, default=SliceOrientation.Z)
     location: float = Column(Float, nullable=True)
     position_x: float = Column(Float, nullable=True)
     position_y: float = Column(Float, nullable=True)
@@ -131,13 +150,16 @@ class Slice(Base):
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     scan: Scan = relationship('Scan', back_populates='slices')
 
-    def __init__(self, location: SliceLocation = None, position: SlicePosition = None) -> None:
+    def __init__(self, orientation: SliceOrientation, location: SliceLocation = None,
+                 position: SlicePosition = None) -> None:
         """Initialize Slice.
 
+        :param orientation: orientation of the Slice
         :param location: location of a Slice (useful for sorting)
         :param position: position of a Slice inside of a patient body
         """
         self.id = SliceID(str(uuid.uuid4()))
+        self.orientation = orientation
         if location:
             self.location = location
         if position:
@@ -147,15 +169,15 @@ class Slice(Base):
 
     def __repr__(self) -> str:
         """Return string representation for Slice."""
-        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.location)
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.location, self.orientation)
 
-    def update_location(self, new_location: SliceLocation) -> 'Label':
+    def update_location(self, new_location: SliceLocation) -> 'Slice':
         """Update location in the Slice."""
         self.location = new_location
         self.save()
         return self
 
-    def update_position(self, new_position: SlicePosition) -> 'Label':
+    def update_position(self, new_position: SlicePosition) -> 'Slice':
         """Update position in the Slice."""
         self.position_x = new_position.x
         self.position_y = new_position.y
@@ -163,13 +185,13 @@ class Slice(Base):
         self.save()
         return self
 
-    def mark_as_stored(self) -> 'Label':
+    def mark_as_stored(self) -> 'Slice':
         """Mark Slice as stored in HBase."""
         self.stored = True
         self.save()
         return self
 
-    def mark_as_converted(self) -> 'Label':
+    def mark_as_converted(self) -> 'Slice':
         """Mark Slice as converted in HBase."""
         self.converted = True
         self.save()
@@ -207,19 +229,19 @@ class Label(Base):
         """Return string representation for Label."""
         return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status)
 
-    def add_selection(self, position: LabelPosition, shape: LabelShape) -> LabelSelectionID:
+    def add_selection(self, position: LabelPosition, shape: LabelShape) -> 'LabelSelection':
         """Add new selection for this label.
 
         :param position: position (x, y, slice_index) of the label
         :param shape: shape (width, height, depth) of the label
-        :return: ID of a selection
+        :return: Label Selection
         """
         with db_session() as session:
             new_label_selection = LabelSelection(position, shape)
             new_label_selection.label = self
             session.add(new_label_selection)
 
-        return new_label_selection.id
+        return new_label_selection
 
     def update_status(self, status: LabelStatus) -> 'Label':
         """Update Label's status.

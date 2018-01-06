@@ -2,7 +2,7 @@
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, Scan, Slice
+from medtagger.database.models import ScanCategory, Scan
 from medtagger.types import ScanID
 
 
@@ -28,21 +28,20 @@ class ScansRepository(object):
             query = query.join(ScanCategory)
             if category:
                 query = query.filter(ScanCategory.key == category.key)
-            # All slices has to be stored and converted
-            query = query.filter(~Scan.slices.any(Slice.stored.is_(False)))  # type: ignore  # No attribute `any()`
-            query = query.filter(~Scan.slices.any(Slice.converted.is_(False)))  # type: ignore  # No attribute `any()`
+            query = query.filter(Scan.converted)
             query = query.order_by(func.random())
             scan = query.first()
         return scan
 
     @staticmethod
-    def add_new_scan(category: ScanCategory) -> Scan:
+    def add_new_scan(category: ScanCategory, number_of_slices: int) -> Scan:
         """Add new Scan to the database.
 
         :param category: Scan's Category object
+        :param number_of_slices: number of Slices that will be uploaded
         :return: Scan object
         """
         with db_session() as session:
-            scan = Scan(category)
+            scan = Scan(category, number_of_slices)
             session.add(scan)
         return scan

@@ -5,7 +5,8 @@ from medtagger.api import api
 
 
 in__new_scan = api.model('New Scan model', {
-    'category': fields.String(description='Scan\'s category'),
+    'category': fields.String(description='Scan\'s category', required=True),
+    'number_of_slices': fields.Integer(description='Number of Slices that will be uploaded', required=True),
 })
 
 in__label_selection = api.model('Label\'s Selection model', {

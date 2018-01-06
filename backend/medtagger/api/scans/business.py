@@ -4,13 +4,13 @@ from typing import Iterable, Dict, List, Tuple
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api.exceptions import NotFoundException
+from medtagger.types import ScanID, LabelPosition, LabelShape, ScanMetadata
+from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
-from medtagger.types import ScanID, LabelPosition, LabelShape, ScanMetadata
-from medtagger.database.models import ScanCategory, Scan, Slice, Label
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
-from medtagger.workers.conversion import convert_dicom_to_png
+from medtagger.workers.conversion import convert_scan_to_png
 from medtagger.workers.storage import store_dicom
 
 
@@ -46,14 +46,15 @@ def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
     return ScanCategoriesRepository.add_new_category(key, name, image_path)
 
 
-def create_empty_scan(category_key: str) -> Scan:
+def create_empty_scan(category_key: str, number_of_slices: int) -> Scan:
     """Create new empty scan.
 
     :param category_key: string with category key
+    :param number_of_slices: number of Slices that will be uploaded
     :return: Newly created Scan object
     """
     category = ScanCategoriesRepository.get_category_by_key(category_key)
-    return ScansRepository.add_new_scan(category)
+    return ScansRepository.add_new_scan(category, number_of_slices)
 
 
 def get_metadata(scan_id: ScanID) -> ScanMetadata:
@@ -63,7 +64,7 @@ def get_metadata(scan_id: ScanID) -> ScanMetadata:
     :return: Scan Metadata object
     """
     scan = ScansRepository.get_scan_by_id(scan_id)
-    return ScanMetadata(scan_id=scan.id, number_of_slices=len(scan.slices))
+    return ScanMetadata(scan_id=scan.id, number_of_slices=scan.number_of_slices)
 
 
 def get_random_scan(category_key: str) -> ScanMetadata:
@@ -77,19 +78,21 @@ def get_random_scan(category_key: str) -> ScanMetadata:
     if not scan:
         raise NotFoundException('Could not find any Scan for this category!')
 
-    return ScanMetadata(scan_id=scan.id, number_of_slices=len(scan.slices))
+    return ScanMetadata(scan_id=scan.id, number_of_slices=scan.number_of_slices)
 
 
-def get_slices_for_scan(scan_id: ScanID, begin: int, count: int) -> Iterable[Tuple[Slice, bytes]]:
+def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
+                        orientation: SliceOrientation = SliceOrientation.Z) -> Iterable[Tuple[Slice, bytes]]:
     """Fetch multiple slices for given scan.
 
     :param scan_id: ID of a given scan
     :param begin: first slice index (included)
     :param count: number of slices that will be returned
+    :param orientation: orientation for Slices (by default set to Z axis)
     :return: generator for Slices
     """
-    scan = ScansRepository.get_scan_by_id(scan_id)
-    for _slice in scan.slices[begin:begin + count]:
+    slices = SlicesRepository.get_slices_by_scan_id(scan_id, orientation=orientation)
+    for _slice in slices[begin:begin + count]:
         image = SlicesRepository.get_slice_converted_image(_slice.id)
         yield _slice, image
 
@@ -119,15 +122,28 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     scan = ScansRepository.get_scan_by_id(scan_id)
     _slice = scan.add_slice()
     store_dicom.delay(_slice.id, image)
-    convert_dicom_to_png.delay(_slice.id, image)
+
+    # Run conversion to PNG if this is the latest uploaded Slice
+    slices = SlicesRepository.get_slices_by_scan_id(scan_id)
+    if scan.number_of_slices == len(slices):  # Check if number of declared Slices is the same as number of Slices in DB
+        convert_scan_to_png.delay(scan_id)
     return _slice
 
 
-def get_scan(scan_id: ScanID) -> ScanMetadata:
-    """Return scan for given scan_id.
+def get_scan(scan_id: ScanID) -> Scan:
+    """Return Scan for given scan_id.
+
+    :param scan_id: ID of a Scan which should be returned
+    :return: Scan object
+    """
+    return ScansRepository.get_scan_by_id(scan_id)
+
+
+def get_scan_metadata(scan_id: ScanID) -> ScanMetadata:
+    """Return ScanMetadata for given scan_id.
 
     :param scan_id: ID of a Scan which should be returned
     :return: Scan Metadata object
     """
     scan = ScansRepository.get_scan_by_id(scan_id)
-    return ScanMetadata(scan_id=scan.id, number_of_slices=len(scan.slices))
+    return ScanMetadata(scan_id=scan.id, number_of_slices=scan.number_of_slices)

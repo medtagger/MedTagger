@@ -28,9 +28,9 @@ import os
 import argparse
 import glob
 
-from medtagger.database import db_session
-from medtagger.database.models import Scan, ScanCategory
-from medtagger.workers.conversion import convert_dicom_to_png
+from medtagger.repositories.scans import ScansRepository
+from medtagger.repositories.scan_categories import ScanCategoriesRepository
+from medtagger.workers.conversion import convert_scan_to_png
 from medtagger.workers.storage import store_dicom
 
 
@@ -41,23 +41,26 @@ args = parser.parse_args()
 
 
 if __name__ == '__main__':
-    with db_session() as session:
-        category = session.query(ScanCategory).filter(ScanCategory.key == args.category).one()
+    print('Checking Scan Category...')
+    category = ScanCategoriesRepository.get_category_by_key(args.category)
 
     source = args.source.rstrip('/')
     for scan_directory in glob.iglob(source + '/*'):
         if not os.path.isdir(scan_directory):
+            print('WARN: "{}" is not a directory. Skipping...'.format(scan_directory))
             continue
 
-        print('Adding new scan from {}.'.format(scan_directory))
-        with db_session() as session:
-            scan = Scan(category)
-            session.add(scan)
+        print('Adding new Scan from "{}".'.format(scan_directory))
+        slice_names = glob.glob(scan_directory + '/*.dcm')
+        number_of_slices = len(slice_names)
+        scan = ScansRepository.add_new_scan(category, number_of_slices)
 
-        for slice_name in glob.iglob(scan_directory + '/*.dcm'):
-            print('Adding new slice to scan {} based on {}.'.format(scan.id, slice_name))
+        for slice_name in slice_names:
+            print('Adding new Slice to Scan "{}" based on "{}".'.format(scan.id, slice_name))
             with open(slice_name, 'rb') as slice_dicom_file:
-                image = slice_dicom_file.read()
                 _slice = scan.add_slice()
+                image = slice_dicom_file.read()
                 store_dicom.delay(_slice.id, image)
-                convert_dicom_to_png.delay(_slice.id, image)
+
+        print('Scan "{}" will be converted to PNG soon!'.format(scan_directory))
+        convert_scan_to_png.delay(scan.id)

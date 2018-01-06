@@ -81,7 +81,7 @@ export class UploadPageComponent implements OnInit {
   uploadSingleScan(files: File[]) {
     let category = this.chooseCategoryFormGroup.get('category').value;
     this.numberOfFiles = this.files.length;
-    this.scanService.createNewScan(category).then((scanId: string) => {
+    this.scanService.createNewScan(category, this.numberOfFiles).then((scanId: string) => {
       console.log('New Scan created with ID:', scanId);
       this.scanService.uploadSlices(scanId, files);
     });
