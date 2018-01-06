@@ -8,7 +8,7 @@
       <mat-card>
         <mat-card-title>Choose category</mat-card-title>
         <mat-card-subtitle>Step 1</mat-card-subtitle>
-        <p>First, choose category of the data you want to label. After choosing category you will be taken to marker page.</p>
+        <p>First, choose category of the data you want to label. After that you will be taken to marker page.</p>
         <button class="nextPage" mat-raised-button matStepperNext color="primary">Next <mat-icon>navigate_next</mat-icon></button>
         <div class="clearfix"></div>
       </mat-card>
@@ -26,7 +26,7 @@
         <mat-card-subtitle>Step 2</mat-card-subtitle>
         <p>Use the slider on your right to search for anomalies on the picture. Remember that by default you are given
           only a part of the scan. To download rest of the images, use the slider to go to the end of available view.</p>
-        <p>If you haven't found any anomalies on the scan, click 'Skip scan' button to draw another set of images.</p>
+        <p>If you haven't found any anomalies on the scan, click 'Skip scan' button to get a new scan for labelling`.</p>
         <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Back</button>
         <button class="nextPage" mat-raised-button matStepperNext color="primary">Next <mat-icon>navigate_next</mat-icon></button>
         <div class="clearfix"></div>
@@ -43,9 +43,9 @@
       <mat-card>
         <mat-card-title>Label it</mat-card-title>
         <mat-card-subtitle>Step 3</mat-card-subtitle>
-        <p>Label part of the image that you find interesting. Using the slider proceed to next levels of the scan to
-          label whole anomaly. Remember that you can always delete your label and create it again.</p>
-        <p>With every annotation you are building a 3D label that will be defined by drawn surfaces.</p>
+        <p>Draw rectangle on the image that you find interesing. Using the slider on the right, move to another slices and draw           additional rectangle. Collection of such selections will create a single 3D annotation. MedTagger will be able to
+           interpolate such rectangles to prepare a complex 3D structure.
+        <p><b>Remember: In case you find multiple anomalies, annotate them separately to create multiple labels.</b></p>
         <p style="color: #666;"><i>In this example we are showing how to label fragments of patient ribs.</i></p>
         <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Back</button>
         <button class="nextPage" mat-raised-button matStepperNext color="primary">Next <mat-icon>navigate_next</mat-icon></button>
@@ -63,7 +63,7 @@
       <mat-card>
         <mat-card-title>Send label</mat-card-title>
         <mat-card-subtitle>Step 4</mat-card-subtitle>
-        <p>After creating label, click 'Send label' button. You still have option of further labeling the scan after
+        <p>After creating label, click 'Send label' button. You'll still have option of further labeling the scan after
           clicking this button.</p>
         <p>After sending all of the labels, please click 'Next scan' button to draw another scan for labelling.</p>
         <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Back</button>
