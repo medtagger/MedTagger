@@ -23,7 +23,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert len(category_key) > 1
 
     # Step 2. Add Scan to the system
-    payload = {'category': category_key}
+    payload = {'category': category_key, 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload), headers={'content-type': 'application/json'})
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -33,7 +33,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert len(scan_id) >= 1
 
     # Step 3. Send slices through Web Socket
-    with open('example_data/example_slice.dcm', 'rb') as image:
+    with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
         binary_image = image.read()
     web_socket_client.emit('upload_slice', {'scan_id': scan_id, 'image': binary_image}, namespace='/slices')
     responses = web_socket_client.get_received(namespace='/slices')
