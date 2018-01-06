@@ -13,14 +13,14 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
     web_socket_client = get_web_socket_client(namespace='/slices')
 
     # Step 1. Add Scan to the system
-    payload = {'category': 'LUNGS'}
+    payload = {'category': 'LUNGS', 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload), headers={'content-type': 'application/json'})
     assert response.status_code == 201
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
     # Step 2. Send Slices through Web Socket
-    with open('example_data/example_slice.dcm', 'rb') as image:
+    with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
         binary_image = image.read()
     web_socket_client.emit('upload_slice', {'scan_id': scan_id, 'image': binary_image}, namespace='/slices')
     responses = web_socket_client.get_received(namespace='/slices')
