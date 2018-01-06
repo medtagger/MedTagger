@@ -10,5 +10,5 @@ export MEDTAGGER__HBASE_PORT=9090
 export MEDTAGGER__HBASE_REST_PORT=8080
 export MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10
 
-export MEDTAGGER__CELERY_BROKER="pyamqp://guest:guest@localhost//"
+export MEDTAGGER__CELERY_BROKER="pyamqp://guest:guest@127.0.0.1//"
 

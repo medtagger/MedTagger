@@ -229,20 +229,6 @@ class Label(Base):
         """Return string representation for Label."""
         return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status)
 
-    def add_selection(self, position: LabelPosition, shape: LabelShape) -> 'LabelSelection':
-        """Add new selection for this label.
-
-        :param position: position (x, y, slice_index) of the label
-        :param shape: shape (width, height, depth) of the label
-        :return: Label Selection
-        """
-        with db_session() as session:
-            new_label_selection = LabelSelection(position, shape)
-            new_label_selection.label = self
-            session.add(new_label_selection)
-
-        return new_label_selection
-
     def update_status(self, status: LabelStatus) -> 'Label':
         """Update Label's status.
 
@@ -264,15 +250,17 @@ class LabelSelection(Base):
     slice_index: int = Column(Integer, nullable=False)
     shape_width: float = Column(Float, nullable=False)
     shape_height: float = Column(Float, nullable=False)
+    has_binary_mask: bool = Column(Boolean, nullable=False)
 
     label_id: LabelID = Column(String, ForeignKey('Labels.id'))
     label: Label = relationship('Label', back_populates='selections')
 
-    def __init__(self, position: LabelPosition, shape: LabelShape) -> None:
+    def __init__(self, position: LabelPosition, shape: LabelShape, has_binary_mask: bool = False) -> None:
         """Initialize Label Selection.
 
         :param position: position (x, y, slice_index) of the label
         :param shape: shape (width, height) of the label
+        :param has_binary_mask: boolean information if such Label Selection has binary mask or not
         """
         self.id = LabelSelectionID(str(uuid.uuid4()))
         self.position_x = position.x
@@ -280,7 +268,9 @@ class LabelSelection(Base):
         self.slice_index = position.slice_index
         self.shape_width = shape.width
         self.shape_height = shape.height
+        self.has_binary_mask = has_binary_mask
 
     def __repr__(self) -> str:
         """Return string representation for Label Selection."""
-        return '<{}: {}>'.format(self.__class__.__name__, self.id)
+        _has_binary_mask = 'WITH BINARY MASK' if self.has_binary_mask else 'WITHOUT BINARY MASK'
+        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, _has_binary_mask)

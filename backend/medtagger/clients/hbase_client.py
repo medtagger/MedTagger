@@ -48,10 +48,12 @@ class HBaseClient(object):
 
     ORIGINAL_SLICES_TABLE = 'original_slices'
     CONVERTED_SLICES_TABLE = 'converted_slices'
+    LABEL_SELECTION_BINARY_MASK_TABLE = 'label_selection_binary_mask'
 
     HBASE_SCHEMA = {
         ORIGINAL_SLICES_TABLE: ['image'],
         CONVERTED_SLICES_TABLE: ['image'],
+        LABEL_SELECTION_BINARY_MASK_TABLE: ['binary_mask'],
     }
 
     def __init__(self) -> None:
