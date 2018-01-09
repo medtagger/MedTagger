@@ -2,15 +2,24 @@ Development with Docker Compose
 -------------------------------
 
 Docker Compose is great to set up all depended services. It can setup things like Hadoop, HBase and RabbitMQ just
- with one command! But... it's not a good idea to develop the project inside of it. Instead, consider using Vagrant
- or setup the project natively.
+ with one command! It can even setup whole MedTagger on your machine easily.
+
+**But...** it's not a good idea to develop the project inside of it. Changes in the code will require rebuilding
+ whole Docker images. Instead, consider using Vagrant or setup the project natively.
 
 ### Requirements
- - [Docker Engine](https://www.docker.com),
- - [Docker Compose](https://docs.docker.com/compose/).
- 
-**Watch out:** It's highly possible that Docker Compose was included as part of a Docker Engine (on macOS/Windows)!
- More information can be found [here](https://docs.docker.com/compose/install/#prerequisites).
+
+ - [Docker CE](https://www.docker.com/community-edition),
+ - [Docker Compose](https://docs.docker.com/compose/install/).
+
+_**TIP!**_ Check your host machine with these commands:
+
+```bash
+$ docker --version
+Docker version 17.09.1-ce, build 19e2cf6
+$ docker-compose --version
+docker-compose version 1.17.1, build 6d101fb
+```
 
 ### How to setup whole MedTagger?
 
