@@ -20,7 +20,7 @@ for the future use.
 
 ## What needs to be done?
  - [x] New CI flow after migration from GitLab to GitHub
- - [ ] Internationalization of the whole platform
+ - [x] Internationalization of the whole platform
  - [ ] Extended labeling mechanism using magic lasso
  - [ ] Extended labeling mechanism using additional views for 3D scans
  - [ ] Extended validation mechanism with looking for similar labels
@@ -45,7 +45,7 @@ Below screenshots show how MedTagger looks like.
 ![Main Page](/docs/assets/main_page.png)
 
 #### Labeling Page
-![Labeling Page](/docs/assets/labeling_page.png)
+![Labeling Page](/docs/assets/labelling_page.png)
 
 #### Validation Page
 ![Validation Page](docs/assets/validation_page.png)

@@ -1,77 +1,74 @@
 <mat-horizontal-stepper [linear]="true" #stepper>
   <mat-step [stepControl]="formGroup">
-    <ng-template matStepLabel>Wybierz kategorię</ng-template>
+    <ng-template matStepLabel>Choose category</ng-template>
     <section class="step-content">
       <video loop #firstStepVideo>
         <source src="../../../assets/video/marker_step1.mp4" type="video/mp4">
       </video>
       <mat-card>
-        <mat-card-title>Wybierz kategorię</mat-card-title>
-        <mat-card-subtitle>Krok 1</mat-card-subtitle>
-        <p>W pierwszym kroku wybierz kategorię w ramach, której chcesz etykietować dane. Masz do wyboru szereg
-          dostępnych opcji, które przeniosą Cię do widoku oznaczania.</p>
-        <button class="nextPage" mat-raised-button matStepperNext color="primary">Dalej <mat-icon>navigate_next</mat-icon></button>
+        <mat-card-title>Choose category</mat-card-title>
+        <mat-card-subtitle>Step 1</mat-card-subtitle>
+        <p>First, choose category of the data you want to label. After that you will be taken to marker page.</p>
+        <button class="nextPage" mat-raised-button matStepperNext color="primary">Next <mat-icon>navigate_next</mat-icon></button>
         <div class="clearfix"></div>
       </mat-card>
     </section>
   </mat-step>
 
   <mat-step [stepControl]="formGroup">
-    <ng-template matStepLabel>Znajdź zmianę</ng-template>
+    <ng-template matStepLabel>Find anomaly</ng-template>
     <section class="step-content">
       <video loop #secondStepVideo>
         <source src="../../../assets/video/marker_step2.mp4" type="video/mp4">
       </video>
       <mat-card>
-        <mat-card-title>Znajdź zmianę</mat-card-title>
-        <mat-card-subtitle>Krok 2</mat-card-subtitle>
-        <p>Użyj suwaka z prawej strony, aby wyszukać zmianę na zdjęciu. Domyślnie przygotowaliśmy dla Ciebie tylko
-          fragment skanu. Aby pobrać pozostałe dane, przejdź na koniec dostępnego widoku.</p>
-        <p>Jeżeli nie znalazłeś żadnej zmiany na wybranym dla Ciebie skanie, kliknij opcję "Pomiń skan", aby
-          wylosować kolejny obraz.</p>
-        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Wstecz</button>
-        <button class="nextPage" mat-raised-button matStepperNext color="primary">Dalej <mat-icon>navigate_next</mat-icon></button>
+        <mat-card-title>Find anomaly</mat-card-title>
+        <mat-card-subtitle>Step 2</mat-card-subtitle>
+        <p>Use the slider on your right to search for anomalies on the picture. Remember that by default you are given
+          only a part of the scan. To download rest of the images, use the slider to go to the end of available view.</p>
+        <p>If you haven't found any anomalies on the scan, click 'Skip scan' button to get a new scan for labelling`.</p>
+        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Back</button>
+        <button class="nextPage" mat-raised-button matStepperNext color="primary">Next <mat-icon>navigate_next</mat-icon></button>
         <div class="clearfix"></div>
       </mat-card>
     </section>
   </mat-step>
 
   <mat-step [stepControl]="formGroup">
-    <ng-template matStepLabel>Zaznacz zmianę</ng-template>
+    <ng-template matStepLabel>Label it</ng-template>
     <section class="step-content">
       <video loop #thirdStepVideo>
         <source src="../../../assets/video/marker_step3.mp4" type="video/mp4">
       </video>
       <mat-card>
-        <mat-card-title>Zaznacz zmianę</mat-card-title>
-        <mat-card-subtitle>Krok 3</mat-card-subtitle>
-        <p>Zaznacz fragment obrazu, który Cię interesuje. Trójwymiarowa etykieta, którą przygotowujesz, będzie
-          ograniczona poprzez narysowane płaszczyzny.</p>
-        <p>Przejdź do kolejnych poziomów skanu, aby zaznaczyć dalszą część zmiany. Pamiętaj, że zawsze możesz usunąć
-          swoje oznaczenie i przygotować je jeszcze raz.</p>
-        <p style="color: #666;"><i>Na załączonym przykładzie, przedstawiamy jak zaznaczyć fragment żebra pracjenta.</i></p>
-        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Wstecz</button>
-        <button class="nextPage" mat-raised-button matStepperNext color="primary">Dalej <mat-icon>navigate_next</mat-icon></button>
+        <mat-card-title>Label it</mat-card-title>
+        <mat-card-subtitle>Step 3</mat-card-subtitle>
+        <p>Draw rectangle on the image that you find interesting. Using the slider on the right, move to another slices and draw
+          additional rectangle. Collection of such selections will create a single 3D annotation. MedTagger will be able to
+          interpolate such rectangles to prepare a complex 3D structure.
+        <p><b>Remember: In case you find multiple anomalies, annotate them separately to create multiple labels.</b></p>
+        <p style="color: #666;"><i>In this example we are showing how to label fragments of patient ribs.</i></p>
+        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Back</button>
+        <button class="nextPage" mat-raised-button matStepperNext color="primary">Next <mat-icon>navigate_next</mat-icon></button>
         <div class="clearfix"></div>
       </mat-card>
     </section>
   </mat-step>
 
   <mat-step>
-    <ng-template matStepLabel>Wyślij etykietę</ng-template>
+    <ng-template matStepLabel>Send label</ng-template>
     <section class="step-content">
       <video loop #fourthStepVideo>
         <source src="../../../assets/video/marker_step4.mp4" type="video/mp4">
       </video>
       <mat-card>
-        <mat-card-title>Wyślij etykietę</mat-card-title>
-        <mat-card-subtitle>Krok 4</mat-card-subtitle>
-        <p>Po wprowadzeniu etykiety, kliknij przycisk "Wyślij oznaczenie". Następnie będziesz miał możliwość dalszego
-          etykietowania skanu.</p>
-        <p>Gdy wszystkie zmiany zostaną już poprawnie wprowadzone do systemu, możesz wybrać opcję "Następny skan", aby
-          wylosować kolejne zdjęcia do etykietowania.</p>
-        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Wstecz</button>
-        <button class="nextPage" mat-raised-button matStepperNext color="primary" routerLink="/category"><mat-icon>label_outline</mat-icon> Przejdź do etykietowania</button>
+        <mat-card-title>Send label</mat-card-title>
+        <mat-card-subtitle>Step 4</mat-card-subtitle>
+        <p>After creating label, click 'Send label' button. You'll still have option of further labeling the scan after
+          clicking this button.</p>
+        <p>After sending all of the labels, please click 'Next scan' button to draw another scan for labelling.</p>
+        <button class="prevPage" mat-button matStepperPrevious><mat-icon>navigate_before</mat-icon> Back</button>
+        <button class="nextPage" mat-raised-button matStepperNext color="primary" routerLink="/category"><mat-icon>label_outline</mat-icon> Proceed to labeling</button>
         <div class="clearfix"></div>
       </mat-card>
     </section>

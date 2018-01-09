@@ -59,31 +59,31 @@ export class LoginPageComponent implements OnInit {
 
   getFirstNameErrorMessage() {
     if (this.userForm.get('firstName').hasError('required')) {
-      return 'Pole obowiązkowe.';
+      return 'Field required.';
     }
   }
 
   getLastNameErrorMessage() {
     if (this.userForm.get('lastName').hasError('required')) {
-      return 'Pole obowiązkowe.';
+      return 'Field required.';
     }
   }
 
   getEmailErrorMessage() {
-    return this.userForm.get('email').hasError('required') ? 'Pole obowiązkowe.' :
-      this.userForm.get('email').hasError('email') ? 'E-mail jest niepoprawny.' :
+    return this.userForm.get('email').hasError('required') ? 'Field required.' :
+      this.userForm.get('email').hasError('email') ? 'Invalid email.' :
         '';
   }
 
   getPasswordErrorMessage() {
     if (this.userForm.get('password').hasError('required')) {
-      return 'Pole obowiązkowe.';
+      return 'Field required.';
     }
   }
 
   getConfirmPasswordErrorMessage() {
-    return this.userForm.get('confirmPassword').hasError('required') ? 'Pole obowiązkowe.' :
-      this.userForm.get('confirmPassword').hasError('passwordValidator') ? 'Podane hasła nie są zgodne.' :
+    return this.userForm.get('confirmPassword').hasError('required') ? 'Field required.' :
+      this.userForm.get('confirmPassword').hasError('passwordValidator') ? 'Passwords does not match.' :
         '';
   }
 

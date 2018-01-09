@@ -3,7 +3,7 @@
 <div class="login-side">
   <mat-card *ngIf="loginPageMode == LoginPageMode.LOG_IN" class="login-card">
     <mat-card-header>
-      <mat-card-title>Logowanie</mat-card-title>
+      <mat-card-title>Sign in</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <form class="example-form" [formGroup]="userForm" (keyup.enter)="logIn()">
@@ -15,7 +15,7 @@
           </tr>
           <tr>
           <td><mat-form-field class="example-full-width">
-            <input matInput type="password" placeholder="Hasło" id="password" formControlName="password" required>
+            <input matInput type="password" placeholder="Password" id="password" formControlName="password" required>
           </mat-form-field></td>
           </tr>
         </table>
@@ -24,12 +24,12 @@
       <table class="example-full-width" cellspacing="0">
         <tr>
           <td><mat-card-actions>
-            <button mat-raised-button color="primary" (click)="logIn()">Zaloguj się</button>
+            <button mat-raised-button color="primary" (click)="logIn()">Sign in</button>
           </mat-card-actions></td>
         </tr>
         <tr>
             <td>
-              <span>Nie masz konta? <a routerLink="/login" (click)="changePageMode()">Zarejestruj się.</a></span>
+              <span>New to MedTagger? <a routerLink="/login" (click)="changePageMode()">Create an account.</a></span>
             </td>
         </tr>
       </table>
@@ -38,20 +38,20 @@
 
   <mat-card *ngIf="loginPageMode == LoginPageMode.REGISTER" class="registration-card">
     <mat-card-header>
-      <mat-card-title>Rejestracja</mat-card-title>
+      <mat-card-title>Register</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="userForm" (keyup.enter)="register()">
         <table class="example-full-width" cellspacing="0">
           <tr>
             <td><mat-form-field class="example-full-width">
-              <input matInput type="text" id="firstName" placeholder="Imię" formControlName="firstName" required>
+              <input matInput type="text" id="firstName" placeholder="First name" formControlName="firstName" required>
               <mat-error *ngIf="userForm.get('firstName').invalid">{{getFirstNameErrorMessage()}}</mat-error>
             </mat-form-field></td>
           </tr>
           <tr>
             <td><mat-form-field class="example-full-width">
-              <input matInput type="text" id="lastName" placeholder="Nazwisko" formControlName="lastName" required>
+              <input matInput type="text" id="lastName" placeholder="Last name" formControlName="lastName" required>
               <mat-error *ngIf="userForm.get('firstName').invalid">{{getLastNameErrorMessage()}}</mat-error>
             </mat-form-field></td>
           </tr>
@@ -63,13 +63,13 @@
           </tr>
           <tr>
             <td><mat-form-field class="example-full-width">
-              <input matInput type="password" id="password" placeholder="Hasło" formControlName="password" required>
+              <input matInput type="password" id="password" placeholder="Password" formControlName="password" required>
               <mat-error *ngIf="userForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
             </mat-form-field></td>
           </tr>
           <tr>
             <td><mat-form-field class="example-full-width" required>
-              <input matInput type="password" id="confirmPassword" placeholder="Potwierdź hasło"  formControlName="confirmPassword" required>
+              <input matInput type="password" id="confirmPassword" placeholder="Confirm Password"  formControlName="confirmPassword" required>
               <mat-error *ngIf="userForm.get('confirmPassword').invalid">{{getConfirmPasswordErrorMessage()}}</mat-error>
             </mat-form-field></td>
           </tr>
@@ -79,10 +79,10 @@
         <table class="example-full-width" cellspacing="0">
           <tr>
             <td><mat-card-actions>
-              <button mat-raised-button color="primary-color" (click)="changePageMode()"><mat-icon>arrow_back</mat-icon> Wstecz</button>
+              <button mat-raised-button color="primary-color" (click)="changePageMode()"><mat-icon>arrow_back</mat-icon> Back</button>
             </mat-card-actions></td>
             <td><mat-card-actions>
-              <button mat-raised-button color="primary" (click)="register()">Zarejestruj się</button>
+              <button mat-raised-button color="primary" (click)="register()">Register</button>
             </mat-card-actions></td>
           </tr>
         </table>

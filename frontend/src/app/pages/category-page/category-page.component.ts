@@ -25,7 +25,7 @@ export class CategoryPageComponent implements OnInit {
         this.iconRegistry.addSvgIcon(category.key, this.sanitizer.bypassSecurityTrustResourceUrl(category.imagePath));
       }
     }, () => {
-      this.snackBar.open('Błąd podczas pobierania kategorii', 'Zamknij', {
+      this.snackBar.open('There was an error while downloading categories', 'Close', {
         duration: 5000,
       });
     });

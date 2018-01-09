@@ -1,26 +1,26 @@
 <section class="main-content">
   <mat-card>
     <mat-card-header>
-      <mat-card-title><h1>Ustawienia konta</h1></mat-card-title>
+      <mat-card-title><h1>Account settings</h1></mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <mat-accordion class="align-accordion-descriptions">
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
-              Dane użytkownika
+              User data
             </mat-panel-title>
             <mat-panel-description>
-              Podstawowe informacje o użytkowniku
+              Basic user information
             </mat-panel-description>
           </mat-expansion-panel-header>
 
           <mat-form-field>
-            <input matInput placeholder="Imię" type="text" [formControl]="userName" required readonly>
+            <input matInput placeholder="First name" type="text" [formControl]="userName" required readonly>
             <mat-error *ngIf="userName.invalid">{{getUserNameErrorMessage()}}</mat-error>
           </mat-form-field>
           <mat-form-field>
-            <input matInput placeholder="Nazwisko" type="text" [formControl]="userSurname" required readonly>
+            <input matInput placeholder="Last name" type="text" [formControl]="userSurname" required readonly>
             <mat-error *ngIf="userSurname.invalid">{{getUserSurnameErrorMessage()}}</mat-error>
           </mat-form-field>
           <mat-form-field>
@@ -32,23 +32,23 @@
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
-              Dodatkowe
+              Additional
             </mat-panel-title>
             <mat-panel-description>
-              Pozostałe dostępne ustawienia
+              Additional settings
             </mat-panel-description>
           </mat-expansion-panel-header>
-          
-          <button mat-raised-button color="warn">Usuń moje konto</button>
+
+          <button mat-raised-button color="warn">Delete my account</button>
         </mat-expansion-panel>
 
         <mat-expansion-panel *ngIf="currentUser.role === 'admin'">
           <mat-expansion-panel-header>
             <mat-panel-title>
-              Wszyscy użytkownicy
+              Users
             </mat-panel-title>
             <mat-panel-description>
-              Przeglądaj użytkowników i zmień ich uprawnienia
+              Browse users and change privilages
             </mat-panel-description>
           </mat-expansion-panel-header>
 
@@ -60,7 +60,7 @@
               <span>{{user.firstName}} {{user.lastName}} ({{user.email}})</span>
               <button *ngIf="user.role === 'volunteer'" mat-button color="primary" (click)="promoteToDoctor(user)">
                 <mat-icon matListIcon>add_circle_outline</mat-icon>
-                Rola doktora
+                Doctor role
               </button>
             </mat-list-item>
           </mat-list>
