@@ -19,12 +19,18 @@ for the future use.
  - [x] Dockerized and virtualized (with Vagrant) environment   
 
 ## What needs to be done?
- - [x] New CI flow after migration from GitLab to GitHub
- - [x] Internationalization of the whole platform
  - [ ] Extended labeling mechanism using magic lasso
+   - [ ] Frontend
+   - [x] Backend
  - [ ] Extended labeling mechanism using additional views for 3D scans
+   - [ ] Frontend
+   - [x] Backend
  - [ ] Extended validation mechanism with looking for similar labels
+   - [ ] Frontend
+   - [ ] Backend
  - [ ] Generating Machine Learning datasets on demand
+   - [ ] Frontend
+   - [ ] Backend
 
 ## Development
 This is the monorepo for the whole platform. More information about the
