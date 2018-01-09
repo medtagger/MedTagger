@@ -1,16 +1,16 @@
 Testing MedTagger Backend
 -------------------------
 
-Backend tests always run on each Pull Request that you will send to our repository. To check your code
- locally follow the instructions below.
+Backend tests run on each Pull Request that you will send to our repository. To check your code locally
+ follow instructions below.
 
 ## Linters & Unit tests
 
 MedTagger Backend uses many linters and checkers to make sure that our codebase follows Python standards.
  We use PyLint, Flake8 with many plugins and MyPy for type checking. We also use PyTest for definition of
- all unit tests.
+ our unit tests.
 
-To run such linters and tests please execute:
+To run linters and unit tests please execute:
 
 ```bash
 $ . ./devenv.sh
@@ -26,10 +26,10 @@ _**TIP!**_ You can also run specific tool by:
 
 ## Functional tests
 
-MedTagger Backend supports also functional tests. To define them we use PyTest with prepared set of
+MedTagger Backend supports functional tests. To define them we use PyTest with prepared set of
  REST & WebSocket API testing clients.
 
-To run such tests, please make sure that all of the dependencies are running on your machine. Use
+To run such tests, please make sure that all of the dependencies are running on your machine. You can use
  Docker-Compose to do so:
 
 ```bash

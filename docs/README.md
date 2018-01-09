@@ -1,4 +1,5 @@
-# Documentation
+Documentation
+-------------
 
 Here you can find the documentation for MedTagger. In case of looking for help
  with specific MedTagger projects go to their own docs:
@@ -13,3 +14,5 @@ There are two ways to setup the developemnt environment for MedTagger:
  - [Setup with Vagrant](/docs/development_setup_vagrant.md),
  - [Setup with Docker](/docs/development_via_docker_compose.md).
 
+You can also setup native development environments for each of the projects! For more
+ informations follow their documentations.
