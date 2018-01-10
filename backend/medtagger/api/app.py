@@ -9,13 +9,21 @@ It is also a great entry point for running this app. To do so, you can use:
      * Debugger PIN: XXX-XXX-XXX
 """
 # pylint: disable=unused-import;  It's used by Flask
-from flask import Flask, current_app
-from flask_cors import CORS
+# pylint: disable=wrong-import-position;  Python logging should be configured ASAP
+import logging
+import logging.config
 
-from medtagger.api import blueprint, web_socket
-from medtagger.api.account.business import security, user_datastore
-from medtagger.database import db
-from medtagger.config import AppConfiguration
+# Setup logging as fast as possible, so imported libraries __init__.py will
+# be able to log using our configuration of logging
+logging.config.fileConfig('logging.conf')
+
+from flask import Flask, current_app  # noqa
+from flask_cors import CORS  # noqa
+
+from medtagger.api import blueprint, web_socket  # noqa
+from medtagger.api.account.business import security, user_datastore  # noqa
+from medtagger.database import db  # noqa
+from medtagger.config import AppConfiguration  # noqa
 
 # Import all REST services
 from medtagger.api.core.service import core_ns as core_rest_ns  # noqa
@@ -27,8 +35,10 @@ from medtagger.api.users.service import users_ns  # noqa
 # Import all WebSocket services
 from medtagger.api.scans.service_web_socket import Slices as slices_websocket_ns  # noqa
 
+logger = logging.getLogger(__name__)
 
 # Load configuration
+logger.info('Loading configuration file...')
 configuration = AppConfiguration()
 
 # Definition of application

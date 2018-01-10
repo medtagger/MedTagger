@@ -1,8 +1,12 @@
 """Insert all database fixtures."""
+import logging
+
 from sqlalchemy import exists
 
 from medtagger.database import db_session
 from medtagger.database.models import ScanCategory, Role
+
+logger = logging.getLogger(__name__)
 
 CATEGORIES = [{
     'key': 'KIDNEYS',
@@ -42,12 +46,12 @@ def insert_scan_categories() -> None:
             category_key = row.get('key', '')
             category_exists = session.query(exists().where(ScanCategory.key == category_key)).scalar()
             if category_exists:
-                print('Scan Category exists with key "{}"'.format(category_key))
+                logger.info('Scan Category exists with key "%s"', category_key)
                 continue
 
             category = ScanCategory(**row)
             session.add(category)
-            print('Scan Category added for key "{}"'.format(category_key))
+            logger.info('Scan Category added for key "%s"', category_key)
 
 
 def insert_user_roles() -> None:
@@ -57,16 +61,16 @@ def insert_user_roles() -> None:
             role_name = row.get('name', '')
             role_exists = session.query(exists().where(Role.name == role_name)).scalar()
             if role_exists:
-                print('Role exists with name "{}"'.format(role_name))
+                logger.info('Role exists with name "%s"', role_name)
                 continue
 
             role = Role(**row)
             session.add(role)
-            print('Role added for name "{}"'.format(role_name))
+            logger.info('Role added for name "%s"', role_name)
 
 
 if __name__ == '__main__':
-    print('Applying fixtures for Scan Categories...')
+    logger.info('Applying fixtures for Scan Categories...')
     insert_scan_categories()
-    print('Applying fixtures for user Roles...')
+    logger.info('Applying fixtures for user Roles...')
     insert_user_roles()

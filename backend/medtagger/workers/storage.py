@@ -1,10 +1,14 @@
 """Module responsible for asynchronous data storage."""
 import io
+import logging
+
 import dicom
 
 from medtagger.types import SliceID, SlicePosition, SliceLocation
 from medtagger.workers import celery_app
 from medtagger.repositories.slices import SlicesRepository
+
+logger = logging.getLogger(__name__)
 
 
 @celery_app.task
@@ -31,4 +35,4 @@ def store_dicom(slice_id: SliceID, image: bytes) -> None:
     _slice.update_position(position)
     SlicesRepository.store_original_image(slice_id, image)
     _slice.mark_as_stored()
-    print('Slice stored under "{}".'.format(slice_id))
+    logger.info('Slice stored under "%s".', slice_id)
