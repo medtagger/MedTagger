@@ -8,9 +8,12 @@ Run this script just by executing following line in the root directory of this p
 
 """
 import argparse
+import logging
 
 from medtagger.clients.hbase_client import HBaseClient
 from utils import get_connection_to_hbase, user_agrees
+
+logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(description='HBase migration.')
 parser.add_argument('-y', '--yes', dest='yes', action='store_const', const=True)
@@ -24,7 +27,7 @@ schema_tables = set(HBASE_SCHEMA)
 tables_to_drop = list(existing_tables - schema_tables)
 for table_name in tables_to_drop:
     if args.yes or user_agrees('Do you want to drop table "{}"?'.format(table_name)):
-        print('Dropping table "{}".'.format(table_name))
+        logger.info('Dropping table "%s".', table_name)
         table = connection.table(table_name)
         table.drop()
 
@@ -33,7 +36,7 @@ for table_name in HBASE_SCHEMA:
     if not table.exists():
         if args.yes or user_agrees('Do you want to create table "{}"?'.format(table_name)):
             list_of_columns = HBASE_SCHEMA[table_name]
-            print('Creating table "{}" with columns {}.'.format(table_name, list_of_columns))
+            logger.info('Creating table "%s" with columns %s.', table_name, list_of_columns)
             table.create(*list_of_columns)
             table.enable_if_exists_checks()
     else:

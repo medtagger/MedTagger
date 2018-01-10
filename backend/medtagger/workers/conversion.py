@@ -1,5 +1,6 @@
 """Module responsible for asynchronous data conversion."""
 import io
+import logging
 import numpy as np
 
 import dicom
@@ -11,6 +12,8 @@ from medtagger.conversion import convert_slice_to_normalized_8bit_array, convert
 from medtagger.database.models import SliceOrientation, Slice
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.slices import SlicesRepository
+
+logger = logging.getLogger(__name__)
 
 
 @celery_app.task
@@ -51,7 +54,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         _slice = scan.add_slice(SliceOrientation.X)
         _convert_to_png_and_store(_slice, slice_pixels)
 
-    print('Marking whole Scan as converted.')
+    logger.info('Marking whole Scan as converted.')
     scan.mark_as_converted()
 
 
@@ -64,7 +67,7 @@ def _convert_to_png_and_store(_slice: Slice, slice_pixels: np.ndarray) -> None:
     converted_image = _convert_slice_pixels_to_png(slice_pixels)
     SlicesRepository.store_converted_image(_slice.id, converted_image)
     _slice.mark_as_converted()
-    print('{} converted and stored.'.format(_slice))
+    logger.info('%s converted and stored.', _slice)
 
 
 def _convert_slice_pixels_to_png(slice_pixels: np.ndarray) -> bytes:

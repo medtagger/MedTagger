@@ -1,4 +1,5 @@
 """Module responsible for definition of client for HBase database."""
+import logging
 from typing import Iterable, List, Mapping, Tuple, Any
 
 import happybase
@@ -7,6 +8,7 @@ from thriftpy.transport import TTransportException
 
 from medtagger.config import AppConfiguration
 
+logger = logging.getLogger(__name__)
 
 configuration = AppConfiguration()
 host = configuration.get('hbase', 'host', fallback='localhost')
@@ -15,7 +17,7 @@ size = configuration.getint('hbase', 'connection_pool_size', fallback=10)
 try:
     HBASE_CONNECTION_POOL = happybase.ConnectionPool(size, host=host, port=port)
 except (TTransportException, BrokenPipeError):
-    print('WARNING! Could not connect to HBase. Is it down?')
+    logger.warning('Could not connect to HBase. Is it down?')
 
 
 def is_alive() -> bool:

@@ -9,7 +9,7 @@ from flask_socketio import SocketIO, emit
 
 from medtagger.api.exceptions import InvalidArgumentsException, NotFoundException, BusinessLogicException
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # Definition of the API
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
@@ -24,7 +24,7 @@ def rest_default_error_handler(exception: Exception) -> Tuple[Dict, int]:  # pyl
     :param exception: Python Exception
     :return: tuple with response and status code
     """
-    log.error(traceback.format_exc())
+    logger.error(traceback.format_exc())
     return {'message': 'An unhandled exception occurred.'}, 500
 
 
@@ -35,7 +35,7 @@ def rest_business_logic_error_handler(exception: Exception) -> Tuple[Dict, int]:
     :param exception: Python Exception
     :return: tuple with response and status code
     """
-    log.warning(traceback.format_exc())
+    logger.warning(traceback.format_exc())
     details = str(exception)
     return {'message': 'Business logic error.', 'details': details}, 500
 
@@ -47,7 +47,7 @@ def rest_not_found_error_handler(exception: Exception) -> Tuple[Dict, int]:
     :param exception: Python Exception
     :return: tuple with response and status code
     """
-    log.warning(traceback.format_exc())
+    logger.warning(traceback.format_exc())
     details = str(exception)
     return {'message': 'Requested object does not exist.', 'details': details}, 404
 
@@ -59,7 +59,7 @@ def rest_invalid_arguments_error_handler(exception: Exception) -> Tuple[Dict, in
     :param exception: Python Exception
     :return: tuple with response and status code
     """
-    log.warning(traceback.format_exc())
+    logger.warning(traceback.format_exc())
     details = str(exception)
     return {'message': 'Invalid arguments.', 'details': details}, 400
 
@@ -70,5 +70,5 @@ def web_socket_default_error_handler(exception: Exception) -> None:  # pylint: d
 
     :param exception: Python Exception
     """
-    log.error(traceback.format_exc())
+    logger.exception('An unhandled exception occurred.')
     emit('error', {'message': 'An unhandled exception occurred.'})
