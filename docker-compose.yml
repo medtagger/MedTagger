@@ -34,6 +34,9 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile
+      args:
+        - ANGULAR_ENV=local
+        - BUILD_OPTIMIZER=False
     ports:
       - 80:80
 

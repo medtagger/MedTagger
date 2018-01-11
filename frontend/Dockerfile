@@ -9,13 +9,16 @@ RUN npm set progress=false && npm config set depth 0 && npm cache clean --force
 
 ## Storing node modules on a separate layer will prevent unnecessary npm installs at each build
 RUN npm i && mkdir /ng-app && cp -R ./node_modules ./ng-app
+RUN cp -R ./node_modules ./ng-app
 
 WORKDIR /ng-app
 
 COPY . .
 
 ## Build the angular app in production mode and store the artifacts in dist folder
-RUN $(npm bin)/ng build --prod --build-optimizer
+ARG ANGULAR_ENV
+ARG BUILD_OPTIMIZER
+RUN if [ "$BUILD_OPTIMIZER" = "True" ]; then $(npm bin)/ng build --env=$ANGULAR_ENV --build-optimizer; else $(npm bin)/ng build --env=$ANGULAR_ENV; fi
 
 
 ### STAGE 2: Setup ###
