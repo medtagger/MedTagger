@@ -28,7 +28,7 @@
       <ng-template matStepLabel>Select upload mode</ng-template>
           <mat-card class="upload-mode">
             <mat-card-header>
-              <mat-card-title>Single 3D scan</mat-card-title>
+              <mat-card-title>Single 3D Scan</mat-card-title>
             </mat-card-header>
             <mat-card-content>
               <p>Select this option if you want to upload single scan.</p>
@@ -40,13 +40,13 @@
           </mat-card>
           <mat-card class="upload-mode">
             <mat-card-header>
-              <mat-card-title>Multiple 3D scans</mat-card-title>
+              <mat-card-title>Multiple 3D Scans</mat-card-title>
             </mat-card-header>
             <mat-card-content>
               <p>Select this option if you want to upload multiple scans.</p>
             </mat-card-content>
             <mat-card-actions>
-              <button class="pull-right" matTooltip="This option is disabled for now" mat-raised-button matStepperNext disabled color="primary" (click)="uploadMode = UploadMode.MULTIPLE_SCANS">Select</button>
+              <button class="pull-right" mat-raised-button matStepperNext color="primary" (click)="uploadMode = UploadMode.MULTIPLE_SCANS">Select</button>
               <div class="clearfix"></div>
             </mat-card-actions>
           </mat-card>
@@ -57,9 +57,9 @@
     <form [formGroup]="chooseFilesFormGroup">
       <section *ngIf="uploadMode == UploadMode.SINGLE_SCAN">
         <ng-template matStepLabel>Select scan</ng-template>
-        <mat-card class="enable-card-border">
+        <mat-card class="enable-card-border choose-files">
           <mat-card-header>
-            <mat-card-title>Single 3D scan</mat-card-title>
+            <mat-card-title>Single 3D Scan</mat-card-title>
           </mat-card-header>
           <mat-card-content>
             <p>Go to selected directory containing CT/MRI scan and select every Dicom file (.dcm).</p>
@@ -75,9 +75,9 @@
       </section>
       <section *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS">
         <ng-template matStepLabel>Select scans</ng-template>
-        <mat-card class="enable-card-border">
+        <mat-card class="enable-card-border choose-files">
           <mat-card-header>
-            <mat-card-title>Multiple 3D scans</mat-card-title>
+            <mat-card-title>Multiple 3D Scans</mat-card-title>
           </mat-card-header>
           <mat-card-content>
             <p>Select <strong>parent directory</strong> containing directories with CT/MRI scans.</p>
@@ -104,8 +104,7 @@
       <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Uploading scans in progress...
     </h1>
     <h5>Don't close your browser!</h5>
-    <p *ngIf="uploadMode == UploadMode.SINGLE_SCAN">Uploaded {{filesSent}} of the {{numberOfFiles}} Dicom images.</p>
-    <p *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS">Uploaded {{filesSent}} of the {{numberOfFiles}} scans.</p>
+    <p>Uploaded {{slicesSent}} of the {{numberOfSlices}} Dicom images.</p>
   </mat-step>
 
   <mat-step [stepControl]="uploadCompletedFormGroup" [editable]="false" #uploadCompletedStep>

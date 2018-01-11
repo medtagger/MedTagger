@@ -12,19 +12,25 @@ logger = logging.getLogger(__name__)
 
 def insert_admin_account() -> None:
     """Insert default admin account."""
+    user_email = 'admin@medtagger.com'
+    password = 'medtagger1'
+    password_hash = generate_password_hash(password)
+
     with db_session() as session:
-        user_email = 'admin@medtagger.com'
         user_exists = session.query(exists().where(User.email == user_email)).scalar()
         if user_exists:
             logger.warning('Admin user already exists with email "%s"', user_email)
             return
-        password = 'medtagger1'
-        password_hash = generate_password_hash(password)
-        user = User(user_email, password_hash, 'Admin', 'Medtagger')
+
         role = Role.query.filter_by(name='admin').first()
+        if not role:
+            logger.error('Role not found! You have probably forgot to apply fixtures.')
+            return
+
+        user = User(user_email, password_hash, 'Admin', 'Medtagger')
         user.roles.append(role)
         session.add(user)
-        logger.info('User added with email "%s" and password "%s"', user_email, password)
+    logger.info('User added with email "%s" and password "%s"', user_email, password)
 
 
 if __name__ == '__main__':

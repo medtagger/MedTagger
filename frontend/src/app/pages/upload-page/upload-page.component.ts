@@ -25,9 +25,11 @@ export class UploadPageComponent implements OnInit {
   @ViewChild('sendingFilesStep') sendingFilesStep: MatStep;
   @ViewChild('uploadCompletedStep') uploadCompletedStep: MatStep;
 
-  files: File[] = [];
-  filesSent = 0;
-  numberOfFiles = 0;
+  scans: object = {};
+  numberOfScans: number = 0;
+  numberOfSlices: number = 0;
+
+  slicesSent = 0;
   progress = 0.0;
 
   UploadMode = UploadMode;  // Needed in template for comparison with Enum values
@@ -51,9 +53,9 @@ export class UploadPageComponent implements OnInit {
       'category': new FormControl(this.category, [Validators.required]),
     });
     this.scanService.acknowledgeObservable().subscribe(() => {
-      this.filesSent += 1;
-      this.progress = 100.0 * this.filesSent / this.numberOfFiles;
-      if (this.filesSent === this.numberOfFiles) {
+      this.slicesSent += 1;
+      this.progress = 100.0 * this.slicesSent / this.numberOfSlices;
+      if (this.slicesSent === this.numberOfSlices) {
         this.stepper.next();
       }
     });
@@ -62,37 +64,50 @@ export class UploadPageComponent implements OnInit {
     });
   }
 
-  chooseFiles(files: File[]) {
-    this.files = files;
+  chooseFiles($event) {
+    this.scans = $event.scans;
+    this.numberOfScans = $event.numberOfScans;
+    this.numberOfSlices = $event.numberOfSlices;
   }
 
   uploadFiles() {
-    this.filesSent = 0;
+    this.slicesSent = 0;
     this.progress = 0.0;
     if (this.uploadMode === UploadMode.SINGLE_SCAN) {
-      this.uploadSingleScan(this.files);
+      this.uploadSingleScan();
     } else if (this.uploadMode === UploadMode.MULTIPLE_SCANS) {
-      this.uploadMultipleScans(this.files);
+      this.uploadMultipleScans();
     } else {
       console.error('Unsupported upload mode!');
     }
   }
 
-  uploadSingleScan(files: File[]) {
+  uploadSingleScan() {
     let category = this.chooseCategoryFormGroup.get('category').value;
-    this.numberOfFiles = this.files.length;
-    this.scanService.createNewScan(category, this.numberOfFiles).then((scanId: string) => {
+    this.scanService.createNewScan(category, this.numberOfSlices).then((scanId: string) => {
       console.log('New Scan created with ID:', scanId);
+      var files = this.scans['singleScan'];
       this.scanService.uploadSlices(scanId, files);
     });
   }
 
-  uploadMultipleScans(files: File[]) {
-    console.warn('Not supported yet!');
-    this.numberOfFiles = this.files.length;  // TODO: Change the way we track number of files in multiple scans upload mode!
+  uploadMultipleScans() {
+    let category = this.chooseCategoryFormGroup.get('category').value;
+    for (var scan in this.scans) {
+      this.scanService.createNewScan(category, this.numberOfSlices).then((scanId: string) => {
+        console.log('New Scan created with ID:', scanId);
+        var files = this.scans[scan];
+        this.scanService.uploadSlices(scanId, files);
+      });
+    }
   }
 
   restart() {
+    this.chooseCategoryFormGroup.reset();
+    this.scans = {};
+    this.numberOfScans = 0;
+    this.numberOfSlices = 0;
+
     this.stepper.selectedIndex = 0;
     this.chooseModeStep.completed = false;
     this.chooseFilesStep.completed = false;

@@ -21,6 +21,9 @@ export class LoginPageComponent implements OnInit {
   loginPageMode: LoginPageMode = LoginPageMode.LOG_IN;
   userForm: FormGroup;
 
+  loggingInProgress: boolean;
+  loggingInError: boolean;
+
   constructor(private routerService: Router, private accountService: AccountService) {
   }
 
@@ -35,14 +38,27 @@ export class LoginPageComponent implements OnInit {
   }
 
   public logIn(): void {
+    this.loggingInProgress = true;
+    this.loggingInError = false;
     this.accountService.logIn(this.userForm.value['email'], this.userForm.value['password'])
       .then(token => {
         sessionStorage.setItem('authenticationToken', token);
         return this.accountService.getCurrentUserInfo();
+      }, error => {
+        this.loggingInProgress = false;
+        this.loggingInError = true;
       })
       .then(userInfo => {
-        sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-        this.routerService.navigate(['home']);
+        this.loggingInProgress = false;
+        if (userInfo) {
+          sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+          this.routerService.navigate(['home']);
+        } else {
+          this.loggingInError = true;
+        }
+      }, error => {
+        this.loggingInProgress = false;
+        this.loggingInError = true;
       });
   }
 

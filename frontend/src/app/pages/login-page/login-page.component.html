@@ -6,31 +6,38 @@
       <mat-card-title>Sign in</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <form class="example-form" [formGroup]="userForm" (keyup.enter)="logIn()">
-        <table class="example-full-width" cellspacing="0">
+      <form [formGroup]="userForm" (keyup.enter)="logIn()">
+        <table cellspacing="0">
           <tr>
-          <td><mat-form-field class="example-full-width">
+          <td><mat-form-field>
             <input matInput type="text" placeholder="E-mail" id="email" formControlName="email" required>
           </mat-form-field></td>
           </tr>
           <tr>
-          <td><mat-form-field class="example-full-width">
+          <td><mat-form-field>
             <input matInput type="password" placeholder="Password" id="password" formControlName="password" required>
           </mat-form-field></td>
           </tr>
         </table>
       </form>
       <tr>
-      <table class="example-full-width" cellspacing="0">
+      <table cellspacing="0">
         <tr>
-          <td><mat-card-actions>
-            <button mat-raised-button color="primary" (click)="logIn()">Sign in</button>
-          </mat-card-actions></td>
+          <td class="login-button-row">
+            <button class="login-button" mat-raised-button color="primary" (click)="logIn()">Sign in</button>
+            <div *ngIf="loggingInProgress">
+              <mat-progress-spinner class="login-spinner" mode="indeterminate" [diameter]="36" strokeWidth="2"></mat-progress-spinner>
+              <span class="login-spinner-label">Logging in...</span>
+            </div>
+            <div *ngIf="loggingInError">
+              <span class="incorrect-login-or-password">Invalid login/password!</span>
+            </div>
+          </td>
         </tr>
         <tr>
-            <td>
-              <span>New to MedTagger? <a routerLink="/login" (click)="changePageMode()">Create an account.</a></span>
-            </td>
+          <td class="register-link-row">
+            <span>New to MedTagger? <a routerLink="/login" (click)="changePageMode()">Create an account.</a></span>
+          </td>
         </tr>
       </table>
     </mat-card-content>
@@ -42,33 +49,33 @@
     </mat-card-header>
     <mat-card-content>
       <form [formGroup]="userForm" (keyup.enter)="register()">
-        <table class="example-full-width" cellspacing="0">
+        <table cellspacing="0">
           <tr>
-            <td><mat-form-field class="example-full-width">
+            <td><mat-form-field>
               <input matInput type="text" id="firstName" placeholder="First name" formControlName="firstName" required>
               <mat-error *ngIf="userForm.get('firstName').invalid">{{getFirstNameErrorMessage()}}</mat-error>
             </mat-form-field></td>
           </tr>
           <tr>
-            <td><mat-form-field class="example-full-width">
+            <td><mat-form-field>
               <input matInput type="text" id="lastName" placeholder="Last name" formControlName="lastName" required>
               <mat-error *ngIf="userForm.get('firstName').invalid">{{getLastNameErrorMessage()}}</mat-error>
             </mat-form-field></td>
           </tr>
           <tr>
-            <td><mat-form-field class="example-full-width">
+            <td><mat-form-field>
               <input matInput type="text" id="email" placeholder="E-mail" formControlName="email" required>
               <mat-error *ngIf="userForm.get('email').invalid">{{getEmailErrorMessage()}}</mat-error>
             </mat-form-field></td>
           </tr>
           <tr>
-            <td><mat-form-field class="example-full-width">
+            <td><mat-form-field>
               <input matInput type="password" id="password" placeholder="Password" formControlName="password" required>
               <mat-error *ngIf="userForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
             </mat-form-field></td>
           </tr>
           <tr>
-            <td><mat-form-field class="example-full-width" required>
+            <td><mat-form-field required>
               <input matInput type="password" id="confirmPassword" placeholder="Confirm Password"  formControlName="confirmPassword" required>
               <mat-error *ngIf="userForm.get('confirmPassword').invalid">{{getConfirmPasswordErrorMessage()}}</mat-error>
             </mat-form-field></td>
@@ -76,7 +83,7 @@
         </table>
       </form>
       <tr>
-        <table class="example-full-width" cellspacing="0">
+        <table cellspacing="0">
           <tr>
             <td><mat-card-actions>
               <button mat-raised-button color="primary-color" (click)="changePageMode()"><mat-icon>arrow_back</mat-icon> Back</button>
