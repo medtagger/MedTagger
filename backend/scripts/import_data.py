@@ -28,12 +28,14 @@ import os
 import argparse
 import glob
 import logging
+import logging.config
 
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
 from medtagger.workers.conversion import convert_scan_to_png
 from medtagger.workers.storage import store_dicom
 
+logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(description='Import data to the HBase Database.')

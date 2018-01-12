@@ -1,5 +1,6 @@
 """Script for populating dev database with default user accounts."""
 import logging
+import logging.config
 
 from sqlalchemy import exists
 from werkzeug.security import generate_password_hash
@@ -7,6 +8,7 @@ from werkzeug.security import generate_password_hash
 from medtagger.database import db_session
 from medtagger.database.models import User, Role
 
+logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
 
 

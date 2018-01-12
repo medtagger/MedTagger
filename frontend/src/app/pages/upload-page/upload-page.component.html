@@ -104,7 +104,7 @@
       <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Uploading scans in progress...
     </h1>
     <h5>Don't close your browser!</h5>
-    <p>Uploaded {{slicesSent}} of the {{numberOfSlices}} Dicom images.</p>
+    <p>Uploaded {{slicesSent}} of the {{totalNumberOfSlices}} Dicom images.</p>
   </mat-step>
 
   <mat-step [stepControl]="uploadCompletedFormGroup" [editable]="false" #uploadCompletedStep>

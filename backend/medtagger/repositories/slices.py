@@ -22,8 +22,10 @@ class SlicesRepository(object):
         """Fetch Slice from database."""
         with db_session() as session:
             query = session.query(Slice)
+            query = query.join(Scan)
             query = query.filter(Scan.id == scan_id)
             query = query.filter(Slice.orientation == orientation)
+            query = query.order_by(Slice.location)
             slices = query.all()
         return slices
 

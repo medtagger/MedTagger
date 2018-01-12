@@ -1,11 +1,13 @@
 """Insert all database fixtures."""
 import logging
+import logging.config
 
 from sqlalchemy import exists
 
 from medtagger.database import db_session
 from medtagger.database.models import ScanCategory, Role
 
+logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
 
 CATEGORIES = [{

@@ -1,4 +1,5 @@
 """Module responsible for business logic in all Scans endpoints."""
+import logging
 from typing import Iterable, Dict, List, Tuple
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -10,8 +11,9 @@ from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
-from medtagger.workers.conversion import convert_scan_to_png
 from medtagger.workers.storage import store_dicom
+
+logger = logging.getLogger(__name__)
 
 
 def get_available_scan_categories() -> List[ScanCategory]:
@@ -122,12 +124,8 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     """
     scan = ScansRepository.get_scan_by_id(scan_id)
     _slice = scan.add_slice()
-    store_dicom.delay(_slice.id, image)
-
-    # Run conversion to PNG if this is the latest uploaded Slice
-    slices = SlicesRepository.get_slices_by_scan_id(scan_id)
-    if scan.number_of_slices == len(slices):  # Check if number of declared Slices is the same as number of Slices in DB
-        convert_scan_to_png.delay(scan_id)
+    SlicesRepository.store_original_image(_slice.id, image)
+    store_dicom.delay(_slice.id)
     return _slice
 
 

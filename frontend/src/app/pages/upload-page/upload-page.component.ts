@@ -27,7 +27,7 @@ export class UploadPageComponent implements OnInit {
 
   scans: object = {};
   numberOfScans: number = 0;
-  numberOfSlices: number = 0;
+  totalNumberOfSlices: number = 0;
 
   slicesSent = 0;
   progress = 0.0;
@@ -54,8 +54,8 @@ export class UploadPageComponent implements OnInit {
     });
     this.scanService.acknowledgeObservable().subscribe(() => {
       this.slicesSent += 1;
-      this.progress = 100.0 * this.slicesSent / this.numberOfSlices;
-      if (this.slicesSent === this.numberOfSlices) {
+      this.progress = 100.0 * this.slicesSent / this.totalNumberOfSlices;
+      if (this.slicesSent === this.totalNumberOfSlices) {
         this.stepper.next();
       }
     });
@@ -67,14 +67,14 @@ export class UploadPageComponent implements OnInit {
   chooseFiles($event) {
     this.scans = $event.scans;
     this.numberOfScans = $event.numberOfScans;
-    this.numberOfSlices = $event.numberOfSlices;
+    this.totalNumberOfSlices = $event.numberOfSlices;
   }
 
   uploadFiles() {
     this.slicesSent = 0;
     this.progress = 0.0;
     if (this.uploadMode === UploadMode.SINGLE_SCAN) {
-      this.uploadSingleScan();
+      this.uploadSingleScan(this.scans['singleScan']);
     } else if (this.uploadMode === UploadMode.MULTIPLE_SCANS) {
       this.uploadMultipleScans();
     } else {
@@ -82,23 +82,18 @@ export class UploadPageComponent implements OnInit {
     }
   }
 
-  uploadSingleScan() {
+  uploadSingleScan(slices) {
     let category = this.chooseCategoryFormGroup.get('category').value;
-    this.scanService.createNewScan(category, this.numberOfSlices).then((scanId: string) => {
-      console.log('New Scan created with ID:', scanId);
-      var files = this.scans['singleScan'];
-      this.scanService.uploadSlices(scanId, files);
+    let numberOfSlices = slices.length;
+    this.scanService.createNewScan(category, numberOfSlices).then((scanId: string) => {
+      console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
+      this.scanService.uploadSlices(scanId, slices);
     });
   }
 
   uploadMultipleScans() {
-    let category = this.chooseCategoryFormGroup.get('category').value;
     for (var scan in this.scans) {
-      this.scanService.createNewScan(category, this.numberOfSlices).then((scanId: string) => {
-        console.log('New Scan created with ID:', scanId);
-        var files = this.scans[scan];
-        this.scanService.uploadSlices(scanId, files);
-      });
+      this.uploadSingleScan(this.scans[scan]);
     }
   }
 
@@ -106,7 +101,7 @@ export class UploadPageComponent implements OnInit {
     this.chooseCategoryFormGroup.reset();
     this.scans = {};
     this.numberOfScans = 0;
-    this.numberOfSlices = 0;
+    this.totalNumberOfSlices = 0;
 
     this.stepper.selectedIndex = 0;
     this.chooseModeStep.completed = false;

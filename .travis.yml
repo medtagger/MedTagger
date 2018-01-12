@@ -8,11 +8,15 @@ before_install:
 - git fetch
 jobs:
   include:
+
+  # Backend - linters & unit tests
   - stage: test backend
     script:
     - ./.travis/run_tests_if_subproject_changed.py backend --command="
        docker-compose build medtagger_api medtagger_worker &&
        docker-compose run medtagger_api /bin/bash -c \"make install_dev_packages && make test\""
+
+  # Backend - functional tests
   - stage: test backend
     if: branch = master
     script:
@@ -20,6 +24,8 @@ jobs:
        docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml up -d hbase postgres rabbitmq &&
        docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run functional_tests &&
        docker-compose down"
+
+  # Frontend - build Docker
   - stage: test frontend
     script:
     - ./.travis/run_tests_if_subproject_changed.py frontend --command="

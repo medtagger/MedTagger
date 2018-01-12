@@ -27,6 +27,7 @@ class Slices(Namespace):
         orientation = SliceOrientation[orientation]
         slices = business.get_slices_for_scan(scan_id, begin, count, orientation=orientation)
         for index, (_slice, image) in enumerate(slices):
+            print(_slice)
             emit('slice', {'scan_id': scan_id, 'index': begin + index, 'image': image})
 
     @staticmethod
