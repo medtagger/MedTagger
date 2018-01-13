@@ -44,14 +44,18 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
     # Prepare Slices in the Y orientation
     for y in range(normalized_scan.shape[1]):
+        location = 100.0 * y / normalized_scan.shape[1]
         slice_pixels = normalized_scan[:, y, :]
         _slice = scan.add_slice(SliceOrientation.Y)
+        _slice.update_location(location)
         _convert_to_png_and_store(_slice, slice_pixels)
 
     # Prepare Slices in the X orientation
     for x in range(normalized_scan.shape[2]):
+        location = 100.0 * x / normalized_scan.shape[2]
         slice_pixels = normalized_scan[:, :, x]
         _slice = scan.add_slice(SliceOrientation.X)
+        _slice.update_location(location)
         _convert_to_png_and_store(_slice, slice_pixels)
 
     logger.info('Marking whole Scan as converted.')

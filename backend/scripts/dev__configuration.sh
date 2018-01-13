@@ -8,7 +8,7 @@ export MEDTAGGER__DB_DATABASE_URI="postgresql://medtagger_user:MedTa99er!@localh
 export MEDTAGGER__HBASE_HOST="localhost"
 export MEDTAGGER__HBASE_PORT=9090
 export MEDTAGGER__HBASE_REST_PORT=8080
-export MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10
+export MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=25
 
 export MEDTAGGER__CELERY_BROKER="pyamqp://guest:guest@localhost//"
 

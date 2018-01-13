@@ -110,4 +110,28 @@ export class UploadPageComponent implements OnInit {
     this.uploadCompletedStep.completed = false;
   }
 
+  isGoogleChrome() {
+    // TODO: It would be nice to check if there is some lib that does it for us
+    // For now, this ugly method was taken (nearly) as-is from: https://stackoverflow.com/a/13348618
+    var isChromium = (window as any).chrome,
+        winNav = window.navigator,
+        vendorName = winNav.vendor,
+        isOpera = winNav.userAgent.indexOf("OPR") > -1,
+        isIEedge = winNav.userAgent.indexOf("Edge") > -1,
+        isIOSChrome = winNav.userAgent.match("CriOS");
+
+    if (isIOSChrome) {
+      return false; // We don't want to support mobile devices
+    } else if (
+      isChromium !== null &&
+      typeof isChromium !== "undefined" &&
+      vendorName === "Google Inc." &&
+      isOpera === false &&
+      isIEedge === false
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

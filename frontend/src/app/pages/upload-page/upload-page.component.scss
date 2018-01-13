@@ -28,6 +28,14 @@
   display: block;
 }
 
+.button-wrapper {
+  display: -webkit-flex;
+  -webkit-flex-wrap: wrap;
+  display: flex;
+  flex-wrap: wrap;
+  float: right;
+}
+
 .choose-files {
   width: 60%;
   min-width: 500px;
