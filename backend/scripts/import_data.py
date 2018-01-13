@@ -32,8 +32,8 @@ import logging.config
 
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
-from medtagger.workers.conversion import convert_scan_to_png
-from medtagger.workers.storage import store_dicom
+from medtagger.workers.storage import parse_dicom_and_update_slice
+
 
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
@@ -64,7 +64,4 @@ if __name__ == '__main__':
             with open(slice_name, 'rb') as slice_dicom_file:
                 _slice = scan.add_slice()
                 image = slice_dicom_file.read()
-                store_dicom.delay(_slice.id, image)
-
-        logger.info('Scan "%s" will be converted to PNG soon!', scan_directory)
-        convert_scan_to_png.delay(scan.id)
+                parse_dicom_and_update_slice.delay(_slice.id, image)

@@ -94,7 +94,7 @@ class Scan(Base):
     __tablename__ = 'Scans'
     id: ScanID = Column(String, primary_key=True)
     converted: bool = Column(Boolean, default=False)
-    number_of_slices: int = Column(Integer, nullable=False)
+    declared_number_of_slices: int = Column(Integer, nullable=False)
 
     category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
     category: ScanCategory = relationship('ScanCategory')
@@ -102,15 +102,15 @@ class Scan(Base):
     slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
     labels: List['Label'] = relationship('Label', back_populates='scan')
 
-    def __init__(self, category: ScanCategory, number_of_slices: int) -> None:
+    def __init__(self, category: ScanCategory, declared_number_of_slices: int) -> None:
         """Initialize Scan.
 
         :param category: Scan's category
-        :param number_of_slices: number of Slices that will be uploaded later
+        :param declared_number_of_slices: number of Slices that will be uploaded later
         """
         self.id = ScanID(str(uuid.uuid4()))
         self.category = category
-        self.number_of_slices = number_of_slices
+        self.declared_number_of_slices = declared_number_of_slices
 
     def __repr__(self) -> str:
         """Return string representation for Scan."""
