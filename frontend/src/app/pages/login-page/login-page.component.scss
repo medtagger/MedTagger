@@ -40,3 +40,32 @@ body {
   }
 }
 
+.login-button {
+  float: left;
+}
+
+.login-spinner {
+  left: 10px;
+  float: left;
+}
+
+.login-spinner-label {
+  margin-left: 15px;
+  line-height: 36px;
+}
+
+.incorrect-login-or-password {
+  color: red;
+  padding-left: 10px;
+  line-height: 36px;
+}
+
+.login-button-row {
+  padding-bottom: 15px;
+}
+
+.register-link-row {
+  padding-top: 15px;
+  border-top: 1px solid #bbb;
+}
+

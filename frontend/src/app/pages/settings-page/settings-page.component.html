@@ -1,7 +1,7 @@
 <section class="main-content">
   <mat-card>
     <mat-card-header>
-      <mat-card-title><h1>Account settings</h1></mat-card-title>
+      <mat-card-title><h1>Account Settings</h1></mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <mat-accordion class="align-accordion-descriptions">
@@ -41,8 +41,16 @@
 
           <button mat-raised-button color="warn">Delete my account</button>
         </mat-expansion-panel>
-
-        <mat-expansion-panel *ngIf="currentUser.role === 'admin'">
+      </mat-accordion>
+    </mat-card-content>
+  </mat-card>
+  <mat-card *ngIf="currentUser.role === 'admin'">
+    <mat-card-header>
+      <mat-card-title><h1>Administrator Panel</h1></mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-accordion class="align-accordion-descriptions">
+        <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
               Users
@@ -66,7 +74,6 @@
           </mat-list>
         </mat-expansion-panel>
       </mat-accordion>
-
     </mat-card-content>
   </mat-card>
 </section>

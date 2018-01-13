@@ -108,6 +108,7 @@ backend_api.conf
 .vagrant/
 
 # Others
+medtagger_backend.log*
 *.swp
 .gitignore.bak
 

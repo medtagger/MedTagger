@@ -9,7 +9,7 @@ export class UsersService {
     constructor(private http: Http, private authenticationHeader: AuthenticationHeader) {}
 
     public getAllUsers(): Promise<Array<UserInfo>> {
-        let url = environment.API_URL + '/users';
+        let url = environment.API_URL + '/users/';
         return new Promise<Array<UserInfo>>((resolve, reject) => {
             this.http.get(url, {
                 headers: this.authenticationHeader.create()

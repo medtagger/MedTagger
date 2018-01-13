@@ -6,22 +6,20 @@ import dicom
 
 from medtagger.types import SliceID, SlicePosition, SliceLocation
 from medtagger.workers import celery_app
+from medtagger.workers.conversion import convert_scan_to_png
 from medtagger.repositories.slices import SlicesRepository
 
 logger = logging.getLogger(__name__)
 
 
 @celery_app.task
-def store_dicom(slice_id: SliceID, image: bytes) -> None:
-    """Store Dicom in HBase database.
-
-    Key is a combination of a ScanID followed by unique SliceID. It also fetch from Dicom information about
-     patient position together with slice location that might be helpful while sorting and fetching slices
-     for given ScanID.
+def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
+    """Parse Dicom from HBase and update Slice for location and position.
 
     :param slice_id: ID of a slice
-    :param image: bytes representing Dicom file
     """
+    logger.debug('Parsing Dicom file from HBase for given Slice ID: %s.', slice_id)
+    image = SlicesRepository.get_slice_original_image(slice_id)
     image_bytes = io.BytesIO(image)
     dicom_image = dicom.read_file(image_bytes, force=True)
 
@@ -33,6 +31,12 @@ def store_dicom(slice_id: SliceID, image: bytes) -> None:
     _slice = SlicesRepository.get_slice_by_id(slice_id)
     _slice.update_location(location)
     _slice.update_position(position)
-    SlicesRepository.store_original_image(slice_id, image)
     _slice.mark_as_stored()
-    logger.info('Slice stored under "%s".', slice_id)
+    logger.info('"%s" updated.', _slice)
+
+    # Run conversion to PNG if this is the latest uploaded Slice
+    scan = _slice.scan
+    logger.debug('Stored %s Slices. Waiting for %s Slices.', len(scan.slices), scan.declared_number_of_slices)
+    if scan.declared_number_of_slices == len(scan.slices):
+        logger.debug('All Slices uploaded for %s! Running conversion...', scan)
+        convert_scan_to_png.delay(scan.id)

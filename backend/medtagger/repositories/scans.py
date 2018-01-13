@@ -25,8 +25,8 @@ class ScansRepository(object):
         """
         with db_session() as session:
             query = session.query(Scan)
-            query = query.join(ScanCategory)
             if category:
+                query = query.join(ScanCategory)
                 query = query.filter(ScanCategory.key == category.key)
             query = query.filter(Scan.converted)
             query = query.order_by(func.random())

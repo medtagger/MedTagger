@@ -9,10 +9,12 @@ Run this script just by executing following line in the root directory of this p
 """
 import argparse
 import logging
+import logging.config
 
 from medtagger.clients.hbase_client import HBaseClient
 from utils import get_connection_to_hbase, user_agrees
 
+logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(description='HBase migration.')

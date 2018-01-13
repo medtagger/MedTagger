@@ -39,8 +39,9 @@ class User(Base, UserMixin):
     password: str = Column(String(255), nullable=False)
     first_name: str = Column(String(50), nullable=False)
     last_name: str = Column(String(50), nullable=False)
-    roles = db.relationship('Role', secondary=users_roles)
-    active = Column(Boolean, nullable=False)
+    active: bool = Column(Boolean, nullable=False)
+
+    roles: List[Role] = db.relationship('Role', secondary=users_roles)
 
     def __init__(self, email: str, password_hash: str, first_name: str, last_name: str) -> None:
         """Initialize User."""
@@ -94,7 +95,7 @@ class Scan(Base):
     __tablename__ = 'Scans'
     id: ScanID = Column(String, primary_key=True)
     converted: bool = Column(Boolean, default=False)
-    number_of_slices: int = Column(Integer, nullable=False)
+    declared_number_of_slices: int = Column(Integer, nullable=False)
 
     category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
     category: ScanCategory = relationship('ScanCategory')
@@ -102,15 +103,15 @@ class Scan(Base):
     slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
     labels: List['Label'] = relationship('Label', back_populates='scan')
 
-    def __init__(self, category: ScanCategory, number_of_slices: int) -> None:
+    def __init__(self, category: ScanCategory, declared_number_of_slices: int) -> None:
         """Initialize Scan.
 
         :param category: Scan's category
-        :param number_of_slices: number of Slices that will be uploaded later
+        :param declared_number_of_slices: number of Slices that will be uploaded later
         """
         self.id = ScanID(str(uuid.uuid4()))
         self.category = category
-        self.number_of_slices = number_of_slices
+        self.declared_number_of_slices = declared_number_of_slices
 
     def __repr__(self) -> str:
         """Return string representation for Scan."""
@@ -211,9 +212,9 @@ class Label(Base):
 
     __tablename__ = 'Labels'
     id: LabelID = Column(String, primary_key=True)
-
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     status: LabelStatus = Column(Enum(LabelStatus), nullable=False, server_default=LabelStatus.NOT_VERIFIED.value)
+
     scan: Scan = relationship('Scan', back_populates='labels')
     selections: 'LabelSelection' = relationship('LabelSelection', back_populates='label')
 

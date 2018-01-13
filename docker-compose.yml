@@ -48,7 +48,7 @@ services:
       - MEDTAGGER__HBASE_HOST=hbase
       - MEDTAGGER__HBASE_PORT=9090
       - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10
+      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=25
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: backend
