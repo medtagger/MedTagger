@@ -36,7 +36,7 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
 
     # Run conversion to PNG if this is the latest uploaded Slice
     scan = _slice.scan
-    logger.debug('Stored %s Slices. Waiting for %s Slices.', len(scan.slices), scan.number_of_slices)
-    if scan.number_of_slices == len(scan.slices):
+    logger.debug('Stored %s Slices. Waiting for %s Slices.', len(scan.slices), scan.declared_number_of_slices)
+    if scan.declared_number_of_slices == len(scan.slices):
         logger.debug('All Slices uploaded for %s! Running conversion...', scan)
         convert_scan_to_png.delay(scan.id)

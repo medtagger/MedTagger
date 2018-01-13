@@ -53,7 +53,7 @@ def upgrade():
     op.create_table('Scans',
                     sa.Column('id', sa.String(), nullable=False),
                     sa.Column('converted', sa.Boolean(), nullable=True),
-                    sa.Column('number_of_slices', sa.Integer(), nullable=False),
+                    sa.Column('declared_number_of_slices', sa.Integer(), nullable=False),
                     sa.Column('category_id', sa.Integer(), nullable=True),
                     sa.ForeignKeyConstraint(['category_id'], ['ScanCategories.id'], ),
                     sa.PrimaryKeyConstraint('id'),

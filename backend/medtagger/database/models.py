@@ -39,8 +39,9 @@ class User(Base, UserMixin):
     password: str = Column(String(255), nullable=False)
     first_name: str = Column(String(50), nullable=False)
     last_name: str = Column(String(50), nullable=False)
-    roles = db.relationship('Role', secondary=users_roles)
-    active = Column(Boolean, nullable=False)
+    active: bool = Column(Boolean, nullable=False)
+
+    roles: List[Role] = db.relationship('Role', secondary=users_roles)
 
     def __init__(self, email: str, password_hash: str, first_name: str, last_name: str) -> None:
         """Initialize User."""
@@ -211,9 +212,9 @@ class Label(Base):
 
     __tablename__ = 'Labels'
     id: LabelID = Column(String, primary_key=True)
-
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     status: LabelStatus = Column(Enum(LabelStatus), nullable=False, server_default=LabelStatus.NOT_VERIFIED.value)
+
     scan: Scan = relationship('Scan', back_populates='labels')
     selections: 'LabelSelection' = relationship('LabelSelection', back_populates='label')
 
