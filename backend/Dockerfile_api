@@ -8,7 +8,6 @@ COPY medtagger ./medtagger
 COPY scripts ./scripts
 COPY tests ./tests
 
-COPY .coverage ./.coverage
 COPY .flake8 ./flake8
 COPY .pylintrc ./.pylintrc
 COPY .test.pylintrc ./.test.pylintrc
