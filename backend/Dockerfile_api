@@ -1,9 +1,24 @@
 FROM python:3.6
 
-COPY . /medtagger
-WORKDIR /medtagger
+WORKDIR /medtagger_backend/
 
-ENV PYTHONPATH /medtagger
+COPY alembic ./alembic
+COPY example_data/example_scan ./example_data/example_scan/
+COPY medtagger ./medtagger
+COPY scripts ./scripts
+COPY tests ./tests
+
+COPY .flake8 ./.flake8
+COPY .pylintrc ./.pylintrc
+COPY .test.pylintrc ./.test.pylintrc
+COPY alembic.ini ./alembic.ini
+COPY logging.conf ./logging.conf
+COPY Makefile ./Makefile
+COPY mypy.ini ./mypy.ini
+COPY requirements.dev.txt ./requirements.dev.txt
+COPY requirements.txt ./requirements.txt
+
+ENV PYTHONPATH /medtagger_backend
 
 RUN pip install -r requirements.txt
 

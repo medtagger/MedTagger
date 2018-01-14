@@ -29,4 +29,4 @@ jobs:
   - stage: test frontend
     script:
     - ./.travis/run_tests_if_subproject_changed.py frontend --command="
-       docker-compose build medtagger_web"
+       docker build frontend --build-arg PRODUCTION=True"
