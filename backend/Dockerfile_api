@@ -8,7 +8,7 @@ COPY medtagger ./medtagger
 COPY scripts ./scripts
 COPY tests ./tests
 
-COPY .flake8 ./flake8
+COPY .flake8 ./.flake8
 COPY .pylintrc ./.pylintrc
 COPY .test.pylintrc ./.test.pylintrc
 COPY alembic.ini ./alembic.ini
