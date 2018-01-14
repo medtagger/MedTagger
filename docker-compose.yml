@@ -35,8 +35,7 @@ services:
       context: frontend
       dockerfile: Dockerfile
       args:
-        - ANGULAR_ENV=local
-        - BUILD_OPTIMIZER=False
+        - PRODUCTION=False
     ports:
       - 80:80
 
@@ -57,6 +56,8 @@ services:
       context: backend
       dockerfile: Dockerfile_api
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && python3.6 medtagger/api/app.py"
+    ports:
+      - 51000:51000
 
   medtagger_worker:
     image: medtagger_backend/worker
