@@ -8,44 +8,67 @@ powered by idea of **crowdsourcing**. Platform also provides mechanism for
 label **validation**, thus making produced datasets of labels more reliable
 for the future use.
 
+MedTagger is still **under heavy development**, so please keep in mind that
+many things may change or new versions may not be fully backward compatible.
+Contact with us directly in case you want to use our work :)
+
 [![Build Status](https://travis-ci.com/jpowie01/MedTagger.svg?token=L7HTUx9jsBXG6tqCCqWJ&branch=master)](https://travis-ci.com/jpowie01/MedTagger)
 
 ## What is currently done?
+
  - [x] User Interface with dynamic 3D scans manipulation
  - [x] Backend architecture ready to be scaled up
  - [x] Basic labeling mechanism ready to be extended with new features
  - [x] Basic validation mechanism
  - [x] Basic users management system
- - [x] Dockerized and virtualized (with Vagrant) environment   
+ - [x] Dockerized and virtualized environment (with Vagrant)
 
 ## What needs to be done?
+
  - [ ] Extended labeling mechanism using magic lasso
    - [ ] Frontend
    - [x] Backend
  - [ ] Extended labeling mechanism using additional views for 3D scans
    - [ ] Frontend
    - [x] Backend
- - [ ] Extended validation mechanism with looking for similar labels
+ - [ ] Extended validation mechanism for faster verification of similar labels
    - [ ] Frontend
    - [ ] Backend
  - [ ] Generating Machine Learning datasets on demand
    - [ ] Frontend
    - [ ] Backend
 
+## Setup
+
+To set up MedTagger locally you can use Docker-Compose:
+
+```bash
+$ docker-compose up
+```
+
+Default development account is:
+ - email: `admin@medtagger.com`,
+ - password: `medtagger1`.
+
+Keep in mind that this is not the best way for development as code changes
+require rebuilding Docker containers. In case you want to develop MedTagger,
+please check [Development](#development) section below.
+
 ## Development
-This is the monorepo for the whole platform. More information about the
-development process can be found in each of the projects itself. In case
-of questions don't hesitate to contact with authors.
+
+More information about the development process can be found in each of the
+projects itself. In case of questions don't hesitate to contact with authors.
 
 MedTagger consists of two main parts:
- - `frontend` - User Interface application written in Angular 4 ([more](/frontend)),
- - `backend` - backend system's architecture written in Python ([more](/backend)).
+ - `frontend` - User Interface application written in TypeScript & Angular ([more](/frontend)),
+ - `backend` - system's architecture and API written in Python ([more](/backend)).
 
 You can develop whole platform natively (recommended) or using Vagrant
- virtual machine. More information can be found inside of our [docs](/docs).
+ virtual machine. More information can be found in our [docs](/docs).
 
 ## User Interface
-Below screenshots show how MedTagger looks like.
+
+Below screenshots show how MedTagger looks like:
 
 #### Main Page
 ![Main Page](/docs/assets/main_page.png)
