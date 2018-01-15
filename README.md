@@ -65,7 +65,7 @@ $ export HOST_URL=http://path_to_production_server.com
 $ docker-compose up
 ```
 
-For now, please disable default admin account. This will be disabled automatically
+For now, please **disable default admin account**. This will be disabled automatically
 on production builds in the future!
 
 **Keep in mind that this project is not fully stable yet!**
