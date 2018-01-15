@@ -54,6 +54,22 @@ Keep in mind that this is not the best way for development as code changes
 require rebuilding Docker containers. In case you want to develop MedTagger,
 please check [Development](#development) section below.
 
+##### Production use
+
+You can also specify where MedTagger UI should look for API and how should it
+be built by specifying environment variables:
+
+```bash
+$ export PRODUCTION=true
+$ export HOST_URL=http://path_to_production_server.com
+$ docker-compose up
+```
+
+For now, please disable default admin account. This will be disabled automatically
+on production builds in the future!
+
+**Keep in mind that this project is not fully stable yet!**
+
 ## Development
 
 More information about the development process can be found in each of the

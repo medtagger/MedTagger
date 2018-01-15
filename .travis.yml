@@ -13,8 +13,8 @@ jobs:
   - stage: test backend
     script:
     - ./.travis/run_tests_if_subproject_changed.py backend --command="
-       docker-compose build medtagger_api medtagger_worker &&
-       docker-compose run medtagger_api /bin/bash -c \"make install_dev_packages && make test\""
+       docker-compose build medtagger_backend_api medtagger_backend_worker &&
+       docker-compose run medtagger_backend_api /bin/bash -c \"make install_dev_packages && make test\""
 
   # Backend - functional tests
   - stage: test backend
@@ -22,11 +22,12 @@ jobs:
     script:
     - ./.travis/run_tests_if_subproject_changed.py backend --command="
        docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml up -d hbase postgres rabbitmq &&
-       docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run functional_tests &&
+       docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run medtagger_backend_functional_tests &&
        docker-compose down"
 
   # Frontend - build Docker
   - stage: test frontend
     script:
     - ./.travis/run_tests_if_subproject_changed.py frontend --command="
-       docker build frontend --build-arg PRODUCTION=True"
+       export PRODUCTION=true &&
+       docker-compose build medtagger_frontend"

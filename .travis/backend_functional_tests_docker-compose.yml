@@ -13,8 +13,8 @@ services:
       POSTGRES_USER: medtagger_user
       POSTGRES_PASSWORD: MedTa99er!
 
-  functional_tests:
-    image: medtagger/functional_tests
+  medtagger_backend_functional_tests:
+    image: medtagger_backend/functional_tests
     environment:
       - MEDTAGGER__API_HOST=0.0.0.0
       - MEDTAGGER__API_PORT=51000
