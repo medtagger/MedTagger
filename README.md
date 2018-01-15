@@ -79,8 +79,8 @@ MedTagger consists of two main parts:
  - `frontend` - User Interface application written in TypeScript & Angular ([more](/frontend)),
  - `backend` - system's architecture and API written in Python ([more](/backend)).
 
-You can develop whole platform natively (recommended) or using Vagrant
- virtual machine. More information can be found in our [docs](/docs).
+You can develop whole platform natively or using Vagrant virtual machine.
+ More information can be found in our [docs](/docs).
 
 ## User Interface
 
