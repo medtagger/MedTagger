@@ -4,8 +4,7 @@ from typing import Any
 
 from tests.functional_tests import get_api_client
 from medtagger.api.users.business import set_user_role
-from medtagger.api.account.business import create_user
-from medtagger.database.models import User
+from medtagger.api.auth.business import create_user
 
 example_user_email = 'test@mail.com'
 example_user_password = 'medtagger1'
@@ -25,7 +24,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     # Step 1. User creates an account
     payload = {'email': example_user_email, 'password': example_user_password,
                'firstName': example_user_first_name, 'lastName': example_user_last_name}
-    response = api_client.post('/api/v1/account/register', data=json.dumps(payload),
+    response = api_client.post('/api/v1/auth/register', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -35,7 +34,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
 
     # Step 2. User logs in
     payload = {'email': example_user_email, 'password': example_user_password}
-    response = api_client.post('/api/v1/account/sign-in', data=json.dumps(payload),
+    response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
     assert response.status_code == 200
     json_response = json.loads(response.data)
@@ -45,7 +44,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert len(user_token) == 149
 
     # Step 3. Get user account information
-    response = api_client.get('/api/v1/account/user-info', headers={'Authentication-Token': user_token})
+    response = api_client.get('/api/v1/users/info', headers={'Authentication-Token': user_token})
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -56,7 +55,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert json_response['role'] == 'volunteer'
 
     # Step 4. User logs out
-    response = api_client.post('/api/v1/account/sign-out', headers={'Authentication-Token': user_token})
+    response = api_client.post('/api/v1/auth/sign-out', headers={'Authentication-Token': user_token})
     assert response.status_code == 204
 
 
@@ -72,7 +71,7 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
 
     # Step 1. Admin user logs in
     payload = {'email': admin_email, 'password': admin_password}
-    response = api_client.post('/api/v1/account/sign-in', data=json.dumps(payload),
+    response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
     assert response.status_code == 200
     json_response = json.loads(response.data)
@@ -96,19 +95,19 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     assert response.status_code == 204
 
     # Step 4. Admin logs out
-    response = api_client.post('/api/v1/account/sign-out', headers={'Authentication-Token': admin_user_token})
+    response = api_client.post('/api/v1/auth/sign-out', headers={'Authentication-Token': admin_user_token})
     assert response.status_code == 204
 
     # Step 5. User logs in
     payload = {'email': example_user_email, 'password': example_user_password}
-    response = api_client.post('/api/v1/account/sign-in', data=json.dumps(payload),
+    response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
     json_response = json.loads(response.data)
     user_token = json_response['token']
     assert response.status_code == 200
 
     # Step 6. Check if user role was changed
-    response = api_client.get('/api/v1/account/user-info', headers={'Authentication-Token': user_token})
+    response = api_client.get('/api/v1/users/info', headers={'Authentication-Token': user_token})
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)

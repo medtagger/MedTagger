@@ -1,1 +1,1 @@
-"""Module responsible for endpoints returning users."""
+"""Module responsible for endpoints for operations done on users."""
