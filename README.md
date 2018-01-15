@@ -54,7 +54,7 @@ Keep in mind that this is not the best way for development as code changes
 require rebuilding Docker containers. In case you want to develop MedTagger,
 please check [Development](#development) section below.
 
-##### Production use
+#### Production use
 
 You can also specify where MedTagger UI should look for API and how should it
 be built by specifying environment variables:
