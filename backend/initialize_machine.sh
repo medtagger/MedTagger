@@ -12,7 +12,7 @@ then
 fi
 
 enable_hdfs=false  # HDFS is now disabled. Enable it once we will support HDFS!
-if [ ! -e /opt/conda/ && enable_hdfs ]
+if [ ! -e /opt/conda/ ] && [ enable_hdfs ]
 then
     # Install Miniconda
     echo "Installing MiniConda..."

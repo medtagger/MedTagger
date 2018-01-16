@@ -10,7 +10,13 @@ Please follow the documentation about setting up Vagrant [here](/docs/developmen
 ### How to run backend?
 
 Open two SSH connections (in separate windows) to your virtual machine and make sure that you're inside `/vagrant/backend`
- directory. In the first one we'll run Celery workers which are responsible for handling difficult tasks (eg. adding and
+ directory. Then run below command in each of the windows to prepare your development environment:
+ 
+ ```bash
+ $ . devenv.sh
+```
+ 
+ In the first window we'll run Celery workers which are responsible for handling difficult tasks (eg. adding and
  converting Dicoms to our HBase DB). To run Celery workers, please execute such command:
 
 ```bash
