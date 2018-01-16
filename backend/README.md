@@ -7,7 +7,7 @@ Here you can find all the code used as a backend for the MedTagger.
 
 There are two ways to setup your MedTagger's backend environment:
 
- - running in Vagrant ([more](/backend/docs/development_setup_vagrant.md)),
+ - running in Vagrant ([more](/backend/docs/development_in_vagrant.md)),
  - running natively on your Linux/macOS machine ([more](/backend/docs/development_setup_native.md)).
 
 ### Good to know about development

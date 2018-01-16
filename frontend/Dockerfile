@@ -15,9 +15,9 @@ WORKDIR /ng-app
 
 COPY . .
 
-## Build the angular app in production mode and store the artifacts in dist folder
+## Build the angular app in given mode and store the artifacts in dist folder
 ARG PRODUCTION
-RUN if [ "$PRODUCTION" = "True" ]; then $(npm bin)/ng build --prod --build-optimizer; else $(npm bin)/ng build --env=local; fi
+RUN if [ "$PRODUCTION" = "true" ]; then $(npm bin)/ng build --prod --build-optimizer; else $(npm bin)/ng build --env=local; fi
 
 
 ### STAGE 2: Setup ###

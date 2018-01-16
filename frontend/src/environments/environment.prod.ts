@@ -5,6 +5,6 @@
 
 export const environment = {
   production: true,
-  API_URL: 'http://demo.voicelab.pl:22433/api/v1',
-  WEBSOCKET_URL: 'http://demo.voicelab.pl:22433',
+  API_URL: window.location.protocol + '//' + window.location.hostname + '/api/v1',
+  WEBSOCKET_URL: window.location.protocol + '//' + window.location.hostname,
 };

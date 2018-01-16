@@ -36,4 +36,7 @@ def insert_admin_account() -> None:
 
 
 if __name__ == '__main__':
-    insert_admin_account()
+    try:
+        insert_admin_account()
+    except Exception as ex:
+        logger.exception('Unhandled exception while inserting default admin account!')

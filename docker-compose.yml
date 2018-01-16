@@ -29,17 +29,19 @@ services:
       POSTGRES_USER: medtagger_user
       POSTGRES_PASSWORD: MedTa99er!
 
-  medtagger_web:
+  medtagger_frontend:
     image: medtagger_frontend/web
     build:
       context: frontend
       dockerfile: Dockerfile
       args:
-        - PRODUCTION=False
+        - PRODUCTION=${MEDTAGGER__FRONTEND_PRODUCTION}
     ports:
       - 80:80
+    depends_on:
+      - medtagger_backend_api
 
-  medtagger_api:
+  medtagger_backend_api:
     image: medtagger_backend/api
     environment:
       - MEDTAGGER__API_HOST=0.0.0.0
@@ -55,11 +57,15 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_api
+    depends_on:
+      - hbase
+      - rabbitmq
+      - postgres
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && python3.6 medtagger/api/app.py"
-    ports:
-      - 51000:51000
+    depends_on:
+      - medtagger_backend_worker
 
-  medtagger_worker:
+  medtagger_backend_worker:
     image: medtagger_backend/worker
     environment:
       - MEDTAGGER__API_HOST=0.0.0.0
@@ -75,5 +81,9 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_worker
+    depends_on:
+      - hbase
+      - rabbitmq
+      - postgres
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && celery -A medtagger.workers worker --loglevel=info"
 
