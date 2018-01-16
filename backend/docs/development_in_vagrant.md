@@ -10,7 +10,7 @@ Please follow the documentation about setting up Vagrant [here](/docs/developmen
 ### How to run backend?
 
 Open two SSH connections (in separate windows) to your virtual machine and make sure that you're inside `/vagrant/backend`
- directory. Then run command below to prepare your development environment:
+ directory. Then run below command in each of the windows to prepare your development environment:
  
  ```bash
  $ . devenv.sh
