@@ -1,11 +1,13 @@
-Development with Docker Compose
--------------------------------
+Setup with Docker Compose
+-------------------------
 
-Docker Compose is great to set up all depended services. It can setup things like Hadoop, HBase and RabbitMQ just
- with one command! It can even setup whole MedTagger on your machine easily.
+Docker Compose is great to set up all environment with one command. It is also great
+ for setting up all depended services. Docker Compose can setup things like Hadoop,
+ HBase and RabbitMQ easily!
 
-**But...** it's not a good idea to develop the project inside of it. Changes in the code will require rebuilding
- whole Docker images. Instead, consider using Vagrant or setup the project natively.
+**But...** it's not a good idea to develop the project inside of it. Changes in the
+ code will require rebuilding whole Docker images. Instead, consider using Vagrant
+ or setup the project natively on Linux/macOS.
 
 ### Requirements
 

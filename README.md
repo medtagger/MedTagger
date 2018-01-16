@@ -66,12 +66,11 @@ $ docker-compose up
 For now, please **disable default admin account**. This will be disabled automatically
 on production builds in the future!
 
+More about setting up environment with Docker Compose can be found [here](/docs/setup_with_docker_compose.md).
+
 **Keep in mind that this project is not fully stable yet!**
 
 ## Development
-
-More information about the development process can be found in each of the
-projects itself. In case of questions don't hesitate to contact with authors.
 
 MedTagger consists of two main parts:
  - `frontend` - User Interface application written in TypeScript & Angular ([more](/frontend)),

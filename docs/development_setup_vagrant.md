@@ -36,6 +36,6 @@ Once Vagrant completed whole initialization try to SSH into the machine with `va
 Now, you can go further with development of the MedTagger. For more information, follow up with documentation
  inside of each projects:
 
- - [Backend](/backend/docs/development_setup_vagrant.md),
+ - [Backend](/backend/docs/development_in_vagrant.md),
  - Frontend - does not support setup with Vagrant yet.
 
