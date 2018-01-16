@@ -60,8 +60,6 @@ You can also specify where MedTagger UI should look for API and how should it
 be built by specifying environment variables:
 
 ```bash
-$ export PRODUCTION=true
-$ export HOST_URL=http://path_to_production_server.com
 $ docker-compose up
 ```
 

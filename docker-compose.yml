@@ -35,10 +35,11 @@ services:
       context: frontend
       dockerfile: Dockerfile
       args:
-        - HOST_URL=${HOST_URL}
-        - PRODUCTION=${PRODUCTION}
+        - PRODUCTION=${MEDTAGGER__FRONTEND_PRODUCTION}
     ports:
       - 80:80
+    depends_on:
+      - medtagger_backend_api
 
   medtagger_backend_api:
     image: medtagger_backend/api
@@ -56,7 +57,13 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_api
+    depends_on:
+      - hbase
+      - rabbitmq
+      - postgres
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && python3.6 medtagger/api/app.py"
+    depends_on:
+      - medtagger_backend_worker
 
   medtagger_backend_worker:
     image: medtagger_backend/worker
@@ -74,5 +81,9 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_worker
+    depends_on:
+      - hbase
+      - rabbitmq
+      - postgres
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && celery -A medtagger.workers worker --loglevel=info"
 

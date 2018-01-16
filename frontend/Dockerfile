@@ -17,13 +17,7 @@ COPY . .
 
 ## Build the angular app in given mode and store the artifacts in dist folder
 ARG PRODUCTION
-ARG HOST_URL
-RUN echo "export const environment = {\
-  production: $PRODUCTION,\
-  API_URL: '$HOST_URL/api/v1',\
-  WEBSOCKET_URL: '$HOST_URL',\
-};" > /ng-app/src/environments/environment.docker.ts
-RUN if [ "$PRODUCTION" = "true" ]; then $(npm bin)/ng build --env=docker --prod --build-optimizer; else $(npm bin)/ng build --env=docker; fi
+RUN if [ "$PRODUCTION" = "true" ]; then $(npm bin)/ng build --prod --build-optimizer; else $(npm bin)/ng build --env=local; fi
 
 
 ### STAGE 2: Setup ###
