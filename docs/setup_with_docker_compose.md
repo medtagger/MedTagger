@@ -25,15 +25,15 @@ docker-compose version 1.17.1, build 6d101fb
 
 ### How to setup whole MedTagger?
 
-To run whole MedTagger using Docker Compose, you can just execute `up` command like this:
+To run whole MedTagger (with all dependencies) using Docker Compose, you can just execute `up` command like this:
 
 ```bash
 $ docker-compose up
 ```
 
-### How to setup dependencies?
+### How to setup only dependencies?
 
-It's really easy to start all needed external dependencies:
+It's really easy to start all needed external dependencies with:
 
 ```bash
 $ docker-compose up hbase postgres rabbitmq
