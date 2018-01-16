@@ -8,6 +8,5 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "docker" do |d|
     config.vm.provision "shell", run: "always", path: "backend/initialize_machine.sh"
-    config.vm.provision "shell", inline: "echo \"cd /vagrant/\" >> /home/vagrant/.bashrc"
   end
 end

@@ -1,7 +1,7 @@
-Running MedTagger's Backend in Vagrant
---------------------------------------
+Running MedTagger Backend in Vagrant
+------------------------------------
 
-Here you can find more information about running MedTagger's Backend in Vagrant.
+Here you can find more information about running MedTagger Backend in Vagrant.
 
 ### Requirements 
 
