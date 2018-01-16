@@ -12,7 +12,7 @@ MedTagger is still **under heavy development**, so please keep in mind that
 many things may change or new versions may not be fully backward compatible.
 Contact with us directly in case you want to use our work :)
 
-[![Build Status](https://travis-ci.com/jpowie01/MedTagger.svg?token=L7HTUx9jsBXG6tqCCqWJ&branch=master)](https://travis-ci.com/jpowie01/MedTagger)
+[![Build Status](https://travis-ci.org/jpowie01/MedTagger.svg?branch=master)](https://travis-ci.org/jpowie01/MedTagger)
 
 ## What is currently done?
 
