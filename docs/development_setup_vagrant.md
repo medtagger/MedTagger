@@ -37,5 +37,5 @@ Now, you can go further with development of the MedTagger. For more information,
  inside of each projects:
 
  - [MedTagger Backend](/backend/docs/development_in_vagrant.md),
- - MedTagger Frontend - does not support setup with Vagrant yet.
+ - [MedMedTagger Frontend](/frontend/docs/development_in_vagrant.md).
 
