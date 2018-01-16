@@ -16,7 +16,7 @@ Open two SSH connections (in separate windows) to your virtual machine and make 
  $ . devenv.sh
 ```
  
- In the first windows we'll run Celery workers which are responsible for handling difficult tasks (eg. adding and
+ In the first window we'll run Celery workers which are responsible for handling difficult tasks (eg. adding and
  converting Dicoms to our HBase DB). To run Celery workers, please execute such command:
 
 ```bash
