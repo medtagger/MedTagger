@@ -3,9 +3,11 @@ PYTHON = python3.6
 MAIN_MODULE = medtagger
 UNIT_TESTS_MODULE = tests/unit_tests
 FUNCTIONAL_TESTS_MODULE = tests/functional_tests
-DOCKER_COMPOSE_FILE = docker-compose.yml
 SCRIPTS_DIRECTORY = scripts
+
+# Tests configuration
 COVERAGE_LIMIT = 0
+MAX_CYCLOMATIC_COMPLEXITY = 5
 
 # Third party configuration files
 PYLINT_CONFIG_FILE = .pylintrc
@@ -43,7 +45,7 @@ test_pylint:
 	pylint $(UNIT_TESTS_MODULE) $(FUNCTIONAL_TESTS_MODULE) --rcfile=$(PYLINT_UNIT_TESTS_CONFIG_FILE)
 
 test_flake8:
-	flake8 $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(FUNCTIONAL_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
+	flake8 $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(FUNCTIONAL_TESTS_MODULE) $(SCRIPTS_DIRECTORY) --max-complexity=$(MAX_CYCLOMATIC_COMPLEXITY)
 
 test_mypy:
 	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(FUNCTIONAL_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
