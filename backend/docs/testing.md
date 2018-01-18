@@ -24,17 +24,26 @@ _**TIP!**_ You can also run specific tool by:
  - `make test_mypy`,
  - `make unit_tests`.
 
+_**TIP!**_ You can also specify which unit test should be executed by:
+
+```bash
+(venv) $ make unit_tests UNIT_TEST=tests/unit_tests/api/core/test_business.py
+```
+
 ## Functional tests
 
 MedTagger Backend supports functional tests. To define them we use PyTest with prepared set of
  REST & WebSocket API testing clients.
 
-To run such tests, please make sure that all of the dependencies are running on your machine. You can use
- Docker-Compose to do so:
+To run such tests run:
 
 ```bash
-(venv) $ docker-compose up -d hbase postgres rabbitmq
 (venv) $ make functional_tests
-(venv) $ docker-compose down
+```
+
+_**TIP!**_ You can also specify which functional test should be executed by:
+
+```bash
+(venv) $ make functional_tests FUNCTIONAL_TEST=tests/functional_tests/test_basic_flow.py 
 ```
 

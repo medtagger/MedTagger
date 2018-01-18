@@ -1,13 +1,16 @@
 # Global constants for whole Makefile
 PYTHON = python3.6
 MAIN_MODULE = medtagger
-UNIT_TESTS_MODULE = tests/unit_tests
-FUNCTIONAL_TESTS_MODULE = tests/functional_tests
 SCRIPTS_DIRECTORY = scripts
 
 # Tests configuration
 COVERAGE_LIMIT = 0
 MAX_CYCLOMATIC_COMPLEXITY = 5
+UNIT_TESTS_MODULE = tests/unit_tests
+UNIT_TEST = $(UNIT_TESTS_MODULE)
+FUNCTIONAL_TESTS_MODULE = tests/functional_tests
+FUNCTIONAL_TESTS_DOCKER_COMPOSE = ../.travis/backend_functional_tests_docker-compose.yml 
+FUNCTIONAL_TEST = $(FUNCTIONAL_TESTS_MODULE)
 
 # Third party configuration files
 PYLINT_CONFIG_FILE = .pylintrc
@@ -51,11 +54,17 @@ test_mypy:
 	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(FUNCTIONAL_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
 
 unit_tests:
-	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TESTS_MODULE)
+	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TEST)
 
 functional_tests:
+	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d hbase postgres rabbitmq
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
-	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && pytest $(FUNCTIONAL_TESTS_MODULE)
+	@if . $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ! pytest $(UNDER_TEST) ; then\
+		echo "Functional tests failed!";\
+		docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down;\
+		exit 1;\
+	fi
+	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down
 
 functional_tests_docker:
 	./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh

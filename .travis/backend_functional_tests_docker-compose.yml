@@ -2,6 +2,9 @@ version: '3'
 services:
   hbase:
     image: dajobe/hbase
+    ports:
+      - 52001:8080
+      - 52002:9090
 
   rabbitmq:
     image: rabbitmq:management
@@ -12,6 +15,8 @@ services:
       POSTGRES_DB: medtagger
       POSTGRES_USER: medtagger_user
       POSTGRES_PASSWORD: MedTa99er!
+    ports:
+      - 52003:5432
 
   medtagger_backend_functional_tests:
     image: medtagger_backend/functional_tests
@@ -20,7 +25,7 @@ services:
       - MEDTAGGER__API_PORT=51000
       - MEDTAGGER__API_DEBUG=1
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
+      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres/medtagger
       - MEDTAGGER__HBASE_HOST=hbase
       - MEDTAGGER__HBASE_PORT=9090
       - MEDTAGGER__HBASE_REST_PORT=8080

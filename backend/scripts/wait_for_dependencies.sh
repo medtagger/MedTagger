@@ -12,5 +12,8 @@ until python3.6 -c 'from medtagger.clients.hbase_client import is_alive; exit(no
   sleep 1
 done
 
->&2 echo "PostgreSQL & HBase are ready! Let's move on..."
+>&2 echo "HBase seems to be ready but let's wait a few seconds just to be sure!"
+sleep 5
+
+>&2 echo "OK. PostgreSQL & HBase are ready! Let's move on..."
 
