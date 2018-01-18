@@ -35,7 +35,7 @@ _**TIP!**_ You can also specify which unit test should be executed by:
 MedTagger Backend supports functional tests. To define them we use PyTest with prepared set of
  REST & WebSocket API testing clients.
 
-To run such tests run:
+To run such tests please execute:
 
 ```bash
 (venv) $ make functional_tests
