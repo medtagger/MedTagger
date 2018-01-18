@@ -21,8 +21,7 @@ class GetUsers(Resource):
     def get() -> Any:
         """Get all users endpoint."""
         users = get_all_users()
-        user_infos = list(map(lambda user: user._asdict(), users))
-        return {'users': user_infos}, 200
+        return {'users': users}, 200
 
 
 @users_ns.route('/<int:user_id>/role')
@@ -48,4 +47,4 @@ class GetUserInfo(Resource):
     def get() -> Any:
         """Get user info."""
         user_info = get_current_user_info()
-        return user_info._asdict(), 200
+        return user_info, 200

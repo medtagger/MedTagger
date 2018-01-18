@@ -22,7 +22,7 @@ class RolesRepository(object):
     @staticmethod
     def set_user_role(user_id: int, role_name: str) -> None:
         """Set user's role. Old role is being replaced."""
-        user = UsersRepository.get_user_with_id(user_id)
+        user = UsersRepository.get_user_by_id(user_id)
         if user is None:
             raise InvalidArgumentsException("User with this id does not exist.")
         role = RolesRepository.get_role_with_name(role_name)

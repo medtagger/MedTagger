@@ -13,7 +13,7 @@ def create_user(email: str, password: str, first_name: str, last_name: str) -> i
 
     :return: id of the new user
     """
-    user = UsersRepository.get_user_with_email(email)
+    user = UsersRepository.get_user_by_email(email)
     if user is not None:
         raise InvalidArgumentsException("User with this email already exist")
     password_hash = generate_password_hash(password)
@@ -30,7 +30,7 @@ def sign_in_user(email: str, password: str) -> str:
 
     :return: authentication token
     """
-    user = UsersRepository.get_user_with_email(email)
+    user = UsersRepository.get_user_by_email(email)
     if user is None:
         raise InvalidArgumentsException("User does not exist.")
     password_match = check_password_hash(user.password, password)

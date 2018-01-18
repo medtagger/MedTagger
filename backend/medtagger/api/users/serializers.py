@@ -8,7 +8,7 @@ user_info = api.model('User info model', {
     'email': fields.String(attribute='email', description='Email address'),
     'firstName': fields.String(attribute='first_name', description='First name'),
     'lastName': fields.String(attribute='last_name', description='Last name'),
-    'role': fields.String(attribute='role', description='User\'s role'),
+    'role': fields.String(attribute='role.name', description='User\'s role'),
 })
 user_info_list = api.model('User info list', {
     'users': fields.List(fields.Nested(user_info)),
