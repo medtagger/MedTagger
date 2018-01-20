@@ -12,6 +12,8 @@ MedTagger is still **under heavy development**, so please keep in mind that
 many things may change or new versions may not be fully backward compatible.
 Contact with us directly in case you want to use our work :)
 
+Documentation for the MedTagger can be found [here](/docs).
+
 [![Build Status](https://travis-ci.org/jpowie01/MedTagger.svg?branch=master)](https://travis-ci.org/jpowie01/MedTagger)
 
 ## What is currently done?
