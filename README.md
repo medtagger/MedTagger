@@ -40,46 +40,33 @@ Documentation for the MedTagger can be found [here](/docs).
    - [ ] Frontend
    - [ ] Backend
 
-## Setup
-
-To set up MedTagger locally you can use Docker-Compose:
-
-```bash
-$ docker-compose up
-```
-
-Default development account is:
- - email: `admin@medtagger.com`,
- - password: `medtagger1`.
-
-Keep in mind that this is not the best way for development as code changes
-require rebuilding Docker containers. In case you want to develop MedTagger,
-please check [Development](#development) section below.
-
-### Production use
-
-You can also specify where MedTagger UI should look for API and how should it
-be built by specifying environment variables:
-
-```bash
-$ docker-compose up
-```
-
-For now, please **disable default admin account**. This will be disabled automatically
-on production builds in the future!
-
-More about setting up environment with Docker Compose can be found [here](/docs/setup_with_docker_compose.md).
-
-**Keep in mind that this project is not fully stable yet!**
-
-## Development
+## MedTagger setup
 
 MedTagger consists of two main parts:
  - `frontend` - User Interface application written in TypeScript & Angular ([more](/frontend)),
  - `backend` - system's architecture and API written in Python ([more](/backend)).
 
-You can develop whole platform natively or using Vagrant virtual machine.
- More information can be found in our [docs](/docs).
+### Development
+
+To set up MedTagger locally you can use Vagrant virtual machine:
+
+```bash
+$ vagrant up
+```
+
+Then follow up with our [documentation](/docs). Default development account is:
+ - email: `admin@medtagger.com`,
+ - password: `medtagger1`.
+
+### Dockerized environment
+
+MedTagger can be set up easily with Docker-Compose:
+
+```bash
+$ docker-compose up
+```
+
+More about setting up environment with Docker Compose can be found [here](/docs/setup_with_docker_compose.md).
 
 ## User Interface
 
