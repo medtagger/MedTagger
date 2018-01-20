@@ -7,6 +7,12 @@ Here you can find the documentation for MedTagger. In case of looking for help
  - [MedTagger Backend](/backend),
  - [MedTagger Frontend](/frontend).
 
+## More about MedTagger
+
+Here you can find more information about MedTagger:
+
+ - [System Architecture](/docs/architecture.md).
+
 ## Development setup
 
 There are two ways to setup the developemnt environment for MedTagger. One of them is
