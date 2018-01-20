@@ -21,3 +21,9 @@ You can also setup native development environments for each of the projects! For
 MedTagger can be setup with Docker-Compose easily. More about it can be found
  [here](/docs/setup_via_docker_compose.md).
 
+## More about MedTagger
+
+Here you can find more information about MedTagger:
+
+ - [System Architecture](/docs/architecture.md).
+
