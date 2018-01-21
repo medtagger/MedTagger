@@ -14,7 +14,8 @@ class RolesRepository(object):
     def get_role_with_name(role_name: str) -> Optional[Role]:
         """Get role with given name.
 
-        :return Optional of role"""
+        :return Optional of role
+        """
         with db_session() as session:
             role = session.query(Role).filter(Role.name == role_name).first()
         return role
@@ -24,10 +25,10 @@ class RolesRepository(object):
         """Set user's role. Old role is being replaced."""
         user = UsersRepository.get_user_by_id(user_id)
         if user is None:
-            raise InvalidArgumentsException("User with this id does not exist.")
+            raise InvalidArgumentsException('User with this id does not exist.')
         role = RolesRepository.get_role_with_name(role_name)
         if role is None:
-            raise InvalidArgumentsException("Role with this name does not exist.")
+            raise InvalidArgumentsException('Role with this name does not exist.')
         with db_session() as session:
             user.roles.clear()
             user.roles.append(role)

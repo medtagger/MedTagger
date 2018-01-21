@@ -18,7 +18,7 @@ admin_last_name = 'Last'
 
 
 def test_basic_user_flow(prepare_environment: Any) -> None:
-    """Test for basic user flow"""
+    """Test for basic user flow."""
     api_client = get_api_client()
 
     # Step 1. User creates an account
@@ -60,7 +60,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
 
 
 def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
-    """Test for upgrading volunteer's to doctor's role"""
+    """Test for upgrading volunteer's to doctor's role."""
     api_client = get_api_client()
 
     admin_id = create_user(admin_email, admin_password, admin_first_name, admin_last_name)

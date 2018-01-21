@@ -30,7 +30,8 @@ class UsersRepository(object):
     def get_user_by_email(user_email: str) -> Optional[User]:
         """Get user with given email.
 
-        :return Optional of User"""
+        :return Optional of User
+        """
         with db_session() as session:
             user = session.query(User).filter(User.email == user_email).first()
         return user
@@ -39,7 +40,8 @@ class UsersRepository(object):
     def get_user_by_id(user_id: int) -> Optional[User]:
         """Get user with given email.
 
-        :return Optional of User"""
+        :return Optional of User
+        """
         with db_session() as session:
             user = session.query(User).filter(User.id == user_id).first()
         return user

@@ -15,12 +15,12 @@ def create_user(email: str, password: str, first_name: str, last_name: str) -> i
     """
     user = UsersRepository.get_user_by_email(email)
     if user is not None:
-        raise InvalidArgumentsException("User with this email already exist")
+        raise InvalidArgumentsException('User with this email already exist')
     password_hash = generate_password_hash(password)
     new_user = User(email, password_hash, first_name, last_name)
     role = RolesRepository.get_role_with_name('volunteer')
     if role is None:
-        raise InvalidArgumentsException("Role does not exist.")
+        raise InvalidArgumentsException('Role does not exist.')
     new_user.roles.append(role)
     return UsersRepository.add_new_user(new_user)
 
@@ -32,10 +32,10 @@ def sign_in_user(email: str, password: str) -> str:
     """
     user = UsersRepository.get_user_by_email(email)
     if user is None:
-        raise InvalidArgumentsException("User does not exist.")
+        raise InvalidArgumentsException('User does not exist.')
     password_match = check_password_hash(user.password, password)
     if not password_match:
-        raise InvalidArgumentsException("Password does not match.")
+        raise InvalidArgumentsException('Password does not match.')
     login_user(user)
     return user.get_auth_token()
 
