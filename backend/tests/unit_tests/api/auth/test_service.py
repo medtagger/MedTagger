@@ -24,7 +24,7 @@ def sign_in_wrong_password_fixture(mocker: Any) -> None:
     return mocked_sign_in_failure
 
 
-def test_create_user_user_already_exist(mocker: Any, create_user_exception_fixture: Any):
+def test_create_user_user_already_exist(mocker: Any, create_user_exception_fixture: Any) -> None:
     """Check if create user endpoint responds accordingly to situation when user exists."""
     api = get_test_application(mocker)
     payload = {'email': 'test@mail.com', 'password': 'medtagger',
@@ -42,7 +42,7 @@ def test_create_user_user_already_exist(mocker: Any, create_user_exception_fixtu
     assert message == 'Invalid arguments.'
 
 
-def test_create_user_password_too_short(mocker: Any):
+def test_create_user_password_too_short(mocker: Any) -> None:
     """Check if create user endpoint responds accordingly to wrong input (password too short)."""
     api = get_test_application(mocker)
     payload = {'email': 'test@mail.com', 'password': 'medtag',
@@ -60,8 +60,8 @@ def test_create_user_password_too_short(mocker: Any):
     assert message == 'Input payload validation failed'
 
 
-def test_create_user_one_argument_missing(mocker: Any):
-    """Check if create user endpoint responds accordingly to wrong input (missing email)."""
+def test_create_user_email_missing(mocker: Any) -> None:
+    """Check if create user endpoint responds accordingly to missing email."""
     api = get_test_application(mocker)
     payload = {'password': 'medtagger1', 'firstName': 'First', 'lastName': 'Last'}
 
@@ -77,7 +77,7 @@ def test_create_user_one_argument_missing(mocker: Any):
     assert message == 'Input payload validation failed'
 
 
-def test_sing_in_wrong_password(mocker: Any, sign_in_wrong_password_fixture: Any):
+def test_sing_in_wrong_password(mocker: Any, sign_in_wrong_password_fixture: Any) -> None:
     """Check if sign in endpoint responds accordingly to user providing wrong password."""
     api = get_test_application(mocker)
     payload = {'email': 'test@mail.com', 'password': 'medtaggger'}

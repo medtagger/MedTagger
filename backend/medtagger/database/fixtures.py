@@ -70,7 +70,7 @@ def insert_user_roles() -> None:
             logger.info('Role added for name "%s"', role_name)
 
 
-def apply_all_fixtures():
+def apply_all_fixtures() -> None:
     """Apply all available fixtures."""
     logger.info('Applying fixtures for Scan Categories...')
     insert_scan_categories()
