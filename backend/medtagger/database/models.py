@@ -2,7 +2,7 @@
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
 import enum
 import uuid
-from typing import List
+from typing import List, cast
 
 from flask_security import UserMixin, RoleMixin
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
@@ -120,8 +120,11 @@ class Scan(Base):
     @property
     def stored_slices(self) -> List['Slice']:
         """Return all Slices which were already stored."""
+        _slice_stored_column = cast(Boolean, Slice.stored)  # MyPy understands stored as 'bool' type
         with db_session() as session:
-            return session.query(Slice).filter(Slice.stored.is_(True)).all()
+            query = session.query(Slice)
+            query = query.filter(_slice_stored_column.is_(True))
+            return query.all()
 
     def add_slice(self, orientation: SliceOrientation = SliceOrientation.Z) -> 'Slice':
         """Add new slice into this Scan.
