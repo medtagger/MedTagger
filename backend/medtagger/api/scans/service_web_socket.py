@@ -13,7 +13,7 @@ from medtagger.api.scans import business
 class Slices(Namespace):
     """WebSocket handler for /slices namespace."""
 
-    MAX_NUMBER_OF_SLICES_PER_REQUEST = 10
+    MAX_NUMBER_OF_SLICES_PER_REQUEST = 25
 
     def on_request_slices(self, request: Dict) -> None:
         """Handle slices request triggered  by `request_slices` event."""

@@ -22,7 +22,7 @@ import {CircleROISelector} from '../../components/selectors/CircleROISelector';
 })
 export class MarkerPageComponent implements OnInit {
 
-  private static readonly SLICE_BATCH_SIZE = 10;
+  private static readonly SLICE_BATCH_SIZE = 25;
 
   @ViewChild(MarkerComponent) marker: MarkerComponent;
 
