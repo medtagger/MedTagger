@@ -123,6 +123,7 @@ class Scan(Base):
         _slice_stored_column = cast(Boolean, Slice.stored)  # MyPy understands stored as 'bool' type
         with db_session() as session:
             query = session.query(Slice)
+            query = query.filter(Slice.scan_id == self.id)
             query = query.filter(_slice_stored_column.is_(True))
             return query.all()
 
