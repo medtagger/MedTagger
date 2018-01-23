@@ -117,6 +117,12 @@ class Scan(Base):
         """Return string representation for Scan."""
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key)
 
+    @property
+    def stored_slices(self) -> List['Slice']:
+        """Return all Slices which were already stored."""
+        with db_session() as session:
+            return session.query(Slice).filter(Slice.stored.is_(True)).all()
+
     def add_slice(self, orientation: SliceOrientation = SliceOrientation.Z) -> 'Slice':
         """Add new slice into this Scan.
 
