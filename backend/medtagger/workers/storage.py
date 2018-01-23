@@ -21,7 +21,7 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
     logger.debug('Parsing Dicom file from HBase for given Slice ID: %s.', slice_id)
     image = SlicesRepository.get_slice_original_image(slice_id)
     image_bytes = io.BytesIO(image)
-    dicom_image = dicom.read_file(image_bytes, force=True)
+    dicom_image = dicom.read_file(image_bytes, stop_before_pixels=True, force=True)
 
     location = SliceLocation(dicom_image.SliceLocation)
     position = SlicePosition(dicom_image.ImagePositionPatient[0],
@@ -36,7 +36,7 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
 
     # Run conversion to PNG if this is the latest uploaded Slice
     scan = _slice.scan
-    logger.debug('Stored %s Slices. Waiting for %s Slices.', len(scan.slices), scan.declared_number_of_slices)
-    if scan.declared_number_of_slices == len(scan.slices):
+    logger.debug('Stored %s Slices. Waiting for %s Slices.', len(scan.stored_slices), scan.declared_number_of_slices)
+    if scan.declared_number_of_slices == len(scan.stored_slices):
         logger.debug('All Slices uploaded for %s! Running conversion...', scan)
         convert_scan_to_png.delay(scan.id)
