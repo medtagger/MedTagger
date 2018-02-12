@@ -1,6 +1,8 @@
 """Module responsible for definition of Roles' Repository."""
 from typing import Optional
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from medtagger.api import InvalidArgumentsException
 from medtagger.database import db_session
 from medtagger.database.models import Role
@@ -17,19 +19,20 @@ class RolesRepository(object):
         :return Optional of role
         """
         with db_session() as session:
-            role = session.query(Role).filter(Role.name == role_name).first()
+            role = session.query(Role).filter(Role.name == role_name).one()
         return role
 
     @staticmethod
     def set_user_role(user_id: int, role_name: str) -> None:
         """Set user's role. Old role is being replaced."""
-        user = UsersRepository.get_user_by_id(user_id)
-        if user is None:
+        try:
+            user = UsersRepository.get_user_by_id(user_id)
+        except NoResultFound:
             raise InvalidArgumentsException('User with this id does not exist.')
-        role = RolesRepository.get_role_with_name(role_name)
-        if role is None:
+        try:
+            role = RolesRepository.get_role_with_name(role_name)
+        except NoResultFound:
             raise InvalidArgumentsException('Role with this name does not exist.')
         with db_session() as session:
-            user.roles.clear()
-            user.roles.append(role)
+            user.roles = [role]
             session.add(user)

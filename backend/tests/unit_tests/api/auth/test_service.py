@@ -18,7 +18,7 @@ def create_user_exception_fixture(mocker: Any) -> None:
 
 @pytest.fixture
 def sign_in_wrong_password_fixture(mocker: Any) -> None:
-    """Return fixture for sing in user method used by sing in endpoint."""
+    """Return fixture for sign in user method used by sign in endpoint."""
     mocked_sign_in_failure = mocker.patch('medtagger.api.auth.service.sign_in_user')
     mocked_sign_in_failure.side_effect = InvalidArgumentsException('Password does not match.')
     return mocked_sign_in_failure
@@ -77,7 +77,7 @@ def test_create_user_email_missing(mocker: Any) -> None:
     assert message == 'Input payload validation failed'
 
 
-def test_sing_in_wrong_password(mocker: Any, sign_in_wrong_password_fixture: Any) -> None:
+def test_sign_in_wrong_password(mocker: Any, sign_in_wrong_password_fixture: Any) -> None:
     """Check if sign in endpoint responds accordingly to user providing wrong password."""
     api = get_test_application(mocker)
     payload = {'email': 'test@mail.com', 'password': 'medtaggger'}

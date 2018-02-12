@@ -67,8 +67,8 @@ def test_create_user_missing_role(mocker: Any, get_user_by_email_failure_fixture
     assert str(exception.value) == 'Role does not exist.'
 
 
-def test_sing_in_user_user_does_not_exists(mocker: Any, get_user_by_email_failure_fixture: Any) -> None:
-    """Check if sing int method raises exception when user provides wrong password."""
+def test_sign_in_user_user_does_not_exists(mocker: Any, get_user_by_email_failure_fixture: Any) -> None:
+    """Check if sign int method raises exception when user provides wrong password."""
     email = 'test@mail.com'
     password = 'medtagger'
 
@@ -77,9 +77,9 @@ def test_sing_in_user_user_does_not_exists(mocker: Any, get_user_by_email_failur
     assert str(exception.value) == 'User does not exist.'
 
 
-def test_sing_in_user_wrong_password(mocker: Any, get_user_by_email_success_fixture: Any,
+def test_sign_in_user_wrong_password(mocker: Any, get_user_by_email_success_fixture: Any,
                                      wrong_password_fixture: Any) -> None:
-    """Check if sing int method raises exception when user provides wrong password."""
+    """Check if sign int method raises exception when user provides wrong password."""
     email = 'test@mail.com'
     password = 'medtagger'
 

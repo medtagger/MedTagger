@@ -22,7 +22,7 @@ from flask_security import Security, SQLAlchemyUserDatastore  # noqa
 from medtagger.api import blueprint, web_socket  # noqa
 from medtagger.config import AppConfiguration  # noqa
 from medtagger.database import db  # noqa
-from medtagger.database.models import User, Role
+from medtagger.database.models import User, Role  # noqa
 
 # Import all REST services
 from medtagger.api.core.service import core_ns as core_rest_ns  # noqa

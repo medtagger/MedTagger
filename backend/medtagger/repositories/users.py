@@ -37,11 +37,11 @@ class UsersRepository(object):
         return user
 
     @staticmethod
-    def get_user_by_id(user_id: int) -> Optional[User]:
+    def get_user_by_id(user_id: int) -> User:
         """Get user with given email.
 
         :return Optional of User
         """
         with db_session() as session:
-            user = session.query(User).filter(User.id == user_id).first()
+            user = session.query(User).filter(User.id == user_id).one()
         return user

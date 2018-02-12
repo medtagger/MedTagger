@@ -6,15 +6,15 @@ from tests.functional_tests import get_api_client
 from medtagger.api.users.business import set_user_role
 from medtagger.api.auth.business import create_user
 
-example_user_email = 'test@mail.com'
-example_user_password = 'medtagger1'
-example_user_first_name = 'First'
-example_user_last_name = 'Last'
+EXAMPLE_USER_EMAIL = 'test@mail.com'
+EXAMPLE_USER_PASSWORD = 'medtagger1'
+EXAMPLE_USER_FIRST_NAME = 'First'
+EXAMPLE_USER_LAST_NAME = 'Last'
 
-admin_email = 'admin@medtagger.com'
-admin_password = 'medtagger2'
-admin_first_name = 'First'
-admin_last_name = 'Last'
+ADMIN_EMAIL = 'admin@medtagger.com'
+ADMIN_PASSWORD = 'medtagger2'
+ADMIN_FIRST_NAME = 'First'
+ADMIN_LAST_NAME = 'Last'
 
 
 def test_basic_user_flow(prepare_environment: Any) -> None:
@@ -22,8 +22,8 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     api_client = get_api_client()
 
     # Step 1. User creates an account
-    payload = {'email': example_user_email, 'password': example_user_password,
-               'firstName': example_user_first_name, 'lastName': example_user_last_name}
+    payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD,
+               'firstName': EXAMPLE_USER_FIRST_NAME, 'lastName': EXAMPLE_USER_LAST_NAME}
     response = api_client.post('/api/v1/auth/register', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
     assert response.status_code == 201
@@ -33,7 +33,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert user_id == 1
 
     # Step 2. User logs in
-    payload = {'email': example_user_email, 'password': example_user_password}
+    payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
     assert response.status_code == 200
@@ -49,9 +49,9 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     assert json_response['id'] == 1
-    assert json_response['email'] == example_user_email
-    assert json_response['firstName'] == example_user_first_name
-    assert json_response['lastName'] == example_user_last_name
+    assert json_response['email'] == EXAMPLE_USER_EMAIL
+    assert json_response['firstName'] == EXAMPLE_USER_FIRST_NAME
+    assert json_response['lastName'] == EXAMPLE_USER_LAST_NAME
     assert json_response['role'] == 'volunteer'
 
     # Step 4. User logs out
@@ -63,14 +63,14 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     """Test for upgrading volunteer's to doctor's role."""
     api_client = get_api_client()
 
-    admin_id = create_user(admin_email, admin_password, admin_first_name, admin_last_name)
-    volunteer_id = create_user(example_user_email, example_user_password, example_user_first_name,
-                               example_user_last_name)
+    admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
+    volunteer_id = create_user(EXAMPLE_USER_EMAIL, EXAMPLE_USER_PASSWORD, EXAMPLE_USER_FIRST_NAME,
+                               EXAMPLE_USER_LAST_NAME)
     set_user_role(admin_id, 'admin')
     set_user_role(volunteer_id, 'volunteer')
 
     # Step 1. Admin user logs in
-    payload = {'email': admin_email, 'password': admin_password}
+    payload = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
     assert response.status_code == 200
@@ -100,7 +100,7 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     assert response.status_code == 204
 
     # Step 5. User logs in
-    payload = {'email': example_user_email, 'password': example_user_password}
+    payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
     json_response = json.loads(response.data)
