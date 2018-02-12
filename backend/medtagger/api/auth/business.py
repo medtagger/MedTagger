@@ -11,6 +11,11 @@ from medtagger.repositories.users import UsersRepository
 def create_user(email: str, password: str, first_name: str, last_name: str) -> int:
     """Create user with the given user information. Password is being hashed.
 
+    :param email: user email in string format
+    :param password: user password in string format
+    :param first_name: user first name in string format
+    :param last_name: user last name in string format
+
     :return: id of the new user
     """
     user = UsersRepository.get_user_by_email(email)
@@ -27,6 +32,9 @@ def create_user(email: str, password: str, first_name: str, last_name: str) -> i
 
 def sign_in_user(email: str, password: str) -> str:
     """Sign in user using given username and password.
+
+    :param email: user email in string format
+    :param password: user password in string format
 
     :return: authentication token
     """
