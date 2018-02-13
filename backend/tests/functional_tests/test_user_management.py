@@ -82,7 +82,6 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
 
     # Step 2. Admin gets all users
     response = api_client.get('/api/v1/users/')
-    print(response.data)
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
