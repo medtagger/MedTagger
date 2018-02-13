@@ -1,6 +1,4 @@
 """Module responsible for definition of Roles' Repository."""
-from typing import Optional
-
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api import InvalidArgumentsException
@@ -13,18 +11,14 @@ class RolesRepository(object):
     """Repository for Roles."""
 
     @staticmethod
-    def get_role_with_name(role_name: str) -> Optional[Role]:
-        """Get role with given name.
-
-        :return Optional of role
-        """
-        with db_session() as session:
-            role = session.query(Role).filter(Role.name == role_name).one()
+    def get_role_with_name(role_name: str) -> Role:
+        """Get role with given name."""
+        role = Role.query.filter(Role.name == role_name).one()
         return role
 
     @staticmethod
     def set_user_role(user_id: int, role_name: str) -> None:
-        """Set user's role. Old role is being replaced."""
+        """Set user's role. Old role will be replaced."""
         try:
             user = UsersRepository.get_user_by_id(user_id)
         except NoResultFound:
