@@ -21,7 +21,6 @@ import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {RouterModule, Routes} from '@angular/router';
 
 import {
   MatCardModule,
@@ -44,20 +43,8 @@ import {
   MatTooltipModule,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
-import { AuthenticationHeader } from '../services/authentication-header';
-
-
-const routes: Routes = [
-  {path: '', redirectTo: 'login', pathMatch: 'full'},
-  {path: 'login', component: LoginPageComponent, data: {title: 'Welcome'}},
-  {path: 'home', component: HomePageComponent, data: {title: 'Home'}},
-  {path: 'category', component: CategoryPageComponent, data: {title: 'Choosing category'}},
-  {path: 'marker', component: MarkerPageComponent, data: {title: 'Labelling'}},
-  {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new scans'}},
-  {path: 'settings', component: SettingsPageComponent, data: {title: 'Settings'}},
-  {path: 'validation', component: ValidationPageComponent, data: {title: 'Validation'}},
-  {path: 'marker-tutorial', component: MarkerTutorialPageComponent, data: {title: 'Marker tutorial'}}
-];
+import {AuthenticationHeader} from '../services/authentication-header';
+import {routing} from "./app.routes";
 
 @NgModule({
   declarations: [
@@ -75,10 +62,7 @@ const routes: Routes = [
     ValidationPageComponent,
   ],
   imports: [
-    RouterModule.forRoot(
-      routes,
-      {enableTracing: true} // for debugging
-    ),
+    routing,
     MatToolbarModule,
     MatCardModule,
     MatProgressBarModule,

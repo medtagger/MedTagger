@@ -1,6 +1,6 @@
 <div class="categories">
   <div class="button-row" *ngIf="categories?.length > 0">
-    <button mat-fab *ngFor="let category of categories" routerLink="/marker" [queryParams]="{category: category.key}">
+    <button mat-fab *ngFor="let category of categories" routerLink="/labelling" [queryParams]="{category: category.key}">
       <mat-icon svgIcon="{{category.key}}"></mat-icon>
       <div>{{category.name}}</div>
     </button>
