@@ -1,4 +1,5 @@
 """Module for global fixtures that may be useful during application testing."""
+import logging
 from typing import Any
 
 import pytest
@@ -9,16 +10,18 @@ from medtagger.database import Base, engine, session
 from medtagger.database.fixtures import insert_scan_categories
 from medtagger.clients.hbase_client import HBaseClient
 
+logger = logging.getLogger(__name__)
+
 
 @pytest.fixture
 def prepare_environment() -> Any:
     """Prepare environment for testing purpose (setup DBs, fixtures) and clean up after the tests."""
-    print('Getting needed entries')
+    logger.info('Getting needed entries')
     configuration = AppConfiguration()
     host = configuration.get('hbase', 'host', fallback='localhost')
     port = configuration.getint('hbase', 'rest_port', fallback=8080)
 
-    print('Preparing databases.')
+    logger.info('Preparing databases.')
     Base.metadata.create_all(engine)
     hbase_connection = Connection(host=host, port=port)
     for table_name in HBaseClient.HBASE_SCHEMA:
@@ -26,13 +29,13 @@ def prepare_environment() -> Any:
         table = hbase_connection.table(table_name)
         table.create(*list_of_columns)
 
-    print('Applying fixtures')
+    logger.info('Applying fixtures')
     insert_scan_categories()
 
     # Run the test
     yield
 
-    print('Removing all data.')
+    logger.info('Removing all data.')
     session.close_all()
     Base.metadata.drop_all(engine)
     for table_name in HBaseClient.HBASE_SCHEMA:
