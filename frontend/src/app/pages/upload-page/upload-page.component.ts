@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatHorizontalStepper, MatStep } from '@angular/material';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import * as Rx from 'rxjs/Rx';
 
 import { ScanService } from '../../services/scan.service';
 
@@ -75,9 +76,9 @@ export class UploadPageComponent implements OnInit {
     this.slicesSent = 0;
     this.progress = 0.0;
     if (this.uploadMode === UploadMode.SINGLE_SCAN) {
-      this.uploadSingleScan(this.scans['singleScan']);
+      this.uploadSingleScan(this.scans['singleScan']).subscribe(_ => this.updateProgressBar());
     } else if (this.uploadMode === UploadMode.MULTIPLE_SCANS) {
-      this.uploadMultipleScans();
+      this.uploadMultipleScans().subscribe(_ => this.updateProgressBar());
     } else {
       console.error('Unsupported upload mode!');
     }
@@ -86,16 +87,22 @@ export class UploadPageComponent implements OnInit {
   uploadSingleScan(slices) {
     let category = this.chooseCategoryFormGroup.get('category').value;
     let numberOfSlices = slices.length;
-    this.scanService.createNewScan(category, numberOfSlices).then((scanId: string) => {
-      console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
-      this.scanService.uploadSlices(scanId, slices).subscribe(_ => this.updateProgressBar());
-    });
+
+    return Rx.Observable.defer(
+        () => this.scanService.createNewScan(category, numberOfSlices)
+      )
+      .map((scanId: string) => {
+        console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
+        return this.scanService.uploadSlices(scanId, slices);
+      });
   }
 
   uploadMultipleScans() {
-    for (var scan in this.scans) {
-      this.uploadSingleScan(this.scans[scan]);
-    }
+    let CONCURRENT_SCANS_UPLOAD = 1;
+
+    return Rx.Observable.from(Object.keys(this.scans))
+      .flatMap((scan) => this.uploadSingleScan(this.scans[scan]))
+      .mergeAll(CONCURRENT_SCANS_UPLOAD);
   }
 
   restart() {
