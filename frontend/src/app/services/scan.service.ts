@@ -5,6 +5,7 @@ import {Socket} from 'ng-socket-io';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 import {Observable} from 'rxjs/Observable';
+import * as Rx from 'rxjs/Rx';
 import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 import {ROISelection3D} from '../model/ROISelection3D';
@@ -52,7 +53,6 @@ export class ScanService {
     });
   }
 
-
   getScanForScanId(scanId: string): Promise<ScanMetadata> {
     return new Promise((resolve, reject) => {
       this.http.get(environment.API_URL + '/scans/' + scanId).toPromise().then(
@@ -89,12 +89,6 @@ export class ScanService {
     });
   }
 
-  acknowledgeObservable() {
-    return this.websocket.fromEvent<any>('ack').map(() => {
-      return true;
-    });
-  }
-
   slicesObservable(): Observable<MarkerSlice> {
     return this.websocket.fromEvent<any>('slice').map((slice: { scan_id: string, index: number, image: ArrayBuffer }) => {
       return new MarkerSlice(slice.scan_id, slice.index, slice.image);
@@ -123,21 +117,20 @@ export class ScanService {
     });
   }
 
-  uploadSlices(scanId: string, files: File[], currentFileUpload: number = 0) {
-    // Upload completed
-    if (currentFileUpload === files.length) {
-      return;
-    }
-
-    // Continue reading files from list
-    const fileReader = new FileReader();
-    fileReader.onload = () => {
-      const image = fileReader.result;
-      this.websocket.emit('upload_slice', {scan_id: scanId, image: image}, () => {
-        // Let's send another file from the list after completed upload
-        this.uploadSlices(scanId, files, currentFileUpload + 1);
-      });
-    };
-    fileReader.readAsArrayBuffer(files[currentFileUpload]);
+  uploadSlices(scanId: string, files: File[]) {
+    let TIME_INTERVAL = 1000;
+    return Rx.Observable.from(files)
+    .concatMap(file => Rx.Observable.just(file).delay(TIME_INTERVAL))
+    .flatMap((file) => {
+      let form = new FormData();
+      form.append('image', file, file.name);
+      return this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form);
+    })
+    .flatMap((response) => response)
+    .flatMap((response) => {
+      return 'ok';
+    });
+    // TODO: (important) throttle these calls and do not send them at once (maybe batches?)
   }
+
 }

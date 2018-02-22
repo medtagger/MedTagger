@@ -29,17 +29,6 @@ class Slices(Namespace):
         for index, (_slice, image) in enumerate(slices):
             emit('slice', {'scan_id': scan_id, 'index': begin + index, 'image': image})
 
-    @staticmethod
-    def on_upload_slice(request: Dict) -> None:
-        """Handle uploading new slices triggered by `upload_slice` event."""
-        assert request.get('scan_id'), 'ScanID is required!'
-        assert request.get('image'), 'Image is required!'
-        scan_id = ScanID(str(request['scan_id']))
-        image = request['image']
-
-        business.add_new_slice(scan_id, image)
-        emit('ack', {'success': True})
-
     def _raise_on_invalid_request_slices(self, scan_id: ScanID, begin: int, count: int, orientation: str) -> None:
         """Validate incoming request and raise an exception if there are issues with given arguments.
 

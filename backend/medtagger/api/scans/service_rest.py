@@ -109,3 +109,16 @@ class Scan(Resource):
     def get(scan_id: ScanID) -> Any:
         """Return scan for the given scan_id."""
         return business.get_scan_metadata(scan_id)._asdict()
+
+
+@scans_ns.route('/<string:scan_id>/slices')
+@scans_ns.param('scan_id', 'Scan identifier')
+class ScanSlices(Resource):
+    """Endpoint that allow for uploading Slices to given Scan."""
+
+    @staticmethod
+    def post(scan_id: ScanID) -> Any:
+        """Upload Slice for given Scan."""
+        image = request.files['image']
+        image_data = image.read()
+        business.add_new_slice(scan_id, image_data)

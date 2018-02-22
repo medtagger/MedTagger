@@ -52,13 +52,6 @@ export class UploadPageComponent implements OnInit {
     this.chooseCategoryFormGroup = this.formBuilder.group({
       'category': new FormControl(this.category, [Validators.required]),
     });
-    this.scanService.acknowledgeObservable().subscribe(() => {
-      this.slicesSent += 1;
-      this.progress = 100.0 * this.slicesSent / this.totalNumberOfSlices;
-      if (this.slicesSent === this.totalNumberOfSlices) {
-        this.stepper.next();
-      }
-    });
     this.scanService.getAvailableCategories().then((availableCategories) => {
       this.availableCategories = availableCategories;
     });
@@ -68,6 +61,14 @@ export class UploadPageComponent implements OnInit {
     this.scans = $event.scans;
     this.numberOfScans = $event.numberOfScans;
     this.totalNumberOfSlices = $event.numberOfSlices;
+  }
+ 
+  updateProgressBar() {
+    this.slicesSent += 1;
+    this.progress = 100.0 * this.slicesSent / this.totalNumberOfSlices;
+    if (this.slicesSent === this.totalNumberOfSlices) {
+      this.stepper.next();
+    }
   }
 
   uploadFiles() {
@@ -87,7 +88,7 @@ export class UploadPageComponent implements OnInit {
     let numberOfSlices = slices.length;
     this.scanService.createNewScan(category, numberOfSlices).then((scanId: string) => {
       console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
-      this.scanService.uploadSlices(scanId, slices);
+      this.scanService.uploadSlices(scanId, slices).subscribe(_ => this.updateProgressBar());
     });
   }
 
