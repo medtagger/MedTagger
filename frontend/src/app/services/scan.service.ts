@@ -118,19 +118,17 @@ export class ScanService {
   }
 
   uploadSlices(scanId: string, files: File[]) {
-    let TIME_INTERVAL = 1000;
+    let CONCURRENT_API_CALLS = 5;
+
     return Rx.Observable.from(files)
-    .concatMap(file => Rx.Observable.just(file).delay(TIME_INTERVAL))
-    .flatMap((file) => {
-      let form = new FormData();
-      form.append('image', file, file.name);
-      return this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form);
-    })
-    .flatMap((response) => response)
-    .flatMap((response) => {
-      return 'ok';
-    });
-    // TODO: (important) throttle these calls and do not send them at once (maybe batches?)
+      .map((file) => {
+        let form = new FormData();
+        form.append('image', file, file.name);
+        return Rx.Observable.defer(
+          () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
+        );
+      }) 
+      .mergeAll(CONCURRENT_API_CALLS);
   }
 
 }
