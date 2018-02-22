@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+echo "Waiting for dependencies..."
+. scripts/wait_for_dependencies.sh
+
 echo "Migrating SQL database..."
 alembic upgrade head
 
