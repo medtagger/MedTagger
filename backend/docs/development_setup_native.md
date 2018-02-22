@@ -60,6 +60,6 @@ And that's all! Everything should be fine and Swagger for our REST API should be
 To make sure that your databases are up-to-date use:
 
 ```bash
-(venv) make update_dependencies
+(venv) $ make update_dependencies
 ```
 
