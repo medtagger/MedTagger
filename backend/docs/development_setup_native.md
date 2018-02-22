@@ -12,12 +12,9 @@ Here is a list of things that you need to run our backend natively:
  - Python 3.6-dev,
  - Virtualenv,
  - Make,
- - RabbitMQ, Hadoop and HBase (can be set up using Docker Compose).
+ - Docker with Docker-Compose.
 
 ### How to do this?
-
-**Important:** Before following below steps, please make sure that you've got access to the Rabbit, HBase and other
-dependencies. To do so, please follow steps from the docs [here](/docs/dependencies_via_docker_compose.md)!
 
 Let's start! At first, please clone this repository somewhere on your computer:
 
@@ -35,29 +32,9 @@ $ make venv
 $ . ./devenv.sh
 ```
 
-Your project is now ready to be run but your HBase database is still empty. Before you start your journey with backend,
-launch script that will create all tables in HBase.
-
+You can now run all dependencies like HBase, PostgreSQL and RabbitMQ with just one command:
 ```bash
-(venv) $ python3.6 scripts/migrate_hbase.py
-```
-
-It will ask you a few questions and answer them with `y` or `yes` to create all needed entries.
-
-**_Tip!_** This script may be useful one day to create new tables or delete a new one. Please check documentation
-inside of this script for more information.
-
-Then, prepare your PostgreSQL database with:
-
-```bash
-(venv) $ alembic upgrade head
-```
-
-After schema is prepared, fill database with fixtures and default Dev accounts:
-
-```bash
-(venv) $ python3.6 medtagger/database/fixtures.py
-(venv) $ python3.6 scripts/dev__add_default_accounts.py
+(venv) $ make start_dependencies
 ```
 
 Now, your backend is ready to be used, so let's try to run it!
@@ -77,3 +54,12 @@ In the second window we'll open our Flask REST API with WebSockets server. To do
 
 And that's all! Everything should be fine and Swagger for our REST API should be available on
 `http://localhost:51000/api/v1`.
+
+### How to update dependencies (eg. database schema)?
+
+To make sure that your databases are up-to-date use:
+
+```bash
+(venv) $ make update_dependencies
+```
+

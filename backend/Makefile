@@ -38,6 +38,20 @@ run_workers:
 	PYTHONPATH=`pwd` celery -A medtagger.workers worker --loglevel=info
 
 #
+# Dependencies
+#
+
+start_dependencies:
+	cd .. && docker-compose up -d hbase postgres rabbitmq
+	make update_dependencies
+
+stop_dependencies:
+	cd .. && docker-compose down hbase postgres rabbitmq
+
+update_dependencies:
+	./scripts/dev__prepare_backend.sh
+
+#
 # Testing
 #
 
@@ -80,4 +94,4 @@ clean:
 	find . -name '*.pyc' -delete
 	find . -name '*.log' -delete
 
-.PHONY: venv install_packages run_api run_workers clean test test_pylint test_flake8 test_mypy unit_tests functional_tests
+.PHONY: venv install_packages run_api run_workers start_dependencies stop_dependencies update_dependencies clean test test_pylint test_flake8 test_mypy unit_tests functional_tests

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 export MEDTAGGER__API_HOST="0.0.0.0"
 export MEDTAGGER__API_PORT=51000
 export MEDTAGGER__API_DEBUG=1
