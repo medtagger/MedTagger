@@ -32,7 +32,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert isinstance(scan_id, str)
     assert len(scan_id) >= 1
 
-    # Step 3. Send slices through Web Socket
+    # Step 3. Send slices
     with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
         response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
             'image': (image, 'slice_1.dcm'),

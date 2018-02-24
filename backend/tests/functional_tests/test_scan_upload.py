@@ -23,7 +23,7 @@ def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Send Slices through Web Socket
+    # Step 2. Send Slices
     for file in glob.glob('example_data/example_scan/*.dcm'):
         with open(file, 'rb') as image:
             response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={

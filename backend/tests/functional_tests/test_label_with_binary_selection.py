@@ -18,7 +18,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Send Slices through Web Socket
+    # Step 2. Send Slices
     with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
         response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
             'image': (image, 'slice_1.dcm'),
