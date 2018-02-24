@@ -3,6 +3,7 @@ import { MatHorizontalStepper, MatStep } from '@angular/material';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { ScanService } from '../../services/scan.service';
+import {UploadScansSelectorComponent} from "../../components/upload-scans-selector/upload-scans-selector.component";
 
 
 enum UploadMode {
@@ -24,6 +25,8 @@ export class UploadPageComponent implements OnInit {
   @ViewChild('chooseFilesStep') chooseFilesStep: MatStep;
   @ViewChild('sendingFilesStep') sendingFilesStep: MatStep;
   @ViewChild('uploadCompletedStep') uploadCompletedStep: MatStep;
+  @ViewChild('uploadSingleScanSelector') uploadSingleScanSelector: UploadScansSelectorComponent;
+  @ViewChild('uploadMultipleScansSelector') uploadMultipleScansSelector: UploadScansSelectorComponent;
 
   scans: object = {};
   numberOfScans: number = 0;
@@ -99,8 +102,23 @@ export class UploadPageComponent implements OnInit {
 
   restart() {
     this.chooseCategoryFormGroup.reset();
+    this.chooseModeFormGroup.reset();
+    this.chooseFilesFormGroup.reset();
+    this.sendingFilesFormGroup.reset();
+    this.uploadCompletedFormGroup.reset();
+
+    if(this.uploadSingleScanSelector) {
+      this.uploadSingleScanSelector.reinitialize();
+    }
+
+    if(this.uploadMultipleScansSelector) {
+      this.uploadMultipleScansSelector.reinitialize();
+    }
+
     this.scans = {};
     this.numberOfScans = 0;
+    this.totalNumberOfSlices = 0;
+    this.slicesSent = 0;
     this.totalNumberOfSlices = 0;
 
     this.stepper.selectedIndex = 0;

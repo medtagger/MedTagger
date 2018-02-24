@@ -70,7 +70,7 @@
             <!--<img src="../../../assets/img/example_upload_single_scan.png">-->
           </mat-card-content>
           <mat-card-actions>
-            <upload-scans-selector (onFileSelect)="chooseFiles($event)" [multipleScans]="false" style="float: left;"></upload-scans-selector>
+            <upload-scans-selector #uploadSingleScanSelector (onFileSelect)="chooseFiles($event)" [multipleScans]="false" style="float: left;"></upload-scans-selector>
             <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" matStepperNext>Upload!</button>
             <div class="clearfix"></div>
           </mat-card-actions>
@@ -88,7 +88,7 @@
             <!--<img src="../../../assets/img/example_upload_multiple_scans.png">-->
           </mat-card-content>
           <mat-card-actions>
-            <upload-scans-selector (onFileSelect)="chooseFiles($event)" [multipleScans]="true" style="float: left;"></upload-scans-selector>
+            <upload-scans-selector #uploadMultipleScansSelector (onFileSelect)="chooseFiles($event)" [multipleScans]="true" style="float: left;"></upload-scans-selector>
             <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" matStepperNext>Upload!</button>
             <div class="clearfix"></div>
           </mat-card-actions>
