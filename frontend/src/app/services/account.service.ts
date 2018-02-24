@@ -9,7 +9,7 @@ export class AccountService {
     constructor(private http: Http, private authenticationHeader: AuthenticationHeader) {}
 
     public register(email: string, password: string, firstName: string, lastName: string): Promise<void> {
-        let url = environment.API_URL + '/account/register';
+        let url = environment.API_URL + '/auth/register';
         let payload = {
             email: email,
             password: password,
@@ -30,7 +30,7 @@ export class AccountService {
     }
 
     public logIn(email: string, password: string): Promise<string> {
-        let url = environment.API_URL + '/account/sign-in';
+        let url = environment.API_URL + '/auth/sign-in';
         let payload = {
             'email': email,
             'password': password
@@ -49,7 +49,7 @@ export class AccountService {
     }
 
     public getCurrentUserInfo(): Promise<UserInfo> {
-        let url = environment.API_URL + '/account/user-info';
+        let url = environment.API_URL + '/users/info';
         return new Promise((resolve, reject) => {
             this.http.get(url, {
                 headers: this.authenticationHeader.create()
