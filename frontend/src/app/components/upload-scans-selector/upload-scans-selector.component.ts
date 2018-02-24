@@ -33,7 +33,7 @@ export class UploadScansSelectorComponent {
       };
       return;
     }
-    
+
     // User selected multiple scans for upload, so let's group them into the Scans
     this.numberOfScans = 0;
     this.numberOfSlices = 0;
@@ -68,5 +68,13 @@ export class UploadScansSelectorComponent {
 
   selectFile() {
     this.nativeInputFile.nativeElement.click();
+  }
+
+  public reinitialize(): void {
+    this._files = [];
+
+    this.numberOfSlices = 0;
+    this.numberOfScans = 0;
+    this.scans = {};
   }
 }
