@@ -111,4 +111,5 @@ backend_api.conf
 medtagger_backend.log*
 *.swp
 .gitignore.bak
+.pytest_cache
 

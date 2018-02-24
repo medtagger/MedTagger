@@ -32,15 +32,17 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert isinstance(scan_id, str)
     assert len(scan_id) >= 1
 
-    # Step 3. Send slices through Web Socket
+    # Step 3. Send slices
     with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
-        binary_image = image.read()
-    web_socket_client.emit('upload_slice', {'scan_id': scan_id, 'image': binary_image}, namespace='/slices')
-    responses = web_socket_client.get_received(namespace='/slices')
-    assert len(responses) == 1
-    response = responses[0]
-    assert response['name'] == 'ack'
-    assert response['args'][0] == {'success': True}
+        response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
+            'image': (image, 'slice_1.dcm'),
+        }, content_type='multipart/form-data')
+    assert response.status_code == 201
+    json_response = json.loads(response.data)
+    assert isinstance(json_response, dict)
+    slice_id = json_response['slice_id']
+    assert isinstance(slice_id, str)
+    assert len(slice_id) >= 1
 
     # Step 4. Get random scan
     response = api_client.get('/api/v1/scans/random?category={}'.format(category_key))

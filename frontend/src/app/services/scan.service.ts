@@ -52,7 +52,6 @@ export class ScanService {
     });
   }
 
-
   getScanForScanId(scanId: string): Promise<ScanMetadata> {
     return new Promise((resolve, reject) => {
       this.http.get(environment.API_URL + '/scans/' + scanId).toPromise().then(
@@ -89,12 +88,6 @@ export class ScanService {
     });
   }
 
-  acknowledgeObservable() {
-    return this.websocket.fromEvent<any>('ack').map(() => {
-      return true;
-    });
-  }
-
   slicesObservable(): Observable<MarkerSlice> {
     return this.websocket.fromEvent<any>('slice').map((slice: { scan_id: string, index: number, image: ArrayBuffer }) => {
       return new MarkerSlice(slice.scan_id, slice.index, slice.image);
@@ -123,21 +116,18 @@ export class ScanService {
     });
   }
 
-  uploadSlices(scanId: string, files: File[], currentFileUpload: number = 0) {
-    // Upload completed
-    if (currentFileUpload === files.length) {
-      return;
-    }
+  uploadSlices(scanId: string, files: File[]) {
+    let CONCURRENT_API_CALLS = 5;
 
-    // Continue reading files from list
-    const fileReader = new FileReader();
-    fileReader.onload = () => {
-      const image = fileReader.result;
-      this.websocket.emit('upload_slice', {scan_id: scanId, image: image}, () => {
-        // Let's send another file from the list after completed upload
-        this.uploadSlices(scanId, files, currentFileUpload + 1);
-      });
-    };
-    fileReader.readAsArrayBuffer(files[currentFileUpload]);
+    return Observable.from(files)
+      .map((file) => {
+        let form = new FormData();
+        form.append('image', file, file.name);
+        return Observable.defer(
+          () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
+        );
+      }) 
+      .mergeAll(CONCURRENT_API_CALLS);
   }
+
 }

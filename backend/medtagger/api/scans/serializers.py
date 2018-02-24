@@ -41,5 +41,9 @@ out__new_scan = api.model('Newly created Scan model', {
     'scan_id': fields.String(description='Scan\'s ID', attribute='id'),
 })
 
+out__new_slice = api.model('Newly created Slice model', {
+    'slice_id': fields.String(description='Slice\'s ID', attribute='id'),
+})
+
 args__random_scan = reqparse.RequestParser()
 args__random_scan.add_argument('category', type=str, required=True, help='Scan\'s category')
