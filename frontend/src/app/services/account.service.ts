@@ -66,4 +66,8 @@ export class AccountService {
                 });
         })
     }
+
+    public isLoggedIn(): boolean {
+      return !!(sessionStorage.getItem('userInfo') && sessionStorage.getItem('authenticationToken'))
+    }
 }
