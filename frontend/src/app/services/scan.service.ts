@@ -5,7 +5,6 @@ import {Socket} from 'ng-socket-io';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 import {Observable} from 'rxjs/Observable';
-import * as Rx from 'rxjs/Rx';
 import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 import {ROISelection3D} from '../model/ROISelection3D';
@@ -120,11 +119,11 @@ export class ScanService {
   uploadSlices(scanId: string, files: File[]) {
     let CONCURRENT_API_CALLS = 5;
 
-    return Rx.Observable.from(files)
+    return Observable.from(files)
       .map((file) => {
         let form = new FormData();
         form.append('image', file, file.name);
-        return Rx.Observable.defer(
+        return Observable.defer(
           () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
         );
       }) 

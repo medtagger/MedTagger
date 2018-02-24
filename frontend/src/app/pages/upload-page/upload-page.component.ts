@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatHorizontalStepper, MatStep } from '@angular/material';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
-import * as Rx from 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 
 import { ScanService } from '../../services/scan.service';
 
@@ -88,7 +88,7 @@ export class UploadPageComponent implements OnInit {
     let category = this.chooseCategoryFormGroup.get('category').value;
     let numberOfSlices = slices.length;
 
-    return Rx.Observable.defer(
+    return Observable.defer(
         () => this.scanService.createNewScan(category, numberOfSlices)
       )
       .map((scanId: string) => {
@@ -100,7 +100,7 @@ export class UploadPageComponent implements OnInit {
   uploadMultipleScans() {
     let CONCURRENT_SCANS_UPLOAD = 1;
 
-    return Rx.Observable.from(Object.keys(this.scans))
+    return Observable.from(Object.keys(this.scans))
       .flatMap((scan) => this.uploadSingleScan(this.scans[scan]))
       .mergeAll(CONCURRENT_SCANS_UPLOAD);
   }
