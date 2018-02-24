@@ -8,20 +8,21 @@ import {RouterModule, Routes} from "@angular/router";
 import {MarkerPageComponent} from "../pages/marker-page/marker-page.component";
 import {LoginPageComponent} from "../pages/login-page/login-page.component";
 import {ModuleWithProviders} from "@angular/core";
+import {AuthGuard} from "../guards/auth.guard";
 
 export const labellingRoutes: Routes = [
-  {path: 'labelling', component: MarkerPageComponent, data: {title: 'Labelling'}},
-  {path: 'labelling/choose-category', component: CategoryPageComponent, data: {title: 'Choosing category'}},
-  {path: 'labelling/tutorial', component: MarkerTutorialPageComponent, data: {title: 'Marker tutorial'}}
+  {path: 'labelling', component: MarkerPageComponent, data: {title: 'Labelling'}, canActivate: [AuthGuard]},
+  {path: 'labelling/choose-category', component: CategoryPageComponent, data: {title: 'Choosing category'}, canActivate: [AuthGuard]},
+  {path: 'labelling/tutorial', component: MarkerTutorialPageComponent, data: {title: 'Marker tutorial'}, canActivate: [AuthGuard]}
 ];
 
 export const routes: Routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full'},
   {path: 'login', component: LoginPageComponent, data: {title: 'Welcome'}},
-  {path: 'home', component: HomePageComponent, data: {title: 'Home'}},
-  {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new scans'}},
-  {path: 'settings', component: SettingsPageComponent, data: {title: 'Settings'}},
-  {path: 'validation', component: ValidationPageComponent, data: {title: 'Validation'}},
+  {path: 'home', component: HomePageComponent, data: {title: 'Home'}, canActivate: [AuthGuard]},
+  {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new scans'}, canActivate: [AuthGuard]},
+  {path: 'settings', component: SettingsPageComponent, data: {title: 'Settings'}, canActivate: [AuthGuard]},
+  {path: 'validation', component: ValidationPageComponent, data: {title: 'Validation'}, canActivate: [AuthGuard]},
   ...labellingRoutes
 ];
 

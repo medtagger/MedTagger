@@ -16,7 +16,6 @@ import {SettingsPageComponent} from '../pages/settings-page/settings-page.compon
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
 import {MockService} from '../services/mock.service';
-
 import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
 
@@ -45,6 +44,8 @@ import {
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {AuthenticationHeader} from '../services/authentication-header';
 import {routing} from "./app.routes";
+import {AuthGuard} from "../guards/auth.guard";
+import {AccountService} from "../services/account.service";
 
 @NgModule({
   declarations: [
@@ -92,7 +93,9 @@ import {routing} from "./app.routes";
   ],
   providers: [
     MockService,
-    AuthenticationHeader
+    AuthenticationHeader,
+    AuthGuard,
+    AccountService
   ],
   bootstrap: [AppComponent]
 })
