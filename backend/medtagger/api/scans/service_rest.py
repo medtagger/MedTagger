@@ -109,3 +109,20 @@ class Scan(Resource):
     def get(scan_id: ScanID) -> Any:
         """Return scan for the given scan_id."""
         return business.get_scan_metadata(scan_id)._asdict()
+
+
+@scans_ns.route('/<string:scan_id>/slices')
+@scans_ns.param('scan_id', 'Scan identifier')
+class ScanSlices(Resource):
+    """Endpoint that allow for uploading Slices to given Scan."""
+
+    @staticmethod
+    @scans_ns.marshal_with(serializers.out__new_slice)
+    @scans_ns.doc(description='Returns newly created Slice.')
+    @scans_ns.doc(responses={201: 'Success', 400: 'Invalid arguments'})
+    def post(scan_id: ScanID) -> Any:
+        """Upload Slice for given Scan."""
+        image = request.files['image']
+        image_data = image.read()
+        new_slice = business.add_new_slice(scan_id, image_data)
+        return new_slice, 201

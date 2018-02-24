@@ -4,13 +4,12 @@ from typing import Any
 
 from medtagger.database.models import LabelStatus
 
-from tests.functional_tests import get_api_client, get_web_socket_client
+from tests.functional_tests import get_api_client
 
 
 def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application for adding and verifying Labels with Selections that have binary masks."""
     api_client = get_api_client()
-    web_socket_client = get_web_socket_client(namespace='/slices')
 
     # Step 1. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 1}
@@ -19,12 +18,17 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Send Slices through Web Socket
+    # Step 2. Send Slices
     with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
-        binary_image = image.read()
-    web_socket_client.emit('upload_slice', {'scan_id': scan_id, 'image': binary_image}, namespace='/slices')
-    responses = web_socket_client.get_received(namespace='/slices')
-    assert len(responses) == 1
+        response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
+            'image': (image, 'slice_1.dcm'),
+        }, content_type='multipart/form-data')
+    assert response.status_code == 201
+    json_response = json.loads(response.data)
+    assert isinstance(json_response, dict)
+    slice_id = json_response['slice_id']
+    assert isinstance(slice_id, str)
+    assert len(slice_id) >= 1
 
     # Step 3. Label it
     payload = {

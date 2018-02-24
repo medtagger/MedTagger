@@ -1,8 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatHorizontalStepper, MatStep } from '@angular/material';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Observable } from 'rxjs/Rx';
 
 import { ScanService } from '../../services/scan.service';
+import {UploadScansSelectorComponent} from "../../components/upload-scans-selector/upload-scans-selector.component";
 
 
 enum UploadMode {
@@ -24,6 +26,8 @@ export class UploadPageComponent implements OnInit {
   @ViewChild('chooseFilesStep') chooseFilesStep: MatStep;
   @ViewChild('sendingFilesStep') sendingFilesStep: MatStep;
   @ViewChild('uploadCompletedStep') uploadCompletedStep: MatStep;
+  @ViewChild('uploadSingleScanSelector') uploadSingleScanSelector: UploadScansSelectorComponent;
+  @ViewChild('uploadMultipleScansSelector') uploadMultipleScansSelector: UploadScansSelectorComponent;
 
   scans: object = {};
   numberOfScans: number = 0;
@@ -52,13 +56,6 @@ export class UploadPageComponent implements OnInit {
     this.chooseCategoryFormGroup = this.formBuilder.group({
       'category': new FormControl(this.category, [Validators.required]),
     });
-    this.scanService.acknowledgeObservable().subscribe(() => {
-      this.slicesSent += 1;
-      this.progress = 100.0 * this.slicesSent / this.totalNumberOfSlices;
-      if (this.slicesSent === this.totalNumberOfSlices) {
-        this.stepper.next();
-      }
-    });
     this.scanService.getAvailableCategories().then((availableCategories) => {
       this.availableCategories = availableCategories;
     });
@@ -69,14 +66,22 @@ export class UploadPageComponent implements OnInit {
     this.numberOfScans = $event.numberOfScans;
     this.totalNumberOfSlices = $event.numberOfSlices;
   }
+ 
+  updateProgressBar() {
+    this.slicesSent += 1;
+    this.progress = 100.0 * this.slicesSent / this.totalNumberOfSlices;
+    if (this.slicesSent === this.totalNumberOfSlices) {
+      this.stepper.next();
+    }
+  }
 
   uploadFiles() {
     this.slicesSent = 0;
     this.progress = 0.0;
     if (this.uploadMode === UploadMode.SINGLE_SCAN) {
-      this.uploadSingleScan(this.scans['singleScan']);
+      this.uploadSingleScan(this.scans['singleScan']).subscribe(_ => this.updateProgressBar());
     } else if (this.uploadMode === UploadMode.MULTIPLE_SCANS) {
-      this.uploadMultipleScans();
+      this.uploadMultipleScans().subscribe(_ => this.updateProgressBar());
     } else {
       console.error('Unsupported upload mode!');
     }
@@ -85,23 +90,43 @@ export class UploadPageComponent implements OnInit {
   uploadSingleScan(slices) {
     let category = this.chooseCategoryFormGroup.get('category').value;
     let numberOfSlices = slices.length;
-    this.scanService.createNewScan(category, numberOfSlices).then((scanId: string) => {
-      console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
-      this.scanService.uploadSlices(scanId, slices);
-    });
+
+    return Observable.defer(
+        () => this.scanService.createNewScan(category, numberOfSlices)
+      )
+      .map((scanId: string) => {
+        console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
+        return this.scanService.uploadSlices(scanId, slices);
+      });
   }
 
   uploadMultipleScans() {
-    for (var scan in this.scans) {
-      this.uploadSingleScan(this.scans[scan]);
-    }
+    let CONCURRENT_SCANS_UPLOAD = 1;
+
+    return Observable.from(Object.keys(this.scans))
+      .flatMap((scan) => this.uploadSingleScan(this.scans[scan]))
+      .mergeAll(CONCURRENT_SCANS_UPLOAD);
   }
 
   restart() {
     this.chooseCategoryFormGroup.reset();
+    this.chooseModeFormGroup.reset();
+    this.chooseFilesFormGroup.reset();
+    this.sendingFilesFormGroup.reset();
+    this.uploadCompletedFormGroup.reset();
+
+    if(this.uploadSingleScanSelector) {
+      this.uploadSingleScanSelector.reinitialize();
+    }
+
+    if(this.uploadMultipleScansSelector) {
+      this.uploadMultipleScansSelector.reinitialize();
+    }
+
     this.scans = {};
     this.numberOfScans = 0;
     this.totalNumberOfSlices = 0;
+    this.slicesSent = 0;
 
     this.stepper.selectedIndex = 0;
     this.chooseModeStep.completed = false;

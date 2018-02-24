@@ -12,9 +12,7 @@ class ScansRepository(object):
     @staticmethod
     def get_scan_by_id(scan_id: ScanID) -> Scan:
         """Fetch Scan from database."""
-        with db_session() as session:
-            scan = session.query(Scan).filter(Scan.id == scan_id).one()
-        return scan
+        return Scan.query.filter(Scan.id == scan_id).one()
 
     @staticmethod
     def get_random_scan(category: ScanCategory = None) -> Scan:
@@ -23,15 +21,13 @@ class ScansRepository(object):
         :param category: (optional) Scan's Category object
         :return: Label object
         """
-        with db_session() as session:
-            query = session.query(Scan)
-            if category:
-                query = query.join(ScanCategory)
-                query = query.filter(ScanCategory.key == category.key)
-            query = query.filter(Scan.converted)
-            query = query.order_by(func.random())
-            scan = query.first()
-        return scan
+        query = Scan.query
+        if category:
+            query = query.join(ScanCategory)
+            query = query.filter(ScanCategory.key == category.key)
+        query = query.filter(Scan.converted)
+        query = query.order_by(func.random())
+        return query.first()
 
     @staticmethod
     def add_new_scan(category: ScanCategory, number_of_slices: int) -> Scan:
