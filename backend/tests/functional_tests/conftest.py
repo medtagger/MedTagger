@@ -7,7 +7,7 @@ from starbase import Connection
 
 from medtagger.config import AppConfiguration
 from medtagger.database import Base, engine, session
-from medtagger.database.fixtures import insert_scan_categories
+from medtagger.database.fixtures import apply_all_fixtures
 from medtagger.clients.hbase_client import HBaseClient
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ def prepare_environment() -> Any:
         table.create(*list_of_columns)
 
     logger.info('Applying fixtures')
-    insert_scan_categories()
+    apply_all_fixtures()
 
     # Run the test
     yield
@@ -39,7 +39,6 @@ def prepare_environment() -> Any:
     session.close_all()
     Base.metadata.drop_all(engine)
     for table_name in HBaseClient.HBASE_SCHEMA:
-        list_of_columns = HBaseClient.HBASE_SCHEMA[table_name]
         table = hbase_connection.table(table_name)
         table.drop()
 

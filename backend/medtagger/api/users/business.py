@@ -1,29 +1,23 @@
-"""Module responseble for business logic for users administration."""
+"""Module responsible for business logic for users administration."""
 from typing import List
 
-from medtagger.api import InvalidArgumentsException
-from medtagger.api.account.business import user_datastore, user_to_user_info
-from medtagger.database import db_session
+from flask_login import current_user
+
 from medtagger.database.models import User
-from medtagger.types import UserInfo
+from medtagger.repositories.users import UsersRepository
+from medtagger.repositories.roles import RolesRepository
 
 
-def get_all_users() -> List[UserInfo]:
+def get_all_users() -> List[User]:
     """Return list of all users."""
-    users = User.query.all()
-    user_infos = list(map(user_to_user_info, users))
-    return user_infos
+    return UsersRepository.get_all_users()
+
+
+def get_current_user_info() -> User:
+    """Get current user personal information."""
+    return current_user
 
 
 def set_user_role(user_id: int, role_name: str) -> None:
     """Set user's role. Old role is being replaced."""
-    user = user_datastore.find_user(id=user_id)
-    if user is None:
-        raise InvalidArgumentsException("User not found")
-    role = user_datastore.find_role(role_name)
-    if role is None:
-        raise InvalidArgumentsException("Role not found")
-    with db_session() as session:
-        user.roles.clear()
-        user.roles.append(role)
-        session.add(user)
+    RolesRepository.set_user_role(user_id, role_name)

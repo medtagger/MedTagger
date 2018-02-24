@@ -1,18 +1,18 @@
-"""Module responsible for defining endpoints for user's account."""
+"""Module responsible for definition of Auth service."""
 from typing import Any
 
 from flask import request
-from flask_restplus import Resource
 from flask_security import login_required
+from flask_restplus import Resource
 
 from medtagger.api import api
-from medtagger.api.account import serializers
-from medtagger.api.account.business import create_user, sign_in_user, sign_out_user, get_current_user_info
+from medtagger.api.auth.business import create_user, sign_in_user, sign_out_user
+from medtagger.api.auth import serializers
 
-account_ns = api.namespace('account', 'User account management')
+auth_ns = api.namespace('auth', 'Auth methods')
 
 
-@account_ns.route('/register')
+@auth_ns.route('/register')
 class Register(Resource):
     """Register user endpoint."""
 
@@ -26,13 +26,13 @@ class Register(Resource):
         return {'id': user_id}, 201
 
 
-@account_ns.route('/sign-in')
+@auth_ns.route('/sign-in')
 class SignIn(Resource):
     """Sign in endpoint."""
 
     @staticmethod
     @api.expect(serializers.sign_in)
-    @api.doc(responses={200: 'Signed in', 400: 'User does not exist or wrong password'})
+    @api.doc(responses={200: 'Signed in', 400: 'User does not exist or wrong password was provided'})
     def post() -> Any:
         """Sign in the user."""
         sign_in = request.json
@@ -40,7 +40,7 @@ class SignIn(Resource):
         return {"token": token}, 200
 
 
-@account_ns.route('/sign-out')
+@auth_ns.route('/sign-out')
 class SignOut(Resource):
     """Sign out endpoint."""
 
@@ -51,17 +51,3 @@ class SignOut(Resource):
         """Sign out the user."""
         sign_out_user()
         return {}, 204
-
-
-@account_ns.route('/user-info')
-class GetUserInfo(Resource):
-    """Get user info endpoint."""
-
-    @staticmethod
-    @login_required
-    @api.marshal_with(serializers.user_info)
-    @api.doc(responses={200: 'Successfully retrieved data.'})
-    def get() -> Any:
-        """Get user info."""
-        user_info = get_current_user_info()
-        return user_info._asdict(), 200

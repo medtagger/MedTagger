@@ -1,5 +1,4 @@
 """Insert all database fixtures."""
-import logging
 import logging.config
 
 from sqlalchemy import exists
@@ -71,8 +70,13 @@ def insert_user_roles() -> None:
             logger.info('Role added for name "%s"', role_name)
 
 
-if __name__ == '__main__':
+def apply_all_fixtures() -> None:
+    """Apply all available fixtures."""
     logger.info('Applying fixtures for Scan Categories...')
     insert_scan_categories()
     logger.info('Applying fixtures for user Roles...')
     insert_user_roles()
+
+
+if __name__ == '__main__':
+    apply_all_fixtures()

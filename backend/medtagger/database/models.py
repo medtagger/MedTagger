@@ -55,6 +55,11 @@ class User(Base, UserMixin):
         """Return string representation for User."""
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.email)
 
+    @property
+    def role(self) -> List[Role]:
+        """Return role for User."""
+        return self.roles[0]
+
 
 class ScanCategory(Base):
     """Definition of a Scan Category."""
