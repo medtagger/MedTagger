@@ -9,14 +9,13 @@ from PIL import Image
 from medtagger.database.models import SliceOrientation
 from medtagger.repositories.slices import SlicesRepository
 
-from tests.functional_tests import get_api_client, get_web_socket_client
+from tests.functional_tests import get_api_client
 
 
 # pylint: disable=too-many-locals
 def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application for Scan upload and conversion."""
     api_client = get_api_client()
-    web_socket_client = get_web_socket_client(namespace='/slices')
 
     # Step 1. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 3}
@@ -27,8 +26,10 @@ def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery
     # Step 2. Send Slices through Web Socket
     for file in glob.glob('example_data/example_scan/*.dcm'):
         with open(file, 'rb') as image:
-            binary_image = image.read()
-            web_socket_client.emit('upload_slice', {'scan_id': scan_id, 'image': binary_image}, namespace='/slices')
+            response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
+                'image': (image, 'slice_1.dcm'),
+            }, content_type='multipart/form-data')
+            assert response.status_code == 201
 
     # Step 3. Check Scan & Slices in the databases
     z_slices = SlicesRepository.get_slices_by_scan_id(scan_id)

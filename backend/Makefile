@@ -46,7 +46,7 @@ start_dependencies:
 	make update_dependencies
 
 stop_dependencies:
-	cd .. && docker-compose down hbase postgres rabbitmq
+	cd .. && docker-compose down
 
 update_dependencies:
 	./scripts/dev__prepare_backend.sh
@@ -73,7 +73,7 @@ unit_tests:
 functional_tests:
 	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d hbase postgres rabbitmq
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
-	@if . $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ! pytest $(UNDER_TEST) ; then\
+	@if . $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ! pytest $(FUNCTIONAL_TEST) ; then\
 		echo "Functional tests failed!";\
 		docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down;\
 		exit 1;\

@@ -5,6 +5,7 @@ export MEDTAGGER__API_DEBUG=1
 export MEDTAGGER__API_SECRET_KEY="SECRET_KEY"
 
 export MEDTAGGER__DB_DATABASE_URI="postgresql://medtagger_user:MedTa99er!@localhost/medtagger"
+export MEDTAGGER__DB_CONNECTION_POOL_SIZE=25
 
 export MEDTAGGER__HBASE_HOST="localhost"
 export MEDTAGGER__HBASE_PORT=9090

@@ -117,8 +117,12 @@ class ScanSlices(Resource):
     """Endpoint that allow for uploading Slices to given Scan."""
 
     @staticmethod
+    @scans_ns.marshal_with(serializers.out__new_slice)
+    @scans_ns.doc(description='Returns newly created Slice.')
+    @scans_ns.doc(responses={201: 'Success', 400: 'Invalid arguments'})
     def post(scan_id: ScanID) -> Any:
         """Upload Slice for given Scan."""
         image = request.files['image']
         image_data = image.read()
-        business.add_new_slice(scan_id, image_data)
+        new_slice = business.add_new_slice(scan_id, image_data)
+        return new_slice, 201

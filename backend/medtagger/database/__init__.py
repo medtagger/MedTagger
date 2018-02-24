@@ -23,7 +23,8 @@ db = SQLAlchemy()
 
 configuration = AppConfiguration()
 db_uri = configuration.get('db', 'database_uri')
-engine = create_engine(db_uri, pool_size=20, convert_unicode=True)  # TODO: Move pool size to the env variable
+db_pool_size = configuration.getint('db', 'connection_pool_size')
+engine = create_engine(db_uri, pool_size=db_pool_size, convert_unicode=True)
 session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 Base = declarative_base(cls=DataLabelingBase)
