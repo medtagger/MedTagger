@@ -45,12 +45,25 @@ export class ROISelection2D implements SliceSelection {
   }
 
   public toJSON(scalar: number): SelectionData {
+    let correctPositionX = this._positionX;
+    let correctPositionY = this._positionY;
+    let correctWidth = this._width;
+    let correctHeight = this._height;
+
+    if (this._width < 0) {
+      correctPositionX += this._width;
+      correctWidth = Math.abs(this._width);
+    }
+    if (this._height < 0) {
+      correctPositionY += this._height;
+      correctHeight = Math.abs(this._height);
+    }
     return new SelectionData(
       this.sliceIndex,
-      this.normalize(this._positionX, scalar),
-      this.normalize(this._positionY, scalar),
-      this.normalize(this._width, scalar),
-      this.normalize(this._height, scalar)
+      this.normalize(correctPositionX, scalar),
+      this.normalize(correctPositionY, scalar),
+      this.normalize(correctWidth, scalar),
+      this.normalize(correctHeight, scalar)
     );
   }
 
