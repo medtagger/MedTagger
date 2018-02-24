@@ -119,7 +119,6 @@ export class UploadPageComponent implements OnInit {
     this.numberOfScans = 0;
     this.totalNumberOfSlices = 0;
     this.slicesSent = 0;
-    this.totalNumberOfSlices = 0;
 
     this.stepper.selectedIndex = 0;
     this.chooseModeStep.completed = false;
