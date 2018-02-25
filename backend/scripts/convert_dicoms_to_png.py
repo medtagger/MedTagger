@@ -26,8 +26,8 @@ parser.add_argument('--output', type=str, required=True,
                     help='Full path to directory where converted dicoms would be located')
 
 args = parser.parse_args()
-dicoms_folder_path = args.input_folder_path
-converted_dicoms_folder_path = args.output_folder_path
+dicoms_folder_path = args.input
+converted_dicoms_folder_path = args.output
 
 dicoms = [dicom.read_file(dicoms_folder_path + d) for d in os.listdir(dicoms_folder_path) if
           os.path.isfile(dicoms_folder_path + d)]
