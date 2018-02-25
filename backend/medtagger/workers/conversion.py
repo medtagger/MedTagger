@@ -1,10 +1,10 @@
 """Module responsible for asynchronous data conversion."""
 import io
-import logging
 import numpy as np
 
 import dicom
 from PIL import Image
+from celery.utils.log import get_task_logger
 
 from medtagger.types import ScanID
 from medtagger.workers import celery_app
@@ -13,7 +13,7 @@ from medtagger.database.models import SliceOrientation, Slice
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.slices import SlicesRepository
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 
 @celery_app.task

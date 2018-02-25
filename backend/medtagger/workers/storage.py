@@ -1,15 +1,15 @@
 """Module responsible for asynchronous data storage."""
 import io
-import logging
 
 import dicom
+from celery.utils.log import get_task_logger
 
 from medtagger.types import SliceID, SlicePosition, SliceLocation
 from medtagger.workers import celery_app
 from medtagger.workers.conversion import convert_scan_to_png
 from medtagger.repositories.slices import SlicesRepository
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 
 @celery_app.task
