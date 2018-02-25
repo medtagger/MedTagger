@@ -94,7 +94,7 @@ export class UploadPageComponent implements OnInit {
     return Observable.defer(
         () => this.scanService.createNewScan(category, numberOfSlices)
       )
-      .map((scanId: string) => {
+      .flatMap((scanId: string) => {
         console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
         return this.scanService.uploadSlices(scanId, slices);
       });
@@ -104,7 +104,7 @@ export class UploadPageComponent implements OnInit {
     let CONCURRENT_SCANS_UPLOAD = 1;
 
     return Observable.from(Object.keys(this.scans))
-      .flatMap((scan) => this.uploadSingleScan(this.scans[scan]))
+      .map((scan) => this.uploadSingleScan(this.scans[scan]))
       .mergeAll(CONCURRENT_SCANS_UPLOAD);
   }
 
