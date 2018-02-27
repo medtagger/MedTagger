@@ -3,7 +3,7 @@ from typing import List, Optional
 
 import numpy as np
 from scipy import ndimage
-from dicom.dataset import FileDataset
+from pydicom.dataset import FileDataset
 
 
 def convert_slice_to_normalized_8bit_array(dicom_file: FileDataset) -> np.ndarray:
