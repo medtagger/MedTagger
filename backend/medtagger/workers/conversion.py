@@ -2,7 +2,7 @@
 import io
 import numpy as np
 
-import dicom
+import pydicom
 from PIL import Image
 from celery.utils.log import get_task_logger
 
@@ -30,7 +30,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     for _slice in slices:
         image = SlicesRepository.get_slice_original_image(_slice.id)
         image_bytes = io.BytesIO(image)
-        dicom_image = dicom.read_file(image_bytes, force=True)
+        dicom_image = pydicom.read_file(image_bytes, force=True)
         dicom_images.append(dicom_image)
 
     # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation

@@ -14,7 +14,7 @@ Name of the converted Dicom file is a position of the scan on the z axis.
 import os
 import argparse
 
-import dicom
+import pydicom
 from PIL import Image
 
 from medtagger.conversion import convert_slice_to_normalized_8bit_array
