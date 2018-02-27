@@ -24,5 +24,5 @@ And that's all! You should be able to see MedTagger UI on `http://10.0.0.99:4200
 ### How to log in?
 
 There is default account for development purposes:
-- email: admin@medtagger.com,
-- password: medtagger1.
+ - email: `admin@medtagger.com`,
+ - password: `medtagger1`.

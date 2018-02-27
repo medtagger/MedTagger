@@ -29,9 +29,9 @@ args = parser.parse_args()
 dicoms_folder_path = args.input
 converted_dicoms_folder_path = args.output
 
-dicoms = [dicom.read_file(dicoms_folder_path + d) for d in os.listdir(dicoms_folder_path) if
+dicoms = [pydicom.read_file(dicoms_folder_path + d) for d in os.listdir(dicoms_folder_path) if
           os.path.isfile(dicoms_folder_path + d)]
-min_position = abs(min([dicom.ImagePositionPatient[2] for dicom in dicoms]))
+min_position = abs(min([pydicom.ImagePositionPatient[2] for dicom in dicoms]))
 
 if not os.path.exists(converted_dicoms_folder_path):
     os.mkdir(converted_dicoms_folder_path)
