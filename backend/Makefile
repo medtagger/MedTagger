@@ -73,12 +73,16 @@ unit_tests:
 functional_tests:
 	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d hbase postgres rabbitmq
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
+	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic upgrade head
+	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && $(PYTHON) ./$(SCRIPTS_DIRECTORY)/migrate_hbase.py -y
 	@if . $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ! pytest $(FUNCTIONAL_TEST) ; then\
-		echo "Functional tests failed!";\
 		docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down;\
+		echo "Functional tests failed!";\
 		exit 1;\
 	fi
+	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic downgrade base
 	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down
+	echo "Functional tests passed!"
 
 functional_tests_docker:
 	./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
