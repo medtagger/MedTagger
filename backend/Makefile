@@ -86,6 +86,8 @@ functional_tests:
 
 functional_tests_docker:
 	./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
+	alembic upgrade head
+	$(PYTHON) ./$(SCRIPTS_DIRECTORY)/migrate_hbase.py -y
 	pytest $(FUNCTIONAL_TESTS_MODULE)
 
 #
