@@ -21,8 +21,8 @@ jobs:
   - stage: test backend
     if: branch = master
     script:
-     - export MEDTAGGER__BACKEND_INSTALL_SYSTEM_DEPENDENCIES=false
-     - ./.travis/run_tests_if_subproject_changed.py backend --command="
+    - export MEDTAGGER__BACKEND_INSTALL_SYSTEM_DEPENDENCIES=false
+    - ./.travis/run_tests_if_subproject_changed.py backend --command="
        docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml up -d hbase postgres rabbitmq &&
        docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run medtagger_backend_functional_tests &&
        docker-compose down"
