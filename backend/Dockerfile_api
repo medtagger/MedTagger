@@ -18,6 +18,9 @@ COPY mypy.ini ./mypy.ini
 COPY requirements.dev.txt ./requirements.dev.txt
 COPY requirements.txt ./requirements.txt
 
+RUN make install_system_dependencies
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/local/lib:/usr/lib64:/usr/lib:/lib
+
 ENV PYTHONPATH /medtagger_backend
 
 RUN pip install -r requirements.txt

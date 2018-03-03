@@ -20,6 +20,9 @@ COPY requirements.txt ./requirements.txt
 
 ENV PYTHONPATH /medtagger_backend
 
+RUN make install_system_dependencies
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/local/lib:/usr/lib64:/usr/lib:/lib
+
 RUN pip install -r requirements.txt
 
 ENV C_FORCE_ROOT true

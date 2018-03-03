@@ -1,5 +1,7 @@
 """Module responsible for asynchronous data conversion."""
 import io
+import os
+import tempfile
 import numpy as np
 
 import pydicom
@@ -22,6 +24,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
     :param scan_id: ID of a Scan
     """
+    _temp_files_to_remove = []
     scan = ScansRepository.get_scan_by_id(scan_id)
     slices = SlicesRepository.get_slices_by_scan_id(scan_id)
 
@@ -29,8 +32,24 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     dicom_images = []
     for _slice in slices:
         image = SlicesRepository.get_slice_original_image(_slice.id)
-        image_bytes = io.BytesIO(image)
-        dicom_image = pydicom.read_file(image_bytes, force=True)
+        #
+        # UGLY WORKAROUND - Start
+        #
+        # This workaround enable support for compressed DICOMs that will be read by the GDCM
+        # low-level library. Please remove this workaround as soon as this FIX ME notice
+        # will be removed:
+        #   https://github.com/pydicom/pydicom/blob/master/pydicom/pixel_data_handlers/gdcm_handler.py#L77
+        # and this Issue will be closed:
+        #   https://github.com/pydicom/pydicom/issues/233
+        #
+        with tempfile.NamedTemporaryFile(delete=False) as _file:
+            _temp_file_name = _file.name
+            _temp_files_to_remove.append(_temp_file_name)
+            _file.write(image)
+        #
+        # UGLY WORKAROUND - Stop
+        #
+        dicom_image = pydicom.read_file(_temp_file_name, force=True)
         dicom_images.append(dicom_image)
 
     # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
@@ -60,6 +79,10 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
     logger.info('Marking whole Scan as converted.')
     scan.mark_as_converted()
+
+    # Remove all temporarily created files for applying workaround
+    for file_name in _temp_files_to_remove:
+        os.remove(file_name)
 
 
 def _convert_to_png_and_store(_slice: Slice, slice_pixels: np.ndarray) -> None:
