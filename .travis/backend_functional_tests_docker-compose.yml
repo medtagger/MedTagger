@@ -34,5 +34,7 @@ services:
     build:
       context: ../backend
       dockerfile: Dockerfile_api
+      args:
+        - INSTALL_SYSTEM_DEPENDENCIES=false
     command: /bin/bash -c "make install_dev_packages && make functional_tests_docker"
 
