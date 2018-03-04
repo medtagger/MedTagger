@@ -3,10 +3,8 @@ import logging
 from typing import Any
 
 import pytest
-from starbase import Connection
 
-from medtagger.config import AppConfiguration
-from medtagger.database import Base, engine, session
+from medtagger.database import Base, session
 from medtagger.database.fixtures import apply_all_fixtures
 from medtagger.clients.hbase_client import HBaseClient
 
@@ -16,31 +14,22 @@ logger = logging.getLogger(__name__)
 @pytest.fixture
 def prepare_environment() -> Any:
     """Prepare environment for testing purpose (setup DBs, fixtures) and clean up after the tests."""
-    logger.info('Getting needed entries')
-    configuration = AppConfiguration()
-    host = configuration.get('hbase', 'host', fallback='localhost')
-    port = configuration.getint('hbase', 'rest_port', fallback=8080)
-
-    logger.info('Preparing databases.')
-    Base.metadata.create_all(engine)
-    hbase_connection = Connection(host=host, port=port)
-    for table_name in HBaseClient.HBASE_SCHEMA:
-        list_of_columns = HBaseClient.HBASE_SCHEMA[table_name]
-        table = hbase_connection.table(table_name)
-        table.create(*list_of_columns)
-
-    logger.info('Applying fixtures')
+    logger.info('Applying fixtures to PostgreSQL.')
     apply_all_fixtures()
 
     # Run the test
     yield
 
-    logger.info('Removing all data.')
+    logger.info('Removing all data from PostgreSQL.')
+    for table in reversed(Base.metadata.sorted_tables):
+        session.execute(table.delete())
+    session.commit()
     session.close_all()
-    Base.metadata.drop_all(engine)
+
+    logger.info('Removing all data from HBase.')
     for table_name in HBaseClient.HBASE_SCHEMA:
-        table = hbase_connection.table(table_name)
-        table.drop()
+        for key in HBaseClient.get_all_keys(table_name):
+            HBaseClient.delete(table_name, key)
 
 
 @pytest.fixture

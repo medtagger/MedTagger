@@ -1,7 +1,7 @@
 """Module responsible for asynchronous data storage."""
 import io
 
-import dicom
+import pydicom
 from celery.utils.log import get_task_logger
 
 from medtagger.types import SliceID, SlicePosition, SliceLocation
@@ -21,12 +21,12 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
     logger.debug('Parsing Dicom file from HBase for given Slice ID: %s.', slice_id)
     image = SlicesRepository.get_slice_original_image(slice_id)
     image_bytes = io.BytesIO(image)
-    dicom_image = dicom.read_file(image_bytes, stop_before_pixels=True, force=True)
+    dicom_image = pydicom.read_file(image_bytes, stop_before_pixels=True, force=True)
 
-    location = SliceLocation(dicom_image.SliceLocation)
-    position = SlicePosition(dicom_image.ImagePositionPatient[0],
-                             dicom_image.ImagePositionPatient[1],
-                             dicom_image.ImagePositionPatient[2])
+    location = SliceLocation(float(dicom_image.SliceLocation))
+    position = SlicePosition(float(dicom_image.ImagePositionPatient[0]),
+                             float(dicom_image.ImagePositionPatient[1]),
+                             float(dicom_image.ImagePositionPatient[2]))
 
     _slice = SlicesRepository.get_slice_by_id(slice_id)
     _slice.update_location(location)

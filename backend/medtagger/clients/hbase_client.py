@@ -10,18 +10,27 @@ from medtagger.config import AppConfiguration
 
 logger = logging.getLogger(__name__)
 
-configuration = AppConfiguration()
-host = configuration.get('hbase', 'host', fallback='localhost')
-port = configuration.getint('hbase', 'port', fallback=9090)
-size = configuration.getint('hbase', 'connection_pool_size', fallback=10)
-try:
-    HBASE_CONNECTION_POOL = happybase.ConnectionPool(size, host=host, port=port)
-except (TTransportException, BrokenPipeError):
-    logger.warning('Could not connect to HBase. Is it down?')
+HBASE_CONNECTION_POOL = None
+
+
+def create_hbase_connection_pool() -> None:
+    """Create new HBase Connection Pool."""
+    global HBASE_CONNECTION_POOL  # pylint: disable=global-statement
+    configuration = AppConfiguration()
+    host = configuration.get('hbase', 'host', fallback='localhost')
+    port = configuration.getint('hbase', 'port', fallback=9090)
+    size = configuration.getint('hbase', 'connection_pool_size', fallback=10)
+    try:
+        HBASE_CONNECTION_POOL = happybase.ConnectionPool(size, host=host, port=port)
+    except (TTransportException, BrokenPipeError):
+        logger.warning('Could not connect to HBase. Is it down?')
 
 
 def is_alive() -> bool:
     """Return boolean information if HBase is alive or not."""
+    configuration = AppConfiguration()
+    host = configuration.get('hbase', 'host', fallback='localhost')
+    port = configuration.getint('hbase', 'port', fallback=9090)
     try:
         happybase.ConnectionPool(1, host=host, port=port)
         return True
@@ -60,7 +69,8 @@ class HBaseClient(object):
 
     def __init__(self) -> None:
         """Initialize client."""
-        pass
+        if not HBASE_CONNECTION_POOL:
+            create_hbase_connection_pool()
 
     @staticmethod
     @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
@@ -72,6 +82,7 @@ class HBaseClient(object):
         :param starts_with: prefix for keys
         :return: iterator for table keys
         """
+        assert HBASE_CONNECTION_POOL, 'There is no active Connection Pool to HBase!'
         with HBASE_CONNECTION_POOL.connection() as connection:
             row_prefix = str.encode(starts_with) if starts_with else None
             table = connection.table(table_name)
@@ -89,6 +100,7 @@ class HBaseClient(object):
         :param columns: list of columns to fetch
         :return: iterator for table keys
         """
+        assert HBASE_CONNECTION_POOL, 'There is no active Connection Pool to HBase!'
         with HBASE_CONNECTION_POOL.connection() as connection:
             row_prefix = str.encode(starts_with) if starts_with else None
             table = connection.table(table_name)
@@ -106,10 +118,27 @@ class HBaseClient(object):
         :param columns: columns which should be loaded (by default all)
         :return: mapping returned by HBase
         """
+        assert HBASE_CONNECTION_POOL, 'There is no active Connection Pool to HBase!'
         hbase_key = str.encode(key)
         with HBASE_CONNECTION_POOL.connection() as connection:
             table = connection.table(table_name)
             return table.row(hbase_key, columns=columns)
+
+    @staticmethod
+    @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
+           retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
+    def delete(table_name: str, key: str, columns: List[str] = None) -> None:
+        """Delete a single row (or values from colums in given row) in HBase table.
+
+        :param table_name: name of a table
+        :param key: key representing a row
+        :param columns: columns which should be cleared
+        """
+        assert HBASE_CONNECTION_POOL, 'There is no active Connection Pool to HBase!'
+        hbase_key = str.encode(key)
+        with HBASE_CONNECTION_POOL.connection() as connection:
+            table = connection.table(table_name)
+            table.delete(hbase_key, columns=columns)
 
     @staticmethod
     @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
@@ -121,6 +150,7 @@ class HBaseClient(object):
         :param key: key under value should be stored
         :param value: value which should be stored
         """
+        assert HBASE_CONNECTION_POOL, 'There is no active Connection Pool to HBase!'
         hbase_key = str.encode(key)
         with HBASE_CONNECTION_POOL.connection() as connection:
             table = connection.table(table_name)
@@ -136,6 +166,7 @@ class HBaseClient(object):
         :param key: HBase key
         :return: boolean information if such key exists or not
         """
+        assert HBASE_CONNECTION_POOL, 'There is no active Connection Pool to HBase!'
         hbase_key = str.encode(key)
         with HBASE_CONNECTION_POOL.connection() as connection:
             table = connection.table(table_name)

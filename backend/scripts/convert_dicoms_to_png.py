@@ -14,7 +14,7 @@ Name of the converted Dicom file is a position of the scan on the z axis.
 import os
 import argparse
 
-import dicom
+import pydicom
 from PIL import Image
 
 from medtagger.conversion import convert_slice_to_normalized_8bit_array
@@ -29,7 +29,7 @@ args = parser.parse_args()
 dicoms_folder_path = args.input
 converted_dicoms_folder_path = args.output
 
-dicoms = [dicom.read_file(dicoms_folder_path + d) for d in os.listdir(dicoms_folder_path) if
+dicoms = [pydicom.read_file(dicoms_folder_path + d) for d in os.listdir(dicoms_folder_path) if
           os.path.isfile(dicoms_folder_path + d)]
 min_position = abs(min([dicom.ImagePositionPatient[2] for dicom in dicoms]))
 

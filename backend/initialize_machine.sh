@@ -31,8 +31,11 @@ then
     cp -p /lib/x86_64-linux-gnu/libreadline.so.6 /opt/conda/lib/libreadline.so.6
 fi
 
-echo "Applying environment variables..."
+echo "Installing all system dependencies..."
 cd /vagrant/backend
+make install_system_dependencies
+
+echo "Applying environment variables..."
 . ./devenv.sh
 
 if [ ! -e /usr/local/bin/docker-compose ]

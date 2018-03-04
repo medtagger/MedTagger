@@ -8,7 +8,7 @@ then
     echo "Using virtualenv from ./venv."
     . venv/bin/activate
 else
-    echo "Could not find any virtualenv. Skipping..."
+    echo "Could not find any virtualenv. Using `which python3.6` instead."
 fi
 
 echo "Applying default development configuration entries..."

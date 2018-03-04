@@ -21,6 +21,7 @@ from flask_security import Security, SQLAlchemyUserDatastore  # noqa
 
 from medtagger.api import blueprint, web_socket  # noqa
 from medtagger.config import AppConfiguration  # noqa
+from medtagger.clients.hbase_client import create_hbase_connection_pool  # noqa
 from medtagger.database import db  # noqa
 from medtagger.database.models import User, Role  # noqa
 
@@ -61,6 +62,7 @@ security.init_app(app, user_datastore)
 
 if __name__ == '__main__':
     with app.app_context():
+        create_hbase_connection_pool()
         db.init_app(app)
         current_app.login_manager.login_view = None
 

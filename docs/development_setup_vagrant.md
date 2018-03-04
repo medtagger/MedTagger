@@ -14,22 +14,23 @@ Here is a list of things that you've got to install:
  - [VirtualBox](https://www.virtualbox.org),
  - [Vagrant](https://www.vagrantup.com).
 
-### How set it up?
+### How to set it up?
 
-Once you've install your VirtualBox with Vagrant, it's time to clone this repository:
+Once you've installed your VirtualBox with Vagrant, it's time to clone this repository:
 
 ```bash
 $ git clone git@github.com:jpowie01/MedTagger.git
 ```
 
-Then you will be able to open it inside PyCharm and use Vagrant plugin to boot up your machine. To do this
- you can choose `Tools > Vagrant > Up` or use command `vagrant up` in the root directory of this repository. 
+You can create virtual machine directly from command line or using Vagrant plugin inside of PyCharm:
+- **Command line:**  Run `vagrant up` in the root directory of this repository,
+- **PyCharm:** Open project in Pycharm and choose `Tools > Vagrant > Up`.
 
 **Important:** It may take a while, because Vagrant needs to download box with Ubuntu image and then install
  all dependencies like Python and Docker with all needed containers.
 
-Once Vagrant completed whole initialization try to SSH into the machine with `vagrant ssh` and make sure that
- you're inside `/vagrant` directory. 
+Once Vagrant completed whole initialization try to SSH into the machine with `vagrant ssh`. Project files are located 
+under `/vagrant` directory. 
 
 ### What's next?
 
