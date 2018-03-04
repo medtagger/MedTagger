@@ -3,9 +3,10 @@ import os
 import logging.config
 from typing import List, Any
 
-from celery.signals import setup_logging
+from celery.signals import setup_logging, worker_process_init
 
 from medtagger.config import AppConfiguration
+from medtagger.clients.hbase_client import create_hbase_connection_pool
 
 
 def get_all_modules_with_tasks() -> List[str]:
@@ -23,6 +24,12 @@ def get_all_modules_with_tasks() -> List[str]:
 def setup_logging_handler(*args: List[Any], **kwargs: List[Any]) -> None:  # pylint: disable=unused-argument
     """Set up logger for Celery tasks."""
     logging.config.fileConfig('logging.conf')
+
+
+@worker_process_init.connect
+def process_initialization(*args: List[Any], **kwargs: List[Any]) -> None:  # pylint: disable=unused-argument
+    """Initialize given Celery process."""
+    create_hbase_connection_pool()
 
 
 configuration = AppConfiguration()
