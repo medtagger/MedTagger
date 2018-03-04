@@ -126,6 +126,21 @@ class HBaseClient(object):
     @staticmethod
     @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
            retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
+    def delete(table_name: str, key: str, columns: List[str] = None) -> None:
+        """Delete a single row (or values from colums in given row) in HBase table.
+
+        :param table_name: name of a table
+        :param key: key representing a row
+        :param columns: columns which should be cleared
+        """
+        hbase_key = str.encode(key)
+        with HBASE_CONNECTION_POOL.connection() as connection:
+            table = connection.table(table_name)
+            table.delete(hbase_key, columns=columns)
+
+    @staticmethod
+    @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
+           retry_on_exception=lambda ex: isinstance(ex, (TTransportException, BrokenPipeError)))
     def put(table_name: str, key: str, value: Any) -> None:
         """Add new entry into HBase table.
 

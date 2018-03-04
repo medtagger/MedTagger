@@ -1,8 +1,13 @@
 """Storage for all utility functions."""
 from starbase import Connection
+from retrying import retry
+import requests
+
 from medtagger.config import AppConfiguration
 
 
+@retry(stop_max_attempt_number=5, wait_random_min=200, wait_random_max=1000,
+       retry_on_exception=lambda ex: isinstance(ex, requests.ConnectionError))
 def get_connection_to_hbase() -> Connection:
     """Fetch configuration data and create HBase connection.
 
@@ -11,7 +16,9 @@ def get_connection_to_hbase() -> Connection:
     configuration = AppConfiguration()
     host = configuration.get('hbase', 'host', fallback='localhost')
     port = configuration.getint('hbase', 'rest_port', fallback=8080)
-    return Connection(host=host, port=port)
+    connection = Connection(host=host, port=port)
+    connection.tables()  # Test if the connection was properly set up
+    return connection
 
 
 def user_agrees(prompt_message: str) -> bool:
