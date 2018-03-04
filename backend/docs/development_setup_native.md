@@ -28,6 +28,7 @@ please run below make's entry and activate it:
 
 ```bash
 $ cd backend
+$ make install_system_dependencies
 $ make venv
 $ . ./devenv.sh
 ```

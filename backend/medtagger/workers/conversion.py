@@ -1,5 +1,7 @@
 """Module responsible for asynchronous data conversion."""
 import io
+import os
+import tempfile
 import numpy as np
 
 import pydicom
@@ -9,11 +11,13 @@ from celery.utils.log import get_task_logger
 from medtagger.types import ScanID
 from medtagger.workers import celery_app
 from medtagger.conversion import convert_slice_to_normalized_8bit_array, convert_scan_to_normalized_8bit_array
-from medtagger.database.models import SliceOrientation, Slice
+from medtagger.database.models import SliceOrientation, Slice, Scan
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.slices import SlicesRepository
 
 logger = get_task_logger(__name__)
+
+MAX_PREVIEW_X_SIZE = 256
 
 
 @celery_app.task
@@ -22,6 +26,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
     :param scan_id: ID of a Scan
     """
+    temp_files_to_remove = []
     scan = ScansRepository.get_scan_by_id(scan_id)
     slices = SlicesRepository.get_slices_by_scan_id(scan_id)
 
@@ -29,8 +34,11 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     dicom_images = []
     for _slice in slices:
         image = SlicesRepository.get_slice_original_image(_slice.id)
-        image_bytes = io.BytesIO(image)
-        dicom_image = pydicom.read_file(image_bytes, force=True)
+        # UGLY WORKAROUND - Start
+        temp_file_name = _create_temporary_file(image)
+        temp_files_to_remove.append(temp_file_name)
+        # UGLY WORKAROUND - Stop
+        dicom_image = pydicom.read_file(temp_file_name, force=True)
         dicom_images.append(dicom_image)
 
     # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
@@ -39,10 +47,47 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         _convert_to_png_and_store(_slice, slice_pixels)
 
     # Prepare a preview size and convert 3D scan to fit its max X's axis shape
-    max_preview_x_size = 256
-    normalized_scan = convert_scan_to_normalized_8bit_array(dicom_images, output_x_size=max_preview_x_size)
+    logger.info('Normalizing Scan in 3D. This may take a while...')
+    normalized_scan = convert_scan_to_normalized_8bit_array(dicom_images, output_x_size=MAX_PREVIEW_X_SIZE)
 
-    # Prepare Slices in the Y orientation
+    # Prepare Slices in other orientations
+    logger.info('Preparing Slices in other axis.')
+    _prepare_slices_in_y_orientation(normalized_scan, scan)
+    _prepare_slices_in_x_orientation(normalized_scan, scan)
+
+    logger.info('Marking whole Scan as converted.')
+    scan.mark_as_converted()
+
+    # Remove all temporarily created files for applying workaround
+    for file_name in temp_files_to_remove:
+        os.remove(file_name)
+
+
+def _create_temporary_file(image: bytes) -> str:
+    """Create new temporary file based on given DICOM image.
+
+    This workaround enable support for compressed DICOMs that will be read by the GDCM
+    low-level library. Please remove this workaround as soon as this FIX ME notice
+    will be removed:
+       https://github.com/pydicom/pydicom/blob/master/pydicom/pixel_data_handlers/gdcm_handler.py#L77
+    and this Issue will be closed:
+       https://github.com/pydicom/pydicom/issues/233
+
+    :param image: bytes with DICOM image
+    :return: path to temporary file
+    """
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_file_name = temp_file.name
+        temp_file.write(image)
+    return temp_file_name
+
+
+def _prepare_slices_in_y_orientation(normalized_scan: np.ndarray, scan: Scan) -> None:
+    """Prepare and save Slices in Y orientation.
+
+    :param normalized_scan: Numpy array with 3D normalized Scan
+    :param scan: Scan object to which new Slices should be added
+    """
     for y in range(normalized_scan.shape[1]):
         location = 100.0 * y / normalized_scan.shape[1]
         slice_pixels = normalized_scan[:, y, :]
@@ -50,16 +95,19 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         _slice.update_location(location)
         _convert_to_png_and_store(_slice, slice_pixels)
 
-    # Prepare Slices in the X orientation
+
+def _prepare_slices_in_x_orientation(normalized_scan: np.ndarray, scan: Scan) -> None:
+    """Prepare and save Slices in Y orientation.
+
+    :param normalized_scan: Numpy array with 3D normalized Scan
+    :param scan: Scan object to which new Slices should be added
+    """
     for x in range(normalized_scan.shape[2]):
         location = 100.0 * x / normalized_scan.shape[2]
         slice_pixels = normalized_scan[:, :, x]
         _slice = scan.add_slice(SliceOrientation.X)
         _slice.update_location(location)
         _convert_to_png_and_store(_slice, slice_pixels)
-
-    logger.info('Marking whole Scan as converted.')
-    scan.mark_as_converted()
 
 
 def _convert_to_png_and_store(_slice: Slice, slice_pixels: np.ndarray) -> None:
