@@ -69,7 +69,8 @@ class HBaseClient(object):
 
     def __init__(self) -> None:
         """Initialize client."""
-        pass
+        if not HBASE_CONNECTION_POOL:
+            create_hbase_connection_pool()
 
     @staticmethod
     @retry(stop_max_attempt_number=3, wait_random_min=200, wait_random_max=1000,
