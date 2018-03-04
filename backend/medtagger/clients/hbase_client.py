@@ -133,6 +133,7 @@ class HBaseClient(object):
         :param key: key representing a row
         :param columns: columns which should be cleared
         """
+        assert HBASE_CONNECTION_POOL, 'There is no active Connection Pool to HBase!'
         hbase_key = str.encode(key)
         with HBASE_CONNECTION_POOL.connection() as connection:
             table = connection.table(table_name)
