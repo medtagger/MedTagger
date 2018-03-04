@@ -39,11 +39,6 @@ export class UploadScansSelectorComponent {
     this.numberOfSlices = 0;
     var lastScanDirectory: String;
     for (let sliceFile of this._files) {
-      // Skip all files that are not Dicoms
-      if (sliceFile.type != "application/dicom" || !sliceFile.webkitRelativePath.endsWith(".dcm")) {
-        continue;
-      }
-
       // Slices that are in the same directory as others (previous ones) are considered as a single Scan
       var slicePath = sliceFile.webkitRelativePath;
       var currentScanDirectory = slicePath.split("/").slice(0, -1).join("/");

@@ -8,7 +8,7 @@
         </mat-card-header>
         <mat-card-content>
           <mat-form-field>
-            <mat-select placeholder="Select category" formControlName="category" required>
+            <mat-select placeholder="Scan category" formControlName="category" required>
               <mat-option *ngFor="let availableCategory of availableCategories" [value]="availableCategory.key">
                 {{availableCategory.name}}
               </mat-option>
@@ -26,33 +26,33 @@
   <mat-step [stepControl]="chooseModeFormGroup" #chooseModeStep>
     <form [formGroup]="chooseModeFormGroup">
       <ng-template matStepLabel>Select upload mode</ng-template>
-          <mat-card class="upload-mode">
-            <mat-card-header>
-              <mat-card-title>Single 3D Scan</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <p>Select this option if you want to upload single scan.</p>
-            </mat-card-content>
-            <mat-card-actions>
-              <button class="pull-right" mat-raised-button matStepperNext color="primary" (click)="uploadMode = UploadMode.SINGLE_SCAN">Select</button>
-              <div class="clearfix"></div>
-            </mat-card-actions>
-          </mat-card>
-          <mat-card class="upload-mode">
-            <mat-card-header>
-              <mat-card-title>Multiple 3D Scans</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <p>Select this option if you want to upload multiple scans.</p>
-            </mat-card-content>
-            <mat-card-actions>
-              <button class="pull-right" mat-raised-button matStepperNext color="primary" (click)="uploadMode = UploadMode.MULTIPLE_SCANS" *ngIf="isGoogleChrome()">Select</button>
-              <span class="button-wrapper" *ngIf="!isGoogleChrome()" matTooltip="This mode is available only on Google Chrome" matTooltipPosition="above">
-                <button class="pull-right" mat-raised-button matStepperNext color="primary" (click)="uploadMode = UploadMode.MULTIPLE_SCANS" disabled>Select</button>
-              </span>
-              <div class="clearfix"></div>
-            </mat-card-actions>
-          </mat-card>
+      <mat-card class="upload-mode">
+        <mat-card-header>
+          <mat-card-title>Single 3D Scan</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Select this option if you want to upload a single 3D Scan.</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button class="pull-right" mat-raised-button matStepperNext color="primary" (click)="uploadMode = UploadMode.SINGLE_SCAN">Select</button>
+          <div class="clearfix"></div>
+        </mat-card-actions>
+      </mat-card>
+      <mat-card class="upload-mode">
+        <mat-card-header>
+          <mat-card-title>Multiple 3D Scans</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Select this option if you want to upload multiple 3D Scans.</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button class="pull-right" mat-raised-button matStepperNext color="primary" (click)="uploadMode = UploadMode.MULTIPLE_SCANS" *ngIf="isGoogleChrome()">Select</button>
+          <span class="button-wrapper" *ngIf="!isGoogleChrome()" matTooltip="This mode is available only on Google Chrome" matTooltipPosition="above">
+            <button class="pull-right" mat-raised-button matStepperNext color="primary" (click)="uploadMode = UploadMode.MULTIPLE_SCANS" disabled>Select</button>
+          </span>
+          <div class="clearfix"></div>
+        </mat-card-actions>
+      </mat-card>
     </form>
   </mat-step>
 
@@ -65,13 +65,13 @@
             <mat-card-title>Single 3D Scan</mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <p>Go to selected directory containing CT/MRI scan and select every Dicom file (.dcm).</p>
+            <p>Go to the directory containing CT Scan and select all Dicom files (*.dcm).</p>
             <!-- TODO: Move this image into a dialog popup -->
             <!--<img src="../../../assets/img/example_upload_single_scan.png">-->
           </mat-card-content>
           <mat-card-actions>
             <upload-scans-selector #uploadSingleScanSelector (onFileSelect)="chooseFiles($event)" [multipleScans]="false" style="float: left;"></upload-scans-selector>
-            <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" matStepperNext>Upload!</button>
+            <button mat-raised-button color="primary" (click)="uploadFiles()" [disabled]="totalNumberOfSlices == 0" style="float: right;" matStepperNext>Upload Scan!</button>
             <div class="clearfix"></div>
           </mat-card-actions>
         </mat-card>
@@ -83,13 +83,13 @@
             <mat-card-title>Multiple 3D Scans</mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <p>Select <strong>parent directory</strong> containing directories with CT/MRI scans.</p>
+            <p>Select <strong>parent directory</strong> that contains subdirectories with CT Scans.</p>
             <!-- TODO: Move this image into a dialog popup -->
             <!--<img src="../../../assets/img/example_upload_multiple_scans.png">-->
           </mat-card-content>
           <mat-card-actions>
             <upload-scans-selector #uploadMultipleScansSelector (onFileSelect)="chooseFiles($event)" [multipleScans]="true" style="float: left;"></upload-scans-selector>
-            <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" matStepperNext>Upload!</button>
+            <button mat-raised-button color="primary" (click)="uploadFiles()" [disabled]="totalNumberOfSlices == 0" style="float: right;" matStepperNext>Upload Scans!</button>
             <div class="clearfix"></div>
           </mat-card-actions>
         </mat-card>
@@ -101,20 +101,20 @@
     <ng-template matStepLabel>Upload</ng-template>
     <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
     <h1 *ngIf="uploadMode == UploadMode.SINGLE_SCAN" class="uploading-header">
-      <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Uploading scan in progress...
+      <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Uploading Scan in progress...
     </h1>
     <h1 *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS" class="uploading-header">
-      <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Uploading scans in progress...
+      <mat-progress-spinner mode="indeterminate" [diameter]="36" [strokeWidth]="5" class="progress-spinner"></mat-progress-spinner> Uploading Scans in progress...
     </h1>
-    <h5>Don't close your browser!</h5>
+    <h5>Do not close your browser!</h5>
     <p>Uploaded {{slicesSent}} of the {{totalNumberOfSlices}} Dicom images.</p>
   </mat-step>
 
   <mat-step [stepControl]="uploadCompletedFormGroup" [editable]="false" #uploadCompletedStep>
     <ng-template matStepLabel>Success!</ng-template>
     <section class="success-message">
-      <p><mat-icon class="success-indicator">check</mat-icon> Upload completed! Your scans will be available shortly!</p>
+      <p><mat-icon class="success-indicator">check</mat-icon> Upload completed! Your Scans will be available shortly!</p>
     </section>
-    <button mat-raised-button class="restart-button" color="primary-color" (click)="restart()"><mat-icon>replay</mat-icon> Upload more scans</button>
+    <button mat-raised-button class="restart-button" color="primary-color" (click)="restart()"><mat-icon>replay</mat-icon> Upload more Scans</button>
   </mat-step>
 </mat-horizontal-stepper>

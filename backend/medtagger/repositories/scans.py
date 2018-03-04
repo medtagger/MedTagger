@@ -30,6 +30,12 @@ class ScansRepository(object):
         return query.first()
 
     @staticmethod
+    def delete_scan_by_id(scan_id: ScanID) -> None:
+        """Remove Scan from SQL database."""
+        with db_session() as session:
+            session.query(Scan).filter(Scan.id == scan_id).delete()
+
+    @staticmethod
     def add_new_scan(category: ScanCategory, number_of_slices: int) -> Scan:
         """Add new Scan to the database.
 
@@ -41,3 +47,10 @@ class ScansRepository(object):
             scan = Scan(category, number_of_slices)
             session.add(scan)
         return scan
+
+    @staticmethod
+    def reduce_number_of_declared_slices(scan_id: ScanID) -> Scan:
+        with db_session() as session:
+            query = session.query(Scan)
+            query = query.filter(Scan.id == scan_id)
+            query.update({"declared_number_of_slices": (Scan.declared_number_of_slices - 1)})

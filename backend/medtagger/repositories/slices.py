@@ -30,6 +30,14 @@ class SlicesRepository(object):
         return slices
 
     @staticmethod
+    def delete_slice_by_id(slice_id: SliceID) -> None:
+        """Remove Slice from SQL database and HBase."""
+        with db_session() as session:
+            session.query(Slice).filter(Slice.id == slice_id).delete()
+        hbase_client = HBaseClient()
+        hbase_client.delete(HBaseClient.ORIGINAL_SLICES_TABLE, slice_id)
+
+    @staticmethod
     def get_slice_original_image(slice_id: SliceID) -> bytes:
         """Return original Dicom image as bytes."""
         hbase_client = HBaseClient()
