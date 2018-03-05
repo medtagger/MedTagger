@@ -2,6 +2,8 @@ version: '3'
 services:
   hbase:
     image: dajobe/hbase
+    volumes:
+      - hbase-data:/data
     ports:
       - 8080:8080
       - 8085:8085
@@ -12,6 +14,8 @@ services:
 
   rabbitmq:
     image: rabbitmq:management
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq/mnesia
     ports:
       - 4369:4369
       - 5671:5671
@@ -24,6 +28,8 @@ services:
     image: postgres
     ports:
       - 5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: medtagger
       POSTGRES_USER: medtagger_user
@@ -91,3 +97,7 @@ services:
       - postgres
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && celery -A medtagger.workers worker --loglevel=info"
 
+volumes:
+  hbase-data:
+  rabbitmq-data:
+  postgres-data:
