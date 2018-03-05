@@ -49,7 +49,8 @@ class ScansRepository(object):
         return scan
 
     @staticmethod
-    def reduce_number_of_declared_slices(scan_id: ScanID) -> Scan:
+    def reduce_number_of_declared_slices(scan_id: ScanID) -> None:
+        """Decrease number of declared Slices by one."""
         with db_session() as session:
             query = session.query(Scan)
             query = query.filter(Scan.id == scan_id)

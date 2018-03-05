@@ -53,4 +53,3 @@ def trigger_scan_conversion_if_needed(scan_id: ScanID) -> None:
     if scan.declared_number_of_slices == len(scan.stored_slices):
         logger.debug('All Slices uploaded for %s! Running conversion...', scan)
         convert_scan_to_png.delay(scan.id)
-
