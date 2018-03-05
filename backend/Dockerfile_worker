@@ -2,6 +2,12 @@ FROM python:3.6
 
 WORKDIR /medtagger_backend/
 
+COPY Makefile ./Makefile
+
+ARG INSTALL_SYSTEM_DEPENDENCIES
+RUN if [ "$INSTALL_SYSTEM_DEPENDENCIES" = "true" ]; then make install_system_dependencies; fi
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/local/lib:/usr/lib64:/usr/lib:/lib
+
 COPY alembic ./alembic
 COPY example_data/example_scan ./example_data/example_scan/
 COPY medtagger ./medtagger
@@ -13,14 +19,9 @@ COPY .pylintrc ./.pylintrc
 COPY .test.pylintrc ./.test.pylintrc
 COPY alembic.ini ./alembic.ini
 COPY logging.conf ./logging.conf
-COPY Makefile ./Makefile
 COPY mypy.ini ./mypy.ini
 COPY requirements.dev.txt ./requirements.dev.txt
 COPY requirements.txt ./requirements.txt
-
-ARG INSTALL_SYSTEM_DEPENDENCIES
-RUN if [ "$INSTALL_SYSTEM_DEPENDENCIES" = "true" ]; then make install_system_dependencies; fi
-ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/local/lib:/usr/lib64:/usr/lib:/lib
 
 ENV PYTHONPATH /medtagger_backend
 
