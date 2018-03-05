@@ -20,7 +20,7 @@ export const routes: Routes = [
   {path: '', redirectTo: 'login', pathMatch: 'full'},
   {path: 'login', component: LoginPageComponent, data: {title: 'Welcome'}},
   {path: 'home', component: HomePageComponent, data: {title: 'Home'}, canActivate: [AuthGuard]},
-  {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new scans'}, canActivate: [AuthGuard]},
+  {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new Scans'}, canActivate: [AuthGuard]},
   {path: 'settings', component: SettingsPageComponent, data: {title: 'Settings'}, canActivate: [AuthGuard]},
   {path: 'validation', component: ValidationPageComponent, data: {title: 'Validation'}, canActivate: [AuthGuard]},
   ...labellingRoutes
