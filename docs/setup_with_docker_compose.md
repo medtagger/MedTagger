@@ -31,15 +31,23 @@ To run whole MedTagger (with all dependencies) using Docker Compose, you can jus
 $ docker-compose up
 ```
 
+_**TIP!**_ Add `-d` (detach) option to run everything in the background!
+
+### How to update MedTagger in Docker?
+
+To update MedTagger using Docker Compose please use below `up` command with `--build` switch:
+
+```bash
+$ git pull
+$ docker-compose up -d --no-deps --build medtagger_frontend medtagger_backend_api medtagger_backend_worker
+```
+
 ### How to setup only dependencies?
 
 It's really easy to start all needed external dependencies with:
 
 ```bash
-$ docker-compose up hbase postgres rabbitmq
+$ docker-compose up -d hbase postgres rabbitmq
 ```
 
-_**TIP!**_ Add `-d` (detach) option to run everything in the background!
-
 For more information about usage please read the [documentation](https://docs.docker.com/compose/).
-
