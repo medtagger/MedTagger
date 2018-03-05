@@ -5,7 +5,7 @@ from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
 from medtagger.database.models import ScanCategory, Scan
-from medtagger.types import ScanID
+from medtagger.types import ScanID, UserId
 
 
 class ScansRepository(object):
@@ -43,15 +43,16 @@ class ScansRepository(object):
             session.query(Scan).filter(Scan.id == scan_id).delete()
 
     @staticmethod
-    def add_new_scan(category: ScanCategory, number_of_slices: int) -> Scan:
+    def add_new_scan(category: ScanCategory, number_of_slices: int, owner_id: UserId) -> Scan:
         """Add new Scan to the database.
 
         :param category: Scan's Category object
         :param number_of_slices: number of Slices that will be uploaded
+        :param owner_id: ID for user that uploaded scan
         :return: Scan object
         """
         with db_session() as session:
-            scan = Scan(category, number_of_slices)
+            scan = Scan(category, number_of_slices, owner_id)
             session.add(scan)
         return scan
 

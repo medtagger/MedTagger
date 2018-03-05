@@ -8,6 +8,7 @@ from medtagger.api.exceptions import NotFoundException
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata, LabelingTime
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
 from medtagger.repositories.labels import LabelsRepository
+from medtagger.api.users.business import get_current_user_info
 from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
@@ -55,8 +56,10 @@ def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan
     :param declared_number_of_slices: number of Slices that will be uploaded
     :return: Newly created Scan object
     """
+
+    owner_id = get_current_user_info().id
     category = ScanCategoriesRepository.get_category_by_key(category_key)
-    return ScansRepository.add_new_scan(category, declared_number_of_slices)
+    return ScansRepository.add_new_scan(category, declared_number_of_slices, owner_id)
 
 
 def get_metadata(scan_id: ScanID) -> ScanMetadata:

@@ -43,6 +43,9 @@ class User(Base, UserMixin):
 
     roles: List[Role] = db.relationship('Role', secondary=users_roles)
 
+    scans = relationship("Scan")
+    labels = relationship("Label")
+
     def __init__(self, email: str, password_hash: str, first_name: str, last_name: str) -> None:
         """Initialize User."""
         self.email = email
@@ -105,22 +108,26 @@ class Scan(Base):
     category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
     category: ScanCategory = relationship('ScanCategory')
 
+    owner_id: int = Column(Integer, ForeignKey('Users.id'))
+
     slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
     labels: List['Label'] = relationship('Label', back_populates='scan')
 
-    def __init__(self, category: ScanCategory, declared_number_of_slices: int) -> None:
+    def __init__(self, category: ScanCategory, declared_number_of_slices: int, owner_id: owner_id) -> None:
         """Initialize Scan.
 
         :param category: Scan's category
         :param declared_number_of_slices: number of Slices that will be uploaded later
+        :param owner_id: User ID that uploaded scan
         """
         self.id = ScanID(str(uuid.uuid4()))
         self.category = category
         self.declared_number_of_slices = declared_number_of_slices
+        self.owner_id = owner_id
 
     def __repr__(self) -> str:
         """Return string representation for Scan."""
-        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key)
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
 
     @property
     def stored_slices(self) -> List['Slice']:
@@ -234,6 +241,8 @@ class Label(Base):
     scan: Scan = relationship('Scan', back_populates='labels')
     selections: 'LabelSelection' = relationship('LabelSelection', back_populates='label')
 
+    owner_id: int = Column(Integer, ForeignKey('Users.id'))
+
     def __init__(self) -> None:
         """Initialize Label.
 
@@ -244,8 +253,8 @@ class Label(Base):
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
-        return '<{}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
-                                           self.labeling_time)
+        return '<{}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
+                                           self.labeling_time, self.owner_id)
 
     def update_status(self, status: LabelStatus) -> 'Label':
         """Update Label's status.

@@ -1,10 +1,19 @@
 """Tests for basic flow of the system."""
 import json
+import pytest
 from typing import Any
 
-from medtagger.database.models import LabelStatus
-
+from medtagger.database.models import User, LabelStatus
+from medtagger.repositories.users import UsersRepository
 from tests.functional_tests import get_api_client, get_web_socket_client
+
+
+@pytest.fixture
+def user_repository_mock(mocker: Any) -> None:
+    """Return user with volunteer role."""
+    mocked_user_repository = mocker.patch('medtagger.api.users.get_user_by_id')
+    mocked_user_repository.return_value = User('test@mail.com', 'medtagger', 'First', 'Last')
+    return mocked_user_repository
 
 
 def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
