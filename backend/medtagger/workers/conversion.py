@@ -26,11 +26,17 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
     :param scan_id: ID of a Scan
     """
+    logger.info('Starting Scan (%s) conversion.', scan_id)
     temp_files_to_remove = []
     scan = ScansRepository.get_scan_by_id(scan_id)
     slices = SlicesRepository.get_slices_by_scan_id(scan_id)
+    if scan.declared_number_of_slices == 0:
+        logger.error('This Scan is empty! Removing from database...')
+        ScansRepository.delete_scan_by_id(scan_id)
+        return
 
     # At first, collect all Dicom images for given Scan
+    logger.info('Reading all Slices for this Scan.')
     dicom_images = []
     for _slice in slices:
         image = SlicesRepository.get_slice_original_image(_slice.id)
@@ -42,6 +48,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         dicom_images.append(dicom_image)
 
     # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
+    logger.info('Converting each Slice in Z axis.')
     for dicom_image, _slice in zip(dicom_images, slices):
         slice_pixels = convert_slice_to_normalized_8bit_array(dicom_image)
         _convert_to_png_and_store(_slice, slice_pixels)

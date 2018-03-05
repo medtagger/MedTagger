@@ -40,6 +40,7 @@ export class UploadPageComponent implements OnInit {
   uploadMode: UploadMode = UploadMode.SINGLE_SCAN;
   category: string;
   availableCategories = [];
+  
   chooseModeFormGroup: FormGroup;
   chooseFilesFormGroup: FormGroup;
   sendingFilesFormGroup: FormGroup;
@@ -108,18 +109,27 @@ export class UploadPageComponent implements OnInit {
       .mergeAll(CONCURRENT_SCANS_UPLOAD);
   }
 
-  restart() {
-    this.chooseCategoryFormGroup.reset();
-    this.chooseModeFormGroup.reset();
-    this.chooseFilesFormGroup.reset();
-    this.sendingFilesFormGroup.reset();
-    this.uploadCompletedFormGroup.reset();
+  resetFormGroup(formGroup: FormGroup) {
+    formGroup.reset();
+    formGroup.markAsUntouched();
+    Object.keys(formGroup.controls).forEach((name) => {
+      let control = formGroup.controls[name];
+      control.setErrors(null);
+    });
+  }
 
-    if(this.uploadSingleScanSelector) {
+  restart() {
+    this.resetFormGroup(this.chooseCategoryFormGroup);
+    this.resetFormGroup(this.chooseModeFormGroup);
+    this.resetFormGroup(this.chooseFilesFormGroup);
+    this.resetFormGroup(this.sendingFilesFormGroup);
+    this.resetFormGroup(this.uploadCompletedFormGroup);
+
+    if (this.uploadSingleScanSelector) {
       this.uploadSingleScanSelector.reinitialize();
     }
 
-    if(this.uploadMultipleScansSelector) {
+    if (this.uploadMultipleScansSelector) {
       this.uploadMultipleScansSelector.reinitialize();
     }
 
@@ -128,11 +138,11 @@ export class UploadPageComponent implements OnInit {
     this.totalNumberOfSlices = 0;
     this.slicesSent = 0;
 
-    this.stepper.selectedIndex = 0;
     this.chooseModeStep.completed = false;
     this.chooseFilesStep.completed = false;
     this.sendingFilesStep.completed = false;
     this.uploadCompletedStep.completed = false;
+    this.stepper.selectedIndex = 0;
   }
 
   isGoogleChrome() {

@@ -39,8 +39,8 @@ export class UploadScansSelectorComponent {
     this.numberOfSlices = 0;
     var lastScanDirectory: String;
     for (let sliceFile of this._files) {
-      // Skip all files that are not Dicoms
-      if (sliceFile.type != "application/dicom" || !sliceFile.webkitRelativePath.endsWith(".dcm")) {
+      // Skip all files that are not DICOMs
+      if (sliceFile.type != "application/dicom") {
         continue;
       }
 

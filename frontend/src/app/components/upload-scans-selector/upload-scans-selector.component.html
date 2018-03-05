@@ -2,8 +2,8 @@
   <input [accept]="'.dcm'" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden multiple />
   <button type="button" mat-raised-button (click)="selectFile()">
     <mat-icon>recent_actors</mat-icon>
-    <span *ngIf="!numberOfSlices">Select Dicom images</span>
-    <span *ngIf="numberOfSlices">Selected <span>{{numberOfSlices}}</span> Dicom images</span>
+    <span *ngIf="!numberOfSlices">Select DICOM images</span>
+    <span *ngIf="numberOfSlices">Selected <span>{{numberOfSlices}}</span> DICOM images</span>
   </button>
 </section>
 
