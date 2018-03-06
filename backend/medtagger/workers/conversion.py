@@ -3,10 +3,11 @@ import io
 import os
 import tempfile
 from subprocess import call
-from typing import Optional
+from typing import List, Optional
 
 import numpy as np
 import pydicom
+from pydicom.dataset import FileDataset
 from PIL import Image
 from celery.utils.log import get_task_logger
 
@@ -29,7 +30,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     :param scan_id: ID of a Scan
     """
     logger.info('Starting Scan (%s) conversion.', scan_id)
-    temp_files_to_remove = []
+    temp_files_to_remove: List[str] = []
     scan = ScansRepository.get_scan_by_id(scan_id)
     slices = SlicesRepository.get_slices_by_scan_id(scan_id)
     if scan.declared_number_of_slices == 0:
@@ -42,8 +43,9 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     dicom_images = []
     for _slice in slices:
         image = SlicesRepository.get_slice_original_image(_slice.id)
-        dicom_image = _get_dicom_image(image)
+        dicom_image, files_to_remove = _get_dicom_image(image)
         dicom_images.append(dicom_image)
+        temp_files_to_remove.extend(files_to_remove)
 
     # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
     logger.info('Converting each Slice in Z axis.')
@@ -68,21 +70,20 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         os.remove(file_name)
 
 
-def _get_dicom_image(image: bytes) -> pd.DataFrame:
+def _get_dicom_image(image: bytes) -> FileDataset:
     """Return PyDICOM image based on image from HBase."""
     # UGLY WORKAROUND FOR COMPRESSED DICOMs - Start
     temp_file_name = _create_temporary_file(image)
-    temp_files_to_remove.append(temp_file_name)
     try:
         dicom_image = pydicom.read_file(temp_file_name, force=True)
         dicom_image.pixel_array  # pylint: disable=pointless-statement; Try to read pixel array from DICOM...
-        return dicom_image
+        return dicom_image, [temp_file_name]
     except Exception:  # pylint: disable=broad-except;  Intended - too much cases to cover...
         # In case of any Exception - try to uncompress data from DICOM first
         temp_file_uncompressed = _create_temporary_file()
-        temp_files_to_remove.append(temp_file_uncompressed)
         call(["gdcmconv", "--raw", "-i", temp_file_name, "-o", temp_file_uncompressed])  # Convert to RAW DICOMs
-        return pydicom.read_file(temp_file_uncompressed, force=True)
+        dicom_image = pydicom.read_file(temp_file_uncompressed, force=True)
+        return dicom_image, [temp_file_name, temp_file_uncompressed]
     # UGLY WORKAROUND - Stop
 
 
