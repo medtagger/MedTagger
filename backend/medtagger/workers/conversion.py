@@ -71,7 +71,13 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
 
 def _get_dicom_image(image: bytes) -> FileDataset:
-    """Return PyDICOM image based on image from HBase."""
+    """Return PyDICOM image based on image from HBase.
+
+    This workaround enables support for compressed DICOMs as GDCM wrapper does not support Python3 well.
+
+    :param image: bytes with DICOM image (eg. from HBase)
+    :return: PyDICOM Image
+    """
     # UGLY WORKAROUND FOR COMPRESSED DICOMs - Start
     temp_file_name = _create_temporary_file(image)
     try:
@@ -97,7 +103,7 @@ def _create_temporary_file(image: Optional[bytes] = None) -> str:
     and this Issue will be closed:
        https://github.com/pydicom/pydicom/issues/233
 
-    :param image: bytes with DICOM image
+    :param image: (optional) bytes with DICOM image
     :return: path to temporary file
     """
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
