@@ -2,9 +2,12 @@
 import io
 import os
 import tempfile
-import numpy as np
+from subprocess import call
+from typing import List, Optional
 
+import numpy as np
 import pydicom
+from pydicom.dataset import FileDataset
 from PIL import Image
 from celery.utils.log import get_task_logger
 
@@ -27,7 +30,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     :param scan_id: ID of a Scan
     """
     logger.info('Starting Scan (%s) conversion.', scan_id)
-    temp_files_to_remove = []
+    temp_files_to_remove: List[str] = []
     scan = ScansRepository.get_scan_by_id(scan_id)
     slices = SlicesRepository.get_slices_by_scan_id(scan_id)
     if scan.declared_number_of_slices == 0:
@@ -36,16 +39,13 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         return
 
     # At first, collect all Dicom images for given Scan
-    logger.info('Reading all Slices for this Scan.')
+    logger.info('Reading all Slices for this Scan... This may take a while...')
     dicom_images = []
     for _slice in slices:
         image = SlicesRepository.get_slice_original_image(_slice.id)
-        # UGLY WORKAROUND - Start
-        temp_file_name = _create_temporary_file(image)
-        temp_files_to_remove.append(temp_file_name)
-        # UGLY WORKAROUND - Stop
-        dicom_image = pydicom.read_file(temp_file_name, force=True)
+        dicom_image, files_to_remove = _get_dicom_image(image)
         dicom_images.append(dicom_image)
+        temp_files_to_remove.extend(files_to_remove)
 
     # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
     logger.info('Converting each Slice in Z axis.')
@@ -70,7 +70,30 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         os.remove(file_name)
 
 
-def _create_temporary_file(image: bytes) -> str:
+def _get_dicom_image(image: bytes) -> FileDataset:
+    """Return PyDICOM image based on image from HBase.
+
+    This workaround enables support for compressed DICOMs as GDCM wrapper does not support Python3 well.
+
+    :param image: bytes with DICOM image (eg. from HBase)
+    :return: PyDICOM Image
+    """
+    # UGLY WORKAROUND FOR COMPRESSED DICOMs - Start
+    temp_file_name = _create_temporary_file(image)
+    try:
+        dicom_image = pydicom.read_file(temp_file_name, force=True)
+        dicom_image.pixel_array  # pylint: disable=pointless-statement; Try to read pixel array from DICOM...
+        return dicom_image, [temp_file_name]
+    except Exception:  # pylint: disable=broad-except;  Intended - too much cases to cover...
+        # In case of any Exception - try to uncompress data from DICOM first
+        temp_file_uncompressed = _create_temporary_file()
+        call(["gdcmconv", "--raw", "-i", temp_file_name, "-o", temp_file_uncompressed])  # Convert to RAW DICOMs
+        dicom_image = pydicom.read_file(temp_file_uncompressed, force=True)
+        return dicom_image, [temp_file_name, temp_file_uncompressed]
+    # UGLY WORKAROUND - Stop
+
+
+def _create_temporary_file(image: Optional[bytes] = None) -> str:
     """Create new temporary file based on given DICOM image.
 
     This workaround enable support for compressed DICOMs that will be read by the GDCM
@@ -80,12 +103,13 @@ def _create_temporary_file(image: bytes) -> str:
     and this Issue will be closed:
        https://github.com/pydicom/pydicom/issues/233
 
-    :param image: bytes with DICOM image
+    :param image: (optional) bytes with DICOM image
     :return: path to temporary file
     """
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         temp_file_name = temp_file.name
-        temp_file.write(image)
+        if image:
+            temp_file.write(image)
     return temp_file_name
 
 
