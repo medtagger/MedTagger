@@ -3,6 +3,8 @@ import io
 import os
 import tempfile
 import numpy as np
+from subprocess import call
+from typing import Optional
 
 import pydicom
 from PIL import Image
@@ -36,15 +38,23 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         return
 
     # At first, collect all Dicom images for given Scan
-    logger.info('Reading all Slices for this Scan.')
+    logger.info('Reading all Slices for this Scan... This may take a while...')
     dicom_images = []
     for _slice in slices:
         image = SlicesRepository.get_slice_original_image(_slice.id)
-        # UGLY WORKAROUND - Start
+        # UGLY WORKAROUND FOR COMPRESSED DICOMs - Start
         temp_file_name = _create_temporary_file(image)
         temp_files_to_remove.append(temp_file_name)
+        temp_file_uncompressed = _create_temporary_file()
+        try:
+            dicom_image = pydicom.read_file(temp_file_uncompressed, force=True)
+            dicom_image.pixel_array  # Try to read pixel array from DICOM...
+        except Exception:
+            # In case of any Exception - try to uncompress data from DICOM first
+            temp_files_to_remove.append(temp_file_uncompressed)
+            call(["gdcmconv", "--raw", "-i", temp_file_name, "-o", temp_file_uncompressed])  # Convert to RAW DICOMs
+            dicom_image = pydicom.read_file(temp_file_uncompressed, force=True)
         # UGLY WORKAROUND - Stop
-        dicom_image = pydicom.read_file(temp_file_name, force=True)
         dicom_images.append(dicom_image)
 
     # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
@@ -70,7 +80,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         os.remove(file_name)
 
 
-def _create_temporary_file(image: bytes) -> str:
+def _create_temporary_file(image: Optional[bytes] = None) -> str:
     """Create new temporary file based on given DICOM image.
 
     This workaround enable support for compressed DICOMs that will be read by the GDCM
@@ -85,7 +95,8 @@ def _create_temporary_file(image: bytes) -> str:
     """
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         temp_file_name = temp_file.name
-        temp_file.write(image)
+        if image:
+            temp_file.write(image)
     return temp_file_name
 
 
