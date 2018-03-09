@@ -96,7 +96,6 @@ export class ScanViewerComponent implements OnInit {
 
     public setScanMetadata(scanMetadata: ScanMetadata): void {
         this.scanMetadata = scanMetadata;
-        // this.slider.max = scanMetadata.numberOfSlices;
     }
 
     public hookUpSliceObserver(sliceBatchSize: number): Promise<boolean> {
