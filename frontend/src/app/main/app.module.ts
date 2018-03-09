@@ -39,13 +39,15 @@ import {
   MatExpansionModule,
   MatSnackBarModule,
   MatSelectModule,
-  MatTooltipModule,
+  MatTooltipModule, MatDialog, MatDialogModule,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {AuthenticationHeader} from '../services/authentication-header';
 import {routing} from "./app.routes";
 import {AuthGuard} from "../guards/auth.guard";
 import {AccountService} from "../services/account.service";
+import {DialogService} from "../services/dialog.service";
+import {InfoDialog} from "../dialogs/info.dialog";
 
 @NgModule({
   declarations: [
@@ -61,6 +63,7 @@ import {AccountService} from "../services/account.service";
     UploadPageComponent,
     SettingsPageComponent,
     ValidationPageComponent,
+    InfoDialog
   ],
   imports: [
     routing,
@@ -79,6 +82,7 @@ import {AccountService} from "../services/account.service";
     MatListModule,
     MatGridListModule,
     MatTooltipModule,
+    MatDialogModule,
     BrowserModule,
     BrowserAnimationsModule,
     BrowserAnimationsModule,
@@ -91,11 +95,16 @@ import {AccountService} from "../services/account.service";
     MatSelectModule,
     HttpModule
   ],
+  entryComponents: [
+    InfoDialog
+  ],
   providers: [
     MockService,
     AuthenticationHeader,
     AuthGuard,
-    AccountService
+    AccountService,
+    DialogService,
+    MatDialog
   ],
   bootstrap: [AppComponent]
 })

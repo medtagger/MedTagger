@@ -1,12 +1,14 @@
-import { Injectable } from "@angular/core";
-import { environment } from "../../environments/environment";
-import { UserInfo } from "../model/UserInfo";
-import { Http, Headers } from "@angular/http";
-import { AuthenticationHeader } from "./authentication-header";
+import {Injectable} from "@angular/core";
+import {environment} from "../../environments/environment";
+import {UserInfo} from "../model/UserInfo";
+import {Http, Headers} from "@angular/http";
+import {AuthenticationHeader} from "./authentication-header";
+import {DialogService} from "./dialog.service";
 
 @Injectable()
 export class AccountService {
-    constructor(private http: Http, private authenticationHeader: AuthenticationHeader) {}
+    constructor(private http: Http, private authenticationHeader: AuthenticationHeader) {
+    }
 
     public register(email: string, password: string, firstName: string, lastName: string): Promise<void> {
         let url = environment.API_URL + '/auth/register';
@@ -57,7 +59,7 @@ export class AccountService {
                 .then(response => {
                     console.log("AccountService | getCurrentUserInfo | response: ", response);
                     let json = response.json();
-                    let userInfo = new UserInfo(json.id, json.email, json.firstName, json.lastName, json.role)
+                    let userInfo = new UserInfo(json.id, json.email, json.firstName, json.lastName, json.role);
                     resolve(userInfo);
                 })
                 .catch(error => {
@@ -68,6 +70,6 @@ export class AccountService {
     }
 
     public isLoggedIn(): boolean {
-      return !!(sessionStorage.getItem('userInfo') && sessionStorage.getItem('authenticationToken'))
+        return !!(sessionStorage.getItem('userInfo') && sessionStorage.getItem('authenticationToken'))
     }
 }
