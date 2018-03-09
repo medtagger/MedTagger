@@ -34,21 +34,25 @@ export class ScanService {
     });
   }
 
-  getRandomScan(category: string): Promise<ScanMetadata> {
+  public getRandomScan(category: string): Promise<ScanMetadata> {
     return new Promise((resolve, reject) => {
       let params = new URLSearchParams();
       params.set('category', category);
-      this.http.get(environment.API_URL + '/scans/random', {params: params}).toPromise().then(
-        response => {
-          console.log('ScanService | getRandomScan | response: ', response);
-          const json = response.json();
-          resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
-        },
-        error => {
-          console.log('ScanService | getRandomScan | error: ', error);
-          reject(error);
-        }
-      );
+      this.http.get(environment.API_URL + '/scans/random', {params: params})
+        .map(response => response.json())
+        .subscribe(
+          (response) => {
+            console.log('ScanService | getRandomScan | response: ', response);
+            const json = response.json();
+            resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
+          },
+          (error) => {
+            console.log('ScanService | getRandomScan | error: ', error);
+            reject(error);
+          },
+          () => {
+            console.log('ScanService | getRandomScan | done');
+          });
     });
   }
 
@@ -126,7 +130,7 @@ export class ScanService {
         return Observable.defer(
           () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
         );
-      }) 
+      })
       .mergeAll(CONCURRENT_API_CALLS);
   }
 

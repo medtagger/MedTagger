@@ -7,11 +7,10 @@ import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {Response} from '@angular/http';
-import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
-import {Selector} from '../../components/selectors/Selector';
-import {CircleROISelector} from '../../components/selectors/CircleROISelector';
+import {DialogService} from "../../services/dialog.service";
+import {Location} from '@angular/common';
 
 
 @Component({
@@ -30,7 +29,8 @@ export class MarkerPageComponent implements OnInit {
   category: string;
   lastSliceID = 0;
 
-  constructor(private scanService: ScanService, private route: ActivatedRoute) {
+  constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
+              private location: Location) {
     console.log('MarkerPage constructor', this.marker);
   }
 
@@ -71,14 +71,24 @@ export class MarkerPageComponent implements OnInit {
   }
 
   private requestScan(): void {
-    this.scanService.getRandomScan(this.category).then((scan: ScanMetadata) => {
-      this.scan = scan;
-      this.marker.setScanMetadata(this.scan);
+    this.scanService.getRandomScan(this.category).then(
+      (scan: ScanMetadata) => {
+        this.scan = scan;
+        this.marker.setScanMetadata(this.scan);
 
-      const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
-      const count = MarkerPageComponent.SLICE_BATCH_SIZE;
-      this.scanService.requestSlices(scan.scanId, begin, count);
-    });
+        const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
+        const count = MarkerPageComponent.SLICE_BATCH_SIZE;
+        this.scanService.requestSlices(scan.scanId, begin, count);
+      },
+      (errorResponse: Error) => {
+        console.log(errorResponse);
+        this.dialogService
+          .openInfoDialog("Error", "No slices found for this category", "Go back")
+          .afterClosed()
+          .subscribe(() => {
+            this.location.back();
+          });
+      });
   }
 
   public skipScan(): void {
@@ -88,11 +98,16 @@ export class MarkerPageComponent implements OnInit {
 
   public sendSelection() {
     const roiSelection: ROISelection3D = new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection());
-    this.scanService.send3dSelection(this.scan.scanId, roiSelection).then((response: Response) => {
-      if (response.status === 200) {
-        console.log('MarkerPage | sendSelection | success!');
-      }
-    });
+    this.scanService.send3dSelection(this.scan.scanId, roiSelection)
+      .then((response: Response) => {
+        if (response.status === 200) {
+          console.log('MarkerPage | sendSelection | success!');
+        }
+      })
+      .catch((errorResponse: Error) => {
+        this.dialogService
+          .openInfoDialog("Error", "Cannot send selection", "Ok");
+      });
     return;
   }
 
