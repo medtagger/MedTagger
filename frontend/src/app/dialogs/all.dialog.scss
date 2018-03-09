@@ -1,9 +1,16 @@
 p {
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  margin-top: 0;
 }
 
 .mat-dialog-title {
   margin: 0 0 0 0;
 }
 
+.mat-dialog-content {
+  white-space: pre-wrap;      /* CSS3 */
+  white-space: -moz-pre-wrap; /* Firefox */
+  white-space: -o-pre-wrap;   /* Opera */
+  word-wrap: break-word;
+}
 

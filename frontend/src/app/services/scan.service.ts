@@ -10,128 +10,128 @@ import {MarkerSlice} from '../model/MarkerSlice';
 import {ROISelection3D} from '../model/ROISelection3D';
 
 import {environment} from '../../environments/environment';
+import {DialogService} from "./dialog.service";
 
 
 @Injectable()
 export class ScanService {
 
-  websocket: Socket;
+    websocket: Socket;
 
-  constructor(private http: Http) {
-    this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {}});
-  }
+    constructor(private http: Http) {
+        this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {}});
+    }
 
-  public send3dSelection(scanId: string, roiSelection: ROISelection3D): Promise<Response> {
-    console.log('ScanService | send3dSelection | sending ROI:', roiSelection, `for scanId: ${scanId}`);
-    return new Promise((resolve, reject) => {
-      this.http.post(environment.API_URL + `/scans/${scanId}/label`, roiSelection.toJSON()).toPromise().then((response: Response) => {
-        console.log('ScanService | send3dSelection | response: ', response);
-        resolve(response);
-      }).catch((error: Response) => {
-        console.log('ScanService | send3dSelection | error: ', error);
-        reject(error);
-      });
-    });
-  }
+    public send3dSelection(scanId: string, roiSelection: ROISelection3D): Promise<Response> {
+        console.log('ScanService | send3dSelection | sending ROI:', roiSelection, `for scanId: ${scanId}`);
+        return new Promise((resolve, reject) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/label`, roiSelection.toJSON()).toPromise().then((response: Response) => {
+                console.log('ScanService | send3dSelection | response: ', response);
+                resolve(response);
+            }).catch((error: Response) => {
+                console.log('ScanService | send3dSelection | error: ', error);
+                reject(error);
+            });
+        });
+    }
 
-  public getRandomScan(category: string): Promise<ScanMetadata> {
-    return new Promise((resolve, reject) => {
-      let params = new URLSearchParams();
-      params.set('category', category);
-      this.http.get(environment.API_URL + '/scans/random', {params: params})
-        .map(response => response.json())
-        .subscribe(
-          (response) => {
-            console.log('ScanService | getRandomScan | response: ', response);
-            const json = response.json();
-            resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
-          },
-          (error) => {
-            console.log('ScanService | getRandomScan | error: ', error);
-            reject(error);
-          },
-          () => {
-            console.log('ScanService | getRandomScan | done');
-          });
-    });
-  }
+    public getRandomScan(category: string): Promise<ScanMetadata> {
+        return new Promise((resolve, reject) => {
+            let params = new URLSearchParams();
+            params.set('category', category);
+            this.http.get(environment.API_URL + '/scans/random', {params: params})
+                .map(response => response.json())
+                .subscribe(
+                    (response) => {
+                        console.log('ScanService | getRandomScan | response: ', response);
+                        const json = response.json();
+                        resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
+                    },
+                    (error) => {
+                        console.log('ScanService | getRandomScan | error: ', error);
+                        reject(error);
+                    },
+                    () => {
+                        console.log('ScanService | getRandomScan | done');
+                    });
+        });
+    }
 
-  getScanForScanId(scanId: string): Promise<ScanMetadata> {
-    return new Promise((resolve, reject) => {
-      this.http.get(environment.API_URL + '/scans/' + scanId).toPromise().then(
-        response => {
-          console.log('ScanService | getScanForScanId | response: ', response);
-          const json = response.json();
-          resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
-        },
-        error => {
-          console.log('ScanService | getRandomScan | error: ', error);
-          reject(error);
-        }
-      );
-    });
-  }
+    getScanForScanId(scanId: string): Promise<ScanMetadata> {
+        return new Promise((resolve, reject) => {
+            this.http.get(environment.API_URL + '/scans/' + scanId).toPromise().then(
+                response => {
+                    console.log('ScanService | getScanForScanId | response: ', response);
+                    const json = response.json();
+                    resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
+                },
+                error => {
+                    console.log('ScanService | getRandomScan | error: ', error);
+                    reject(error);
+                }
+            );
+        });
+    }
 
-  getAvailableCategories(): Promise<ScanCategory[]> {
-    return new Promise((resolve, reject) => {
-      this.http.get(environment.API_URL + '/scans/categories').toPromise().then(
-        response => {
-          console.log('ScanService | getAvailableCategories | response: ', response);
-          const json = response.json();
-          const categories = [];
-          for (let category of json) {
-            categories.push(new ScanCategory(category.key, category.name, category.image_path))
-          }
-          resolve(categories);
-        },
-        error => {
-          console.log('ScanService | getAvailableCategories | error: ', error);
-          reject(error);
-        }
-      );
-    });
-  }
+    getAvailableCategories(): Promise<ScanCategory[]> {
+        return new Promise((resolve, reject) => {
+            this.http.get(environment.API_URL + '/scans/categories').toPromise().then(
+                response => {
+                    console.log('ScanService | getAvailableCategories | response: ', response);
+                    const json = response.json();
+                    const categories = [];
+                    for (let category of json) {
+                        categories.push(new ScanCategory(category.key, category.name, category.image_path))
+                    }
+                    resolve(categories);
+                },
+                error => {
+                    console.log('ScanService | getAvailableCategories | error: ', error);
+                    reject(error);
+                }
+            );
+        });
+    }
 
-  slicesObservable(): Observable<MarkerSlice> {
-    return this.websocket.fromEvent<any>('slice').map((slice: { scan_id: string, index: number, image: ArrayBuffer }) => {
-      return new MarkerSlice(slice.scan_id, slice.index, slice.image);
-    });
-  }
+    slicesObservable(): Observable<MarkerSlice> {
+        return this.websocket.fromEvent<any>('slice').map((slice: { scan_id: string, index: number, image: ArrayBuffer }) => {
+            return new MarkerSlice(slice.scan_id, slice.index, slice.image);
+        });
+    }
 
-  requestSlices(scanId: string, begin: number, count: number) {
-    console.log('ScanService | requestSlices | begin:', begin);
-    this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count});
-  }
+    requestSlices(scanId: string, begin: number, count: number) {
+        console.log('ScanService | requestSlices | begin:', begin);
+        this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count});
+    }
 
-  createNewScan(category: string, numberOfSlices: number) {
-    return new Promise((resolve, reject) => {
-      const payload = {
-        category: category,
-        number_of_slices: numberOfSlices,
-      };
-      this.http.post(environment.API_URL + '/scans/', payload).toPromise().then(
-        response => {
-          resolve(response.json().scan_id);
-        },
-        error => {
-          reject(error);
-        }
-      );
-    });
-  }
+    createNewScan(category: string, numberOfSlices: number) {
+        return new Promise((resolve, reject) => {
+            const payload = {
+                category: category,
+                number_of_slices: numberOfSlices,
+            };
+            this.http.post(environment.API_URL + '/scans/', payload).toPromise().then(
+                response => {
+                    resolve(response.json().scan_id);
+                },
+                error => {
+                    reject(error);
+                }
+            );
+        });
+    }
 
-  uploadSlices(scanId: string, files: File[]) {
-    let CONCURRENT_API_CALLS = 5;
+    uploadSlices(scanId: string, files: File[]) {
+        let CONCURRENT_API_CALLS = 5;
 
-    return Observable.from(files)
-      .map((file) => {
-        let form = new FormData();
-        form.append('image', file, file.name);
-        return Observable.defer(
-          () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
-        );
-      })
-      .mergeAll(CONCURRENT_API_CALLS);
-  }
-
+        return Observable.from(files)
+            .map((file) => {
+                let form = new FormData();
+                form.append('image', file, file.name);
+                return Observable.defer(
+                    () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
+                );
+            })
+            .mergeAll(CONCURRENT_API_CALLS);
+    }
 }
