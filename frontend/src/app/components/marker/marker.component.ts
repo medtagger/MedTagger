@@ -6,111 +6,111 @@ import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
 
 @Component({
-  selector: 'app-marker-component',
-  templateUrl: './marker.component.html',
-  styleUrls: ['./marker.component.scss']
+    selector: 'app-marker-component',
+    templateUrl: './marker.component.html',
+    styleUrls: ['./marker.component.scss']
 })
 export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
-  currentImage: HTMLImageElement;
+    currentImage: HTMLImageElement;
 
-  @ViewChild('image')
-  set viewImage(viewElement: ElementRef) {
-    this.currentImage = viewElement.nativeElement;
-  }
+    @ViewChild('image')
+    set viewImage(viewElement: ElementRef) {
+        this.currentImage = viewElement.nativeElement;
+    }
 
-  canvas: HTMLCanvasElement;
+    canvas: HTMLCanvasElement;
 
-  @ViewChild('canvas')
-  set viewCanvas(viewElement: ElementRef) {
-    this.canvas = viewElement.nativeElement;
-  }
+    @ViewChild('canvas')
+    set viewCanvas(viewElement: ElementRef) {
+        this.canvas = viewElement.nativeElement;
+    }
 
-  @ViewChild('slider') slider: MatSlider;
+    @ViewChild('slider') slider: MatSlider;
 
-  public has3dSelection: boolean;
-  public has2dSelection: boolean;
-  public hasArchivedSelections: boolean;
+    public has3dSelection: boolean;
+    public has2dSelection: boolean;
+    public hasArchivedSelections: boolean;
 
-  public observableSliceRequest: Subject<number>;
+    public observableSliceRequest: Subject<number>;
 
-  constructor() {
-    super();
-  }
+    constructor() {
+        super();
+    }
 
-  get currentSlice() {
-    return this._currentSlice;
-  }
+    get currentSlice() {
+        return this._currentSlice;
+    }
 
-  public removeCurrentSelection(): void {
-    this.selector.removeCurrentSelection();
-    this.updateSelectionState();
-  }
+    public removeCurrentSelection(): void {
+        this.selector.removeCurrentSelection();
+        this.updateSelectionState();
+    }
 
-  private updateSelectionState(): void {
-    this.hasArchivedSelections = this.selector.hasArchivedSelections();
-    this.has2dSelection = this.selector.hasSliceSelection();
-    this.has3dSelection = this.selector.hasFullSelection();
-  }
+    private updateSelectionState(): void {
+        this.hasArchivedSelections = this.selector.hasArchivedSelections();
+        this.has2dSelection = this.selector.hasSliceSelection();
+        this.has3dSelection = this.selector.hasFullSelection();
+    }
 
-  public get3dSelection(): SliceSelection[] {
-    this.selector.addCurrentSelection();
-    this.selector.archiveSelections();
-    this.updateSelectionState();
+    public get3dSelection(): SliceSelection[] {
+        this.selector.addCurrentSelection();
+        this.selector.archiveSelections();
+        this.updateSelectionState();
 
-    this.selector.clearCanvasSelection();
+        this.selector.clearCanvasSelection();
 
-    const coordinates: SliceSelection[] = this.selector.getSelections();
-    this.selector.clearSelections();
-    this.updateSelectionState();
+        const coordinates: SliceSelection[] = this.selector.getSelections();
+        this.selector.clearSelections();
+        this.updateSelectionState();
 
-    this.selector.drawPreviousSelections();
+        this.selector.drawPreviousSelections();
 
-    return coordinates;
-  }
+        return coordinates;
+    }
 
-  ngOnInit() {
-    console.log('Marker init');
-    console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
+    ngOnInit() {
+        console.log('Marker init');
+        console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
 
-    this.slices = new Map<number, MarkerSlice>();
+        this.slices = new Map<number, MarkerSlice>();
 
-    this.selector.clearData();
+        this.selector.clearData();
 
-    this.initializeCanvas();
+        this.initializeCanvas();
 
-    this.currentImage.onload = () => {
-      this.initCanvasSelectionTool();
-    };
+        this.currentImage.onload = () => {
+            this.initCanvasSelectionTool();
+        };
 
-    this.setCanvasImage();
+        this.setCanvasImage();
 
-    this.slider.registerOnChange((sliderValue: number) => {
-      console.log('Marker init | slider change: ', sliderValue);
+        this.slider.registerOnChange((sliderValue: number) => {
+            console.log('Marker init | slider change: ', sliderValue);
 
-      this.requestSlicesIfNeeded(sliderValue);
+            this.requestSlicesIfNeeded(sliderValue);
 
-      this.changeMarkerImage(sliderValue);
-      this.selector.drawPreviousSelections();
+            this.changeMarkerImage(sliderValue);
+            this.selector.drawPreviousSelections();
 
-      this.updateSelectionState();
-    });
-  }
+            this.updateSelectionState();
+        });
+    }
 
-  private initCanvasSelectionTool(): void {
-    console.log('Marker | initCanvasSelectionTool');
+    private initCanvasSelectionTool(): void {
+        console.log('Marker | initCanvasSelectionTool');
 
-    this.canvas.onmousedown = (mouseEvent: MouseEvent) => {
-      console.log('Marker | initCanvasSelectionTool | onmousedown clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-      this.selector.onMouseDown(mouseEvent);
-    };
+        this.canvas.onmousedown = (mouseEvent: MouseEvent) => {
+            console.log('Marker | initCanvasSelectionTool | onmousedown clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
+            this.selector.onMouseDown(mouseEvent);
+        };
 
-    this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
-      this.selector.onMouseUp(mouseEvent);
-    };
+        this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
+            this.selector.onMouseUp(mouseEvent);
+        };
 
-    this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
-      this.selector.onMouseMove(mouseEvent);
-    };
-  }
+        this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
+            this.selector.onMouseMove(mouseEvent);
+        };
+    }
 }

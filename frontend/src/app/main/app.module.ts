@@ -15,31 +15,30 @@ import {CategoryPageComponent} from '../pages/category-page/category-page.compon
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
-import {MockService} from '../services/mock.service';
 import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {
-  MatCardModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatStepperModule,
-  MatRadioModule,
-  MatSliderModule,
-  MatButtonModule,
-  MatIconModule,
-  MatFormFieldModule,
-  MatInputModule,
-  MatToolbarModule,
-  MatSidenavModule,
-  MatListModule,
-  MatGridListModule,
-  MatExpansionModule,
-  MatSnackBarModule,
-  MatSelectModule,
-  MatTooltipModule, MatDialog, MatDialogModule,
+    MatCardModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatStepperModule,
+    MatRadioModule,
+    MatSliderModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatListModule,
+    MatGridListModule,
+    MatExpansionModule,
+    MatSnackBarModule,
+    MatSelectModule,
+    MatTooltipModule, MatDialog, MatDialogModule,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {AuthenticationHeader} from '../services/authentication-header';
@@ -50,63 +49,62 @@ import {DialogService} from "../services/dialog.service";
 import {InfoDialog} from "../dialogs/info.dialog";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginPageComponent,
-    MarkerPageComponent,
-    HomePageComponent,
-    CategoryPageComponent,
-    MarkerComponent,
-    ScanViewerComponent,
-    MarkerTutorialPageComponent,
-    UploadScansSelectorComponent,
-    UploadPageComponent,
-    SettingsPageComponent,
-    ValidationPageComponent,
-    InfoDialog
-  ],
-  imports: [
-    routing,
-    MatToolbarModule,
-    MatCardModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule,
-    MatStepperModule,
-    MatRadioModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSliderModule,
-    MatButtonModule,
-    MatIconModule,
-    MatSidenavModule,
-    MatListModule,
-    MatGridListModule,
-    MatTooltipModule,
-    MatDialogModule,
-    BrowserModule,
-    BrowserAnimationsModule,
-    BrowserAnimationsModule,
-    FormsModule,
-    ReactiveFormsModule,
-    SocketIoModule,
-    ReactiveFormsModule,
-    MatExpansionModule,
-    MatSnackBarModule,
-    MatSelectModule,
-    HttpModule
-  ],
-  entryComponents: [
-    InfoDialog
-  ],
-  providers: [
-    MockService,
-    AuthenticationHeader,
-    AuthGuard,
-    AccountService,
-    DialogService,
-    MatDialog
-  ],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        LoginPageComponent,
+        MarkerPageComponent,
+        HomePageComponent,
+        CategoryPageComponent,
+        MarkerComponent,
+        ScanViewerComponent,
+        MarkerTutorialPageComponent,
+        UploadScansSelectorComponent,
+        UploadPageComponent,
+        SettingsPageComponent,
+        ValidationPageComponent,
+        InfoDialog
+    ],
+    imports: [
+        routing,
+        MatToolbarModule,
+        MatCardModule,
+        MatProgressBarModule,
+        MatProgressSpinnerModule,
+        MatStepperModule,
+        MatRadioModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSliderModule,
+        MatButtonModule,
+        MatIconModule,
+        MatSidenavModule,
+        MatListModule,
+        MatGridListModule,
+        MatTooltipModule,
+        MatDialogModule,
+        BrowserModule,
+        BrowserAnimationsModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        ReactiveFormsModule,
+        SocketIoModule,
+        ReactiveFormsModule,
+        MatExpansionModule,
+        MatSnackBarModule,
+        MatSelectModule,
+        HttpModule
+    ],
+    entryComponents: [
+        InfoDialog
+    ],
+    providers: [
+        AuthenticationHeader,
+        AuthGuard,
+        AccountService,
+        DialogService,
+        MatDialog
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }

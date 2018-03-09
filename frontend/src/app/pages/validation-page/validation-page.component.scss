@@ -1,21 +1,21 @@
 @import '../../components/marker/marker.component.scss';
 
 button {
-  position: relative;
-  top: $canvas-size;
-  margin: 1%;
+    position: relative;
+    top: $canvas-size;
+    margin: 1%;
 }
 
 .validation-page {
-  margin: 10px auto;
+    margin: 10px auto;
 }
 
 .canvasInterface {
-  position: relative;
-  margin: 0 auto;
-  width: $canvas-size;
+    position: relative;
+    margin: 0 auto;
+    width: $canvas-size;
 }
 
 .button-row {
-  text-align: center;
+    text-align: center;
 }

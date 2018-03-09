@@ -3,26 +3,26 @@
 $canvas-size: 600px;
 
 #markerCanvas {
-  width: $canvas-size;
-  height: $canvas-size;
-  position: absolute;
-  user-select: none;
+    width: $canvas-size;
+    height: $canvas-size;
+    position: absolute;
+    user-select: none;
 }
 
 #markerBackgroundImage {
-  @extend #markerCanvas;
-  background-color: grey;
+    @extend #markerCanvas;
+    background-color: grey;
 }
 
 #markerSlider {
-  position: absolute;
-  left: $canvas-size;
-  height: $canvas-size;
+    position: absolute;
+    left: $canvas-size;
+    height: $canvas-size;
 }
 
 #markerAcceptButton {
-  position: absolute;
-  left: $canvas-size / 2;
-  top: $canvas-size;
+    position: absolute;
+    left: $canvas-size / 2;
+    top: $canvas-size;
 }
 

@@ -4,13 +4,11 @@ import {environment} from '../../environments/environment';
 import {Label} from '../model/Label';
 import {Http} from '@angular/http';
 import {SliceSelection} from '../model/SliceSelection';
-import {DialogService} from "./dialog.service";
 
 @Injectable()
 export class LabelService {
 
-    constructor(private http: Http) {
-    }
+    constructor(private http: Http) {}
 
     getRandomLabel(selectionConverter: (selections: any) => Array<SliceSelection>): Promise<Label> {
         return new Promise((resolve, reject) => {
