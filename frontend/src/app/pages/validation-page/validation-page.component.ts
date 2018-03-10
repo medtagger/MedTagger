@@ -23,7 +23,6 @@ export class ValidationPageComponent implements OnInit {
     @ViewChild(ScanViewerComponent) scanViewer: ScanViewerComponent;
     label: Label;
     scan: ScanMetadata;
-    labelingTime: number;
 
 
     constructor(private labelService: LabelService, private scanService: ScanService,
@@ -69,7 +68,6 @@ export class ValidationPageComponent implements OnInit {
     private requestSlicesWithLabel(): void {
         this.labelService.getRandomLabel(this.rect2DROIConverter).then((label: Label) => {
             this.label = label;
-            this.labelingTime = this.label.labelingTime;
             this.scanViewer.setArchivedSelections(this.label.labelSelections);
 
             this.scanService.getScanForScanId(this.label.scanId).then((scan: ScanMetadata) => {

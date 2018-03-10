@@ -79,7 +79,6 @@ export class MarkerPageComponent implements OnInit {
 
                 const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
-                console.log('MarkerPage | Started measuring labeling time!');
                 this.startMeasuringLabelingTime();
                 this.scanService.requestSlices(scan.scanId, begin, count);
             },
@@ -101,7 +100,6 @@ export class MarkerPageComponent implements OnInit {
 
     public sendSelection() {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
-        console.log('MarkerPage | Finished measuring labeling time!');
         const roiSelection: ROISelection3D = new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection());
         this.scanService.send3dSelection(this.scan.scanId, roiSelection, labelingTime)
             .then((response: Response) => {
@@ -113,6 +111,7 @@ export class MarkerPageComponent implements OnInit {
                 this.dialogService
                     .openInfoDialog("Error", "Cannot send selection", "Ok");
             });
+        this.startMeasuringLabelingTime();
         return;
     }
 
