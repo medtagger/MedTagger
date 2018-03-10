@@ -38,7 +38,8 @@ import {
     MatExpansionModule,
     MatSnackBarModule,
     MatSelectModule,
-    MatTooltipModule, MatDialog, MatDialogModule,
+    MatTooltipModule,
+    MatDialog, MatDialogModule, MatIconRegistry,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {AuthenticationHeader} from '../services/authentication-header';
@@ -66,6 +67,7 @@ import {InfoDialog} from "../dialogs/info.dialog";
     ],
     imports: [
         routing,
+        BrowserModule,
         MatToolbarModule,
         MatCardModule,
         MatProgressBarModule,
@@ -82,8 +84,6 @@ import {InfoDialog} from "../dialogs/info.dialog";
         MatGridListModule,
         MatTooltipModule,
         MatDialogModule,
-        BrowserModule,
-        BrowserAnimationsModule,
         BrowserAnimationsModule,
         FormsModule,
         ReactiveFormsModule,
@@ -106,5 +106,4 @@ import {InfoDialog} from "../dialogs/info.dialog";
     ],
     bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule {}
