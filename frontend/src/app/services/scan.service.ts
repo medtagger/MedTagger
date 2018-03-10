@@ -23,8 +23,8 @@ export class ScanService {
 
     public send3dSelection(scanId: string, roiSelection: ROISelection3D, labelingTime: number): Promise<Response> {
         console.log('ScanService | send3dSelection | sending ROI:', roiSelection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
-            const payload = roiSelection.toJSON();
-            payload['labeling_time'] = labelingTime;
+        const payload = roiSelection.toJSON();
+        payload['labeling_time'] = labelingTime;
         return new Promise((resolve, reject) => {
             this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
