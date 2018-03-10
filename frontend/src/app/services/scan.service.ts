@@ -10,7 +10,6 @@ import {MarkerSlice} from '../model/MarkerSlice';
 import {ROISelection3D} from '../model/ROISelection3D';
 
 import {environment} from '../../environments/environment';
-import {DialogService} from "./dialog.service";
 
 
 @Injectable()
@@ -44,8 +43,7 @@ export class ScanService {
                 .subscribe(
                     (response) => {
                         console.log('ScanService | getRandomScan | response: ', response);
-                        const json = response.json();
-                        resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
+                        resolve(new ScanMetadata(response.scan_id, response.number_of_slices));
                     },
                     (error) => {
                         console.log('ScanService | getRandomScan | error: ', error);
