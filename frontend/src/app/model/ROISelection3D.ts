@@ -17,10 +17,10 @@ export class ROISelection3D implements ScanSelection<ROISelection2D> {
         return coordinatesArray;
     }
 
-    public toJSON(): { selections: SelectionData[] } {
+    public toJSON(): { selections: SelectionData[], labeling_time: number } {
         // TODO: w jakiś elegancki sposób wyciągnięcie tego z widoku
         const canvasSize = 600;
-        const jsonObject: { selections: SelectionData[] } = {selections: undefined};
+        const jsonObject: { selections: SelectionData[], labeling_time: number } = {selections: undefined, labeling_time: undefined};
         jsonObject.selections = [];
         this._selections.forEach((selection: ROISelection2D) => {
             jsonObject.selections.push(selection.toJSON(canvasSize));

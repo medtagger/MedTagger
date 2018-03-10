@@ -79,6 +79,8 @@ export class MarkerPageComponent implements OnInit {
 
                 const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
+                console.log('MarkerPage | Started measuring labeling time!');
+                this.startMeasuringLabelingTime();
                 this.scanService.requestSlices(scan.scanId, begin, count);
             },
             (errorResponse: Error) => {
@@ -98,8 +100,10 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendSelection() {
+        const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
+        console.log('MarkerPage | Finished measuring labeling time!');
         const roiSelection: ROISelection3D = new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection());
-        this.scanService.send3dSelection(this.scan.scanId, roiSelection)
+        this.scanService.send3dSelection(this.scan.scanId, roiSelection, labelingTime)
             .then((response: Response) => {
                 if (response.status === 200) {
                     console.log('MarkerPage | sendSelection | success!');
@@ -115,16 +119,13 @@ export class MarkerPageComponent implements OnInit {
     public remove2dSelection(): void {
         this.marker.removeCurrentSelection();
     }
-  public remove2dSelection(): void {
-    this.marker.removeCurrentSelection();
-  }
 
-  private startMeasuringLabelingTime(): void {
-    this.startTime = new Date();
-  }
+    private startMeasuringLabelingTime(): void {
+      this.startTime = new Date();
+    }
 
-  private getLabelingTime(startTime: Date): number {
-    const endTime = new Date();
-    return endTime.valueOf() - startTime.valueOf();
-  }
+    private getLabelingTimeInSeconds(startTime: Date): number {
+      const endTime = new Date();
+      return (endTime.getTime() - startTime.getTime())/1000.0;
+    }
 }
