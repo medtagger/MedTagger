@@ -5,7 +5,7 @@ from typing import Iterable, Dict, List, Tuple
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api.exceptions import NotFoundException
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata, LabelingTime
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
@@ -99,14 +99,15 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
         yield _slice, image
 
 
-def add_label(scan_id: ScanID, selections: List[Dict]) -> Label:
+def add_label(scan_id: ScanID, selections: List[Dict], labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
     :param selections: List of JSONs describing selections for a single label
+    :param labeling_time: time in seconds that user spent on labeling
     :return: Label object
     """
-    label = LabelsRepository.add_new_label(scan_id)
+    label = LabelsRepository.add_new_label(scan_id, labeling_time)
     for selection in selections:
         position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
         shape = LabelShape(width=selection['width'], height=selection['height'])

@@ -1,6 +1,9 @@
 <div class="validation-page">
     <div class="innerElement canvasInterface">
         <app-scan-viewer #scanViewer></app-scan-viewer>
+        <div class="labeling-time-info" *ngIf="label.labelingTime != null">
+            <p>Labeling time: {{label.labelingTime | number : '1.2-2' }}s</p>
+        </div>
         <div class="button-row">
             <button mat-raised-button color="primary" (click)="markAsValid()">Valid</button>
             <button mat-raised-button color="warn" (click)="markAsInvalid()">Invalid</button>

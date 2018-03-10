@@ -20,6 +20,7 @@ in__label_selection = api.model('Label\'s Selection model', {
 
 in__label = api.model('Label model', {
     'selections': fields.List(fields.Nested(in__label_selection)),
+    'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
 })
 
 inout__scan_category = api.model('Scan Category model', {

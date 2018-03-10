@@ -28,6 +28,7 @@ export class MarkerPageComponent implements OnInit {
     scan: ScanMetadata;
     category: string;
     lastSliceID = 0;
+    startTime: Date;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location) {
@@ -78,6 +79,7 @@ export class MarkerPageComponent implements OnInit {
 
                 const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
+                this.startMeasuringLabelingTime();
                 this.scanService.requestSlices(scan.scanId, begin, count);
             },
             (errorResponse: Error) => {
@@ -97,8 +99,9 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendSelection() {
+        const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
         const roiSelection: ROISelection3D = new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection());
-        this.scanService.send3dSelection(this.scan.scanId, roiSelection)
+        this.scanService.send3dSelection(this.scan.scanId, roiSelection, labelingTime)
             .then((response: Response) => {
                 if (response.status === 200) {
                     console.log('MarkerPage | sendSelection | success!');
@@ -108,10 +111,20 @@ export class MarkerPageComponent implements OnInit {
                 this.dialogService
                     .openInfoDialog("Error", "Cannot send selection", "Ok");
             });
+        this.startMeasuringLabelingTime();
         return;
     }
 
     public remove2dSelection(): void {
         this.marker.removeCurrentSelection();
+    }
+
+    private startMeasuringLabelingTime(): void {
+      this.startTime = new Date();
+    }
+
+    private getLabelingTimeInSeconds(startTime: Date): number {
+      const endTime = new Date();
+      return (endTime.getTime() - startTime.getTime())/1000.0;
     }
 }

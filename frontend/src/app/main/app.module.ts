@@ -15,6 +15,7 @@ import {CategoryPageComponent} from '../pages/category-page/category-page.compon
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
+
 import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
 
@@ -39,7 +40,9 @@ import {
     MatSnackBarModule,
     MatSelectModule,
     MatTooltipModule,
-    MatDialog, MatDialogModule, MatIconRegistry,
+    MatDialog,
+    MatDialogModule,
+    MatChipsModule,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {AuthenticationHeader} from '../services/authentication-header';
@@ -92,7 +95,8 @@ import {InfoDialog} from "../dialogs/info.dialog";
         MatExpansionModule,
         MatSnackBarModule,
         MatSelectModule,
-        HttpModule
+        HttpModule,
+        MatChipsModule
     ],
     entryComponents: [
         InfoDialog

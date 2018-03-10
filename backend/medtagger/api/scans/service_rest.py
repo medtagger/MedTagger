@@ -92,8 +92,9 @@ class Label(Resource):
         """Save new label for given scan."""
         payload = request.json
         selections = payload['selections']
+        labeling_time = payload['labeling_time']
 
-        label = business.add_label(scan_id, selections)
+        label = business.add_label(scan_id, selections, labeling_time)
         return label, 201
 
 

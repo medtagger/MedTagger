@@ -71,6 +71,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
             'width': 0.1,
             'height': 0.1,
         }],
+        'labeling_time': 12.34,
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
@@ -87,6 +88,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     assert json_response['label_id'] == label_id
+    assert json_response['labeling_time'] == 12.34
     assert json_response['status'] == LabelStatus.NOT_VERIFIED.value
     assert json_response['scan_id'] == scan_id
     assert json_response['selections'] == [{

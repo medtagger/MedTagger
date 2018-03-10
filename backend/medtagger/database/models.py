@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session, db
 from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
-    LabelPosition, LabelShape
+    LabelPosition, LabelShape, LabelingTime
 
 
 users_roles = db.Table('Users_Roles', Base.metadata,
@@ -228,6 +228,7 @@ class Label(Base):
     __tablename__ = 'Labels'
     id: LabelID = Column(String, primary_key=True)
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
+    labeling_time: LabelingTime = Column(Float, nullable=True)
     status: LabelStatus = Column(Enum(LabelStatus), nullable=False, server_default=LabelStatus.NOT_VERIFIED.value)
 
     scan: Scan = relationship('Scan', back_populates='labels')
@@ -243,7 +244,8 @@ class Label(Base):
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
-        return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status)
+        return '<{}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
+                                           self.labeling_time)
 
     def update_status(self, status: LabelStatus) -> 'Label':
         """Update Label's status.
