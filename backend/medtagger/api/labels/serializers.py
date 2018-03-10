@@ -27,4 +27,5 @@ out__label_status = api.model('Label status and ID', {
 out__label = api.inherit('Label model', out__label_status, {
     'scan_id': fields.String(description='Scan\'s ID'),
     'selections': fields.List(fields.Nested(out__label_selection)),
+    'labeling_time': fields.Float(description='Time in seconds that user spent on labeling', attribute='labeling_time'),
 })

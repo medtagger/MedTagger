@@ -3,7 +3,7 @@ from typing import Any
 from flask import request
 from flask_restplus import Resource
 
-from medtagger.types import ScanID, LabelingTime
+from medtagger.types import ScanID
 from medtagger.api import api
 from medtagger.api.exceptions import InvalidArgumentsException
 from medtagger.api.scans import business, serializers
@@ -88,10 +88,11 @@ class Label(Resource):
     @scans_ns.marshal_with(serializers.out__label)
     @scans_ns.doc(description='Stores label and assigns it to given scan.')
     @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan'})
-    def post(scan_id: ScanID, labeling_time: LabelingTime) -> Any:
+    def post(scan_id: ScanID) -> Any:
         """Save new label for given scan."""
         payload = request.json
         selections = payload['selections']
+        labeling_time = payload['labeling_time']
 
         label = business.add_label(scan_id, selections, labeling_time)
         return label, 201

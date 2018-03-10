@@ -99,12 +99,12 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
         yield _slice, image
 
 
-def add_label(scan_id: ScanID, labeling_time: LabelingTime, selections: List[Dict]) -> Label:
+def add_label(scan_id: ScanID, selections: List[Dict], labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
-    :param labeling_time: time in seconds that user spent on labeling
     :param selections: List of JSONs describing selections for a single label
+    :param labeling_time: time in seconds that user spent on labeling
     :return: Label object
     """
     label = LabelsRepository.add_new_label(scan_id, labeling_time)

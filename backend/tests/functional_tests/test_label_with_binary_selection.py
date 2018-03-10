@@ -40,6 +40,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
             'height': 0.1,
             'binary_mask': 'THIS_IS_BASE64_REPRESENTATION',
         }],
+        'labeling_time': 34.56,
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
@@ -53,6 +54,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     assert json_response['label_id'] == label_id
+    assert json_response['labeling_time'] == 34.56
     assert json_response['status'] == LabelStatus.NOT_VERIFIED.value
     assert json_response['scan_id'] == scan_id
     assert json_response['selections'] == [{

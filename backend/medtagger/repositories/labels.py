@@ -4,7 +4,8 @@ from sqlalchemy.sql.expression import func
 from medtagger.clients.hbase_client import HBaseClient
 from medtagger.database import db_session
 from medtagger.database.models import Label, LabelStatus, LabelSelection
-from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelSelectionID, ScanID, LabelingTime
+from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelSelectionID, ScanID, \
+    LabelingTime
 
 
 class LabelsRepository(object):
