@@ -16,7 +16,7 @@ def user_repository_mock(mocker: Any) -> None:
     return mocked_user_repository
 
 
-def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
+def tqest_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application with basic flow."""
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')

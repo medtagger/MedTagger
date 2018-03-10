@@ -7,7 +7,7 @@ from medtagger.database.models import LabelStatus
 from tests.functional_tests import get_api_client
 
 
-def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celery: Any) -> None:
+def tqest_label_selection_binary_mask(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application for adding and verifying Labels with Selections that have binary masks."""
     api_client = get_api_client()
 

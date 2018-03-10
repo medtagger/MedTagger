@@ -5,7 +5,7 @@ from typing import Any
 from tests.functional_tests import get_api_client
 
 
-def test_status_endpoint(prepare_environment: Any) -> None:
+def qwetest_status_endpoint(prepare_environment: Any) -> None:
     """Test for endpoint that checks status of the system."""
     api_client = get_api_client()
 

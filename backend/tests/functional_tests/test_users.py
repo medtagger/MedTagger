@@ -1,5 +1,6 @@
 """Tests for user management operations."""
 import json
+import glob
 from typing import Any
 
 from tests.functional_tests import get_api_client
@@ -112,3 +113,41 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     assert json_response['role'] == 'doctor'
+
+
+def test_scan_ownership(prepare_environment: Any) -> None:
+    """Test for checking scan ownership when user uploads new scan ."""
+    api_client = get_api_client()
+
+    admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
+    set_user_role(admin_id, 'admin')
+
+    # Step 1. Admin user logs in
+    payload = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
+    response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
+                               headers={'content-type': 'application/json'})
+    assert response.status_code == 200
+
+    # Step 2. Add Scan to the system
+    payload = {'category': 'LUNGS', 'number_of_slices': 1}
+    response = api_client.post('/api/v1/scans/', data=json.dumps(payload), headers={'content-type': 'application/json'})
+    assert response.status_code == 201
+    json_response = json.loads(response.data)
+    assert isinstance(json_response, dict)
+    scan_id = json_response['scan_id']
+    assert isinstance(scan_id, str)
+    assert len(scan_id) >= 1
+    owner_id = json_response['owner_id']
+    assert owner_id == admin_id
+
+    # Step 3. Send slices
+    with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
+        response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
+            'image': (image, 'slice_1.dcm'),
+        }, content_type='multipart/form-data')
+    assert response.status_code == 201
+    json_response = json.loads(response.data)
+    assert isinstance(json_response, dict)
+    slice_id = json_response['slice_id']
+    assert isinstance(slice_id, str)
+    assert len(slice_id) >= 1
