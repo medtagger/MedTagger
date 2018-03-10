@@ -2,7 +2,7 @@ import {Component, HostListener, OnInit, ViewChild, ElementRef} from '@angular/c
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {Subject} from 'rxjs/Subject';
 import {ScanMetadata} from '../../model/ScanMetadata';
-import {MatSlider} from '@angular/material';
+import {MatSlider, MatTooltip} from '@angular/material';
 import {Selector} from '../selectors/Selector';
 import {SliceSelection} from '../../model/SliceSelection';
 
@@ -29,6 +29,8 @@ export class ScanViewerComponent implements OnInit {
 
     @ViewChild('slider') slider: MatSlider;
 
+    @ViewChild('tooltip') tooltip: MatTooltip;
+
     public scanMetadata: ScanMetadata;
     public slices: Map<number, MarkerSlice>;
     protected _currentSlice;
@@ -41,6 +43,15 @@ export class ScanViewerComponent implements OnInit {
     protected selector: Selector<SliceSelection>;
 
     constructor() {
+    }
+
+    ngAfterViewInit() {
+        console.log('Marker after init');
+        this.slider._elementRef.nativeElement.focus();
+    }
+
+    public sliderFocus() {
+        this.slider._elementRef.nativeElement.focus();
     }
 
     public setSelector(newSelector: Selector<SliceSelection>) {
@@ -106,6 +117,10 @@ export class ScanViewerComponent implements OnInit {
         });
     }
 
+    ngAfterViewChecked() {
+        this.tooltip.show();
+    }
+
     ngOnInit() {
         console.log('Marker init');
         console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
@@ -118,6 +133,7 @@ export class ScanViewerComponent implements OnInit {
 
         this.slider.registerOnChange((sliderValue: number) => {
             console.log('Marker init | slider change: ', sliderValue);
+
             this.selector.updateCurrentSlice(sliderValue);
 
             this.requestSlicesIfNeeded(sliderValue);

@@ -1,9 +1,10 @@
-import {Component, ElementRef, OnInit, ViewChild, HostListener} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild, HostListener, Renderer2} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs/Subject';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
+import {MatTooltip} from "@angular/material";
 
 @Component({
     selector: 'app-marker-component',
@@ -27,6 +28,8 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     @ViewChild('slider') slider: MatSlider;
+
+    @ViewChild('tooltip') tooltip: MatTooltip;
 
     public has3dSelection: boolean;
     public has2dSelection: boolean;
@@ -71,7 +74,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     ngOnInit() {
         console.log('Marker init');
-        console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
+        console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider, ' tooltip ', this.tooltip);
 
         this.slices = new Map<number, MarkerSlice>();
 
@@ -89,10 +92,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             console.log('Marker init | slider change: ', sliderValue);
 
             this.requestSlicesIfNeeded(sliderValue);
-
             this.changeMarkerImage(sliderValue);
-            this.selector.drawPreviousSelections();
 
+            this.selector.drawPreviousSelections();
             this.updateSelectionState();
         });
     }
