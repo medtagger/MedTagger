@@ -28,6 +28,7 @@ export class MarkerPageComponent implements OnInit {
     scan: ScanMetadata;
     category: string;
     lastSliceID = 0;
+    startTime: Date;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location) {
@@ -114,4 +115,16 @@ export class MarkerPageComponent implements OnInit {
     public remove2dSelection(): void {
         this.marker.removeCurrentSelection();
     }
+  public remove2dSelection(): void {
+    this.marker.removeCurrentSelection();
+  }
+
+  private startMeasuringLabelingTime(): void {
+    this.startTime = new Date();
+  }
+
+  private getLabelingTime(startTime: Date): number {
+    const endTime = new Date();
+    return endTime.valueOf() - startTime.valueOf();
+  }
 }
