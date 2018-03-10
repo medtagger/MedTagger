@@ -16,7 +16,7 @@ export class LabelService {
                 response => {
                     console.log('LabelsService | getRandomLabel | response: ', response);
                     const json = response.json();
-                    resolve(new Label(json.label_id, json.scan_id, json.status, selectionConverter(json.selections)));
+                    resolve(new Label(json.label_id, json.scan_id, json.status, selectionConverter(json.selections), json.labeling_time));
                 },
                 error => {
                     console.log('LabelsService | getRandomLabel | error: ', error);
