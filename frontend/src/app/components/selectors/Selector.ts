@@ -2,40 +2,40 @@ import {SliceSelection} from '../../model/SliceSelection';
 
 export interface Selector<SliceSelection> {
 
-  drawPreviousSelections(): any;
+    drawPreviousSelections(): any;
 
-  drawSelection(selection: SliceSelection, color: string): any;
+    drawSelection(selection: SliceSelection, color: string): any;
 
-  onMouseDown(event: MouseEvent): any;
+    onMouseDown(event: MouseEvent): any;
 
-  onMouseMove(event: MouseEvent): any;
+    onMouseMove(event: MouseEvent): any;
 
-  onMouseUp(event: MouseEvent): any;
+    onMouseUp(event: MouseEvent): any;
 
-  clearCanvasSelection(): any;
+    clearCanvasSelection(): any;
 
-  clearData(): any;
+    clearData(): any;
 
-  addCurrentSelection(): any;
+    addCurrentSelection(): any;
 
-  updateCurrentSlice(currentSliceId: number): any;
+    updateCurrentSlice(currentSliceId: number): any;
 
-  updateCanvasPosition(canvasRect: ClientRect): any;
+    updateCanvasPosition(canvasRect: ClientRect): any;
 
-  hasArchivedSelections(): boolean;
+    hasArchivedSelections(): boolean;
 
-  hasSliceSelection(): boolean;
+    hasSliceSelection(): boolean;
 
-  hasFullSelection(): boolean;
+    hasFullSelection(): boolean;
 
-  getSelections(): SliceSelection[];
+    getSelections(): SliceSelection[];
 
-  formArchivedSelections(selectionMap: Array<SliceSelection>): Array<SliceSelection>;
+    formArchivedSelections(selectionMap: Array<SliceSelection>): Array<SliceSelection>;
 
-  archiveSelections(selectionMap?: Array<SliceSelection>): any;
+    archiveSelections(selectionMap?: Array<SliceSelection>): any;
 
-  removeCurrentSelection(): any;
+    removeCurrentSelection(): any;
 
-  clearSelections(): any;
+    clearSelections(): any;
 
 }

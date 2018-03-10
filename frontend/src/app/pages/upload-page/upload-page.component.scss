@@ -1,76 +1,76 @@
 .pull-right {
-  float: right;
+    float: right;
 }
 
 .upload-mode {
-  width: 40%;
-  max-width: 450px;
-  float: left;
-  margin: 1.5em;
+    width: 40%;
+    max-width: 450px;
+    float: left;
+    margin: 1.5em;
 }
 
 .mat-card-title {
-  width: 100%;
-  font-size: 1.5em;
-  position: relative;
-  right: 0.5em;
+    width: 100%;
+    font-size: 1.5em;
+    position: relative;
+    right: 0.5em;
 }
 
 .enable-card-border {
-  margin: 5px;
+    margin: 5px;
 }
 
 .category-selection {
-  width: 60%;
-  min-width: 400px;
-  max-width: 600px;
-  margin: 5px auto;
-  display: block;
+    width: 60%;
+    min-width: 400px;
+    max-width: 600px;
+    margin: 5px auto;
+    display: block;
 }
 
 .button-wrapper {
-  display: -webkit-flex;
-  -webkit-flex-wrap: wrap;
-  display: flex;
-  flex-wrap: wrap;
-  float: right;
+    display: -webkit-flex;
+    -webkit-flex-wrap: wrap;
+    display: flex;
+    flex-wrap: wrap;
+    float: right;
 }
 
 .choose-files {
-  width: 60%;
-  min-width: 500px;
-  max-width: 700px;
-  margin: 5px auto;
-  display: block;
+    width: 60%;
+    min-width: 500px;
+    max-width: 700px;
+    margin: 5px auto;
+    display: block;
 }
 
 .progress-spinner {
-  float: left;
-  margin-right: 10px;
+    float: left;
+    margin-right: 10px;
 }
 
 .uploading-header {
-  margin-top: 15px;
+    margin-top: 15px;
 }
 
 .success-message {
-  background: #4caf50;
-  color: white;
-  padding: 1.6em;
-  min-width: 50%;
-  max-width: 800px;
-  margin: 0 auto;
+    background: #4caf50;
+    color: white;
+    padding: 1.6em;
+    min-width: 50%;
+    max-width: 800px;
+    margin: 0 auto;
 
-  p {
-    margin: 0;
-  }
+    p {
+        margin: 0;
+    }
 }
 
 .success-indicator {
-  vertical-align: middle !important;
+    vertical-align: middle !important;
 }
 
 .restart-button {
-  margin: 20px auto;
-  display: block;
+    margin: 20px auto;
+    display: block;
 }

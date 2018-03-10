@@ -1,47 +1,47 @@
 .main-content {
-  width: 70%;
-  max-width: 1000px;
-  display: block;
-  margin: 3em auto;
+    width: 70%;
+    max-width: 1000px;
+    display: block;
+    margin: 3em auto;
 }
 
 .main-content mat-card {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 hr {
-  border: none;
-  border-top: 1px solid #eeeeee;
+    border: none;
+    border-top: 1px solid #eeeeee;
 }
 
 mat-form-field {
-  width: 50%;
-  min-width: 200px;
-  max-width: 400px;
-  display: block;
+    width: 50%;
+    min-width: 200px;
+    max-width: 400px;
+    display: block;
 }
 
 .user-avatar {
-  width: 9em;
-  height: 9em;
-  border-radius: 50%;
-  margin-right: 2em;
-  float: left;
+    width: 9em;
+    height: 9em;
+    border-radius: 50%;
+    margin-right: 2em;
+    float: left;
 }
 
 .user-avatar-settings {
-  margin-top: 1em;
+    margin-top: 1em;
 
-  hr {
-    margin: 1em auto;
-  }
+    hr {
+        margin: 1em auto;
+    }
 
-  p {
-    color: gray;
-  }
+    p {
+        color: gray;
+    }
 }
 
 .align-accordion-descriptions .mat-expansion-panel-header-title,
 .align-accordion-descriptions .mat-expansion-panel-header-description {
-  flex-basis: 0;
+    flex-basis: 0;
 }

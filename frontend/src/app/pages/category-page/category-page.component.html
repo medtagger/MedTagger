@@ -1,14 +1,15 @@
 <div class="categories">
-  <div class="button-row" *ngIf="categories?.length > 0">
-    <button mat-fab *ngFor="let category of categories" routerLink="/labelling" [queryParams]="{category: category.key}">
-      <mat-icon svgIcon="{{category.key}}"></mat-icon>
-      <div>{{category.name}}</div>
-    </button>
-  </div>
-  <div class="button-row" *ngIf="!categories || categories?.length === 0">
-    <h1>No categories available</h1>
-  </div>
-  <div class="title-row">
-    <span>Choose examination category</span>
-  </div>
+    <div class="button-row" *ngIf="categories?.length > 0">
+        <button mat-fab *ngFor="let category of categories" routerLink="/labelling"
+                [queryParams]="{category: category.key}">
+            <mat-icon svgIcon="{{category.key}}"></mat-icon>
+            <div>{{category.name}}</div>
+        </button>
+    </div>
+    <div class="button-row" *ngIf="!categories || categories?.length === 0">
+        <h1>No categories available</h1>
+    </div>
+    <div class="title-row">
+        <span>Choose examination category</span>
+    </div>
 </div>

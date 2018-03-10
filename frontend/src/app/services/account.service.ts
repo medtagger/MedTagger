@@ -1,14 +1,12 @@
 import {Injectable} from "@angular/core";
 import {environment} from "../../environments/environment";
 import {UserInfo} from "../model/UserInfo";
-import {Http, Headers} from "@angular/http";
+import {Http} from "@angular/http";
 import {AuthenticationHeader} from "./authentication-header";
-import {DialogService} from "./dialog.service";
 
 @Injectable()
 export class AccountService {
-    constructor(private http: Http, private authenticationHeader: AuthenticationHeader) {
-    }
+    constructor(private http: Http, private authenticationHeader: AuthenticationHeader) {}
 
     public register(email: string, password: string, firstName: string, lastName: string): Promise<void> {
         let url = environment.API_URL + '/auth/register';

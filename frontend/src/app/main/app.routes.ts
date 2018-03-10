@@ -11,19 +11,29 @@ import {ModuleWithProviders} from "@angular/core";
 import {AuthGuard} from "../guards/auth.guard";
 
 export const labellingRoutes: Routes = [
-  {path: 'labelling', component: MarkerPageComponent, data: {title: 'Labelling'}, canActivate: [AuthGuard]},
-  {path: 'labelling/choose-category', component: CategoryPageComponent, data: {title: 'Choosing category'}, canActivate: [AuthGuard]},
-  {path: 'labelling/tutorial', component: MarkerTutorialPageComponent, data: {title: 'Marker tutorial'}, canActivate: [AuthGuard]}
+    {path: 'labelling', component: MarkerPageComponent, data: {title: 'Labelling'}, canActivate: [AuthGuard]},
+    {
+        path: 'labelling/choose-category',
+        component: CategoryPageComponent,
+        data: {title: 'Choosing category'},
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'labelling/tutorial',
+        component: MarkerTutorialPageComponent,
+        data: {title: 'Marker tutorial'},
+        canActivate: [AuthGuard]
+    }
 ];
 
 export const routes: Routes = [
-  {path: '', redirectTo: 'login', pathMatch: 'full'},
-  {path: 'login', component: LoginPageComponent, data: {title: 'Welcome'}},
-  {path: 'home', component: HomePageComponent, data: {title: 'Home'}, canActivate: [AuthGuard]},
-  {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new Scans'}, canActivate: [AuthGuard]},
-  {path: 'settings', component: SettingsPageComponent, data: {title: 'Settings'}, canActivate: [AuthGuard]},
-  {path: 'validation', component: ValidationPageComponent, data: {title: 'Validation'}, canActivate: [AuthGuard]},
-  ...labellingRoutes
+    {path: '', redirectTo: 'login', pathMatch: 'full'},
+    {path: 'login', component: LoginPageComponent, data: {title: 'Welcome'}},
+    {path: 'home', component: HomePageComponent, data: {title: 'Home'}, canActivate: [AuthGuard]},
+    {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new Scans'}, canActivate: [AuthGuard]},
+    {path: 'settings', component: SettingsPageComponent, data: {title: 'Settings'}, canActivate: [AuthGuard]},
+    {path: 'validation', component: ValidationPageComponent, data: {title: 'Validation'}, canActivate: [AuthGuard]},
+    ...labellingRoutes
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forRoot(routes, {enableTracing: true} // config for debugging
