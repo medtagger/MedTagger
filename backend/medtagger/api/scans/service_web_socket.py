@@ -35,7 +35,6 @@ class Slices(Namespace):
         :param count: number of slices that should be returned
         :param orientation: Slice's orientation as a string
         """
-
         # Make sure that passed orientation is proper one
         if orientation not in SliceOrientation.__members__:
             raise InvalidArgumentsException('Invalid Slice orientation.')
