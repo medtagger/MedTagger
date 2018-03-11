@@ -1,25 +1,17 @@
 """Tests for basic flow of the system."""
 import json
-import pytest
 from typing import Any
 
-from medtagger.database.models import User, LabelStatus
-from medtagger.repositories.users import UsersRepository
+from medtagger.database.models import LabelStatus
 from tests.functional_tests import get_api_client, get_web_socket_client
-
-
-@pytest.fixture
-def user_repository_mock(mocker: Any) -> None:
-    """Return user with volunteer role."""
-    mocked_user_repository = mocker.patch('medtagger.api.users.get_user_by_id')
-    mocked_user_repository.return_value = User('test@mail.com', 'medtagger', 'First', 'Last')
-    return mocked_user_repository
+from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
 def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application with basic flow."""
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')
+    user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Get all categories
     response = api_client.get('/api/v1/scans/categories')
@@ -33,7 +25,9 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
 
     # Step 2. Add Scan to the system
     payload = {'category': category_key, 'number_of_slices': 1}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload), headers={'content-type': 'application/json'})
+    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+                               headers={'content-type': 'application/json',
+                                        'Authentication-Token': user_token})
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)

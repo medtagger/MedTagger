@@ -1,13 +1,10 @@
 """Tests for user management operations."""
 import json
-import glob
 from typing import Any
 
 from tests.functional_tests import get_api_client
 from medtagger.api.users.business import set_user_role
 from medtagger.api.auth.business import create_user
-
-from medtagger.api.scans.business import create_empty_scan
 
 EXAMPLE_USER_EMAIL = 'test@mail.com'
 EXAMPLE_USER_PASSWORD = 'medtagger1'
@@ -32,8 +29,6 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
-    user_id = json_response['id']
-    assert user_id == 1
 
     # Step 2. User logs in
     payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}
@@ -51,7 +46,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
-    assert json_response['id'] == 1
+    assert json_response['id'] > 0
     assert json_response['email'] == EXAMPLE_USER_EMAIL
     assert json_response['firstName'] == EXAMPLE_USER_FIRST_NAME
     assert json_response['lastName'] == EXAMPLE_USER_LAST_NAME

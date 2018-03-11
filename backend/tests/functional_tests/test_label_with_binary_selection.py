@@ -5,15 +5,19 @@ from typing import Any
 from medtagger.database.models import LabelStatus
 
 from tests.functional_tests import get_api_client
+from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
 def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application for adding and verifying Labels with Selections that have binary masks."""
     api_client = get_api_client()
+    user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 1}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload), headers={'content-type': 'application/json'})
+    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+                               headers={'content-type': 'application/json',
+                                        'Authentication-Token': user_token})
     assert response.status_code == 201
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']

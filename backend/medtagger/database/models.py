@@ -127,7 +127,7 @@ class Scan(Base):
 
     def __repr__(self) -> str:
         """Return string representation for Scan."""
-        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner_id)
 
     @property
     def stored_slices(self) -> List['Slice']:
