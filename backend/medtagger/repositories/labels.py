@@ -49,10 +49,8 @@ class LabelsRepository(object):
     def add_new_label(scan_id: ScanID, owner_id: OwnerID, labeling_time: LabelingTime) -> Label:
         """Add new Label for given Scan."""
         with db_session() as session:
-            label = Label()
+            label = Label(owner_id, labeling_time)
             label.scan_id = scan_id
-            label.owner_id = owner_id
-            label.labeling_time = labeling_time
             session.add(label)
         return label
 

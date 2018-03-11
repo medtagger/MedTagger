@@ -36,6 +36,7 @@ out__scan = api.model('Scan model', {
 out__label = api.model('Newly created Label model', {
     'label_id': fields.String(description='Label\'s ID', attribute='id'),
     'owner_id': fields.Integer(description='ID of user that created label'),
+    'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
 })
 
 out__new_scan = api.model('Newly created Scan model', {

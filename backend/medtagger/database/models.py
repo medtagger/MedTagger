@@ -12,7 +12,6 @@ from medtagger.database import Base, db_session, db
 from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime
 
-
 users_roles = db.Table('Users_Roles', Base.metadata,
                        Column('user_id', Integer, ForeignKey('Users.id')),
                        Column('role_id', Integer, ForeignKey('Roles.id')))
@@ -243,18 +242,20 @@ class Label(Base):
 
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
 
-    def __init__(self) -> None:
+    def __init__(self, ownerId, labeling_time) -> None:
         """Initialize Label.
 
         By default all of the labels are not verified
         """
         self.id = LabelID(str(uuid.uuid4()))
         self.status = LabelStatus.NOT_VERIFIED
+        self.owner_id = ownerId
+        self.labeling_time = labeling_time
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
         return '<{}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
-                                           self.labeling_time, self.owner_id)
+                                              self.labeling_time, self.owner_id)
 
     def update_status(self, status: LabelStatus) -> 'Label':
         """Update Label's status.
