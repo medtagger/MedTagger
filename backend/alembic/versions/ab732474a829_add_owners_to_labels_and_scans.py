@@ -1,7 +1,7 @@
 """Add owners to labels and scans
 
 Revision ID: ab732474a829
-Revises: 4e93b463a357
+Revises: e4721c7f3521
 Create Date: 2018-03-05 22:59:20.353295
 
 """
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 revision = 'ab732474a829'
-down_revision = '4e93b463a357'
+down_revision = 'e4721c7f3521'
 branch_labels = None
 depends_on = None
 

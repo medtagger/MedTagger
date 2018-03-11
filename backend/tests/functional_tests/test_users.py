@@ -153,6 +153,7 @@ def test_ownership(prepare_environment: Any) -> None:
             'width': 0.1,
             'height': 0.1,
         }],
+        'labeling_time': 12.34
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
                                headers={'content-type': 'application/json', 'Authentication-Token': admin_user_token})
