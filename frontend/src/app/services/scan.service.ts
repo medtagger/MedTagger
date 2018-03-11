@@ -27,7 +27,8 @@ export class ScanService {
         const payload = roiSelection.toJSON();
         payload['labeling_time'] = labelingTime;
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload).toPromise().then((response: Response) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload, {
+                headers: this.authenticationHeader.create()}).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
                 resolve(response);
             }).catch((error: Response) => {
