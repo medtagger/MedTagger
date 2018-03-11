@@ -46,8 +46,8 @@ export class ScanViewerComponent implements OnInit {
     }
 
     ngAfterViewInit() {
-        console.log('Marker after init');
-        this.slider._elementRef.nativeElement.focus();
+        console.log('ScanViewer | ngAfterViewInit');
+        this.sliderFocus();
     }
 
     public sliderFocus() {
@@ -79,7 +79,7 @@ export class ScanViewerComponent implements OnInit {
     }
 
     public feedData(newSlice: MarkerSlice): void {
-        console.log('Marker | feedData: ', newSlice);
+        console.log('ScanViewer | feedData: ', newSlice);
         if (!this._currentSlice) {
             this._currentSlice = newSlice.index;
             this.selector.updateCurrentSlice(this._currentSlice);
@@ -92,7 +92,7 @@ export class ScanViewerComponent implements OnInit {
         const sortedKeys: number[] = Array.from(this.slices.keys()).sort((a: number, b: number) => {
             return a - b;
         });
-        console.log('MarkerComponent | updateSliderRange | sortedKeys: ', sortedKeys);
+        console.log('ScanViewer | updateSliderRange | sortedKeys: ', sortedKeys);
 
         this.slider.min = sortedKeys[0];
         this.slider.max = sortedKeys[sortedKeys.length - 1];
@@ -118,11 +118,14 @@ export class ScanViewerComponent implements OnInit {
     }
 
     ngAfterViewChecked() {
-        this.tooltip.show();
+        // Waiting for next rendering cycle to avoid race conditions
+        setTimeout(()=> {
+            this.tooltip.show();
+        }, 0);
     }
 
     ngOnInit() {
-        console.log('Marker init');
+        console.log('ScanViewer | ngOnInit');
         console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
 
         this.slices = new Map<number, MarkerSlice>();
@@ -132,7 +135,7 @@ export class ScanViewerComponent implements OnInit {
         this.setCanvasImage();
 
         this.slider.registerOnChange((sliderValue: number) => {
-            console.log('Marker init | slider change: ', sliderValue);
+            console.log('ScanViewer init | slider change: ', sliderValue);
 
             this.selector.updateCurrentSlice(sliderValue);
 
@@ -144,16 +147,16 @@ export class ScanViewerComponent implements OnInit {
     }
 
     protected requestSlicesIfNeeded(sliderValue: number): void {
-        console.log('Marker | requestSlicesIfNeeded sliderValue: ', sliderValue);
+        console.log('ScanViewer | requestSlicesIfNeeded sliderValue: ', sliderValue);
         let requestSliceIndex;
         if (this.slider.max === sliderValue) {
             requestSliceIndex = sliderValue + 1;
-            console.log('Marker | requestSlicesIfNeeded more (higher indexes): ', requestSliceIndex);
+            console.log('ScanViewer | requestSlicesIfNeeded more (higher indexes): ', requestSliceIndex);
             this.observableSliceRequest.next(requestSliceIndex);
         }
         if (this.slider.min === sliderValue) {
             requestSliceIndex = sliderValue - this.sliceBatchSize;
-            console.log('Marker | requestSlicesIfNeeded more (lower indexes): ', requestSliceIndex);
+            console.log('ScanViewer | requestSlicesIfNeeded more (lower indexes): ', requestSliceIndex);
             this.observableSliceRequest.next(requestSliceIndex);
         }
     }
