@@ -86,6 +86,7 @@ class Label(Resource):
     """Endpoint that stores label for given scan."""
 
     @staticmethod
+    @login_required
     @scans_ns.expect(serializers.in__label)
     @scans_ns.marshal_with(serializers.out__label)
     @scans_ns.doc(description='Stores label and assigns it to given scan.')

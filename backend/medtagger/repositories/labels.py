@@ -7,7 +7,7 @@ from medtagger.clients.hbase_client import HBaseClient
 from medtagger.database import db_session
 from medtagger.database.models import Label, LabelStatus, LabelSelection
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelSelectionID, ScanID, \
-    LabelingTime
+    OwnerID, LabelingTime
 
 
 class LabelsRepository(object):
@@ -46,11 +46,12 @@ class LabelsRepository(object):
         return label
 
     @staticmethod
-    def add_new_label(scan_id: ScanID, labeling_time: LabelingTime) -> Label:
+    def add_new_label(scan_id: ScanID, owner_id: OwnerID, labeling_time: LabelingTime) -> Label:
         """Add new Label for given Scan."""
         with db_session() as session:
             label = Label()
             label.scan_id = scan_id
+            label.owner_id = owner_id
             label.labeling_time = labeling_time
             session.add(label)
         return label

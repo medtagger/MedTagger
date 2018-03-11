@@ -47,7 +47,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
         'labeling_time': 34.56,
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
-                               headers={'content-type': 'application/json'})
+                               headers={'content-type': 'application/json', 'Authentication-Token': user_token})
     assert response.status_code == 201
     json_response = json.loads(response.data)
     label_id = json_response['label_id']

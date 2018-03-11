@@ -112,8 +112,8 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     assert json_response['role'] == 'doctor'
 
 
-def test_scan_ownership(prepare_environment: Any) -> None:
-    """Test for checking scan ownership when user uploads new scan ."""
+def test_ownership(prepare_environment: Any) -> None:
+    """Test for checking scan and label ownership."""
     api_client = get_api_client()
 
     admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
@@ -133,12 +133,9 @@ def test_scan_ownership(prepare_environment: Any) -> None:
                                headers={'content-type': 'application/json', 'Authentication-Token': admin_user_token})
     assert response.status_code == 201
     json_response = json.loads(response.data)
-    assert isinstance(json_response, dict)
-    scan_id = json_response['scan_id']
-    assert isinstance(scan_id, str)
-    assert len(scan_id) >= 1
     owner_id = json_response['owner_id']
     assert owner_id == admin_id
+    scan_id = json_response['scan_id']
 
     # Step 3. Send slices
     with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
@@ -146,3 +143,20 @@ def test_scan_ownership(prepare_environment: Any) -> None:
             'image': (image, 'slice_1.dcm'),
         }, content_type='multipart/form-data')
     assert response.status_code == 201
+
+    # Step 4. Label
+    payload = {
+        'selections': [{
+            'x': 0.5,
+            'y': 0.5,
+            'slice_index': 0,
+            'width': 0.1,
+            'height': 0.1,
+        }],
+    }
+    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
+                               headers={'content-type': 'application/json', 'Authentication-Token': admin_user_token})
+    assert response.status_code == 201
+    json_response = json.loads(response.data)
+    owner_id = json_response['owner_id']
+    assert owner_id == admin_id

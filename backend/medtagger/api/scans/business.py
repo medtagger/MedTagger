@@ -109,7 +109,8 @@ def add_label(scan_id: ScanID, selections: List[Dict], labeling_time: LabelingTi
     :param labeling_time: time in seconds that user spent on labeling
     :return: Label object
     """
-    label = LabelsRepository.add_new_label(scan_id, labeling_time)
+    owner_id = get_current_user_info().id
+    label = LabelsRepository.add_new_label(scan_id, owner_id, labeling_time)
     for selection in selections:
         position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
         shape = LabelShape(width=selection['width'], height=selection['height'])
