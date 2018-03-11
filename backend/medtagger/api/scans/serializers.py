@@ -40,6 +40,7 @@ out__label = api.model('Newly created Label model', {
 
 out__new_scan = api.model('Newly created Scan model', {
     'scan_id': fields.String(description='Scan\'s ID', attribute='id'),
+    'owner_id': fields.Integer(description='ID of user that uploaded scan'),
 })
 
 out__new_slice = api.model('Newly created Slice model', {

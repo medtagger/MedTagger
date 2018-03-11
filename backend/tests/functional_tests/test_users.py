@@ -7,6 +7,8 @@ from tests.functional_tests import get_api_client
 from medtagger.api.users.business import set_user_role
 from medtagger.api.auth.business import create_user
 
+from medtagger.api.scans.business import create_empty_scan
+
 EXAMPLE_USER_EMAIL = 'test@mail.com'
 EXAMPLE_USER_PASSWORD = 'medtagger1'
 EXAMPLE_USER_FIRST_NAME = 'First'
@@ -126,11 +128,14 @@ def test_scan_ownership(prepare_environment: Any) -> None:
     payload = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
+    json_response = json.loads(response.data)
+    admin_user_token = json_response['token']
     assert response.status_code == 200
 
     # Step 2. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 1}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload), headers={'content-type': 'application/json'})
+    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+                               headers={'content-type': 'application/json', 'Authentication-Token': admin_user_token})
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -146,8 +151,3 @@ def test_scan_ownership(prepare_environment: Any) -> None:
             'image': (image, 'slice_1.dcm'),
         }, content_type='multipart/form-data')
     assert response.status_code == 201
-    json_response = json.loads(response.data)
-    assert isinstance(json_response, dict)
-    slice_id = json_response['slice_id']
-    assert isinstance(slice_id, str)
-    assert len(slice_id) >= 1

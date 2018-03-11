@@ -1,6 +1,7 @@
 """Module responsible for definition of Scans service available via HTTP REST API."""
 from typing import Any
 from flask import request
+from flask_login import login_required
 from flask_restplus import Resource
 
 from medtagger.types import ScanID
@@ -16,6 +17,7 @@ class Scans(Resource):
     """Endpoint that can create new scan."""
 
     @staticmethod
+    @login_required
     @scans_ns.expect(serializers.in__new_scan)
     @scans_ns.marshal_with(serializers.out__new_scan)
     @scans_ns.doc(description='Creates empty scan.')

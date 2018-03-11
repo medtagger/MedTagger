@@ -56,7 +56,6 @@ def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan
     :param declared_number_of_slices: number of Slices that will be uploaded
     :return: Newly created Scan object
     """
-
     owner_id = get_current_user_info().id
     category = ScanCategoriesRepository.get_category_by_key(category_key)
     return ScansRepository.add_new_scan(category, declared_number_of_slices, owner_id)

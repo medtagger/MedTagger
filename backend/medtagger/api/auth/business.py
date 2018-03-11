@@ -51,6 +51,3 @@ def sign_in_user(email: str, password: str) -> str:
 def sign_out_user() -> None:
     """Sign out the current user."""
     logout_user()
-
-def get_current_user() -> User:
-    """Get current user"""
