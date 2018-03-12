@@ -1,4 +1,6 @@
 """Module responsible for definition of Scans' Repository."""
+from typing import List
+
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
@@ -8,6 +10,11 @@ from medtagger.types import ScanID
 
 class ScansRepository(object):
     """Repository for Scans."""
+
+    @staticmethod
+    def get_all_scans() -> List[Scan]:
+        """Fetch all Scans from database."""
+        return Scan.query.all()
 
     @staticmethod
     def get_scan_by_id(scan_id: ScanID) -> Scan:

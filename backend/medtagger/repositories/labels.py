@@ -1,4 +1,6 @@
 """Module responsible for definition of Labels' Repository."""
+from typing import List
+
 from sqlalchemy.sql.expression import func
 
 from medtagger.clients.hbase_client import HBaseClient
@@ -10,6 +12,11 @@ from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBi
 
 class LabelsRepository(object):
     """Repository for Labels."""
+
+    @staticmethod
+    def get_all_labels() -> List[Label]:
+        """Fetch all Labels from database."""
+        return Label.query.all()
 
     @staticmethod
     def get_label_by_id(label_id: LabelID, fetch_binary_masks: bool = False) -> Label:
