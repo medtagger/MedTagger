@@ -42,8 +42,8 @@ class User(Base, UserMixin):
 
     roles: List[Role] = db.relationship('Role', secondary=users_roles)
 
-    scans = relationship("Scan")
-    labels = relationship("Label")
+    scans: List['Scan'] = relationship('Scan', back_populates='owner')
+    labels: List['Label'] = relationship('Label', back_populates='owner')
 
     def __init__(self, email: str, password_hash: str, first_name: str, last_name: str) -> None:
         """Initialize User."""
@@ -108,6 +108,7 @@ class Scan(Base):
     category: ScanCategory = relationship('ScanCategory')
 
     owner_id: Optional[int] = Column(Integer, ForeignKey('Users.id'))
+    owner: Optional[User] = relationship('User', back_populates='scans')
 
     slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
     labels: List['Label'] = relationship('Label', back_populates='scan')
@@ -122,14 +123,11 @@ class Scan(Base):
         self.id = ScanID(str(uuid.uuid4()))
         self.category = category
         self.declared_number_of_slices = declared_number_of_slices
-        if user is not None:
-            self.owner_id = user.id
-        else:
-            self.owner_id = None
+        self.owner_id = user.id if user else None
 
     def __repr__(self) -> str:
         """Return string representation for Scan."""
-        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner_id)
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
 
     @property
     def stored_slices(self) -> List['Slice']:
@@ -244,6 +242,7 @@ class Label(Base):
     selections: 'LabelSelection' = relationship('LabelSelection', back_populates='label')
 
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
+    owner: User = relationship('User', back_populates='labels')
 
     def __init__(self, user: User, labeling_time: LabelingTime) -> None:
         """Initialize Label.
@@ -252,13 +251,13 @@ class Label(Base):
         """
         self.id = LabelID(str(uuid.uuid4()))
         self.status = LabelStatus.NOT_VERIFIED
-        self.owner_id = user.id
+        self.owner = user
         self.labeling_time = labeling_time
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
         return '<{}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
-                                              self.labeling_time, self.owner_id)
+                                              self.labeling_time, self.owner)
 
     def update_status(self, status: LabelStatus) -> 'Label':
         """Update Label's status.

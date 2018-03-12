@@ -7,7 +7,8 @@ from flask_restplus import Resource
 
 from medtagger.api import api
 from medtagger.api.users import serializers
-from medtagger.api.users.business import get_all_users, set_user_role, get_current_user_info
+from medtagger.api.users.business import get_all_users, set_user_role
+from medtagger.api.utils import get_current_user
 
 users_ns = api.namespace('users', 'Users management')
 
@@ -17,7 +18,7 @@ class GetUsers(Resource):
     """Get all users endpoint."""
 
     @staticmethod
-    @api.marshal_with(serializers.user_info_list)
+    @api.marshal_with(serializers.users_list)
     def get() -> Any:
         """Get all users endpoint."""
         users = get_all_users()
@@ -38,13 +39,13 @@ class SetRole(Resource):
 
 @users_ns.route('/info')
 class GetUserInfo(Resource):
-    """Get user info endpoint."""
+    """Get current user information."""
 
     @staticmethod
     @login_required
-    @api.marshal_with(serializers.user_info)
+    @api.marshal_with(serializers.user)
     @api.doc(responses={200: 'Successfully retrieved data.'})
     def get() -> Any:
         """Get user info."""
-        user_info = get_current_user_info()
-        return user_info, 200
+        user = get_current_user()
+        return user, 200

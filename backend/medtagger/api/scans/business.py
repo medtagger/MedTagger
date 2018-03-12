@@ -8,11 +8,11 @@ from medtagger.api.exceptions import NotFoundException
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata, LabelingTime
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
 from medtagger.repositories.labels import LabelsRepository
-from medtagger.api.users.business import get_current_user_info
 from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
 from medtagger.workers.storage import parse_dicom_and_update_slice
+from medtagger.api.utils import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan
     :param declared_number_of_slices: number of Slices that will be uploaded
     :return: Newly created Scan object
     """
-    user = get_current_user_info()
+    user = get_current_user()
     category = ScanCategoriesRepository.get_category_by_key(category_key)
     return ScansRepository.add_new_scan(category, declared_number_of_slices, user)
 
@@ -109,7 +109,7 @@ def add_label(scan_id: ScanID, selections: List[Dict], labeling_time: LabelingTi
     :param labeling_time: time in seconds that user spent on labeling
     :return: Label object
     """
-    user = get_current_user_info()
+    user = get_current_user()
     label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
     for selection in selections:
         position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
