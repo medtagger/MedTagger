@@ -56,7 +56,7 @@ class User(Base, UserMixin):
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.email)
 
     @property
-    def role(self) -> List[Role]:
+    def role(self) -> Role:
         """Return role for User."""
         return self.roles[0]
 

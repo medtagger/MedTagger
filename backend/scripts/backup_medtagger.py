@@ -1,5 +1,7 @@
+"""Script for backuping whole MedTagger."""  # flake8: noqa: T001  # Prints instead of logging
 import os
 import json
+from typing import Dict, List  # pylint: disable=unused-import
 
 from medtagger.repositories.roles import RolesRepository
 from medtagger.repositories.users import UsersRepository
@@ -29,7 +31,7 @@ create_directory(BACKUP_DIRECTORY)
 _users_and_roles = {
     'roles': [],
     'users': [],
-}
+}  # type: Dict[str, List[Dict]]
 print('\nFetching all Roles...')
 for role in RolesRepository.get_all_roles():
     print('Saving Role: {}'.format(role.name))
@@ -57,7 +59,8 @@ with open(ROLES_AND_USERS_FILE, 'w') as json_file:
 _scans = {
     'scan_categories': [],
     'scans': [],
-}
+}  # type: Dict[str, List[Dict]]
+
 print('\nFetching Scan Categories...')
 for scan_category in ScanCategoriesRepository.get_all_categories():
     print('Saving Scan Category: {}'.format(scan_category.key))
@@ -104,7 +107,7 @@ with open(SCANS_METADATA_FILE, 'w') as json_file:
 # Save Labels to JSON file
 _labels = {
     'labels': [],
-}
+}  # type: Dict[str, List[Dict]]
 print('\nFetching all Labels...')
 for label in LabelsRepository.get_all_labels():
     print('Saving Label: {}'.format(label.id))

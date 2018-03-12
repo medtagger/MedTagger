@@ -14,7 +14,7 @@ class RolesRepository(object):
 
     @staticmethod
     def get_all_roles() -> List[Role]:
-        """Get all available roles"""
+        """Get all available roles."""
         return Role.query.all()
 
     @staticmethod
