@@ -26,11 +26,26 @@ export class UploadScansSelectorComponent {
 
         // User selected single scan upload
         if (!this.multipleScans) {
-            this.numberOfScans = 1;
-            this.numberOfSlices = this._files && this._files.length || 0;
             this.scans = {
-                "singleScan": this._files
+                "singleScan": []
             };
+            for (let sliceFile of this._files) {
+                // Skip all files that are not DICOMs
+                if (sliceFile.type != "application/dicom") {
+                    continue;
+                }
+
+                // Check for size limit (5 MB)
+                console.log(sliceFile.size);
+                if (sliceFile.size > 5 * 1024 * 1024) {
+                    continue;
+                }
+
+                // File seems to be fine
+                this.scans["singleScan"].push(sliceFile);
+            }
+            this.numberOfScans = 1;
+            this.numberOfSlices = this.scans["singleScan"] && this.scans["singleScan"].length || 0;
             return;
         }
 
@@ -41,6 +56,11 @@ export class UploadScansSelectorComponent {
         for (let sliceFile of this._files) {
             // Skip all files that are not DICOMs
             if (sliceFile.type != "application/dicom") {
+                continue;
+            }
+
+            // Check for size limit (5 MB)
+            if (sliceFile.size > 5 * 1024 * 1024) {
                 continue;
             }
 
