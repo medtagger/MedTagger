@@ -7,9 +7,10 @@ import 'rxjs/add/operator/toPromise';
 import {Observable} from 'rxjs/Observable';
 import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
-import {ROISelection3D} from '../model/ROISelection3D';
 
 import {environment} from '../../environments/environment';
+import {ScanSelection} from "../model/ScanSelection";
+import {SliceSelection} from "../model/SliceSelection";
 
 
 @Injectable()
@@ -21,9 +22,9 @@ export class ScanService {
         this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {}});
     }
 
-    public send3dSelection(scanId: string, roiSelection: ROISelection3D, labelingTime: number): Promise<Response> {
-        console.log('ScanService | send3dSelection | sending ROI:', roiSelection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
-        const payload = roiSelection.toJSON();
+    public sendSelection(scanId: string, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {
+        console.log('ScanService | send3dSelection | sending ROI:', selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
+        const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
         return new Promise((resolve, reject) => {
             this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload).toPromise().then((response: Response) => {

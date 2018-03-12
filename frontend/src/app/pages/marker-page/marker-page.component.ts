@@ -71,6 +71,10 @@ export class MarkerPageComponent implements OnInit {
         });
     }
 
+    public updateSelectionState() {
+
+    }
+
     private requestScan(): void {
         this.scanService.getRandomScan(this.category).then(
             (scan: ScanMetadata) => {
@@ -98,10 +102,19 @@ export class MarkerPageComponent implements OnInit {
         this.requestScan();
     }
 
-    public sendSelection() {
+    public sendCompleteLabel(): void {
+        this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()));
+    }
+
+    public sendEmptyLabel(): void {
+        this.sendSelection(new ROISelection3D());
+        this.skipScan();
+    }
+
+    private sendSelection(roiSelection: ROISelection3D) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
-        const roiSelection: ROISelection3D = new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection());
-        this.scanService.send3dSelection(this.scan.scanId, roiSelection, labelingTime)
+
+        this.scanService.sendSelection(this.scan.scanId, roiSelection, labelingTime)
             .then((response: Response) => {
                 if (response.status === 200) {
                     console.log('MarkerPage | sendSelection | success!');

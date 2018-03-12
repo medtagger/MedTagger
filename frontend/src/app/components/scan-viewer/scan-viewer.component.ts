@@ -5,6 +5,7 @@ import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider, MatTooltip} from '@angular/material';
 import {Selector} from '../selectors/Selector';
 import {SliceSelection} from '../../model/SliceSelection';
+import {Subscriber} from "rxjs/Subscriber";
 
 @Component({
     selector: 'app-scan-viewer',
@@ -34,8 +35,6 @@ export class ScanViewerComponent implements OnInit {
     public scanMetadata: ScanMetadata;
     public slices: Map<number, MarkerSlice>;
     protected _currentSlice;
-
-    public hasArchivedSelections: boolean;
 
     public observableSliceRequest: Subject<number>;
     protected sliceBatchSize: number;

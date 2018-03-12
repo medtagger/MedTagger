@@ -1,4 +1,4 @@
-import {SliceSelection} from '../../model/SliceSelection';
+import {EventEmitter} from "@angular/core";
 
 export interface Selector<SliceSelection> {
 
@@ -16,6 +16,8 @@ export interface Selector<SliceSelection> {
 
     clearData(): any;
 
+    getStateChangeEmitter(): EventEmitter<void>;
+
     addCurrentSelection(): any;
 
     updateCurrentSlice(currentSliceId: number): any;
@@ -26,7 +28,7 @@ export interface Selector<SliceSelection> {
 
     hasSliceSelection(): boolean;
 
-    hasFullSelection(): boolean;
+    hasValidSelection(...validityFlags: boolean[]): boolean;
 
     getSelections(): SliceSelection[];
 
