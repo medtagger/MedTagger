@@ -56,9 +56,9 @@ def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan
     :param declared_number_of_slices: number of Slices that will be uploaded
     :return: Newly created Scan object
     """
-    owner_id = get_current_user_info().id
+    user = get_current_user_info()
     category = ScanCategoriesRepository.get_category_by_key(category_key)
-    return ScansRepository.add_new_scan(category, declared_number_of_slices, owner_id)
+    return ScansRepository.add_new_scan(category, declared_number_of_slices, user)
 
 
 def get_metadata(scan_id: ScanID) -> ScanMetadata:
@@ -109,8 +109,8 @@ def add_label(scan_id: ScanID, selections: List[Dict], labeling_time: LabelingTi
     :param labeling_time: time in seconds that user spent on labeling
     :return: Label object
     """
-    owner_id = get_current_user_info().id
-    label = LabelsRepository.add_new_label(scan_id, owner_id, labeling_time)
+    user = get_current_user_info()
+    label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
     for selection in selections:
         position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
         shape = LabelShape(width=selection['width'], height=selection['height'])

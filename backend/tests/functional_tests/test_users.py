@@ -1,6 +1,6 @@
 """Tests for user management operations."""
 import json
-from typing import Any
+from typing import Dict, Any
 
 from tests.functional_tests import get_api_client
 from medtagger.api.users.business import set_user_role
@@ -120,7 +120,7 @@ def test_ownership(prepare_environment: Any) -> None:
     set_user_role(admin_id, 'admin')
 
     # Step 1. Admin user logs in
-    payload = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
+    payload: Dict[str, Any] = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
                                headers={'content-type': 'application/json'})
     json_response = json.loads(response.data)
@@ -153,7 +153,7 @@ def test_ownership(prepare_environment: Any) -> None:
             'width': 0.1,
             'height': 0.1,
         }],
-        'labeling_time': 12.34
+        'labeling_time': 12.34,
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
                                headers={'content-type': 'application/json', 'Authentication-Token': admin_user_token})

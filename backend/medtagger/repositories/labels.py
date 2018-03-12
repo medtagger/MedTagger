@@ -5,9 +5,9 @@ from sqlalchemy.sql.expression import func
 
 from medtagger.clients.hbase_client import HBaseClient
 from medtagger.database import db_session
-from medtagger.database.models import Label, LabelStatus, LabelSelection
+from medtagger.database.models import Label, LabelStatus, LabelSelection, User
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelSelectionID, ScanID, \
-    OwnerID, LabelingTime
+    LabelingTime
 
 
 class LabelsRepository(object):
@@ -46,10 +46,10 @@ class LabelsRepository(object):
         return label
 
     @staticmethod
-    def add_new_label(scan_id: ScanID, owner_id: OwnerID, labeling_time: LabelingTime) -> Label:
+    def add_new_label(scan_id: ScanID, user: User, labeling_time: LabelingTime) -> Label:
         """Add new Label for given Scan."""
         with db_session() as session:
-            label = Label(owner_id, labeling_time)
+            label = Label(user, labeling_time)
             label.scan_id = scan_id
             session.add(label)
         return label

@@ -1,11 +1,11 @@
 """Module responsible for definition of Scans' Repository."""
-from typing import List
+from typing import Optional, List
 
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, Scan
-from medtagger.types import ScanID, OwnerID
+from medtagger.database.models import ScanCategory, Scan, User
+from medtagger.types import ScanID
 
 
 class ScansRepository(object):
@@ -43,16 +43,16 @@ class ScansRepository(object):
             session.query(Scan).filter(Scan.id == scan_id).delete()
 
     @staticmethod
-    def add_new_scan(category: ScanCategory, number_of_slices: int, owner_id: OwnerID) -> Scan:
+    def add_new_scan(category: ScanCategory, number_of_slices: int, user: Optional[User]) -> Scan:
         """Add new Scan to the database.
 
         :param category: Scan's Category object
         :param number_of_slices: number of Slices that will be uploaded
-        :param owner_id: ID for user that uploaded scan
+        :param user: User that uploaded scan
         :return: Scan object
         """
         with db_session() as session:
-            scan = Scan(category, number_of_slices, owner_id)
+            scan = Scan(category, number_of_slices, user)
             session.add(scan)
         return scan
 

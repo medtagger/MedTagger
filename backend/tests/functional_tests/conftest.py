@@ -44,7 +44,7 @@ def synchronous_celery(mocker: Any) -> Any:
 
 
 def get_token_for_logged_in_user(role: str) -> str:
-    """Create and log in user with given role and return its token
+    """Create and log in user with given role and return its token.
 
     :param: role that will be granted to created user
     :return: user token
