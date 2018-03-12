@@ -104,6 +104,9 @@ ENV/
 # Configuration files
 backend_api.conf
 
+# MedTagger
+medtagger_backup
+
 # Tools
 .vagrant/
 

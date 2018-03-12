@@ -1,4 +1,6 @@
 """Module responsible for definition of Roles' Repository."""
+from typing import List
+
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api import InvalidArgumentsException
@@ -9,6 +11,11 @@ from medtagger.repositories.users import UsersRepository
 
 class RolesRepository(object):
     """Repository for Roles."""
+
+    @staticmethod
+    def get_all_roles() -> List[Role]:
+        """Get all available roles."""
+        return Role.query.all()
 
     @staticmethod
     def get_role_with_name(role_name: str) -> Role:
