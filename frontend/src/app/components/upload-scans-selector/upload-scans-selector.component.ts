@@ -36,7 +36,6 @@ export class UploadScansSelectorComponent {
                 }
 
                 // Check for size limit (5 MB)
-                console.log(sliceFile.size);
                 if (sliceFile.size > 5 * 1024 * 1024) {
                     continue;
                 }
