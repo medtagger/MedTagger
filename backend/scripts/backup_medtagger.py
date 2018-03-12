@@ -82,6 +82,7 @@ for scan in ScansRepository.get_all_scans():
         'converted': scan.converted,
         'declared_number_of_slices': scan.declared_number_of_slices,
         'category': scan.category.key,
+        'owner_id': scan.owner_id,
         'slices': [{
             'id': scan_slice.id,
             'location': scan_slice.location,
@@ -116,6 +117,7 @@ for label in LabelsRepository.get_all_labels():
         'scan_id': label.scan_id,
         'labeling_time': label.labeling_time,
         'status': label.status.value,
+        'owner_id': label.owner_id,
         'selections': [{
             'id': selection.id,
             'position_x': selection.position_x,
