@@ -67,6 +67,18 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         return coordinates;
     }
 
+    private hookUpStateChangeSubscription(): void {
+        this.selector.getStateChangeEmitter().subscribe(()=> {
+            console.log('Marker | getStateChange event from selector!');
+            this.updateSelectionState();
+        });
+    }
+
+    public prepareForNewScan(): void {
+        this.clearData();
+        this.hookUpStateChangeSubscription();
+    }
+
     ngOnInit() {
         console.log('Marker init');
         console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
@@ -75,15 +87,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.selector.clearData();
 
-        this.selector.getStateChangeEmitter().subscribe(()=> {
-            this.updateSelectionState();
-        });
+        this.hookUpStateChangeSubscription();
 
         this.initializeCanvas();
-
-        this.currentImage.onload = () => {
-            this.initCanvasSelectionTool();
-        };
 
         this.setCanvasImage();
 
@@ -93,10 +99,13 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             this.requestSlicesIfNeeded(sliderValue);
             this.changeMarkerImage(sliderValue);
 
+            this.selector.clearCanvasSelection();
+
             this.selector.drawPreviousSelections();
             this.updateSelectionState();
         });
 
+        this.initCanvasSelectionTool();
 
     }
 

@@ -71,10 +71,6 @@ export class MarkerPageComponent implements OnInit {
         });
     }
 
-    public updateSelectionState() {
-
-    }
-
     private requestScan(): void {
         this.scanService.getRandomScan(this.category).then(
             (scan: ScanMetadata) => {
@@ -98,7 +94,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
-        this.marker.clearData();
+        this.marker.prepareForNewScan();
         this.requestScan();
     }
 
