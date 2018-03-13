@@ -89,7 +89,7 @@ export class MarkerPageComponent implements OnInit {
             (errorResponse: Error) => {
                 console.log(errorResponse);
                 this.dialogService
-                    .openInfoDialog("Error", "No slices found for this category", "Go back")
+                    .openInfoDialog("Nothing to do here!", "No more Scans available for you in this category!", "Go back")
                     .afterClosed()
                     .subscribe(() => {
                         this.location.back();

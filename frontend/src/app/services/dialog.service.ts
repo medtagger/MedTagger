@@ -10,7 +10,7 @@ export class DialogService {
         let buttonLabel: string = buttonText ? buttonText : "Ok";
 
         let infoDialogRef = this.dialog.open(InfoDialog, {
-            width: '250px',
+            width: '450px',
             data: {title: title, content: content, buttonText: buttonLabel}
         });
 
