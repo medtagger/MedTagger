@@ -12,6 +12,7 @@ from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
 from medtagger.workers.storage import parse_dicom_and_update_slice
+from medtagger.api.utils import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +56,9 @@ def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan
     :param declared_number_of_slices: number of Slices that will be uploaded
     :return: Newly created Scan object
     """
+    user = get_current_user()
     category = ScanCategoriesRepository.get_category_by_key(category_key)
-    return ScansRepository.add_new_scan(category, declared_number_of_slices)
+    return ScansRepository.add_new_scan(category, declared_number_of_slices, user)
 
 
 def get_metadata(scan_id: ScanID) -> ScanMetadata:
@@ -107,7 +109,8 @@ def add_label(scan_id: ScanID, selections: List[Dict], labeling_time: LabelingTi
     :param labeling_time: time in seconds that user spent on labeling
     :return: Label object
     """
-    label = LabelsRepository.add_new_label(scan_id, labeling_time)
+    user = get_current_user()
+    label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
     for selection in selections:
         position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
         shape = LabelShape(width=selection['width'], height=selection['height'])

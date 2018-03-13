@@ -10,16 +10,20 @@ from medtagger.database.models import SliceOrientation
 from medtagger.repositories.slices import SlicesRepository
 
 from tests.functional_tests import get_api_client
+from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
 # pylint: disable=too-many-locals
 def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application for Scan upload and conversion."""
     api_client = get_api_client()
+    user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 3}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload), headers={'content-type': 'application/json'})
+    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+                               headers={'content-type': 'application/json',
+                                        'Authentication-Token': user_token})
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
