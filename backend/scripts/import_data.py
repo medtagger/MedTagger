@@ -57,7 +57,7 @@ if __name__ == '__main__':
         logger.info('Adding new Scan from "%s".', scan_directory)
         slice_names = glob.glob(scan_directory + '/*.dcm')
         number_of_slices = len(slice_names)
-        scan = ScansRepository.add_new_scan(category, number_of_slices)
+        scan = ScansRepository.add_new_scan(category, number_of_slices, None)
 
         for slice_name in slice_names:
             logger.info('Adding new Slice to Scan "%s" based on "%s".', scan.id, slice_name)

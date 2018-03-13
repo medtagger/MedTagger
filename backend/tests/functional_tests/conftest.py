@@ -4,9 +4,14 @@ from typing import Any
 
 import pytest
 
+from medtagger.api import InvalidArgumentsException
+from medtagger.api.app import app
 from medtagger.database import Base, session
 from medtagger.database.fixtures import apply_all_fixtures
 from medtagger.clients.hbase_client import HBaseClient
+from medtagger.api.auth.business import create_user, sign_in_user
+from medtagger.api.users.business import set_user_role
+from medtagger.repositories.roles import RolesRepository
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +33,34 @@ def prepare_environment() -> Any:
 
     logger.info('Removing all data from HBase.')
     for table_name in HBaseClient.HBASE_SCHEMA:
-        for key in HBaseClient.get_all_keys(table_name):
-            HBaseClient.delete(table_name, key)
+        for key in HBaseClient().get_all_keys(table_name):
+            HBaseClient().delete(table_name, key)
 
 
 @pytest.fixture
 def synchronous_celery(mocker: Any) -> Any:
     """Set Celery to executing tasks eagerly (each time tasks are called/delayed)."""
     mocker.patch('medtagger.workers.celery_configuration.task_always_eager', True, create=True)
+
+
+def get_token_for_logged_in_user(role: str) -> str:
+    """Create and log in user with given role and return its token.
+
+    :param: role that will be granted to created user
+    :return: user token
+    """
+    logger.info('Preparing user with admin role.')
+
+    email = 'admin@medtagger.com'
+    password = 'medtagger2'
+    first_name = 'First'
+    last_name = 'Last'
+
+    role = RolesRepository.get_role_with_name(role)
+    if role is None:
+        raise InvalidArgumentsException('Role does not exist.')
+    user_id = create_user(email, password, first_name, last_name)
+    set_user_role(user_id, role.name)
+
+    with app.app_context():
+        return sign_in_user(email, password)

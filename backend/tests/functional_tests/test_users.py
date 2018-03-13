@@ -1,6 +1,6 @@
 """Tests for user management operations."""
 import json
-from typing import Any
+from typing import Dict, Any
 
 from tests.functional_tests import get_api_client
 from medtagger.api.users.business import set_user_role
@@ -29,8 +29,6 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
-    user_id = json_response['id']
-    assert user_id == 1
 
     # Step 2. User logs in
     payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}
@@ -48,7 +46,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
-    assert json_response['id'] == 1
+    assert json_response['id'] > 0
     assert json_response['email'] == EXAMPLE_USER_EMAIL
     assert json_response['firstName'] == EXAMPLE_USER_FIRST_NAME
     assert json_response['lastName'] == EXAMPLE_USER_LAST_NAME
@@ -112,3 +110,54 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     assert json_response['role'] == 'doctor'
+
+
+def test_ownership(prepare_environment: Any) -> None:
+    """Test for checking scan and label ownership."""
+    api_client = get_api_client()
+
+    admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
+    set_user_role(admin_id, 'admin')
+
+    # Step 1. Admin user logs in
+    payload: Dict[str, Any] = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
+    response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
+                               headers={'content-type': 'application/json'})
+    json_response = json.loads(response.data)
+    admin_user_token = json_response['token']
+    assert response.status_code == 200
+
+    # Step 2. Add Scan to the system
+    payload = {'category': 'LUNGS', 'number_of_slices': 1}
+    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+                               headers={'content-type': 'application/json', 'Authentication-Token': admin_user_token})
+    assert response.status_code == 201
+    json_response = json.loads(response.data)
+    owner_id = json_response['owner_id']
+    assert owner_id == admin_id
+    scan_id = json_response['scan_id']
+
+    # Step 3. Send slices
+    with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
+        response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
+            'image': (image, 'slice_1.dcm'),
+        }, content_type='multipart/form-data')
+    assert response.status_code == 201
+
+    # Step 4. Label
+    payload = {
+        'selections': [{
+            'x': 0.5,
+            'y': 0.5,
+            'slice_index': 0,
+            'width': 0.1,
+            'height': 0.1,
+        }],
+        'labeling_time': 12.34,
+    }
+    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
+                               headers={'content-type': 'application/json', 'Authentication-Token': admin_user_token})
+    assert response.status_code == 201
+    json_response = json.loads(response.data)
+    owner_id = json_response['owner_id']
+    assert owner_id == admin_id

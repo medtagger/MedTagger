@@ -1,15 +1,22 @@
 """Module responsible for definition of Labels' Repository."""
+from typing import List
+
 from sqlalchemy.sql.expression import func
 
 from medtagger.clients.hbase_client import HBaseClient
 from medtagger.database import db_session
-from medtagger.database.models import Label, LabelStatus, LabelSelection
+from medtagger.database.models import Label, LabelStatus, LabelSelection, User
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelSelectionID, ScanID, \
     LabelingTime
 
 
 class LabelsRepository(object):
     """Repository for Labels."""
+
+    @staticmethod
+    def get_all_labels() -> List[Label]:
+        """Fetch all Labels from database."""
+        return Label.query.all()
 
     @staticmethod
     def get_label_by_id(label_id: LabelID, fetch_binary_masks: bool = False) -> Label:
@@ -39,12 +46,11 @@ class LabelsRepository(object):
         return label
 
     @staticmethod
-    def add_new_label(scan_id: ScanID, labeling_time: LabelingTime) -> Label:
+    def add_new_label(scan_id: ScanID, user: User, labeling_time: LabelingTime) -> Label:
         """Add new Label for given Scan."""
         with db_session() as session:
-            label = Label()
+            label = Label(user, labeling_time)
             label.scan_id = scan_id
-            label.labeling_time = labeling_time
             session.add(label)
         return label
 

@@ -11,6 +11,7 @@ import {MarkerSlice} from '../model/MarkerSlice';
 import {environment} from '../../environments/environment';
 import {ScanSelection} from "../model/ScanSelection";
 import {SliceSelection} from "../model/SliceSelection";
+import {AuthenticationHeader} from "./authentication-header";
 
 
 @Injectable()
@@ -18,7 +19,7 @@ export class ScanService {
 
     websocket: Socket;
 
-    constructor(private http: Http) {
+    constructor(private http: Http, private authenticationHeader: AuthenticationHeader) {
         this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {}});
     }
 
@@ -27,7 +28,8 @@ export class ScanService {
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload).toPromise().then((response: Response) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload, {
+                headers: this.authenticationHeader.create()}).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
                 resolve(response);
             }).catch((error: Response) => {
@@ -111,7 +113,9 @@ export class ScanService {
                 category: category,
                 number_of_slices: numberOfSlices,
             };
-            this.http.post(environment.API_URL + '/scans/', payload).toPromise().then(
+            this.http.post(environment.API_URL + '/scans/', payload, {
+                headers: this.authenticationHeader.create()
+            }).toPromise().then(
                 response => {
                     resolve(response.json().scan_id);
                 },

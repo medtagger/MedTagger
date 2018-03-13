@@ -2,7 +2,7 @@
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
 import enum
 import uuid
-from typing import List, cast
+from typing import List, cast, Optional
 
 from flask_security import UserMixin, RoleMixin
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
@@ -11,7 +11,6 @@ from sqlalchemy.orm import relationship
 from medtagger.database import Base, db_session, db
 from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime
-
 
 users_roles = db.Table('Users_Roles', Base.metadata,
                        Column('user_id', Integer, ForeignKey('Users.id')),
@@ -43,6 +42,9 @@ class User(Base, UserMixin):
 
     roles: List[Role] = db.relationship('Role', secondary=users_roles)
 
+    scans: List['Scan'] = relationship('Scan', back_populates='owner')
+    labels: List['Label'] = relationship('Label', back_populates='owner')
+
     def __init__(self, email: str, password_hash: str, first_name: str, last_name: str) -> None:
         """Initialize User."""
         self.email = email
@@ -56,7 +58,7 @@ class User(Base, UserMixin):
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.email)
 
     @property
-    def role(self) -> List[Role]:
+    def role(self) -> Role:
         """Return role for User."""
         return self.roles[0]
 
@@ -105,22 +107,27 @@ class Scan(Base):
     category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
     category: ScanCategory = relationship('ScanCategory')
 
+    owner_id: Optional[int] = Column(Integer, ForeignKey('Users.id'))
+    owner: Optional[User] = relationship('User', back_populates='scans')
+
     slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
     labels: List['Label'] = relationship('Label', back_populates='scan')
 
-    def __init__(self, category: ScanCategory, declared_number_of_slices: int) -> None:
+    def __init__(self, category: ScanCategory, declared_number_of_slices: int, user: Optional[User]) -> None:
         """Initialize Scan.
 
         :param category: Scan's category
         :param declared_number_of_slices: number of Slices that will be uploaded later
+        :param user: User that uploaded scan
         """
         self.id = ScanID(str(uuid.uuid4()))
         self.category = category
         self.declared_number_of_slices = declared_number_of_slices
+        self.owner_id = user.id if user else None
 
     def __repr__(self) -> str:
         """Return string representation for Scan."""
-        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key)
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
 
     @property
     def stored_slices(self) -> List['Slice']:
@@ -234,18 +241,23 @@ class Label(Base):
     scan: Scan = relationship('Scan', back_populates='labels')
     selections: 'LabelSelection' = relationship('LabelSelection', back_populates='label')
 
-    def __init__(self) -> None:
+    owner_id: int = Column(Integer, ForeignKey('Users.id'))
+    owner: User = relationship('User', back_populates='labels')
+
+    def __init__(self, user: User, labeling_time: LabelingTime) -> None:
         """Initialize Label.
 
         By default all of the labels are not verified
         """
         self.id = LabelID(str(uuid.uuid4()))
         self.status = LabelStatus.NOT_VERIFIED
+        self.owner = user
+        self.labeling_time = labeling_time
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
-        return '<{}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
-                                           self.labeling_time)
+        return '<{}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
+                                              self.labeling_time, self.owner)
 
     def update_status(self, status: LabelStatus) -> 'Label':
         """Update Label's status.
