@@ -29,8 +29,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     @ViewChild('slider') slider: MatSlider;
 
-    @ViewChild('tooltip') tooltip: MatTooltip;
-
     public selectionState: {isValid: boolean, is2d: boolean, hasArchive: boolean} = { isValid: false, is2d: false, hasArchive: false};
 
     public observableSliceRequest: Subject<number>;
@@ -71,7 +69,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     ngOnInit() {
         console.log('Marker init');
-        console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider, ' tooltip ', this.tooltip);
+        console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
 
         this.slices = new Map<number, MarkerSlice>();
 
