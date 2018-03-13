@@ -1,5 +1,7 @@
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {Selector} from './Selector';
+import {Observable} from "rxjs/Observable";
+import {EventEmitter} from "@angular/core";
 
 export class RectROISelector implements Selector<ROISelection2D> {
     readonly STYLE = {
@@ -19,6 +21,8 @@ export class RectROISelector implements Selector<ROISelection2D> {
     protected canvasPosition: ClientRect;
     canvasSize: { width: number, height: number };
 
+    public stateChange: EventEmitter<void>;
+
     constructor(canvas: HTMLCanvasElement) {
         this.canvasCtx = canvas.getContext('2d');
         this.canvasSize = {
@@ -29,6 +33,11 @@ export class RectROISelector implements Selector<ROISelection2D> {
         this.archivedSelections = [];
         this.selectedArea = undefined;
         this.currentSlice = undefined;
+        this.stateChange = new EventEmitter<void>();
+    }
+
+    public getStateChangeEmitter(): EventEmitter<void> {
+        return this.stateChange;
     }
 
     public getSelections(): ROISelection2D[] {
@@ -105,6 +114,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
     public onMouseUp(event: MouseEvent): void {
         if (this.mouseDrag) {
             this.mouseDrag = false;
+            this.addCurrentSelection();
         }
     }
 
@@ -117,12 +127,14 @@ export class RectROISelector implements Selector<ROISelection2D> {
         this.selectedArea = undefined;
         this.selections = new Map<number, ROISelection2D>();
         this.archivedSelections = [];
+        this.stateChange = new EventEmitter<void>();
         this.clearCanvasSelection();
     }
 
     public addCurrentSelection(): void {
         if (this.selectedArea) {
             this.selections.set(this.currentSlice, this.selectedArea);
+            this.stateChange.emit();
             this.selectedArea = undefined;
         }
     }
@@ -139,8 +151,8 @@ export class RectROISelector implements Selector<ROISelection2D> {
         return this.archivedSelections.length > 0;
     }
 
-    public hasFullSelection(): boolean {
-        return this.selections.size >= 2 || (this.selections.size === 1 && !!this.selectedArea);
+    public hasValidSelection(): boolean {
+        return this.selections.size >= 1;
     }
 
     public hasSliceSelection(): boolean {

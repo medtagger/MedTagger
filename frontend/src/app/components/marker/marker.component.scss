@@ -26,12 +26,6 @@ $canvas-size: 600px;
     top: $canvas-size;
 }
 
-#markerKeysTooltip {
-    position: absolute;
-    left: $canvas-size + 12;
-    top: $canvas-size + 10;
-}
-
 // pretty neat workaround to always show slider thumb
 ::ng-deep {
     .mat-slider-thumb-label {

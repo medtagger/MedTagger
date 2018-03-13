@@ -2,9 +2,10 @@ import {Component, HostListener, OnInit, ViewChild, ElementRef} from '@angular/c
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {Subject} from 'rxjs/Subject';
 import {ScanMetadata} from '../../model/ScanMetadata';
-import {MatSlider, MatTooltip} from '@angular/material';
+import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
 import {SliceSelection} from '../../model/SliceSelection';
+import {Subscriber} from "rxjs/Subscriber";
 
 @Component({
     selector: 'app-scan-viewer',
@@ -29,13 +30,9 @@ export class ScanViewerComponent implements OnInit {
 
     @ViewChild('slider') slider: MatSlider;
 
-    @ViewChild('tooltip') tooltip: MatTooltip;
-
     public scanMetadata: ScanMetadata;
     public slices: Map<number, MarkerSlice>;
     protected _currentSlice;
-
-    public hasArchivedSelections: boolean;
 
     public observableSliceRequest: Subject<number>;
     protected sliceBatchSize: number;
@@ -117,12 +114,7 @@ export class ScanViewerComponent implements OnInit {
         });
     }
 
-    ngAfterViewChecked() {
-        // Waiting for next rendering cycle to avoid race conditions
-        setTimeout(()=> {
-            this.tooltip.show();
-        }, 0);
-    }
+    ngAfterViewChecked() {}
 
     ngOnInit() {
         console.log('ScanViewer | ngOnInit');
