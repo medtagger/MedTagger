@@ -91,10 +91,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.initializeCanvas();
 
-        this.currentImage.onload = () => {
-            // this.initCanvasSelectionTool();
-        };
-
         this.setCanvasImage();
 
         this.slider.registerOnChange((sliderValue: number) => {
