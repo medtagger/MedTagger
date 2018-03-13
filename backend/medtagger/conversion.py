@@ -16,11 +16,13 @@ def convert_slice_to_normalized_8bit_array(dicom_file: FileDataset) -> np.ndarra
     intercept = dicom_file.RescaleIntercept
     slope = dicom_file.RescaleSlope
 
-    hu_units_array = convert_to_hounsfield_units(pixel_array, intercept, slope)
-    normalized_hu_array = normalize(hu_units_array)
+    if dicom_file.RescaleType != 'normalized':
+        hu_units_array = convert_to_hounsfield_units(pixel_array, intercept, slope)
+        normalized_hu_array = normalize(hu_units_array)
+        pixel_array = normalized_hu_array
 
-    pixel_array = normalized_hu_array * 255
-    pixel_array = pixel_array.astype(np.int8)
+    pixel_array_normalized = (pixel_array - np.min(pixel_array)) / (np.max(pixel_array) - np.min(pixel_array))
+    pixel_array = np.uint8(pixel_array_normalized * 255)
     return pixel_array
 
 
@@ -77,7 +79,7 @@ def convert_to_hounsfield_units(pixel_array: np.ndarray, intercept: float, slope
     return pixel_array
 
 
-def normalize(hu_array: np.ndarray, min_bound: int = -360, max_bound: int = 440) -> np.ndarray:
+def normalize(hu_array: np.ndarray, min_bound: int = 400, max_bound: int = 1700) -> np.ndarray:
     """Normalize values of the Hounsfield units array.
 
     :param hu_array: numpy array of Hounsfield units for the Dicom file
