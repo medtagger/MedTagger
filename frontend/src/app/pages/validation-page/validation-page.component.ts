@@ -86,7 +86,7 @@ export class ValidationPageComponent implements OnInit {
             });
         }).catch((error: Error) => {
             this.dialogService
-                .openInfoDialog("Error", "Cannot find any selections to validate", "Go back")
+                .openInfoDialog("Nothing to do here!", "No more Labels need your attention!", "Go back")
                 .afterClosed()
                 .subscribe(() => {
                     this.location.back();

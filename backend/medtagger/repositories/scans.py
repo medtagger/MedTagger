@@ -4,7 +4,7 @@ from typing import Optional, List
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, Scan, User
+from medtagger.database.models import ScanCategory, Scan, User, Label
 from medtagger.types import ScanID
 
 
@@ -22,16 +22,21 @@ class ScansRepository(object):
         return Scan.query.filter(Scan.id == scan_id).one()
 
     @staticmethod
-    def get_random_scan(category: ScanCategory = None) -> Scan:
+    def get_random_scan(category: ScanCategory = None, user: User = None) -> Scan:
         """Fetch random Scan from database.
 
         :param category: (optional) Scan's Category object
+        :param user: (optional) User for which Scan should be randomized
         :return: Label object
         """
         query = Scan.query
         if category:
             query = query.join(ScanCategory)
             query = query.filter(ScanCategory.key == category.key)
+        if user:
+            labelled_scans = Label.query.filter(Label.owner == user).all()
+            labelled_scans_ids = [label.scan_id for label in labelled_scans]
+            query = query.filter(~Scan.id.in_(labelled_scans_ids))
         query = query.filter(Scan.converted)
         query = query.order_by(func.random())
         return query.first()

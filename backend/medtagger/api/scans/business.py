@@ -77,8 +77,9 @@ def get_random_scan(category_key: str) -> ScanMetadata:
     :param category_key: unique key identifying category
     :return: Scan Metadata object
     """
+    user = get_current_user()
     category = ScanCategoriesRepository.get_category_by_key(category_key)
-    scan = ScansRepository.get_random_scan(category)
+    scan = ScansRepository.get_random_scan(category, user)
     if not scan:
         raise NotFoundException('Could not find any Scan for this category!')
 

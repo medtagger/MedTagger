@@ -43,7 +43,7 @@ export class ScanService {
         return new Promise((resolve, reject) => {
             let params = new URLSearchParams();
             params.set('category', category);
-            this.http.get(environment.API_URL + '/scans/random', {params: params})
+            this.http.get(environment.API_URL + '/scans/random', {params: params, headers: this.authenticationHeader.create()})
                 .map(response => response.json())
                 .subscribe(
                     (response) => {
