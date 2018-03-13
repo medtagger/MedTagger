@@ -93,7 +93,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
     }
 
     public onMouseMove(mouseEvent: MouseEvent): void {
-        if (this.mouseDrag) {
+        if (this.mouseDrag && this.selectedArea) {
             console.log('RectROISelector | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
             this.updateSelection(mouseEvent);
             this.clearCanvasSelection();
@@ -104,17 +104,29 @@ export class RectROISelector implements Selector<ROISelection2D> {
 
     public updateSelection(event: MouseEvent): void {
         console.log('RectROISelector | updateSelection | event: ', event);
-        const newWidth = (event.clientX - this.canvasPosition.left) - this.selectedArea.positionX;
-        const newHeight = (event.clientY - this.canvasPosition.top) - this.selectedArea.positionY;
 
-        this.selectedArea.updateWidth(newWidth);
-        this.selectedArea.updateHeight(newHeight);
+        if(this.selectedArea) {
+            const newWidth = (event.clientX - this.canvasPosition.left) - this.selectedArea.positionX;
+            const newHeight = (event.clientY - this.canvasPosition.top) - this.selectedArea.positionY;
+
+            this.selectedArea.updateWidth(newWidth);
+            this.selectedArea.updateHeight(newHeight);
+        }
+    }
+
+    private checkSquareSelection(): boolean {
+        return !!this.selectedArea && this.selectedArea.height != 0 && this.selectedArea.width != 0;
     }
 
     public onMouseUp(event: MouseEvent): void {
         if (this.mouseDrag) {
             this.mouseDrag = false;
-            this.addCurrentSelection();
+            if(this.checkSquareSelection()) {
+                this.addCurrentSelection();
+            } else {
+                this.clearSelectedArea();
+                this.clearCanvasSelection();
+            }
         }
     }
 
@@ -133,10 +145,15 @@ export class RectROISelector implements Selector<ROISelection2D> {
 
     public addCurrentSelection(): void {
         if (this.selectedArea) {
+            console.log("RectROISelector | addCurrentSelection");
             this.selections.set(this.currentSlice, this.selectedArea);
             this.stateChange.emit();
-            this.selectedArea = undefined;
+            this.clearSelectedArea();
         }
+    }
+
+    private clearSelectedArea() {
+        this.selectedArea = undefined;
     }
 
     public updateCurrentSlice(currentSliceId: number): void {
