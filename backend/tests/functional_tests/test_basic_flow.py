@@ -48,7 +48,8 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert len(slice_id) >= 1
 
     # Step 4. Get random scan
-    response = api_client.get('/api/v1/scans/random?category={}'.format(category_key))
+    response = api_client.get('/api/v1/scans/random?category={}'.format(category_key),
+                              headers={'Authentication-Token': user_token})
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
