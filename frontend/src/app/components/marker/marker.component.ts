@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild, HostListener, Renderer2} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs/Subject';
@@ -29,11 +29,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     @ViewChild('slider') slider: MatSlider;
 
-    @ViewChild('tooltip') tooltip: MatTooltip;
-
-    public has3dSelection: boolean;
-    public has2dSelection: boolean;
-    public hasArchivedSelections: boolean;
+    public selectionState: {isValid: boolean, is2d: boolean, hasArchive: boolean} = { isValid: false, is2d: false, hasArchive: false};
 
     public observableSliceRequest: Subject<number>;
 
@@ -51,13 +47,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     private updateSelectionState(): void {
-        this.hasArchivedSelections = this.selector.hasArchivedSelections();
-        this.has2dSelection = this.selector.hasSliceSelection();
-        this.has3dSelection = this.selector.hasFullSelection();
+        this.selectionState.hasArchive = this.selector.hasArchivedSelections();
+        this.selectionState.is2d = this.selector.hasSliceSelection();
+        this.selectionState.isValid = this.selector.hasValidSelection();
     }
 
     public get3dSelection(): SliceSelection[] {
-        this.selector.addCurrentSelection();
         this.selector.archiveSelections();
         this.updateSelectionState();
 
@@ -74,11 +69,15 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     ngOnInit() {
         console.log('Marker init');
-        console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider, ' tooltip ', this.tooltip);
+        console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
 
         this.slices = new Map<number, MarkerSlice>();
 
         this.selector.clearData();
+
+        this.selector.getStateChangeEmitter().subscribe(()=> {
+            this.updateSelectionState();
+        });
 
         this.initializeCanvas();
 
@@ -97,6 +96,8 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             this.selector.drawPreviousSelections();
             this.updateSelectionState();
         });
+
+
     }
 
     private initCanvasSelectionTool(): void {

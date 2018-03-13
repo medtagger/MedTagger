@@ -1,18 +1,21 @@
 <div class="marker-page">
     <div class="innerElement canvasInterface">
-        <app-marker-component #marker></app-marker-component>
+        <app-marker-component #marker (selectionStateNotification)="updateSelectionState()"></app-marker-component>
         <div class="button-row">
-            <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="!this.marker.hasArchivedSelections">
+            <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="!this.marker.selectionState.hasArchive">
                 Skip scan
             </button>
-            <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="this.marker.hasArchivedSelections">
+            <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="this.marker.selectionState.hasArchive">
                 Next scan
             </button>
-            <button mat-raised-button color="warn" [disabled]="!this.marker.has2dSelection"
+            <button mat-raised-button color="warn" [disabled]="!this.marker.selectionState.is2d"
                     (click)="remove2dSelection()">Delete current label
             </button>
-            <button mat-raised-button color="accent" [disabled]="!this.marker.has3dSelection" (click)="sendSelection()">
+            <button mat-raised-button color="accent" [disabled]="!this.marker.selectionState.isValid" (click)="sendCompleteLabel()">
                 Send label
+            </button>
+            <button mat-raised-button color="accent" (click)="sendEmptyLabel()">
+                Nothing to tag
             </button>
         </div>
     </div>

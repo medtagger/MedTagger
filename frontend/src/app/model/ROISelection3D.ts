@@ -5,7 +5,7 @@ import {ScanSelection} from './ScanSelection';
 export class ROISelection3D implements ScanSelection<ROISelection2D> {
     _selections: ROISelection2D[];
 
-    constructor(selections: ROISelection2D[]) {
+    constructor(selections?: ROISelection2D[]) {
         this._selections = selections;
     }
 
@@ -17,14 +17,14 @@ export class ROISelection3D implements ScanSelection<ROISelection2D> {
         return coordinatesArray;
     }
 
-    public toJSON(): { selections: SelectionData[] } {
-        // TODO: w jakiś elegancki sposób wyciągnięcie tego z widoku
-        const canvasSize = 600;
-        const jsonObject: { selections: SelectionData[] } = { selections: undefined };
+    toJSON(): Object {
+        let jsonObject: { selections: SelectionData[] } = {selections: undefined};
         jsonObject.selections = [];
-        this._selections.forEach((selection: ROISelection2D) => {
-            jsonObject.selections.push(selection.toJSON(canvasSize));
-        });
+        if (this._selections) {
+            this._selections.forEach((selection: ROISelection2D) => {
+                jsonObject.selections.push(selection.toJSON());
+            });
+        }
 
         return jsonObject;
     }
