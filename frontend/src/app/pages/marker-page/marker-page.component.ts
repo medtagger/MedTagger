@@ -21,7 +21,7 @@ import {Location} from '@angular/common';
 })
 export class MarkerPageComponent implements OnInit {
 
-    private static readonly SLICE_BATCH_SIZE = 25;
+    private static readonly SLICE_BATCH_SIZE = 10;
 
     @ViewChild(MarkerComponent) marker: MarkerComponent;
 
