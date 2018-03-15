@@ -66,10 +66,10 @@ export class LoginPageComponent implements OnInit {
     }
 
     public changePageMode(): void {
+        this.userForm.reset();
         if (this.loginPageMode === LoginPageMode.LOG_IN) {
             this.loginPageMode = LoginPageMode.REGISTER;
         } else if (this.loginPageMode === LoginPageMode.REGISTER) {
-            this.userForm.reset();
             this.loginPageMode = LoginPageMode.LOG_IN;
         } else {
             console.error('Unsupported login page mode!');
