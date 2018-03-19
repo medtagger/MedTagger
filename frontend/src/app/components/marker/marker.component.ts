@@ -4,7 +4,6 @@ import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs/Subject';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
-import {MatTooltip} from "@angular/material";
 
 @Component({
     selector: 'app-marker-component',

@@ -18,5 +18,8 @@
                 Nothing to tag
             </button>
         </div>
+        <div *ngIf="downloadingScanInProgress">
+            <mat-progress-spinner class="scanSpinner" mode="indeterminate" color="accent"></mat-progress-spinner>
+        </div>
     </div>
 </div>

@@ -22,6 +22,7 @@ import {Location} from '@angular/common';
 export class MarkerPageComponent implements OnInit {
 
     private static readonly SLICE_BATCH_SIZE = 10;
+    downloadingScanInProgress: boolean;
 
     @ViewChild(MarkerComponent) marker: MarkerComponent;
 
@@ -37,6 +38,7 @@ export class MarkerPageComponent implements OnInit {
 
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
+        this.downloadingScanInProgress = true;
 
         this.marker.setSelector(new RectROISelector(this.marker.getCanvas()));
 
@@ -51,6 +53,7 @@ export class MarkerPageComponent implements OnInit {
                 this.lastSliceID = slice.index;
             }
             this.marker.feedData(slice);
+            this.downloadingScanInProgress = false;
         });
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
