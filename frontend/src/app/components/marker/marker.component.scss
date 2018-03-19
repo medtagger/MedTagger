@@ -1,6 +1,7 @@
 @import '../../../app-theme.scss';
 
 $canvas-size: 600px;
+$slider-offset: 20px;
 
 #markerCanvas {
     width: $canvas-size;
@@ -16,7 +17,7 @@ $canvas-size: 600px;
 
 #markerSlider {
     position: absolute;
-    left: $canvas-size;
+    left: $canvas-size + $slider-offset;
     height: $canvas-size;
 }
 
