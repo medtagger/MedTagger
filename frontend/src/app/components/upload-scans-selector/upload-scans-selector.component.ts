@@ -80,7 +80,7 @@ export class UploadScansSelectorComponent {
     }
 
     onNativeInputFileSelect($event) {
-        this._files = $event.srcElement.files;
+        this._files = $event.target.files || $event.scrElement.files;
         this.prepareScans();
         this.onFileSelect.emit(this);
     }
