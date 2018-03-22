@@ -2,6 +2,7 @@
 import logging.config
 
 from sqlalchemy import exists
+from sqlalchemy.exc import IntegrityError
 
 from medtagger.database import db_session
 from medtagger.database.models import ScanCategory, Role
@@ -79,4 +80,8 @@ def apply_all_fixtures() -> None:
 
 
 if __name__ == '__main__':
-    apply_all_fixtures()
+    try:
+        apply_all_fixtures()
+    except IntegrityError:
+        logger.error('An error occurred while applying fixtures! It is highly possible that there was'
+                     'a race condition between multiple processes applying fixtures at the same time.')
