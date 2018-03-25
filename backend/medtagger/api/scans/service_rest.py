@@ -66,6 +66,7 @@ class Random(Resource):
     """Endpoint that returns random scan for labeling."""
 
     @staticmethod
+    @login_required
     @scans_ns.expect(serializers.args__random_scan)
     @scans_ns.marshal_with(serializers.out__scan)
     @scans_ns.doc(description='Returns random scan.')
@@ -76,7 +77,6 @@ class Random(Resource):
         category_key = args.category
         if not business.scan_category_is_valid(category_key):
             raise InvalidArgumentsException('Category "{}" is not available.'.format(category_key))
-
         return business.get_random_scan(category_key)._asdict()
 
 

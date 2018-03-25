@@ -19,7 +19,7 @@ from flask import Flask, current_app  # noqa
 from flask_cors import CORS  # noqa
 from flask_security import Security, SQLAlchemyUserDatastore  # noqa
 
-from medtagger.api import blueprint, web_socket  # noqa
+from medtagger.api import blueprint  # noqa
 from medtagger.config import AppConfiguration  # noqa
 from medtagger.clients.hbase_client import create_hbase_connection_pool  # noqa
 from medtagger.database import db  # noqa
@@ -32,9 +32,6 @@ from medtagger.api.scans.service_rest import scans_ns as scans_rest_ns  # noqa
 from medtagger.api.users.service import users_ns  # noqa
 from medtagger.api.auth.service import auth_ns  # noqa
 
-# Import all WebSocket services
-from medtagger.api.scans.service_web_socket import Slices as slices_websocket_ns  # noqa
-
 logger = logging.getLogger(__name__)
 
 # Load configuration
@@ -46,7 +43,6 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = configuration.get('api', 'secret_key', fallback='')
 app.register_blueprint(blueprint)
-web_socket.init_app(app)
 
 # Application config
 app.config['RESTPLUS_MASK_SWAGGER'] = False
@@ -60,14 +56,14 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security()
 security.init_app(app, user_datastore)
 
-if __name__ == '__main__':
-    with app.app_context():
-        create_hbase_connection_pool()
-        db.init_app(app)
-        current_app.login_manager.login_view = None
+with app.app_context():
+    create_hbase_connection_pool()
+    db.init_app(app)
+    current_app.login_manager.login_view = None
 
+if __name__ == '__main__':
     # Run the application
     host = configuration.get('api', 'host', fallback='localhost')
-    port = configuration.getint('api', 'port', fallback=51000)
+    port = configuration.getint('api', 'rest_port', fallback=51000)
     debug = configuration.getboolean('api', 'debug', fallback=True)
-    web_socket.run(app, host=host, port=port, debug=debug)
+    app.run(host=host, port=port, debug=debug)

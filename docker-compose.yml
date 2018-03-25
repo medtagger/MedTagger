@@ -45,13 +45,14 @@ services:
     ports:
       - 80:80
     depends_on:
-      - medtagger_backend_api
+      - medtagger_backend_rest
 
-  medtagger_backend_api:
-    image: medtagger_backend/api
+  medtagger_backend_rest:
+    image: medtagger_backend/rest
     environment:
       - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_PORT=51000
+      - MEDTAGGER__API_REST_PORT=51000
+      - MEDTAGGER__API_WEBSOCKET_PORT=51001
       - MEDTAGGER__API_DEBUG=1
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
       - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
@@ -62,22 +63,48 @@ services:
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: backend
-      dockerfile: Dockerfile_api
+      dockerfile: Dockerfile_rest
       args:
         - INSTALL_SYSTEM_DEPENDENCIES=${MEDTAGGER__BACKEND_INSTALL_SYSTEM_DEPENDENCIES}
     depends_on:
       - hbase
       - rabbitmq
       - postgres
-    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && python3.6 medtagger/api/app.py"
-    depends_on:
+      - medtagger_backend_websocket
       - medtagger_backend_worker
+    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_rest_production"
+
+  medtagger_backend_websocket:
+    image: medtagger_backend/websocket
+    environment:
+      - MEDTAGGER__API_HOST=0.0.0.0
+      - MEDTAGGER__API_REST_PORT=51000
+      - MEDTAGGER__API_WEBSOCKET_PORT=51001
+      - MEDTAGGER__API_DEBUG=1
+      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
+      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
+      - MEDTAGGER__HBASE_HOST=hbase
+      - MEDTAGGER__HBASE_PORT=9090
+      - MEDTAGGER__HBASE_REST_PORT=8080
+      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=25
+      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    build:
+      context: backend
+      dockerfile: Dockerfile_websocket
+      args:
+        - INSTALL_SYSTEM_DEPENDENCIES=${MEDTAGGER__BACKEND_INSTALL_SYSTEM_DEPENDENCIES}
+    depends_on:
+      - hbase
+      - rabbitmq
+      - postgres
+    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_websocket_production"
 
   medtagger_backend_worker:
     image: medtagger_backend/worker
     environment:
       - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_PORT=51000
+      - MEDTAGGER__API_REST_PORT=51000
+      - MEDTAGGER__API_WEBSOCKET_PORT=51001
       - MEDTAGGER__API_DEBUG=1
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
       - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
@@ -95,7 +122,7 @@ services:
       - hbase
       - rabbitmq
       - postgres
-    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && celery -A medtagger.workers worker --loglevel=info"
+    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_workers"
 
 volumes:
   hbase-data:
