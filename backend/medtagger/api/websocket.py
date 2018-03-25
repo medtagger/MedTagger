@@ -4,7 +4,7 @@ It is also a great entry point for running WebSocket's endpoints. To do so, you 
 
     $ python medtagger/api/websocket.py
 
-"""
+"""  # pylint: disable=duplicate-code;  This is one of two application entrypoints
 # pylint: disable=unused-import;  It's used by Flask
 # pylint: disable=wrong-import-position;  Python logging should be configured ASAP
 import logging.config

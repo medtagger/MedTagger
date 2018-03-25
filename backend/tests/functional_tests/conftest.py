@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 
 from medtagger.api import InvalidArgumentsException
-from medtagger.api.app import app
+from medtagger.api.rest import app
 from medtagger.database import Base, session
 from medtagger.database.fixtures import apply_all_fixtures
 from medtagger.clients.hbase_client import HBaseClient

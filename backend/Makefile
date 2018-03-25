@@ -60,6 +60,9 @@ install_system_dependencies__gdcm:
 		cmake -DGDCM_BUILD_SHARED_LIBS=ON -DGDCM_BUILD_APPLICATIONS=ON -DPYTHON_INCLUDE_DIR='$(PYTHON_INCLUDE_DIRECTORY)' -DPYTHON_LIBRARY='$(PYTHON_LIBRARY_DIRECTORY)' -DPYTHON_EXECUTABLE='$(PYTHON)' -DGDCM_INSTALL_PYTHONMODULE_DIR='$(PYTHON_SITE_PACKAGES)' -DGDCM_WRAP_PYTHON=ON ../GDCM-2.8.4;\
 		make;\
 		make install;\
+		cd ..;\
+		rm -rf _build_gdcm;\
+		rm -rf  GDCM-2.8.4;\
 	fi
 
 install_packages:

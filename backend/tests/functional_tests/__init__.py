@@ -1,7 +1,8 @@
 """Module for global methods that may be useful during application testing."""
 from typing import Any
 
-from medtagger.api.app import app, web_socket
+from medtagger.api.rest import app
+from medtagger.api.websocket import web_socket
 
 
 def get_api_client() -> Any:
