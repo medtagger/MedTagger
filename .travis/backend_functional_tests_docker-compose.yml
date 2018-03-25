@@ -22,7 +22,8 @@ services:
     image: medtagger_backend/functional_tests
     environment:
       - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_PORT=51000
+      - MEDTAGGER__API_REST_PORT=51000
+      - MEDTAGGER__API_WEBSOCKET_PORT=51001
       - MEDTAGGER__API_DEBUG=1
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
       - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres/medtagger
@@ -33,7 +34,7 @@ services:
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: ../backend
-      dockerfile: Dockerfile_api
+      dockerfile: Dockerfile_rest
       args:
         - INSTALL_SYSTEM_DEPENDENCIES=false
     command: /bin/bash -c "make install_dev_packages && make functional_tests_docker"

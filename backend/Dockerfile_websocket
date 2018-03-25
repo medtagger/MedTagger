@@ -27,6 +27,6 @@ ENV PYTHONPATH /medtagger_backend
 
 RUN pip install -r requirements.txt
 
-CMD ["python3.6", "medtagger/api/app.py"]
+EXPOSE 51001
+CMD ["make", "run_websocket_production"]
 
-EXPOSE 51000

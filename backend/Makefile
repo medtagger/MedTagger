@@ -6,7 +6,7 @@ VENV_SITE_PACKAGES = venv/lib/python3.6/site-packages
 PYTHON_INCLUDE_DIRECTORY = $(shell $(PYTHON) -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")
 PYTHON_LIBRARY_DIRECTORY = $(shell $(PYTHON) -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
 PYTHON_SITE_PACKAGES = $(shell $(PYTHON) -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
-PYTHON_GDCM_DIRECTORY = $(shell $(PYTHON) -c 'import os, gdcm; print(os.path.split(gdcm.__file__)[0])' 2>&1 || '')
+PYTHON_GDCM_DIRECTORY = $(shell $(PYTHON) -c 'import os, gdcm; print(os.path.split(gdcm.__file__)[0])' 2>/dev/null)
 SYSTEM_NAME = $(shell uname -s)
 
 # Tests configuration
@@ -15,7 +15,7 @@ MAX_CYCLOMATIC_COMPLEXITY = 5
 UNIT_TESTS_MODULE = tests/unit_tests
 UNIT_TEST = $(UNIT_TESTS_MODULE)
 FUNCTIONAL_TESTS_MODULE = tests/functional_tests
-FUNCTIONAL_TESTS_DOCKER_COMPOSE = ../.travis/backend_functional_tests_docker-compose.yml 
+FUNCTIONAL_TESTS_DOCKER_COMPOSE = ../.travis/backend_functional_tests_docker-compose.yml
 FUNCTIONAL_TEST = $(FUNCTIONAL_TESTS_MODULE)
 
 # Third party configuration files
@@ -23,18 +23,26 @@ PYLINT_CONFIG_FILE = .pylintrc
 PYLINT_UNIT_TESTS_CONFIG_FILE = .test.pylintrc
 
 #
-# Development
+# Development setup
 #
 
 venv:
 	virtualenv -p $(PYTHON) venv
-	cp -rf $(PYTHON_SITE_PACKAGES)/_gdcmswig.so $(VENV_SITE_PACKAGES) || echo "WARNING! GDCM not found" 
+	cp -rf $(PYTHON_SITE_PACKAGES)/_gdcmswig.so $(VENV_SITE_PACKAGES) || echo "WARNING! GDCM not found"
 	cp -rf $(PYTHON_SITE_PACKAGES)/gdcm.py $(VENV_SITE_PACKAGES) || echo "WARNING! GDCM not found"
 	cp -rf $(PYTHON_SITE_PACKAGES)/gdcmswig.py $(VENV_SITE_PACKAGES) || echo "WARNING! GDCM not found"
 	venv/bin/pip install -r requirements.txt
 	venv/bin/pip install -r requirements.dev.txt
 
 install_system_dependencies:
+	@echo "Installing GDCM..."
+	@if [ -z $(PYTHON_GDCM_DIRECTORY) ]; then\
+		make install_system_dependencies__gdcm;\
+	else\
+		echo "GDCM has already been installed!";\
+	fi
+
+install_system_dependencies__gdcm:
 	@if [ $(SYSTEM_NAME) = Darwin ]; then\
 		brew install gdcm --with-python3;\
 		cp -rf $(PYTHON_GDCM_DIRECTORY)/_gdcmswig.so $(PYTHON_SITE_PACKAGES);\
@@ -43,6 +51,7 @@ install_system_dependencies:
 	else\
 		apt-get update;\
 		apt-get install -y cmake swig;\
+		cd /tmp;\
 		wget https://github.com/malaterre/GDCM/archive/v2.8.4.tar.gz;\
 		tar xvf v2.8.4.tar.gz;\
 		rm v2.8.4.tar.gz;\
@@ -53,6 +62,7 @@ install_system_dependencies:
 		make install;\
 		cd ..;\
 		rm -rf _build_gdcm;\
+		rm -rf  GDCM-2.8.4;\
 	fi
 
 install_packages:
@@ -61,8 +71,21 @@ install_packages:
 install_dev_packages:
 	$(PYTHON) -m pip install -r requirements.dev.txt
 
-run_api:
-	PYTHONPATH=`pwd` $(PYTHON) medtagger/api/app.py
+#
+# Running MedTagger
+#
+
+run_rest:
+	PYTHONPATH=`pwd` $(PYTHON) medtagger/api/rest.py
+
+run_rest_production:
+	PYTHONPATH=`pwd` uwsgi --http :51000 --gevent 1000 --master --wsgi-file medtagger/api/rest.py --callable app --processes 4
+
+run_websocket:
+	PYTHONPATH=`pwd` $(PYTHON) medtagger/api/websocket.py
+
+run_websocket_production:
+	PYTHONPATH=`pwd` uwsgi --http :51001 --gevent 1000 --http-websockets --master --wsgi-file medtagger/api/websocket.py --callable app
 
 run_workers:
 	PYTHONPATH=`pwd` celery -A medtagger.workers worker --loglevel=info

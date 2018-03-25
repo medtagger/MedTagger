@@ -17,7 +17,8 @@ Current configuration variables are:
 | Environment variable name               | Default value                                              |
 | --------------------------------------- | ---------------------------------------------------------- |
 | `MEDTAGGER__API_HOST`                   | 0.0.0.0                                                    |
-| `MEDTAGGER__API_PORT`                   | 51000                                                      |
+| `MEDTAGGER__API_REST_PORT`              | 51000                                                      |
+| `MEDTAGGER__API_WEBSOCKET_PORT`         | 51001                                                      |
 | `MEDTAGGER__API_DEBUG`                  | 1                                                          |
 | `MEDTAGGER__API_SECRET_KEY`             | SECRET_KEY                                                 |
 | `MEDTAGGER__DB_DATABASE_URI`            | postgresql://medtagger_user:MedTa99er!@localhost/medtagger |

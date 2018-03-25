@@ -6,5 +6,5 @@
 export const environment = {
     production: false,
     API_URL: 'http://localhost:51000/api/v1',
-    WEBSOCKET_URL: 'http://localhost:51000',
+    WEBSOCKET_URL: 'http://localhost:51001',
 };

@@ -40,17 +40,26 @@ You can now run all dependencies like HBase, PostgreSQL and RabbitMQ with just o
 
 Now, your backend is ready to be used, so let's try to run it!
 
-Open two separate windows with activated virtual environment. In the first one we'll run Celery workers which are
+Open three separate windows with activated virtual environment. In the first one we'll run Celery workers which are
 responsible for adding and converting Dicoms to our HBase. To run it, please execute such command:
 
 ```bash
+$ . ./devenv.sh
 (venv) $ make run_workers
 ```
 
-In the second window we'll open our Flask REST API with WebSockets server. To do so, please execute:
+In the second window we'll open our Flask REST API server. To do so, please execute:
 
 ```bash
-(venv) $ make run_api
+$ . ./devenv.sh
+(venv) $ make run_rest
+```
+
+And in the third window we'll open WebSocket server:
+
+```bash
+$ . ./devenv.sh
+(venv) $ make run_websocket
 ```
 
 And that's all! Everything should be fine and Swagger for our REST API should be available on

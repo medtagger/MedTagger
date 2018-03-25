@@ -21,10 +21,7 @@ class UsersRepository(object):
     @staticmethod
     def get_all_users() -> List[User]:
         """Return list of all users."""
-        with db_session() as session:
-            users = session.query(User).order_by(User.id).all()
-
-        return users
+        return User.query.order_by(User.id).all()
 
     @staticmethod
     def get_user_by_email(user_email: str) -> Optional[User]:
@@ -32,13 +29,9 @@ class UsersRepository(object):
 
         :return Optional of User
         """
-        with db_session() as session:
-            user = session.query(User).filter(User.email == user_email).first()
-        return user
+        return User.query.filter(User.email == user_email).first()
 
     @staticmethod
     def get_user_by_id(user_id: int) -> User:
         """Get user with given id."""
-        with db_session() as session:
-            user = session.query(User).filter(User.id == user_id).one()
-        return user
+        return User.query.filter(User.id == user_id).one()

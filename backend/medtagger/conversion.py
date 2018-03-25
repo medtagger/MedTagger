@@ -16,7 +16,7 @@ def convert_slice_to_normalized_8bit_array(dicom_file: FileDataset) -> np.ndarra
     intercept = dicom_file.RescaleIntercept
     slope = dicom_file.RescaleSlope
 
-    if dicom_file.RescaleType != 'normalized':
+    if hasattr(dicom_file, 'RescaleType') and dicom_file.RescaleType != 'normalized':
         hu_units_array = convert_to_hounsfield_units(pixel_array, intercept, slope)
         normalized_hu_array = normalize(hu_units_array)
         pixel_array = normalized_hu_array

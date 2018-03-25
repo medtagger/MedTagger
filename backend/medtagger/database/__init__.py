@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from medtagger.config import AppConfiguration
 
 
-class DataLabelingBase(object):  # pylint: disable=too-few-public-methods
+class MedTaggerBase(object):  # pylint: disable=too-few-public-methods
     """Base class for all of the models."""
 
     def save(self) -> None:
@@ -37,7 +37,7 @@ convention = {
 
 metadata = MetaData(naming_convention=convention)
 
-Base = declarative_base(cls=DataLabelingBase, metadata=metadata)
+Base = declarative_base(cls=MedTaggerBase, metadata=metadata)
 Base.query = session.query_property()
 
 

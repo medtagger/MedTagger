@@ -4,7 +4,7 @@ import logging
 import os
 import argparse
 import subprocess
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 
 
 logging.basicConfig(level=logging.INFO)
@@ -21,9 +21,13 @@ def get_root_dir(path):
 
 def run(command):
     logging.info('Let\'s run the CI!')
-    p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    print('=============================')
+    print('        TESTS OUTPUT         ')
+    print('=============================')
     for stdout_line in iter(p.stdout.readline, ""):
-        print(stdout_line, end="") 
+        print(stdout_line, end="")
+    print('=============================')
     p.stdout.close()
     return_code = p.wait()
     exit(return_code)
