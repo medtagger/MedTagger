@@ -4,8 +4,8 @@ from functools import wraps
 
 from flask import g
 from flask_httpauth import HTTPTokenAuth
-from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired
+from passlib.apps import custom_app_context as pwd_context
 
 from medtagger.config import AppConfiguration
 from medtagger.database.models import User

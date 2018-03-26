@@ -2,8 +2,8 @@ const io = require('socket.io-client');
 const request = require('request');
 
 // Test definition
-const MEDTAGGER_USER = 'test2';
-const MEDTAGGER_PASSWORD = 'asdfasdf'
+const MEDTAGGER_USER = 'admin@medtagger.com';
+const MEDTAGGER_PASSWORD = 'medtagger1'
 const MEDTAGGER_INSTANCE_REST_URL = 'http://localhost:51000';
 const MEDTAGGER_INSTANCE_WEBSOCKET_URL = 'http://localhost:51001';
 const SCAN_CATEGORY = 'KIDNEYS';
