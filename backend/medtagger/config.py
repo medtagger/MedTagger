@@ -22,10 +22,12 @@ class AppConfiguration(object):
         variable_name = 'MEDTAGGER__' + namespace.upper() + '_' + key.upper()
         return os.environ.get(variable_name, fallback)
 
-    def getint(self, namespace: str, key: str, fallback: int = 0) -> int:
+    @staticmethod
+    def getint(namespace: str, key: str, fallback: int = 0) -> int:
         """Return integer value for given key in namespace."""
-        return int(self.get(namespace, key, fallback))
+        return int(AppConfiguration.get(namespace, key, fallback))
 
-    def getboolean(self, namespace: str, key: str, fallback: bool = False) -> bool:
+    @staticmethod
+    def getboolean(namespace: str, key: str, fallback: bool = False) -> bool:
         """Return boolean value for given key in namespace."""
-        return bool(self.getint(namespace, key, fallback))
+        return bool(AppConfiguration.getint(namespace, key, fallback))

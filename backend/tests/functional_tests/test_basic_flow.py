@@ -3,7 +3,7 @@ import json
 from typing import Any
 
 from medtagger.database.models import LabelStatus
-from tests.functional_tests import get_api_client, get_web_socket_client
+from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
@@ -14,7 +14,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Get all categories
-    response = api_client.get('/api/v1/scans/categories')
+    response = api_client.get('/api/v1/scans/categories', headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, list)
@@ -26,8 +26,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     # Step 2. Add Scan to the system
     payload = {'category': category_key, 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
-                               headers={'content-type': 'application/json',
-                                        'Authentication-Token': user_token})
+                               headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -39,7 +38,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
         response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
             'image': (image, 'slice_1.dcm'),
-        }, content_type='multipart/form-data')
+        }, content_type='multipart/form-data', headers=get_headers(token=user_token))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -49,7 +48,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
 
     # Step 4. Get random scan
     response = api_client.get('/api/v1/scans/random?category={}'.format(category_key),
-                              headers={'Authentication-Token': user_token})
+                              headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -78,7 +77,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
         'labeling_time': 12.34,
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
-                               headers={'content-type': 'application/json', 'Authentication-Token': user_token})
+                               headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -87,7 +86,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert len(label_id) >= 1
 
     # Step 7. Get random label for validation
-    response = api_client.get('/api/v1/labels/random')
+    response = api_client.get('/api/v1/labels/random', headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -107,7 +106,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     # Step 8. Verify such label
     payload = {'status': LabelStatus.VALID.value}
     response = api_client.put('/api/v1/labels/{}/status'.format(label_id), data=json.dumps(payload),
-                              headers={'content-type': 'application/json'})
+                              headers=get_headers(token=user_token, json=True))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -115,5 +114,5 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert json_response['status'] == LabelStatus.VALID.value
 
     # Step 9. Try to get another label for validation
-    response = api_client.get('/api/v1/labels/random')
+    response = api_client.get('/api/v1/labels/random', headers=get_headers(token=user_token))
     assert response.status_code == 404

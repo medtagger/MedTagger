@@ -1,11 +1,11 @@
 """Module responsible for definition of Core service."""
 from typing import Any
 
-from flask_security import login_required, roles_required
 from flask_restplus import Resource
 
 from medtagger.api import api
 from medtagger.api.core import business, serializers
+from medtagger.api.security import login_required, role_required
 
 core_ns = api.namespace('core', 'Core methods')
 
@@ -41,7 +41,7 @@ class CheckAuthorization(Resource):
 
     @staticmethod
     @login_required
-    @roles_required('volunteer')
+    @role_required('volunteer', 'doctor', 'admin')
     def get() -> Any:
         """Endpoint to check if user has properly set role."""
         return {}, 204

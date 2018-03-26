@@ -7,7 +7,8 @@ from flask import Blueprint
 from flask_restplus import Api
 from flask_socketio import SocketIO, emit
 
-from medtagger.api.exceptions import InvalidArgumentsException, NotFoundException, BusinessLogicException
+from medtagger.api.exceptions import UnauthorizedException, InvalidArgumentsException, NotFoundException, \
+    BusinessLogicException
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,18 @@ def rest_business_logic_error_handler(exception: Exception) -> Tuple[Dict, int]:
     logger.warning(traceback.format_exc())
     details = str(exception)
     return {'message': 'Business logic error.', 'details': details}, 500
+
+
+@api.errorhandler(UnauthorizedException)
+def rest_unauthorized_error_handler(exception: Exception) -> Tuple[Dict, int]:
+    """Handle unauthorized errors.
+
+    :param exception: Python Exception
+    :return: tuple with response and status code
+    """
+    logger.warning(traceback.format_exc())
+    details = str(exception)
+    return {'message': 'You are not authorized to use this method.', 'details': details}, 401
 
 
 @api.errorhandler(NotFoundException)

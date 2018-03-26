@@ -17,7 +17,6 @@ import logging.config
 logging.config.fileConfig('logging.conf')
 from flask import Flask, current_app  # noqa
 from flask_cors import CORS  # noqa
-from flask_security import Security, SQLAlchemyUserDatastore  # noqa
 
 from medtagger.api import blueprint  # noqa
 from medtagger.config import AppConfiguration  # noqa
@@ -51,15 +50,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = configuration.get('db', 'database_uri')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['RESTPLUS_VALIDATE'] = True
 
-# Prepare adapter for user management
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security()
-security.init_app(app, user_datastore)
-
 with app.app_context():
     create_hbase_connection_pool()
     db.init_app(app)
-    current_app.login_manager.login_view = None
 
 if __name__ == '__main__':
     # Run the application

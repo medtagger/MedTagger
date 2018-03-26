@@ -1,13 +1,13 @@
 """Module responsible for definition of Scans service available via HTTP REST API."""
 from typing import Any
 from flask import request
-from flask_login import login_required
 from flask_restplus import Resource
 
 from medtagger.types import ScanID
 from medtagger.api import api
 from medtagger.api.exceptions import InvalidArgumentsException
 from medtagger.api.scans import business, serializers
+from medtagger.api.security import login_required, role_required
 
 scans_ns = api.namespace('scans', 'Methods related with scans')
 
@@ -18,6 +18,7 @@ class Scans(Resource):
 
     @staticmethod
     @login_required
+    @role_required('doctor', 'admin')
     @scans_ns.expect(serializers.in__new_scan)
     @scans_ns.marshal_with(serializers.out__new_scan)
     @scans_ns.doc(description='Creates empty scan.')
@@ -39,6 +40,7 @@ class ScanCategories(Resource):
     """Endpoint that manages categories."""
 
     @staticmethod
+    @login_required
     @scans_ns.marshal_with(serializers.inout__scan_category)
     @scans_ns.doc(description='Returns all available scan categories.')
     @scans_ns.doc(responses={200: 'Success'})
@@ -47,6 +49,8 @@ class ScanCategories(Resource):
         return business.get_available_scan_categories()
 
     @staticmethod
+    @login_required
+    @role_required('doctor', 'admin')
     @scans_ns.expect(serializers.inout__scan_category)
     @scans_ns.marshal_with(serializers.inout__scan_category)
     @scans_ns.doc(description='Returns all available scan categories.')
@@ -107,6 +111,7 @@ class Scan(Resource):
     """Endpoint that returns scan for the given scan id."""
 
     @staticmethod
+    @login_required
     @scans_ns.marshal_with(serializers.out__scan)
     @scans_ns.doc(description='Returns scan with given scan_id.')
     @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
@@ -121,6 +126,7 @@ class ScanSlices(Resource):
     """Endpoint that allow for uploading Slices to given Scan."""
 
     @staticmethod
+    @login_required
     @scans_ns.marshal_with(serializers.out__new_slice)
     @scans_ns.doc(description='Returns newly created Slice.')
     @scans_ns.doc(responses={201: 'Success', 400: 'Invalid arguments'})

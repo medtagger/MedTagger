@@ -15,8 +15,5 @@ export class HomePageComponent implements OnInit {
     }
 
     ngOnInit() {
-        if (!sessionStorage.getItem('authenticationToken')) {
-            this.routerService.navigate(['login']);
-        }
     }
 }

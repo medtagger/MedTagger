@@ -2,11 +2,10 @@
 from typing import Any
 
 from flask import request
-from flask_security import login_required
 from flask_restplus import Resource
 
 from medtagger.api import api
-from medtagger.api.auth.business import create_user, sign_in_user, sign_out_user
+from medtagger.api.auth.business import create_user, sign_in_user
 from medtagger.api.auth import serializers
 
 auth_ns = api.namespace('auth', 'Auth methods')
@@ -38,16 +37,3 @@ class SignIn(Resource):
         sign_in = request.json
         token = sign_in_user(sign_in['email'], sign_in['password'])
         return {"token": token}, 200
-
-
-@auth_ns.route('/sign-out')
-class SignOut(Resource):
-    """Sign out endpoint."""
-
-    @staticmethod
-    @login_required
-    @api.doc(responses={204: 'Signed out'})
-    def post() -> Any:
-        """Sign out the user."""
-        sign_out_user()
-        return {}, 204

@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
     constructor(private router: Router, private activatedRoute: ActivatedRoute) {
         router.events.subscribe(() => {
             this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));
+            console.log(this.currentUser);
         })
 
     };
@@ -37,11 +38,11 @@ export class AppComponent implements OnInit {
     }
 
     get isLoginPage(): boolean {
-        return this.router.url === '/login';
+        return this.router.url.startsWith('/login');
     }
 
     public logOut(): void {
-        sessionStorage.removeItem('authenticationToken');
+        sessionStorage.removeItem('authorizationToken');
         sessionStorage.removeItem('userInfo');
         this.router.navigate(['login']);
     }

@@ -1,12 +1,23 @@
 import {Injectable} from "@angular/core";
 import {environment} from "../../environments/environment";
 import {UserInfo} from "../model/UserInfo";
-import {Http} from "@angular/http";
-import {AuthenticationHeader} from "./authentication-header";
+import {HttpClient} from '@angular/common/http';
+
+interface LogInResponse {
+    token: string;
+}
+
+interface UserInfoResponse {
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+}
 
 @Injectable()
 export class AccountService {
-    constructor(private http: Http, private authenticationHeader: AuthenticationHeader) {}
+    constructor(private http: HttpClient) {}
 
     public register(email: string, password: string, firstName: string, lastName: string): Promise<void> {
         let url = environment.API_URL + '/auth/register';
@@ -36,10 +47,10 @@ export class AccountService {
             'password': password
         };
         return new Promise((resolve, reject) => {
-            this.http.post(url, payload).toPromise()
+            this.http.post<LogInResponse>(url, payload).toPromise()
                 .then(response => {
                     console.log("AccountService | logIn | response: ", response);
-                    resolve(response.json().token);
+                    resolve(response.token);
                 })
                 .catch(error => {
                     console.log("AccountService | logIn | error: ", error);
@@ -51,13 +62,10 @@ export class AccountService {
     public getCurrentUserInfo(): Promise<UserInfo> {
         let url = environment.API_URL + '/users/info';
         return new Promise((resolve, reject) => {
-            this.http.get(url, {
-                headers: this.authenticationHeader.create()
-            }).toPromise()
+            this.http.get<UserInfoResponse>(url).toPromise()
                 .then(response => {
                     console.log("AccountService | getCurrentUserInfo | response: ", response);
-                    let json = response.json();
-                    let userInfo = new UserInfo(json.id, json.email, json.firstName, json.lastName, json.role);
+                    let userInfo = new UserInfo(response.id, response.email, response.firstName, response.lastName, response.role);
                     resolve(userInfo);
                 })
                 .catch(error => {
@@ -68,6 +76,6 @@ export class AccountService {
     }
 
     public isLoggedIn(): boolean {
-        return !!(sessionStorage.getItem('userInfo') && sessionStorage.getItem('authenticationToken'))
+        return !!(sessionStorage.getItem('userInfo') && sessionStorage.getItem('authorizationToken'))
     }
 }
