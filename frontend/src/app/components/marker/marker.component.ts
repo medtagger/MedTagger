@@ -42,6 +42,14 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         return this._currentSlice;
     }
 
+    public setDownloadScanInProgress(isInProgress: boolean) {
+        this.downloadingScanInProgress = isInProgress;
+    }
+
+    public setDownloadSlicesInProgress(isInProgress: boolean) {
+        this.downloadingSlicesInProgress = isInProgress;
+    }
+
     public removeCurrentSelection(): void {
         this.selector.removeCurrentSelection();
         this.updateSelectionState();

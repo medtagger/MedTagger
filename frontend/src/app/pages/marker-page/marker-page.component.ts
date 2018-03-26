@@ -38,7 +38,6 @@ export class MarkerPageComponent implements OnInit {
 
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
-        this.marker.downloadingScanInProgress = true;
 
         this.marker.setSelector(new RectROISelector(this.marker.getCanvas()));
 
@@ -53,25 +52,27 @@ export class MarkerPageComponent implements OnInit {
                 this.lastSliceID = slice.index;
             }
             this.marker.feedData(slice);
-            this.marker.downloadingSlicesInProgress = false;
-            this.marker.downloadingScanInProgress = false;
-            this.indicateNewScanAppeared();
+            if (this.marker.downloadingScanInProgress === true) {
+                this.indicateNewScanAppeared();
+            }
+            this.marker.setDownloadSlicesInProgress(false);
+            this.marker.setDownloadScanInProgress(false);
         });
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
             if (isObserverHooked) {
                 this.marker.observableSliceRequest.subscribe((sliceRequest: number) => {
                     console.log('MarkerPage | observable sliceRequest: ', sliceRequest);
-                    this.marker.downloadingSlicesInProgress = true;
+                    this.marker.setDownloadSlicesInProgress(true);
                     let count = MarkerPageComponent.SLICE_BATCH_SIZE;
                     if (sliceRequest + count > this.scan.numberOfSlices) {
                         count = this.scan.numberOfSlices - sliceRequest;
-                        this.marker.downloadingSlicesInProgress = false;
+                        this.marker.setDownloadSlicesInProgress(false);
                     }
                     if (sliceRequest < 0) {
                         count = count + sliceRequest;
                         sliceRequest = 0;
-                        this.marker.downloadingSlicesInProgress = false;
+                        this.marker.setDownloadSlicesInProgress(false);
                     }
                     this.scanService.requestSlices(this.scan.scanId, sliceRequest, count);
                 });
@@ -80,7 +81,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private requestScan(): void {
-      this.marker.downloadingScanInProgress = true;
+      this.marker.setDownloadScanInProgress(true);
         this.scanService.getRandomScan(this.category).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -90,12 +91,11 @@ export class MarkerPageComponent implements OnInit {
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
                 this.startMeasuringLabelingTime();
                 this.scanService.requestSlices(scan.scanId, begin, count);
-                this.marker.downloadingScanInProgress = false;
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);
-                this.marker.downloadingScanInProgress = false;
-                this.marker.downloadingSlicesInProgress = false;
+                this.marker.setDownloadScanInProgress(false);
+                this.marker.setDownloadSlicesInProgress(false);
                 this.dialogService
                     .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this category!', 'Go back')
                     .afterClosed()
@@ -106,7 +106,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
-        this.marker.downloadingScanInProgress = true;
+        this.marker.setDownloadScanInProgress(true);
         this.marker.prepareForNewScan();
         this.requestScan();
     }
