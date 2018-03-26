@@ -13,6 +13,7 @@ import {SliceSelection} from '../../model/SliceSelection';
 export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     currentImage: HTMLImageElement;
+    downloadingScanInProgress = false;
 
     @ViewChild('image')
     set viewImage(viewElement: ElementRef) {

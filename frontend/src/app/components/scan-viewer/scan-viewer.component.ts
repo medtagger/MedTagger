@@ -5,7 +5,6 @@ import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
 import {SliceSelection} from '../../model/SliceSelection';
-import {Subscriber} from "rxjs/Subscriber";
 
 @Component({
     selector: 'app-scan-viewer',
@@ -130,7 +129,6 @@ export class ScanViewerComponent implements OnInit {
             console.log('ScanViewer init | slider change: ', sliderValue);
 
             this.selector.updateCurrentSlice(sliderValue);
-
             this.requestSlicesIfNeeded(sliderValue);
 
             this.changeMarkerImage(sliderValue);

@@ -2,6 +2,7 @@
 
 $canvas-size: 600px;
 $slider-offset: 20px;
+$spinner-radius: 50px;
 
 #markerCanvas {
     width: $canvas-size;
@@ -13,6 +14,12 @@ $slider-offset: 20px;
 #markerBackgroundImage {
     @extend #markerCanvas;
     background-color: grey;
+}
+
+#markerSpinner {
+    @extend #markerCanvas;
+    left: $canvas-size / 3 + $spinner-radius;
+    top: $canvas-size / 3 + $spinner-radius;
 }
 
 #markerSlider {

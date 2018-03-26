@@ -30,7 +30,6 @@ export class MarkerPageComponent implements OnInit {
     category: string;
     lastSliceID = 0;
     startTime: Date;
-    downloadingScanInProgress = false;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar) {
@@ -39,7 +38,7 @@ export class MarkerPageComponent implements OnInit {
 
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
-        this.downloadingScanInProgress = true;
+        this.marker.downloadingScanInProgress = true;
 
         this.marker.setSelector(new RectROISelector(this.marker.getCanvas()));
 
@@ -53,13 +52,9 @@ export class MarkerPageComponent implements OnInit {
             if (slice.index > this.lastSliceID) {
                 this.lastSliceID = slice.index;
             }
-            new Promise((resolve => {
-                this.marker.feedData(slice);
-                resolve();
-            })).then(() => {
-                this.downloadingScanInProgress = false;
-                this.indicateNewScanAppeared();
-          });
+            this.marker.feedData(slice);
+            this.marker.downloadingScanInProgress = false;
+            this.indicateNewScanAppeared();
         });
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
@@ -81,7 +76,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private requestScan(): void {
-      this.downloadingScanInProgress = true;
+      this.marker.downloadingScanInProgress = true;
         this.scanService.getRandomScan(this.category).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -91,7 +86,7 @@ export class MarkerPageComponent implements OnInit {
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
                 this.startMeasuringLabelingTime();
                 this.scanService.requestSlices(scan.scanId, begin, count);
-                this.downloadingScanInProgress = false;
+                this.marker.downloadingScanInProgress = false;
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);
@@ -105,7 +100,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
-        this.downloadingScanInProgress = true;
+        this.marker.downloadingScanInProgress = true;
         this.marker.prepareForNewScan();
         this.requestScan();
     }
@@ -150,6 +145,6 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private indicateNewScanAppeared(): void {
-      this.snackBar.open('New scan has been loaded!', ' ', {duration: 2000,});
+      this.snackBar.open('New scan has been loaded', '', {duration: 2000,});
     }
 }
