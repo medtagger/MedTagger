@@ -9,8 +9,9 @@ import {ROISelection3D} from '../../model/ROISelection3D';
 import {Response} from '@angular/http';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
-import {DialogService} from "../../services/dialog.service";
+import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
+import {MatSnackBar} from '@angular/material';
 
 
 @Component({
@@ -22,7 +23,6 @@ import {Location} from '@angular/common';
 export class MarkerPageComponent implements OnInit {
 
     private static readonly SLICE_BATCH_SIZE = 10;
-    downloadingScanInProgress: boolean;
 
     @ViewChild(MarkerComponent) marker: MarkerComponent;
 
@@ -30,9 +30,10 @@ export class MarkerPageComponent implements OnInit {
     category: string;
     lastSliceID = 0;
     startTime: Date;
+    downloadingScanInProgress = false;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private location: Location) {
+                private location: Location, private snackBar: MatSnackBar) {
         console.log('MarkerPage constructor', this.marker);
     }
 
@@ -52,8 +53,13 @@ export class MarkerPageComponent implements OnInit {
             if (slice.index > this.lastSliceID) {
                 this.lastSliceID = slice.index;
             }
-            this.marker.feedData(slice);
-            this.downloadingScanInProgress = false;
+            new Promise((resolve => {
+                this.marker.feedData(slice);
+                resolve();
+            })).then(() => {
+                this.downloadingScanInProgress = false;
+                this.indicateNewScanAppeared();
+          });
         });
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
@@ -75,6 +81,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private requestScan(): void {
+      this.downloadingScanInProgress = true;
         this.scanService.getRandomScan(this.category).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -84,11 +91,12 @@ export class MarkerPageComponent implements OnInit {
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
                 this.startMeasuringLabelingTime();
                 this.scanService.requestSlices(scan.scanId, begin, count);
+                this.downloadingScanInProgress = false;
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);
                 this.dialogService
-                    .openInfoDialog("Nothing to do here!", "No more Scans available for you in this category!", "Go back")
+                    .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this category!', 'Go back')
                     .afterClosed()
                     .subscribe(() => {
                         this.location.back();
@@ -97,6 +105,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
+        this.downloadingScanInProgress = true;
         this.marker.prepareForNewScan();
         this.requestScan();
     }
@@ -121,7 +130,7 @@ export class MarkerPageComponent implements OnInit {
             })
             .catch((errorResponse: Error) => {
                 this.dialogService
-                    .openInfoDialog("Error", "Cannot send selection", "Ok");
+                    .openInfoDialog('Error', 'Cannot send selection', 'Ok');
             });
         this.startMeasuringLabelingTime();
         return;
@@ -137,6 +146,10 @@ export class MarkerPageComponent implements OnInit {
 
     private getLabelingTimeInSeconds(startTime: Date): number {
       const endTime = new Date();
-      return (endTime.getTime() - startTime.getTime())/1000.0;
+      return (endTime.getTime() - startTime.getTime()) / 1000.0;
+    }
+
+    private indicateNewScanAppeared(): void {
+      this.snackBar.open('New scan has been loaded!', ' ', {duration: 2000,});
     }
 }
