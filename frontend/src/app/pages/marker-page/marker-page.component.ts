@@ -53,6 +53,7 @@ export class MarkerPageComponent implements OnInit {
                 this.lastSliceID = slice.index;
             }
             this.marker.feedData(slice);
+            this.marker.downloadingSlicesInProgress = false;
             this.marker.downloadingScanInProgress = false;
             this.indicateNewScanAppeared();
         });
@@ -69,6 +70,7 @@ export class MarkerPageComponent implements OnInit {
                         count = count + sliceRequest;
                         sliceRequest = 0;
                     }
+                    this.marker.downloadingSlicesInProgress = true;
                     this.scanService.requestSlices(this.scan.scanId, sliceRequest, count);
                 });
             }
@@ -90,6 +92,7 @@ export class MarkerPageComponent implements OnInit {
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);
+                this.marker.downloadingScanInProgress = false;
                 this.dialogService
                     .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this category!', 'Go back')
                     .afterClosed()

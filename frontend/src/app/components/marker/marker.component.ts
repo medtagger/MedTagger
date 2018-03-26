@@ -14,6 +14,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     currentImage: HTMLImageElement;
     downloadingScanInProgress = false;
+    downloadingSlicesInProgress = false;
 
     @ViewChild('image')
     set viewImage(viewElement: ElementRef) {
@@ -68,7 +69,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     private hookUpStateChangeSubscription(): void {
-        this.selector.getStateChangeEmitter().subscribe(()=> {
+        this.selector.getStateChangeEmitter().subscribe(() => {
             console.log('Marker | getStateChange event from selector!');
             this.updateSelectionState();
         });
