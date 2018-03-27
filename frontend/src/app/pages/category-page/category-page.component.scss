@@ -4,7 +4,13 @@
 
 .title-row {
     margin-top: 3em;
-    font-size: 1.5em;
+    font-size: 2.5em;
+}
+
+#failureIcon {
+  font-size: 1em;
+  height: 50px;
+  width: 50px;
 }
 
 .button-row {
@@ -23,3 +29,10 @@
     width: 100px;
 }
 
+#categoriesSpinner {
+  margin-top: 3em;
+}
+
+#back-button {
+  font-size: 1.5em;
+}
