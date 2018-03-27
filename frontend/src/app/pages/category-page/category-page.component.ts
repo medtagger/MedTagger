@@ -25,6 +25,7 @@ export class CategoryPageComponent implements OnInit {
             for (const category of categories) {
                 this.iconRegistry.addSvgIcon(category.key, this.sanitizer.bypassSecurityTrustResourceUrl(category.imagePath));
             }
+            this.downloadingCategoriesInProgress = false;
         }, () => {
             this.downloadingCategoriesInProgress = false;
             this.snackBar.open('There was an error while downloading categories', 'Close', {
