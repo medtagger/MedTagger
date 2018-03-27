@@ -1,5 +1,16 @@
 version: '3'
+
 services:
+  reverse-proxy:
+    image: traefik
+    command: --configFile=/var/traefik/traefik.toml
+    ports:
+      - 80:80
+      - 7128:8080
+    volumes:
+      - $PWD/traefik.toml:/var/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+
   hbase:
     image: dajobe/hbase
     volumes:

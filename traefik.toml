@@ -1,0 +1,16 @@
+[traefikLog]
+filePath = "/path/to/traefik.log"
+
+[accessLog]
+
+logLevel = "DEBUG"
+
+[api]
+dashboard = true
+debug = true
+address = ":7128"
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "docker.localhost"
+watch = true
