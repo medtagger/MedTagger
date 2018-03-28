@@ -4,7 +4,6 @@ import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs/Subject';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
-import {MatTooltip} from "@angular/material";
 
 @Component({
     selector: 'app-marker-component',
@@ -14,6 +13,8 @@ import {MatTooltip} from "@angular/material";
 export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     currentImage: HTMLImageElement;
+    downloadingScanInProgress = false;
+    downloadingSlicesInProgress = false;
 
     @ViewChild('image')
     set viewImage(viewElement: ElementRef) {
@@ -39,6 +40,14 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     get currentSlice() {
         return this._currentSlice;
+    }
+
+    public setDownloadScanInProgress(isInProgress: boolean) {
+        this.downloadingScanInProgress = isInProgress;
+    }
+
+    public setDownloadSlicesInProgress(isInProgress: boolean) {
+        this.downloadingSlicesInProgress = isInProgress;
     }
 
     public removeCurrentSelection(): void {
@@ -68,7 +77,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     private hookUpStateChangeSubscription(): void {
-        this.selector.getStateChangeEmitter().subscribe(()=> {
+        this.selector.getStateChangeEmitter().subscribe(() => {
             console.log('Marker | getStateChange event from selector!');
             this.updateSelectionState();
         });

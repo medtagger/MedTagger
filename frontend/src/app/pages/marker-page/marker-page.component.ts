@@ -9,8 +9,9 @@ import {ROISelection3D} from '../../model/ROISelection3D';
 import {Response} from '@angular/http';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
-import {DialogService} from "../../services/dialog.service";
+import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
+import {MatSnackBar} from '@angular/material';
 
 
 @Component({
@@ -31,7 +32,7 @@ export class MarkerPageComponent implements OnInit {
     startTime: Date;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private location: Location) {
+                private location: Location, private snackBar: MatSnackBar) {
         console.log('MarkerPage constructor', this.marker);
     }
 
@@ -51,19 +52,27 @@ export class MarkerPageComponent implements OnInit {
                 this.lastSliceID = slice.index;
             }
             this.marker.feedData(slice);
+            if (this.marker.downloadingScanInProgress === true) {
+                this.indicateNewScanAppeared();
+            }
+            this.marker.setDownloadSlicesInProgress(false);
+            this.marker.setDownloadScanInProgress(false);
         });
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
             if (isObserverHooked) {
                 this.marker.observableSliceRequest.subscribe((sliceRequest: number) => {
                     console.log('MarkerPage | observable sliceRequest: ', sliceRequest);
+                    this.marker.setDownloadSlicesInProgress(true);
                     let count = MarkerPageComponent.SLICE_BATCH_SIZE;
                     if (sliceRequest + count > this.scan.numberOfSlices) {
                         count = this.scan.numberOfSlices - sliceRequest;
+                        this.marker.setDownloadSlicesInProgress(false);
                     }
                     if (sliceRequest < 0) {
                         count = count + sliceRequest;
                         sliceRequest = 0;
+                        this.marker.setDownloadSlicesInProgress(false);
                     }
                     this.scanService.requestSlices(this.scan.scanId, sliceRequest, count);
                 });
@@ -72,6 +81,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private requestScan(): void {
+      this.marker.setDownloadScanInProgress(true);
         this.scanService.getRandomScan(this.category).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -84,8 +94,10 @@ export class MarkerPageComponent implements OnInit {
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);
+                this.marker.setDownloadScanInProgress(false);
+                this.marker.setDownloadSlicesInProgress(false);
                 this.dialogService
-                    .openInfoDialog("Nothing to do here!", "No more Scans available for you in this category!", "Go back")
+                    .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this category!', 'Go back')
                     .afterClosed()
                     .subscribe(() => {
                         this.location.back();
@@ -94,6 +106,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
+        this.marker.setDownloadScanInProgress(true);
         this.marker.prepareForNewScan();
         this.requestScan();
     }
@@ -118,9 +131,10 @@ export class MarkerPageComponent implements OnInit {
             })
             .catch((errorResponse: Error) => {
                 this.dialogService
-                    .openInfoDialog("Error", "Cannot send selection", "Ok");
+                    .openInfoDialog('Error', 'Cannot send selection', 'Ok');
             });
         this.startMeasuringLabelingTime();
+        this.indicateLabelHasBeenSend();
         return;
     }
 
@@ -134,6 +148,14 @@ export class MarkerPageComponent implements OnInit {
 
     private getLabelingTimeInSeconds(startTime: Date): number {
       const endTime = new Date();
-      return (endTime.getTime() - startTime.getTime())/1000.0;
+      return (endTime.getTime() - startTime.getTime()) / 1000.0;
+    }
+
+    private indicateLabelHasBeenSend(): void {
+      this.snackBar.open('Label has been send', '', {duration: 2000, });
+    }
+
+    private indicateNewScanAppeared(): void {
+      this.snackBar.open('New scan has been loaded', '', {duration: 2000, });
     }
 }
