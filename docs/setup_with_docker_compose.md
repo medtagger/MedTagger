@@ -39,7 +39,8 @@ To update MedTagger using Docker Compose please use below `up` command with `--b
 
 ```bash
 $ git pull
-$ docker-compose up -d --no-deps --build medtagger_frontend medtagger_backend_api medtagger_backend_worker
+$ docker-compose up -d --no-deps --build medtagger_frontend medtagger_backend_rest \
+  medtagger_backend_websocket medtagger_backend_worker
 ```
 
 ### How to setup only dependencies?
