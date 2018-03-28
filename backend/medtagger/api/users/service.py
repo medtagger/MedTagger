@@ -20,7 +20,8 @@ class GetUsers(Resource):
     @staticmethod
     @login_required
     @role_required('admin')
-    @api.marshal_with(serializers.users_list)
+    @users_ns.marshal_with(serializers.users_list)
+    @users_ns.doc(security='token')
     def get() -> Any:
         """Get all users endpoint."""
         users = get_all_users()
@@ -34,6 +35,7 @@ class SetRole(Resource):
     @staticmethod
     @login_required
     @role_required('admin')
+    @users_ns.doc(security='token')
     def put(user_id: int) -> Any:
         """Set user's role."""
         set_user_role(user_id, request.json['role'])
@@ -46,8 +48,9 @@ class GetUserInfo(Resource):
 
     @staticmethod
     @login_required
-    @api.marshal_with(serializers.user)
-    @api.doc(responses={200: 'Successfully retrieved data.'})
+    @users_ns.marshal_with(serializers.user)
+    @users_ns.doc(security='token')
+    @users_ns.doc(responses={200: 'Successfully retrieved data.'})
     def get() -> Any:
         """Get user info."""
         user = get_current_user()
