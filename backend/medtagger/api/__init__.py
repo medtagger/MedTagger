@@ -17,7 +17,6 @@ authorizations = {
     'token': {
         'type': 'apiKey',
         'in': 'header',
-        'scheme': 'bearer',
         'name': 'Authorization',
     },
 }
