@@ -4,8 +4,8 @@ const request = require('request');
 // Test definition
 const MEDTAGGER_USER = 'admin@medtagger.com';
 const MEDTAGGER_PASSWORD = 'medtagger1'
-const MEDTAGGER_INSTANCE_REST_URL = 'http://localhost';
-const MEDTAGGER_INSTANCE_WEBSOCKET_URL = 'http://localhost';
+const MEDTAGGER_INSTANCE_REST_URL = 'http://localhost:51000';
+const MEDTAGGER_INSTANCE_WEBSOCKET_URL = 'http://localhost:51001';
 const SCAN_CATEGORY = 'KIDNEYS';
 const SCAN_BEGIN = 0;
 const SCAN_COUNT = 10;
@@ -40,7 +40,7 @@ function getRandomScan(authToken, handler) {
     request.get({
         url: MEDTAGGER_INSTANCE_REST_URL + '/api/v1/scans/random?category=' + SCAN_CATEGORY,
         headers: {
-            'Authentication-Token': authToken
+            'Authorization': 'Bearer ' + authToken
         },
         json: true
     }, (err, res, body) => {

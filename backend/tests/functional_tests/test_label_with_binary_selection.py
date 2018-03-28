@@ -4,7 +4,7 @@ from typing import Any
 
 from medtagger.database.models import LabelStatus
 
-from tests.functional_tests import get_api_client
+from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
@@ -16,8 +16,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
     # Step 1. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
-                               headers={'content-type': 'application/json',
-                                        'Authentication-Token': user_token})
+                               headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
@@ -26,7 +25,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
     with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
         response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
             'image': (image, 'slice_1.dcm'),
-        }, content_type='multipart/form-data')
+        }, content_type='multipart/form-data', headers=get_headers(token=user_token))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -47,13 +46,13 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
         'labeling_time': 34.56,
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
-                               headers={'content-type': 'application/json', 'Authentication-Token': user_token})
+                               headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     label_id = json_response['label_id']
 
     # Step 4. Get random label for validation
-    response = api_client.get('/api/v1/labels/random')
+    response = api_client.get('/api/v1/labels/random', headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)

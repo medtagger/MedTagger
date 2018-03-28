@@ -9,7 +9,7 @@ from PIL import Image
 from medtagger.database.models import SliceOrientation
 from medtagger.repositories.slices import SlicesRepository
 
-from tests.functional_tests import get_api_client
+from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
@@ -22,8 +22,7 @@ def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery
     # Step 1. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
-                               headers={'content-type': 'application/json',
-                                        'Authentication-Token': user_token})
+                               headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
@@ -32,7 +31,7 @@ def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery
         with open(file, 'rb') as image:
             response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
                 'image': (image, 'slice_1.dcm'),
-            }, content_type='multipart/form-data')
+            }, content_type='multipart/form-data', headers=get_headers(token=user_token))
             assert response.status_code == 201
 
     # Step 3. Check Scan & Slices in the databases

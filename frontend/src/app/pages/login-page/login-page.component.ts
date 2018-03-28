@@ -45,7 +45,7 @@ export class LoginPageComponent implements OnInit {
         this.loggingInError = false;
         this.accountService.logIn(this.userForm.value['email'], this.userForm.value['password'])
             .then((token) => {
-                sessionStorage.setItem('authenticationToken', token);
+                sessionStorage.setItem('authorizationToken', token);
                 return this.accountService.getCurrentUserInfo();
             }, (error) => {
                 this.loggingInProgress = false;

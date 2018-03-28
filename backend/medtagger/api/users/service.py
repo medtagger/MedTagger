@@ -2,13 +2,13 @@
 from typing import Any
 
 from flask import request
-from flask_login import login_required
 from flask_restplus import Resource
 
 from medtagger.api import api
 from medtagger.api.users import serializers
 from medtagger.api.users.business import get_all_users, set_user_role
 from medtagger.api.utils import get_current_user
+from medtagger.api.security import login_required, role_required
 
 users_ns = api.namespace('users', 'Users management')
 
@@ -18,6 +18,8 @@ class GetUsers(Resource):
     """Get all users endpoint."""
 
     @staticmethod
+    @login_required
+    @role_required('admin')
     @api.marshal_with(serializers.users_list)
     def get() -> Any:
         """Get all users endpoint."""
@@ -31,6 +33,7 @@ class SetRole(Resource):
 
     @staticmethod
     @login_required
+    @role_required('admin')
     def put(user_id: int) -> Any:
         """Set user's role."""
         set_user_role(user_id, request.json['role'])

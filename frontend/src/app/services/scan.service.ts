@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
-import {Http, URLSearchParams, Response} from '@angular/http';
+import {Response} from '@angular/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 
 import {Socket} from 'ng-socket-io';
 import 'rxjs/add/operator/map';
@@ -11,15 +12,33 @@ import {MarkerSlice} from '../model/MarkerSlice';
 import {environment} from '../../environments/environment';
 import {ScanSelection} from "../model/ScanSelection";
 import {SliceSelection} from "../model/SliceSelection";
-import {AuthenticationHeader} from "./authentication-header";
 
+interface RandomScanResponse {
+    scan_id: string;
+    number_of_slices: number;
+}
+
+interface ScanForScanIDResponse {
+    scan_id: string;
+    number_of_slices: number;
+}
+
+interface AvailableCategoryResponse {
+    key: string;
+    name: string;
+    image_path: string;
+}
+
+interface NewScanResponse {
+    scan_id: string;
+}
 
 @Injectable()
 export class ScanService {
 
     websocket: Socket;
 
-    constructor(private http: Http, private authenticationHeader: AuthenticationHeader) {
+    constructor(private http: HttpClient) {
         this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {}});
     }
 
@@ -28,8 +47,7 @@ export class ScanService {
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload, {
-                headers: this.authenticationHeader.create()}).toPromise().then((response: Response) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
                 resolve(response);
             }).catch((error: Response) => {
@@ -41,10 +59,9 @@ export class ScanService {
 
     public getRandomScan(category: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
-            let params = new URLSearchParams();
-            params.set('category', category);
-            this.http.get(environment.API_URL + '/scans/random', {params: params, headers: this.authenticationHeader.create()})
-                .map(response => response.json())
+            var params = new HttpParams();
+            params = params.set('category', category);
+            this.http.get<RandomScanResponse>(environment.API_URL + '/scans/random', {params: params})
                 .subscribe(
                     (response) => {
                         console.log('ScanService | getRandomScan | response: ', response);
@@ -62,11 +79,10 @@ export class ScanService {
 
     getScanForScanId(scanId: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
-            this.http.get(environment.API_URL + '/scans/' + scanId).toPromise().then(
+            this.http.get<ScanForScanIDResponse>(environment.API_URL + '/scans/' + scanId).toPromise().then(
                 response => {
                     console.log('ScanService | getScanForScanId | response: ', response);
-                    const json = response.json();
-                    resolve(new ScanMetadata(json.scan_id, json.number_of_slices));
+                    resolve(new ScanMetadata(response.scan_id, response.number_of_slices));
                 },
                 error => {
                     console.log('ScanService | getRandomScan | error: ', error);
@@ -78,12 +94,11 @@ export class ScanService {
 
     getAvailableCategories(): Promise<ScanCategory[]> {
         return new Promise((resolve, reject) => {
-            this.http.get(environment.API_URL + '/scans/categories').toPromise().then(
+            this.http.get<Array<AvailableCategoryResponse>>(environment.API_URL + '/scans/categories').toPromise().then(
                 response => {
                     console.log('ScanService | getAvailableCategories | response: ', response);
-                    const json = response.json();
                     const categories = [];
-                    for (let category of json) {
+                    for (let category of response) {
                         categories.push(new ScanCategory(category.key, category.name, category.image_path))
                     }
                     resolve(categories);
@@ -113,11 +128,9 @@ export class ScanService {
                 category: category,
                 number_of_slices: numberOfSlices,
             };
-            this.http.post(environment.API_URL + '/scans/', payload, {
-                headers: this.authenticationHeader.create()
-            }).toPromise().then(
+            this.http.post<NewScanResponse>(environment.API_URL + '/scans/', payload).toPromise().then(
                 response => {
-                    resolve(response.json().scan_id);
+                    resolve(response.scan_id);
                 },
                 error => {
                     reject(error);

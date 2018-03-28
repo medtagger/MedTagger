@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
-
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import {SocketIoModule} from 'ng-socket-io';
 
 import {AppComponent} from './app.component';
@@ -15,6 +15,7 @@ import {CategoryPageComponent} from '../pages/category-page/category-page.compon
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
+import {HttpAuthenticationInterceptor} from "../services/http-authentication.interceptor";
 
 import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
@@ -45,7 +46,6 @@ import {
     MatChipsModule,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
-import {AuthenticationHeader} from '../services/authentication-header';
 import {routing} from "./app.routes";
 import {AuthGuard} from "../guards/auth.guard";
 import {AccountService} from "../services/account.service";
@@ -96,13 +96,18 @@ import {InfoDialog} from "../dialogs/info.dialog";
         MatSnackBarModule,
         MatSelectModule,
         HttpModule,
+        HttpClientModule,
         MatChipsModule
     ],
     entryComponents: [
         InfoDialog
     ],
     providers: [
-        AuthenticationHeader,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: HttpAuthenticationInterceptor,
+            multi: true
+        },
         AuthGuard,
         AccountService,
         DialogService,

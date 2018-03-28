@@ -7,6 +7,12 @@ class BaseHTTPException(Exception):
     pass
 
 
+class UnauthorizedException(BaseHTTPException):
+    """Exception designed to use once there was an authorization error during business logic processing."""
+
+    pass
+
+
 class BusinessLogicException(BaseHTTPException):
     """Exception designed to use once there was an error during business logic processing."""
 

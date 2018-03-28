@@ -38,7 +38,7 @@ def get_role_fixture(mocker: Any) -> None:
 @pytest.fixture
 def wrong_password_fixture(mocker: Any) -> None:
     """Return fixture for get role with namem ethod used in create user business method."""
-    mocked_check_password = mocker.patch('medtagger.api.auth.business.check_password_hash')
+    mocked_check_password = mocker.patch('medtagger.api.auth.business.verify_user_password')
     mocked_check_password.return_value = False
     return mocked_check_password
 

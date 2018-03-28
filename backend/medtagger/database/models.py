@@ -4,7 +4,6 @@ import enum
 import uuid
 from typing import List, cast, Optional
 
-from flask_security import UserMixin, RoleMixin
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
 from sqlalchemy.orm import relationship
 
@@ -17,7 +16,7 @@ users_roles = db.Table('Users_Roles', Base.metadata,
                        Column('role_id', Integer, ForeignKey('Roles.id')))
 
 
-class Role(Base, RoleMixin):
+class Role(Base):
     """Defines model for the Roles table."""
 
     __tablename__ = 'Roles'
@@ -29,7 +28,7 @@ class Role(Base, RoleMixin):
         self.name = name
 
 
-class User(Base, UserMixin):
+class User(Base):
     """Defines model for the Users table."""
 
     __tablename__ = 'Users'

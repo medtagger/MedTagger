@@ -2,7 +2,7 @@
 import json
 from typing import Dict, Any
 
-from tests.functional_tests import get_api_client
+from tests.functional_tests import get_api_client, get_headers
 from medtagger.api.users.business import set_user_role
 from medtagger.api.auth.business import create_user
 
@@ -25,7 +25,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD,
                'firstName': EXAMPLE_USER_FIRST_NAME, 'lastName': EXAMPLE_USER_LAST_NAME}
     response = api_client.post('/api/v1/auth/register', data=json.dumps(payload),
-                               headers={'content-type': 'application/json'})
+                               headers=get_headers(json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -33,16 +33,16 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     # Step 2. User logs in
     payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
-                               headers={'content-type': 'application/json'})
+                               headers=get_headers(json=True))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     user_token = json_response['token']
     assert isinstance(user_token, str)
-    assert len(user_token) == 149
+    assert len(user_token) == 122
 
     # Step 3. Get user account information
-    response = api_client.get('/api/v1/users/info', headers={'Authentication-Token': user_token})
+    response = api_client.get('/api/v1/users/info', headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -51,10 +51,6 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert json_response['firstName'] == EXAMPLE_USER_FIRST_NAME
     assert json_response['lastName'] == EXAMPLE_USER_LAST_NAME
     assert json_response['role'] == 'volunteer'
-
-    # Step 4. User logs out
-    response = api_client.post('/api/v1/auth/sign-out', headers={'Authentication-Token': user_token})
-    assert response.status_code == 204
 
 
 def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
@@ -70,16 +66,16 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     # Step 1. Admin user logs in
     payload = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
-                               headers={'content-type': 'application/json'})
+                               headers=get_headers(json=True))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     admin_user_token = json_response['token']
     assert isinstance(admin_user_token, str)
-    assert len(admin_user_token) == 149
+    assert len(admin_user_token) == 122
 
     # Step 2. Admin gets all users
-    response = api_client.get('/api/v1/users/')
+    response = api_client.get('/api/v1/users/', headers=get_headers(token=admin_user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -89,23 +85,19 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     # Step 3. Admin changes role for user
     payload = {'role': 'doctor'}
     response = api_client.put('/api/v1/users/{}/role'.format(volunteer_id), data=json.dumps(payload),
-                              headers={'Authentication-Token': admin_user_token, 'content-type': 'application/json'})
+                              headers=get_headers(token=admin_user_token, json=True))
     assert response.status_code == 204
 
-    # Step 4. Admin logs out
-    response = api_client.post('/api/v1/auth/sign-out', headers={'Authentication-Token': admin_user_token})
-    assert response.status_code == 204
-
-    # Step 5. User logs in
+    # Step 4. User logs in
     payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
-                               headers={'content-type': 'application/json'})
+                               headers=get_headers(json=True))
     json_response = json.loads(response.data)
     user_token = json_response['token']
     assert response.status_code == 200
 
-    # Step 6. Check if user role was changed
-    response = api_client.get('/api/v1/users/info', headers={'Authentication-Token': user_token})
+    # Step 5. Check if user role was changed
+    response = api_client.get('/api/v1/users/info', headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -122,7 +114,7 @@ def test_ownership(prepare_environment: Any) -> None:
     # Step 1. Admin user logs in
     payload: Dict[str, Any] = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
-                               headers={'content-type': 'application/json'})
+                               headers=get_headers(json=True))
     json_response = json.loads(response.data)
     admin_user_token = json_response['token']
     assert response.status_code == 200
@@ -130,7 +122,7 @@ def test_ownership(prepare_environment: Any) -> None:
     # Step 2. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
-                               headers={'content-type': 'application/json', 'Authentication-Token': admin_user_token})
+                               headers=get_headers(token=admin_user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     owner_id = json_response['owner_id']
@@ -141,7 +133,7 @@ def test_ownership(prepare_environment: Any) -> None:
     with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
         response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
             'image': (image, 'slice_1.dcm'),
-        }, content_type='multipart/form-data')
+        }, content_type='multipart/form-data', headers=get_headers(token=admin_user_token))
     assert response.status_code == 201
 
     # Step 4. Label
@@ -156,7 +148,7 @@ def test_ownership(prepare_environment: Any) -> None:
         'labeling_time': 12.34,
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
-                               headers={'content-type': 'application/json', 'Authentication-Token': admin_user_token})
+                               headers=get_headers(token=admin_user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     owner_id = json_response['owner_id']
