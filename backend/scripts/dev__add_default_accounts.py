@@ -3,8 +3,8 @@ import logging
 import logging.config
 
 from sqlalchemy import exists
-from werkzeug.security import generate_password_hash
 
+from medtagger.api.security import hash_password
 from medtagger.database import db_session
 from medtagger.database.models import User, Role
 
@@ -16,7 +16,7 @@ def insert_admin_account() -> None:
     """Insert default admin account."""
     user_email = 'admin@medtagger.com'
     password = 'medtagger1'
-    password_hash = generate_password_hash(password)
+    password_hash = hash_password(password)
 
     with db_session() as session:
         user_exists = session.query(exists().where(User.email == user_email)).scalar()

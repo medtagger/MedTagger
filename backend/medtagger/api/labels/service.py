@@ -21,6 +21,7 @@ class Random(Resource):
     @staticmethod
     @login_required
     @role_required('doctor', 'admin')
+    @labels_ns.doc(security='token')
     @labels_ns.marshal_with(serializers.out__label)
     @labels_ns.doc(description='Returns random label with NOT_VERIFIED status.')
     @labels_ns.doc(responses={200: 'Success', 404: 'Could not find any Label'})
@@ -40,6 +41,7 @@ class ChangeLabelStatus(Resource):
     @staticmethod
     @login_required
     @role_required('doctor', 'admin')
+    @labels_ns.doc(security='token')
     @labels_ns.expect(serializers.in__label_status)
     @labels_ns.marshal_with(serializers.out__label_status)
     @labels_ns.doc(description='Changes the status of the given label.')

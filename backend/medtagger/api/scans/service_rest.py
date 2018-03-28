@@ -21,6 +21,7 @@ class Scans(Resource):
     @role_required('doctor', 'admin')
     @scans_ns.expect(serializers.in__new_scan)
     @scans_ns.marshal_with(serializers.out__new_scan)
+    @scans_ns.doc(security='token')
     @scans_ns.doc(description='Creates empty scan.')
     @scans_ns.doc(responses={201: 'Success'})
     def post() -> Any:
@@ -42,6 +43,7 @@ class ScanCategories(Resource):
     @staticmethod
     @login_required
     @scans_ns.marshal_with(serializers.inout__scan_category)
+    @scans_ns.doc(security='token')
     @scans_ns.doc(description='Returns all available scan categories.')
     @scans_ns.doc(responses={200: 'Success'})
     def get() -> Any:
@@ -53,6 +55,7 @@ class ScanCategories(Resource):
     @role_required('doctor', 'admin')
     @scans_ns.expect(serializers.inout__scan_category)
     @scans_ns.marshal_with(serializers.inout__scan_category)
+    @scans_ns.doc(security='token')
     @scans_ns.doc(description='Returns all available scan categories.')
     @scans_ns.doc(responses={201: 'Success'})
     def post() -> Any:
@@ -73,6 +76,7 @@ class Random(Resource):
     @login_required
     @scans_ns.expect(serializers.args__random_scan)
     @scans_ns.marshal_with(serializers.out__scan)
+    @scans_ns.doc(security='token')
     @scans_ns.doc(description='Returns random scan.')
     @scans_ns.doc(responses={200: 'Success', 400: 'Invalid arguments', 404: 'No Scans available'})
     def get() -> Any:
@@ -93,6 +97,7 @@ class Label(Resource):
     @login_required
     @scans_ns.expect(serializers.in__label)
     @scans_ns.marshal_with(serializers.out__label)
+    @scans_ns.doc(security='token')
     @scans_ns.doc(description='Stores label and assigns it to given scan.')
     @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan'})
     def post(scan_id: ScanID) -> Any:
@@ -113,6 +118,7 @@ class Scan(Resource):
     @staticmethod
     @login_required
     @scans_ns.marshal_with(serializers.out__scan)
+    @scans_ns.doc(security='token')
     @scans_ns.doc(description='Returns scan with given scan_id.')
     @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
     def get(scan_id: ScanID) -> Any:
@@ -128,6 +134,7 @@ class ScanSlices(Resource):
     @staticmethod
     @login_required
     @scans_ns.marshal_with(serializers.out__new_slice)
+    @scans_ns.doc(security='token')
     @scans_ns.doc(description='Returns newly created Slice.')
     @scans_ns.doc(responses={201: 'Success', 400: 'Invalid arguments'})
     def post(scan_id: ScanID) -> Any:

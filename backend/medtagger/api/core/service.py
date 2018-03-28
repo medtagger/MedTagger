@@ -29,10 +29,12 @@ class CheckAuthentication(Resource):
 
     @staticmethod
     @login_required
-    @api.doc(responses={204: "User authenticated", 401: "Unauthorized"})
+    @core_ns.marshal_with(serializers.out__status)
+    @core_ns.doc(security='token')
+    @core_ns.doc(responses={200: "User authenticated", 401: "Unauthorized"})
     def get() -> Any:
         """Check if the user is authenticated."""
-        return {}, 204
+        return business.success()
 
 
 @core_ns.route('/check-authorization')
@@ -42,6 +44,9 @@ class CheckAuthorization(Resource):
     @staticmethod
     @login_required
     @role_required('volunteer', 'doctor', 'admin')
+    @core_ns.marshal_with(serializers.out__status)
+    @core_ns.doc(security='token')
+    @core_ns.doc(responses={200: "User authenticated", 401: "Unauthorized"})
     def get() -> Any:
         """Endpoint to check if user has properly set role."""
-        return {}, 204
+        return business.success()
