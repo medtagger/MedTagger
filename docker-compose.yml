@@ -3,7 +3,7 @@ version: '3'
 services:
   reverse-proxy:
     image: traefik
-    command: --debug --configFile=/var/traefik/traefik.toml
+    command: --configFile=/var/traefik/traefik.toml
     ports:
       - 80:80
       - 7128:8080

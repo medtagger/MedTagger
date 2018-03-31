@@ -2,7 +2,7 @@
 filePath = "/var/traefik/traefik.log"
 
 [accessLog]
-logLevel = "DEBUG"
+logLevel = "INFO"
 
 defaultEntryPoints = ["http", "ws"]
 
