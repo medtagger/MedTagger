@@ -46,7 +46,6 @@ function logIn(handler) {
         }
     }, (err, res, body) => {
         console.log('Successfully logged in!');
-        console.log(body['token']);
         handler(body['token']);
     });
 }
@@ -60,8 +59,6 @@ function getRandomScan(authToken, handler) {
         },
         json: true
     }, (err, res, body) => {
-        console.log(res.statusCode);
-        console.log(body);
         console.log('Received Scan (', body['scan_id'], ') with', body['number_of_slices'], 'Slices.');
         handler(body['scan_id'], body['number_of_slices']);
     });
