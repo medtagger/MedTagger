@@ -3,13 +3,15 @@ version: '3'
 services:
   reverse-proxy:
     image: traefik
-    command: --configFile=/var/traefik/traefik.toml
+    command: --debug --configFile=/var/traefik/traefik.toml
     ports:
       - 80:80
       - 7128:8080
     volumes:
       - $PWD/traefik.toml:/var/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=false"
 
   hbase:
     image: dajobe/hbase
@@ -22,6 +24,8 @@ services:
       - 9095:9095
       - 2181:2181
       - 16010:16010
+    labels:
+      - "traefik.enable=false"
 
   rabbitmq:
     image: rabbitmq:management
@@ -34,6 +38,8 @@ services:
       - 15671:15671
       - 15672:15672
       - 25672:25672
+    labels:
+      - "traefik.enable=false"
 
   postgres:
     image: postgres
@@ -45,6 +51,8 @@ services:
       POSTGRES_DB: medtagger
       POSTGRES_USER: medtagger_user
       POSTGRES_PASSWORD: MedTa99er!
+    labels:
+      - "traefik.enable=false"
 
   medtagger_frontend:
     image: medtagger_frontend/web
@@ -53,10 +61,11 @@ services:
       dockerfile: Dockerfile
       args:
         - PRODUCTION=${MEDTAGGER__FRONTEND_PRODUCTION}
-    ports:
-      - 80:80
     depends_on:
       - medtagger_backend_rest
+    labels:
+      - "traefik.backend=medtagger_frontend"
+      - "traefik.frontend.rule=PathPrefix: /"
 
   medtagger_backend_rest:
     image: medtagger_backend/rest
@@ -67,10 +76,11 @@ services:
       - MEDTAGGER__API_DEBUG=1
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
       - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
+      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
       - MEDTAGGER__HBASE_HOST=hbase
       - MEDTAGGER__HBASE_PORT=9090
       - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=25
+      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=4
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: backend
@@ -84,6 +94,9 @@ services:
       - medtagger_backend_websocket
       - medtagger_backend_worker
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_rest_production"
+    labels:
+      - "traefik.backend=medtagger_backend_rest"
+      - "traefik.frontend.rule=PathPrefix: /api/v1/,/swaggerui/"
 
   medtagger_backend_websocket:
     image: medtagger_backend/websocket
@@ -94,10 +107,11 @@ services:
       - MEDTAGGER__API_DEBUG=1
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
       - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
+      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
       - MEDTAGGER__HBASE_HOST=hbase
       - MEDTAGGER__HBASE_PORT=9090
       - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=25
+      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=4
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: backend
@@ -109,6 +123,11 @@ services:
       - rabbitmq
       - postgres
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_websocket_production"
+    labels:
+      - "traefik.backend=medtagger_backend_websocket"
+      - "traefik.backend.loadbalancer.stickiness=true"
+      - "traefik.backend.loadbalancer.stickiness.cookieName=MEDTAGER_WEBSOCKET_NODE"
+      - "traefik.frontend.rule=PathPrefix: /socket.io"
 
   medtagger_backend_worker:
     image: medtagger_backend/worker
@@ -119,10 +138,11 @@ services:
       - MEDTAGGER__API_DEBUG=1
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
       - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
+      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
       - MEDTAGGER__HBASE_HOST=hbase
       - MEDTAGGER__HBASE_PORT=9090
       - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10
+      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=4
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: backend
@@ -134,6 +154,8 @@ services:
       - rabbitmq
       - postgres
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_workers"
+    labels:
+      - "traefik.enable=false"
 
 volumes:
   hbase-data:
