@@ -79,7 +79,7 @@ run_rest:
 	PYTHONPATH=`pwd` $(PYTHON) medtagger/api/rest.py
 
 run_rest_production:
-	PYTHONPATH=`pwd` uwsgi --http :51000 --gevent 1000 --master --wsgi-file medtagger/api/rest.py --callable app --processes 4
+	PYTHONPATH=`pwd` uwsgi --http :51000 --gevent 1000 --master --wsgi-file medtagger/api/rest.py --plugin http --http-keepalive --limit-post 10485760 --callable app --processes 4
 
 run_websocket:
 	PYTHONPATH=`pwd` $(PYTHON) medtagger/api/websocket.py

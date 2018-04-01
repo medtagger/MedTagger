@@ -79,7 +79,7 @@ def convert_to_hounsfield_units(pixel_array: np.ndarray, intercept: float, slope
     return pixel_array
 
 
-def normalize(hu_array: np.ndarray, min_bound: int = 400, max_bound: int = 1700) -> np.ndarray:
+def normalize(hu_array: np.ndarray, min_bound: int = -360, max_bound: int = 440) -> np.ndarray:
     """Normalize values of the Hounsfield units array.
 
     :param hu_array: numpy array of Hounsfield units for the Dicom file
