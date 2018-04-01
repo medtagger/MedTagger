@@ -33,6 +33,23 @@ $ docker-compose up
 
 _**TIP!**_ Add `-d` (detach) option to run everything in the background!
 
+### How to scale MedTagger with multiple containers?
+
+MedTagger was designed to be as much scalable as possible. As an administrator you can define how many
+ containers you would like to run for each of our service. Whole load will be balanced across all
+ available resources. To do so, you can run:
+
+```bash
+$ docker-compose up -d \
+   --scale medtagger_backend_websocket=4 \
+   --scale medtagger_backend_rest=2 \
+   --scale medtagger_backend_worker=2 \
+   --scale medtagger_frontend=2
+```
+
+Remember that each service may run on multiple processes on its own, so be reasonable about
+ resource allocation!
+
 ### How to update MedTagger in Docker?
 
 To update MedTagger using Docker Compose please use below `up` command with `--build` switch:

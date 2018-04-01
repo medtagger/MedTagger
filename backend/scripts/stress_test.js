@@ -4,8 +4,8 @@ const request = require('request');
 // Test definition
 const MEDTAGGER_USER = 'admin@medtagger.com';
 const MEDTAGGER_PASSWORD = 'medtagger1'
-const MEDTAGGER_INSTANCE_REST_URL = 'http://localhost:51000';
-const MEDTAGGER_INSTANCE_WEBSOCKET_URL = 'http://localhost:51001';
+const MEDTAGGER_INSTANCE_REST_URL = 'http://localhost';
+const MEDTAGGER_INSTANCE_WEBSOCKET_URL = 'http://localhost';
 const SCAN_CATEGORY = 'KIDNEYS';
 const SCAN_BEGIN = 0;
 const SCAN_COUNT = 10;
@@ -17,9 +17,24 @@ var NUMBER_OF_SLICES = 0;
 var RECEIVED_SLICES_IDS = [];
 var REQUEST_NEXT_SLICES_ON_SIZE = SCAN_COUNT;
 var BATCH_REQUEST_STARTED = Date.now();
+var socket;
 
-console.log('Connecting to the WebSocket server...');
-const socket = io(MEDTAGGER_INSTANCE_WEBSOCKET_URL + '/slices');
+
+function getCookiesForWebSocketStickness(handler) {
+    request.get({
+        url: MEDTAGGER_INSTANCE_WEBSOCKET_URL + '/socket.io/',
+    }, (err, res, body) => {
+        var cookies = res.headers['set-cookie'];
+        var webSocketNode;
+        cookies.forEach(function(cookie) {
+            if (cookie.startsWith('MEDTAGER_WEBSOCKET_NODE=')) {
+                webSocketNode = cookie.split('=')[1].split(';')[0];
+            }
+        });
+        console.log('Using Node:', webSocketNode);
+        handler('MEDTAGER_WEBSOCKET_NODE=' + webSocketNode);
+    });
+}
 
 function logIn(handler) {
     console.log('Logging in...');
@@ -59,40 +74,51 @@ function requestSlices(scan_id, begin, count) {
     });
 };
 
-socket.on('connect', function() {
-    console.log('Connected');
-    logIn((authToken) => {
-        AUTH_TOKEN = authToken;
-        getRandomScan(AUTH_TOKEN, (scanID, numberOfSlices) => {
-            SCAN_ID = scanID;
-            NUMBER_OF_SLICES = numberOfSlices;
-            requestSlices(SCAN_ID, SCAN_BEGIN, SCAN_COUNT);
+logIn((authToken) => {
+    AUTH_TOKEN = authToken;
+
+    getCookiesForWebSocketStickness((cookies) => {
+        console.log('Connecting to the WebSocket server...');
+        socket = io(MEDTAGGER_INSTANCE_WEBSOCKET_URL + '/slices', {
+            extraHeaders: { 'Cookie': cookies }
         });
+
+        socket.on('connect', function() {
+            console.log('Connected');
+            getRandomScan(AUTH_TOKEN, (scanID, numberOfSlices) => {
+                SCAN_ID = scanID;
+                NUMBER_OF_SLICES = numberOfSlices;
+                requestSlices(SCAN_ID, SCAN_BEGIN, SCAN_COUNT);
+            });
+        });
+
+        socket.on('slice', function(data) {
+            RECEIVED_SLICES_IDS.push(data['index']);
+            if (RECEIVED_SLICES_IDS.length == NUMBER_OF_SLICES) {
+                console.log('This is the end of Slices for this Scan. Requesting new one...');
+                RECEIVED_SLICES_IDS = [];
+                REQUEST_NEXT_SLICES_ON_SIZE = SCAN_COUNT;
+
+                getRandomScan(AUTH_TOKEN, (scanID, numberOfSlices) => {
+                    SCAN_ID = scanID;
+                    NUMBER_OF_SLICES = numberOfSlices;
+                    requestSlices(SCAN_ID, SCAN_BEGIN, SCAN_COUNT);
+                });
+                return;
+            }
+            if (RECEIVED_SLICES_IDS.length == REQUEST_NEXT_SLICES_ON_SIZE) {
+                console.log('It took', (Date.now() - BATCH_REQUEST_STARTED) / 1000, 'seconds to get this batch.');
+                REQUEST_NEXT_SLICES_ON_SIZE += SCAN_COUNT;
+                requestSlices(SCAN_ID, RECEIVED_SLICES_IDS.length, SCAN_COUNT);
+            }
+        });
+
+        socket.on('disconnect', function() {
+            console.log('Disconnected');
+        });
+
     });
+
 });
 
-socket.on('slice', function(data) {
-    RECEIVED_SLICES_IDS.push(data['index']);
-    if (RECEIVED_SLICES_IDS.length == NUMBER_OF_SLICES) {
-        console.log('This is the end of Slices for this Scan. Requesting new one...');
-        RECEIVED_SLICES_IDS = [];
-        REQUEST_NEXT_SLICES_ON_SIZE = SCAN_COUNT;
-
-        getRandomScan(AUTH_TOKEN, (scanID, numberOfSlices) => {
-            SCAN_ID = scanID;
-            NUMBER_OF_SLICES = numberOfSlices;
-            requestSlices(SCAN_ID, SCAN_BEGIN, SCAN_COUNT);
-        });
-        return;
-    }
-    if (RECEIVED_SLICES_IDS.length == REQUEST_NEXT_SLICES_ON_SIZE) {
-        console.log('It took', (Date.now() - BATCH_REQUEST_STARTED) / 1000, 'seconds to get this batch.');
-        REQUEST_NEXT_SLICES_ON_SIZE += SCAN_COUNT;
-        requestSlices(SCAN_ID, RECEIVED_SLICES_IDS.length, SCAN_COUNT);
-    }
-});
-
-socket.on('disconnect', function() {
-    console.log('Disconnected');
-});
 
