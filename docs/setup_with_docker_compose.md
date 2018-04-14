@@ -69,3 +69,18 @@ $ docker-compose up -d hbase postgres rabbitmq
 ```
 
 For more information about usage please read the [documentation](https://docs.docker.com/compose/).
+
+### How to setup MedTagger on subdirectory?
+
+To run MedTagger on a subdirectory export `MEDTAGGER__HOST_ON_SUBDIRECTORY` environment variable
+ and run Docker-Compose in the same way as it was done above.
+
+**NOTE:** Always start and end your subdirectory with slashes `/`!
+ 
+Here is an example how to do this:
+
+```bash
+$ export MEDTAGGER__HOST_ON_SUBDIRECTORY=/medtagger/
+$ docker-compose up
+```
+

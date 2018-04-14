@@ -7,4 +7,5 @@ export const environment = {
     production: true,
     API_URL: window.location.origin + '/api/v1',
     WEBSOCKET_URL: window.location.origin,
+    WEBSOCKET_PATH: '/socket.io'
 };
