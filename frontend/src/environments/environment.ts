@@ -7,4 +7,5 @@ export const environment = {
     production: false,
     API_URL: 'http://10.0.0.99:51000/api/v1',
     WEBSOCKET_URL: 'http://10.0.0.99:51001',
+    WEBSOCKET_PATH: '/socket.io'
 };

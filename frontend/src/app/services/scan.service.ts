@@ -39,7 +39,7 @@ export class ScanService {
     websocket: Socket;
 
     constructor(private http: HttpClient) {
-        this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {}});
+        this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {path: environment.WEBSOCKET_PATH}});
     }
 
     public sendSelection(scanId: string, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {

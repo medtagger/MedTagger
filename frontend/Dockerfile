@@ -17,7 +17,9 @@ COPY . .
 
 ## Build the angular app in given mode and store the artifacts in dist folder
 ARG PRODUCTION
-RUN if [ "$PRODUCTION" = "true" ]; then $(npm bin)/ng build --prod --build-optimizer; else $(npm bin)/ng build --env=local; fi
+ARG SUBDIRECTORY
+RUN make create_dynamic_environment_configuration
+RUN if [ "$PRODUCTION" = "true" ]; then $(npm bin)/ng build --prod --env=dynamic --base-href "$SUBDIRECTORY" --build-optimizer; else $(npm bin)/ng build --base-href "$SUBDIRECTORY" --env=dynamic; fi
 
 
 ### STAGE 2: Setup ###

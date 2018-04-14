@@ -27,7 +27,8 @@
       "environments": {
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts",
-        "local": "environments/environment.local.ts"
+        "local": "environments/environment.local.ts",
+        "dynamic": "environments/environment.dynamic.ts"
       },
       "stylePreprocessorOptions": {
         "includePaths": [
