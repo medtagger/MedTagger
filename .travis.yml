@@ -10,7 +10,7 @@ jobs:
   include:
 
   # Backend - linters & unit tests
-  - stage: test backend
+  - stage: test
     script:
     - export MEDTAGGER__BACKEND_INSTALL_SYSTEM_DEPENDENCIES=false
     - ./.travis/run_tests_if_subproject_changed.py backend --command="
@@ -18,7 +18,7 @@ jobs:
        docker-compose run --no-deps medtagger_backend_rest /bin/bash -c \"make install_dev_packages && make test\""
 
   # Backend - functional tests
-  - stage: test backend
+  - stage: test
     if: branch = master
     script:
     - export MEDTAGGER__BACKEND_INSTALL_SYSTEM_DEPENDENCIES=false
@@ -28,7 +28,7 @@ jobs:
        docker-compose down"
 
   # Frontend - build Docker
-  - stage: test frontend
+  - stage: test
     script:
     - ./.travis/run_tests_if_subproject_changed.py frontend --command="
        docker-compose build medtagger_frontend"
