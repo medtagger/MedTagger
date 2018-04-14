@@ -20,6 +20,7 @@ from medtagger.repositories.slices import SlicesRepository
 
 logger = get_task_logger(__name__)
 
+CONVERT_IN_OTHER_AXIS = False  # Disabled until Frontend will enable support for such Slices
 MAX_PREVIEW_X_SIZE = 256
 
 
@@ -53,14 +54,16 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         slice_pixels = convert_slice_to_normalized_8bit_array(dicom_image)
         _convert_to_png_and_store(_slice, slice_pixels)
 
-    # Prepare a preview size and convert 3D scan to fit its max X's axis shape
-    logger.info('Normalizing Scan in 3D. This may take a while...')
-    normalized_scan = convert_scan_to_normalized_8bit_array(dicom_images, output_x_size=MAX_PREVIEW_X_SIZE)
+    # Convert only if it's enabled
+    if CONVERT_IN_OTHER_AXIS:
+        # Prepare a preview size and convert 3D scan to fit its max X's axis shape
+        logger.info('Normalizing Scan in 3D. This may take a while...')
+        normalized_scan = convert_scan_to_normalized_8bit_array(dicom_images, output_x_size=MAX_PREVIEW_X_SIZE)
 
-    # Prepare Slices in other orientations
-    logger.info('Preparing Slices in other axis.')
-    _prepare_slices_in_y_orientation(normalized_scan, scan)
-    _prepare_slices_in_x_orientation(normalized_scan, scan)
+        # Prepare Slices in other orientations
+        logger.info('Preparing Slices in other axis.')
+        _prepare_slices_in_y_orientation(normalized_scan, scan)
+        _prepare_slices_in_x_orientation(normalized_scan, scan)
 
     logger.info('Marking whole Scan as converted.')
     scan.mark_as_converted()
