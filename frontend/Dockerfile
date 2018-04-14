@@ -3,7 +3,7 @@
 # We label our stage as 'builder'
 FROM node:8-alpine as builder
 
-RUN apt-get install make
+RUN apk add --no-cache make
 
 COPY package.json package-lock.json ./
 
