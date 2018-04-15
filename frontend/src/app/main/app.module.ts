@@ -19,6 +19,7 @@ import {HttpAuthenticationInterceptor} from "../services/http-authentication.int
 import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
 
+import {DomSanitizer} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {
@@ -29,6 +30,7 @@ import {
     MatRadioModule,
     MatSliderModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
@@ -44,6 +46,7 @@ import {
     MatDialogModule,
     MatChipsModule,
     MatCheckboxModule,
+    MatIconRegistry,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {routing} from "./app.routes";
@@ -83,6 +86,7 @@ import {MedTaggerWebSocket} from "../services/websocket.service";
         MatInputModule,
         MatSliderModule,
         MatButtonModule,
+        MatButtonToggleModule,
         MatIconModule,
         MatSidenavModule,
         MatListModule,
@@ -118,4 +122,9 @@ import {MedTaggerWebSocket} from "../services/websocket.service";
     ],
     bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+    constructor(matIconRegistry: MatIconRegistry, domSanitizer: DomSanitizer) {
+    let MATERIAL_DESIGN_ICONS = '/assets/fonts/mdi.svg';
+        matIconRegistry.addSvgIconSet(domSanitizer.bypassSecurityTrustResourceUrl(MATERIAL_DESIGN_ICONS));
+    }
+}

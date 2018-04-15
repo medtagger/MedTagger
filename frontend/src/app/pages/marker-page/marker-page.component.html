@@ -1,22 +1,76 @@
 <div class="marker-page">
-    <div class="innerElement canvasInterface">
-        <app-marker-component #marker></app-marker-component>
-        <div class="button-row">
+    <div class="marker-toolbox">
+        <div class="tags">
+            <h3>Available Tags</h3>
+            <mat-form-field>
+                <mat-select placeholder="Current Tag" required>
+                    <mat-option value="LEFT_KIDNEY">Left Kidney</mat-option>
+                    <mat-option value="RIGHT_KIDNEY">Right Kidney</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="tools">
+            <h3>Available Tools</h3>
+            <div class="buttons">
+                <button mat-mini-fab><mat-icon>crop</mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon>brush</mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon svgIcon="eraser"></mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon svgIcon="gesture-tap"></mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon>timeline</mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon>zoom_in</mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon>zoom_out</mat-icon></button>
+            </div>
+        </div>
+
+        <div class="labels">
+            <h3>Your Labels</h3>
+            <mat-list dense>
+                <h4 matSubheader>Left Kidney<mat-icon>arrow_drop_up</mat-icon></h4>
+                <mat-list-item>
+                    <p matLine><mat-icon>crop</mat-icon> Slice #24</p>
+                    <button mat-icon-button><mat-icon>visibility</mat-icon></button>
+                </mat-list-item>
+                <mat-list-item>
+                    <p matLine><mat-icon>crop</mat-icon> Slice #25</p>
+                    <button mat-icon-button><mat-icon>visibility</mat-icon></button>
+                </mat-list-item>
+                <mat-list-item>
+                    <p matLine><mat-icon>crop</mat-icon> Slice #26</p>
+                    <button mat-icon-button><mat-icon>visibility_off</mat-icon></button>
+                </mat-list-item>
+                <mat-divider></mat-divider>
+                <h4 matSubheader>Right Kidney<mat-icon>arrow_drop_up</mat-icon></h4>
+                <mat-list-item>
+                    <p matLine><mat-icon>crop</mat-icon> Slice #27</p>
+                    <button mat-icon-button><mat-icon>visibility</mat-icon></button>
+                </mat-list-item>
+            </mat-list>
+        </div>
+
+        <div class="actions">
+            <h3>Actions</h3>
             <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="!this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
                 Skip scan
             </button>
+            <!--
             <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
                 Next scan
             </button>
-            <button mat-raised-button color="warn" [disabled]="!this.marker.selectionState.is2d"
-                    (click)="remove2dSelection()">Delete current label
-            </button>
+            -->
             <button mat-raised-button color="accent" [disabled]="!this.marker.selectionState.isValid" (click)="sendCompleteLabel()">
                 Send label
             </button>
+            <!--
             <button mat-raised-button color="accent" [disabled]="this.marker.selectionState.hasArchive || this.marker.selectionState.isValid || this.marker.downloadingScanInProgress" (click)="sendEmptyLabel()">
                 Nothing to tag
             </button>
+            -->
+        </div>
+    </div>
+    <div class="marker-content">
+        <div class="innerElement canvasInterface">
+            <app-marker-component #marker></app-marker-component>
         </div>
     </div>
 </div>
