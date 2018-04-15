@@ -22,7 +22,7 @@
                 <button mat-mini-fab disabled><mat-icon>zoom_out</mat-icon></button>
             </div>
         </div>
-
+        
         <div class="labels">
             <h3>Your Labels</h3>
             <mat-list dense>
@@ -52,22 +52,24 @@
 
         <div class="actions">
             <h3>Actions</h3>
-            <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="!this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
-                Skip scan
-            </button>
-            <!--
-            <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
-                Next scan
-            </button>
-            -->
-            <button mat-raised-button color="accent" [disabled]="!this.marker.selectionState.isValid" (click)="sendCompleteLabel()">
-                Send label
-            </button>
-            <!--
-            <button mat-raised-button color="accent" [disabled]="this.marker.selectionState.hasArchive || this.marker.selectionState.isValid || this.marker.downloadingScanInProgress" (click)="sendEmptyLabel()">
-                Nothing to tag
-            </button>
-            -->
+            <div class="buttons">
+                <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="!this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
+                    Skip scan
+                </button>
+                <!--
+                <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
+                    Next scan
+                </button>
+                -->
+                <button mat-raised-button color="accent" [disabled]="!this.marker.selectionState.isValid" (click)="sendCompleteLabel()">
+                    Send label
+                </button>
+                <!--
+                <button mat-raised-button color="accent" [disabled]="this.marker.selectionState.hasArchive || this.marker.selectionState.isValid || this.marker.downloadingScanInProgress" (click)="sendEmptyLabel()">
+                    Nothing to tag
+                </button>
+                -->
+            </div>
         </div>
     </div>
     <div class="marker-content">
