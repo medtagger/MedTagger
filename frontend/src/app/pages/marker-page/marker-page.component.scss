@@ -50,6 +50,10 @@ button {
             padding-left: 8px;
         }
 
+        .clickable {
+            cursor: pointer;
+        }
+
         mat-list-item:hover {
             background-color: #e4e4e4;
         }

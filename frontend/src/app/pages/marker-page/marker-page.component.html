@@ -4,8 +4,9 @@
             <h3>Available Tags</h3>
             <mat-form-field>
                 <mat-select placeholder="Current Tag" required>
-                    <mat-option value="LEFT_KIDNEY">Left Kidney</mat-option>
-                    <mat-option value="RIGHT_KIDNEY">Right Kidney</mat-option>
+                    <mat-option *ngFor="let tag of tags" [value]="tag.key">
+                        {{ tag.name }}
+                    </mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
@@ -26,6 +27,32 @@
         <div class="labels">
             <h3>Your Labels</h3>
             <mat-list dense>
+                <div *ngFor="let tag of tags">
+                    <h4 matSubheader>
+                        {{ tag.name }}
+                        <mat-icon *ngIf="!tag.hidden" (click)="tag.hidden = true;" class="clickable">arrow_drop_up</mat-icon>
+                        <mat-icon *ngIf="tag.hidden" (click)="tag.hidden = false;" class="clickable">arrow_drop_down</mat-icon>
+                    </h4>
+                    <div *ngIf="!tag.hidden">
+                        <mat-list-item *ngFor="let label of getLabelsForTag(tag)"
+                                       (mouseenter)="label.hovered=true"
+                                       (mouseleave)="label.hovered=false">
+                            <p matLine><mat-icon class="size-16px">crop</mat-icon> Slice #{{ label.sliceIndex }}</p>
+                            <button mat-icon-button *ngIf="label.hovered"><mat-icon class="size-16px">delete</mat-icon></button>
+                            <button mat-icon-button *ngIf="label.hovered || label.pinned" (click)="label.pinned=!label.pinned">
+                                <mat-icon *ngIf="!label.pinned" class="smaller-svg" svgIcon="pin-off"></mat-icon>
+                                <mat-icon *ngIf="label.pinned" class="smaller-svg" svgIcon="pin"></mat-icon>
+                            </button>
+                            <button mat-icon-button (click)="label.visible=!label.visible">
+                                <mat-icon *ngIf="label.visible" class="size-16px">visibility</mat-icon>
+                                <mat-icon *ngIf="!label.visible" class="size-16px">visibility_off</mat-icon>
+                            </button>
+                        </mat-list-item>
+                    </div>
+                    <mat-divider></mat-divider>
+                </div>
+
+                <!--
                 <h4 matSubheader>Left Kidney<mat-icon>arrow_drop_up</mat-icon></h4>
                 <mat-list-item>
                     <p matLine><mat-icon class="size-16px">crop</mat-icon> Slice #24</p>
@@ -47,6 +74,7 @@
                     <p matLine><mat-icon class="size-16px">crop</mat-icon> Slice #27</p>
                     <button mat-icon-button><mat-icon class="size-16px">visibility</mat-icon></button>
                 </mat-list-item>
+                -->
             </mat-list>
         </div>
 

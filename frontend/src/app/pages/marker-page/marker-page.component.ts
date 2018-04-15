@@ -13,6 +13,38 @@ import {Location} from '@angular/common';
 import {MatSnackBar} from '@angular/material';
 
 
+class LabelTag {
+    name: string;
+    key: string;
+    tools: Array<string>;
+    hidden: boolean;
+
+    constructor(name: string, key: string, tools: Array<string>) {
+        this.name = name;
+        this.key = key;
+        this.tools = tools;
+        this.hidden = false;
+    }
+}
+
+
+class LabelListItem {
+    sliceIndex: number;
+    pinned: boolean;
+    visible: boolean;
+    tag: LabelTag;
+    hovered: boolean;  // TODO: Can I do this in any better way?
+
+    constructor(sliceIndex: number, tag: LabelTag) {
+        this.sliceIndex = sliceIndex;
+        this.tag = tag;
+        this.visible = true;
+        this.pinned = false;
+        this.hovered = false;
+    }
+}
+
+
 @Component({
     selector: 'app-marker-page',
     templateUrl: './marker-page.component.html',
@@ -30,12 +62,32 @@ export class MarkerPageComponent implements OnInit {
     lastSliceID = 0;
     startTime: Date;
 
+    // Mock-up!
+    tags: Array<LabelTag> = [
+        new LabelTag("Left Kidney", "LEFT_KIDNEY", ["RECTANGLE"]),
+        new LabelTag("Right Kidney", "RIGHT_KIDNEY", ["RECTANGLE"]),
+    ];
+    labels: Array<LabelListItem> = [
+        new LabelListItem(25, this.tags[0]),
+        new LabelListItem(26, this.tags[0]),
+        new LabelListItem(27, this.tags[0]),
+        new LabelListItem(22, this.tags[1]),
+    ];
+
+    public getLabelsForTag(tag: LabelTag): Array<LabelListItem> {
+        return this.labels.filter(label => label.tag.key == tag.key);
+    }
+
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar) {
         console.log('MarkerPage constructor', this.marker);
     }
 
     ngOnInit() {
+        // Mock-up!
+        this.labels[0].visible = false;
+        this.labels[1].pinned = true;
+
         console.log('MarkerPage init', this.marker);
 
         this.marker.setSelector(new RectROISelector(this.marker.getCanvas()));
