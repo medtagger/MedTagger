@@ -11,7 +11,7 @@ $canvas-size: 600px;
 
 #markerBackgroundImage {
     @extend #markerCanvas;
-    background-color: grey;
+    background-color: black;
 }
 
 #markerSlider {

@@ -58,12 +58,25 @@ button {
         p {
             padding-left: 8px;
         }
+
+        mat-list-item:hover {
+            background-color: #e4e4e4;
+        }
         
         mat-icon {
+            vertical-align: sub;
+        }
+
+        mat-icon.size-16px {
             font-size: 16px;
             height: 16px;
             width: 16px;
-            vertical-align: top;
+            line-height: 16px;
+        }
+
+        mat-icon.smaller-svg {
+            transform: scale(0.7);
+            vertical-align: middle !important;
         }
 
         .mat-line {
