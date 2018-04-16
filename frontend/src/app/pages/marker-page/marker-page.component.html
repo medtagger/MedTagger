@@ -23,7 +23,7 @@
                 <button mat-mini-fab disabled><mat-icon>zoom_out</mat-icon></button>
             </div>
         </div>
-        
+
         <div class="labels">
             <h3>Your Labels</h3>
             <mat-list dense>
@@ -34,11 +34,13 @@
                         <mat-icon *ngIf="tag.hidden" (click)="tag.hidden = false;" class="clickable">arrow_drop_down</mat-icon>
                     </h4>
                     <div *ngIf="!tag.hidden">
+                        <!-- TODO: Remove this calls to functions! -->
+                        <h5 *ngIf="getLabelsForTag(tag).length == 0" class="no-labels-for-tag">No Labels for this Tag!</h5>
                         <mat-list-item *ngFor="let label of getLabelsForTag(tag)"
                                        (mouseenter)="label.hovered=true"
                                        (mouseleave)="label.hovered=false">
                             <p matLine><mat-icon class="size-16px">crop</mat-icon> Slice #{{ label.sliceIndex }}</p>
-                            <button mat-icon-button *ngIf="label.hovered"><mat-icon class="size-16px">delete</mat-icon></button>
+                            <button mat-icon-button *ngIf="label.hovered" (click)="deleteLabel(label)"><mat-icon class="size-16px">delete</mat-icon></button>
                             <button mat-icon-button *ngIf="label.hovered || label.pinned" (click)="label.pinned=!label.pinned">
                                 <mat-icon *ngIf="!label.pinned" class="smaller-svg" svgIcon="pin-off"></mat-icon>
                                 <mat-icon *ngIf="label.pinned" class="smaller-svg" svgIcon="pin"></mat-icon>
@@ -51,52 +53,21 @@
                     </div>
                     <mat-divider></mat-divider>
                 </div>
-
-                <!--
-                <h4 matSubheader>Left Kidney<mat-icon>arrow_drop_up</mat-icon></h4>
-                <mat-list-item>
-                    <p matLine><mat-icon class="size-16px">crop</mat-icon> Slice #24</p>
-                    <button mat-icon-button><mat-icon class="size-16px">delete</mat-icon></button>
-                    <button mat-icon-button><mat-icon class="smaller-svg" svgIcon="pin"></mat-icon></button>
-                    <button mat-icon-button><mat-icon class="size-16px">visibility</mat-icon></button>
-                </mat-list-item>
-                <mat-list-item>
-                    <p matLine><mat-icon class="size-16px">crop</mat-icon> Slice #25</p>
-                    <button mat-icon-button><mat-icon class="size-16px">visibility</mat-icon></button>
-                </mat-list-item>
-                <mat-list-item>
-                    <p matLine><mat-icon class="size-16px">crop</mat-icon> Slice #26</p>
-                    <button mat-icon-button><mat-icon class="size-16px">visibility_off</mat-icon></button>
-                </mat-list-item>
-                <mat-divider></mat-divider>
-                <h4 matSubheader>Right Kidney<mat-icon>arrow_drop_up</mat-icon></h4>
-                <mat-list-item>
-                    <p matLine><mat-icon class="size-16px">crop</mat-icon> Slice #27</p>
-                    <button mat-icon-button><mat-icon class="size-16px">visibility</mat-icon></button>
-                </mat-list-item>
-                -->
             </mat-list>
         </div>
 
         <div class="actions">
             <h3>Actions</h3>
             <div class="buttons">
-                <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="!this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
+                <button mat-raised-button color="primary" (click)="skipScan()">
                     Skip scan
                 </button>
-                <!--
-                <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
-                    Next scan
-                </button>
-                -->
-                <button mat-raised-button color="accent" [disabled]="!this.marker.selectionState.isValid" (click)="sendCompleteLabel()">
+                <button mat-raised-button color="accent" (click)="sendCompleteLabel()" *ngIf="this.labels.length > 0">
                     Send label
                 </button>
-                <!--
-                <button mat-raised-button color="accent" [disabled]="this.marker.selectionState.hasArchive || this.marker.selectionState.isValid || this.marker.downloadingScanInProgress" (click)="sendEmptyLabel()">
+                <button mat-raised-button color="accent" (click)="sendEmptyLabel()" *ngIf="this.labels.length == 0">
                     Nothing to tag
                 </button>
-                -->
             </div>
         </div>
     </div>

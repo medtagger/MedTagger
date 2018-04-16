@@ -45,9 +45,13 @@ button {
 
     .labels {
         flex: 1;
-            
+
         p {
             padding-left: 8px;
+        }
+
+        h5.no-labels-for-tag {
+            padding-left: 20px;
         }
 
         .clickable {
@@ -93,6 +97,7 @@ button {
             display: flex;
 
             button {
+                flex-basis: 0;
                 flex-grow: 1;
             }
         }

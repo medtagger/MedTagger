@@ -74,10 +74,6 @@ export class MarkerPageComponent implements OnInit {
         new LabelListItem(22, this.tags[1]),
     ];
 
-    public getLabelsForTag(tag: LabelTag): Array<LabelListItem> {
-        return this.labels.filter(label => label.tag.key == tag.key);
-    }
-
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar) {
         console.log('MarkerPage constructor', this.marker);
@@ -191,6 +187,17 @@ export class MarkerPageComponent implements OnInit {
 
     public remove2dSelection(): void {
         this.marker.removeCurrentSelection();
+    }
+
+    public getLabelsForTag(tag: LabelTag): Array<LabelListItem> {
+        return this.labels.filter(label => label.tag.key == tag.key);
+    }
+
+    public deleteLabel(label: LabelListItem): void {
+        let index = this.labels.indexOf(label);
+        if (index > -1) {
+            this.labels.splice(index, 1);
+        }
     }
 
     private startMeasuringLabelingTime(): void {
