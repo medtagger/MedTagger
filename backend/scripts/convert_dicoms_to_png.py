@@ -39,5 +39,6 @@ if not os.path.exists(converted_dicoms_folder_path):
 
 for single_dicom in dicoms:
     image_bytes = convert_slice_to_normalized_8bit_array(single_dicom)
-    converted_dicom_name = '{0:.2f}'.format(single_dicom.GetMetaData(DicomTags.IMAGE_POSITION_PATIENT).split('\\')[2] + min_position)
+    slice_position = single_dicom.GetMetaData(DicomTags.IMAGE_POSITION_PATIENT).split('\\')[2]
+    converted_dicom_name = '{0:.2f}'.format(slice_position + min_position)
     Image.fromarray(image_bytes, 'L').save(converted_dicoms_folder_path + converted_dicom_name + '.png')

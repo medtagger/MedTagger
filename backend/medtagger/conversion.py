@@ -41,7 +41,8 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[sitk.Image], output_
     :param output_x_size: (optional) X axis size for output shape
     :return: 3D numpy array with normalized pixels
     """
-    dicom_files = sorted(dicom_files, key=lambda _slice: float(_slice.GetMetaData(DicomTags.SLICE_LOCATION)), reverse=True)
+    dicom_files = sorted(dicom_files, key=lambda _slice: float(_slice.GetMetaData(DicomTags.SLICE_LOCATION)),
+                         reverse=True)
     thickness = _get_scan_slice_thickness(dicom_files)
     spacing = float(dicom_files[0].GetMetaData(DicomTags.PIXEL_SPACING).split('\\')[0])
     intercept = float(dicom_files[0].GetMetaData(DicomTags.RESCALE_INTERCEPT))
