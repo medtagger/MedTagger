@@ -3,6 +3,8 @@
 # We label our stage as 'builder'
 FROM node:8-alpine as builder
 
+RUN apk add --no-cache make
+
 COPY package.json package-lock.json ./
 
 RUN npm set progress=false && npm config set depth 0 && npm cache clean --force
@@ -17,7 +19,9 @@ COPY . .
 
 ## Build the angular app in given mode and store the artifacts in dist folder
 ARG PRODUCTION
-RUN if [ "$PRODUCTION" = "true" ]; then $(npm bin)/ng build --prod --build-optimizer; else $(npm bin)/ng build --env=local; fi
+ARG SUBDIRECTORY
+RUN MEDTAGGER__HOST_ON_SUBDIRECTORY=$SUBDIRECTORY make create_dynamic_environment_configuration
+RUN if [ "$PRODUCTION" = "true" ]; then $(npm bin)/ng build --prod --env=dynamic --base-href "$SUBDIRECTORY" --build-optimizer; else $(npm bin)/ng build --base-href "$SUBDIRECTORY" --env=dynamic; fi
 
 
 ### STAGE 2: Setup ###

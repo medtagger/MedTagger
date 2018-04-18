@@ -4,7 +4,7 @@ filePath = "/var/traefik/traefik.log"
 [accessLog]
 logLevel = "INFO"
 
-defaultEntryPoints = ["http", "ws"]
+defaultEntryPoints = ["http", "https", "ws", "wss"]
 
 [api]
 dashboard = true
