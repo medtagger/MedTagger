@@ -36,8 +36,8 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
         reader.SetFileName(temp_file.name)
         reader.ReadImageInformation()
 
-        location = SliceLocation(float(reader.GetMetaData(DicomTags.SLICE_LOCATION)))
-        image_position_patient = reader.GetMetaData(DicomTags.IMAGE_POSITION_PATIENT).split('\\')
+        location = SliceLocation(float(reader.GetMetaData(DicomTags.SLICE_LOCATION.value)))
+        image_position_patient = reader.GetMetaData(DicomTags.IMAGE_POSITION_PATIENT.value).split('\\')
         position = SlicePosition(float(image_position_patient[0]),
                                  float(image_position_patient[1]),
                                  float(image_position_patient[2]))

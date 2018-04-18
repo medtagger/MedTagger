@@ -50,7 +50,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
         dicom_image = sitk.ReadImage(temp_file.name)
         dicom_images.append(dicom_image)
-        temp_files_to_remove.extend(temp_file.name)
+        temp_files_to_remove.append(temp_file.name)
 
     # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
     logger.info('Converting each Slice in Z axis.')
@@ -72,7 +72,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
     # Remove all temporarily created files for applying workaround
     for file_name in temp_files_to_remove:
-        os.remove(file_name)
+        os.unlink(file_name)
 
 
 def _prepare_slices_in_y_orientation(normalized_scan: np.ndarray, scan: Scan) -> None:
