@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 import SimpleITK as sitk
 from celery.utils.log import get_task_logger
 
+from medtagger.definitions import DicomTags
 from medtagger.types import ScanID, SliceID, SlicePosition, SliceLocation
 from medtagger.workers import celery_app
 from medtagger.workers.conversion import convert_scan_to_png
@@ -12,9 +13,6 @@ from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.slices import SlicesRepository
 
 logger = get_task_logger(__name__)
-
-SLICE_LOCATION_TAG = '0020|1041'
-IMAGE_POSITION_PATIENT_TAG = '0020|0032'
 
 
 @celery_app.task
@@ -38,8 +36,8 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
         reader.SetFileName(temp_file.name)
         reader.ReadImageInformation()
 
-        location = SliceLocation(float(reader.GetMetaData(SLICE_LOCATION_TAG)))
-        image_position_patient = reader.GetMetaData(IMAGE_POSITION_PATIENT_TAG).split('\\')
+        location = SliceLocation(float(reader.GetMetaData(DicomTags.SLICE_LOCATION)))
+        image_position_patient = reader.GetMetaData(DicomTags.IMAGE_POSITION_PATIENT).split('\\')
         position = SlicePosition(float(image_position_patient[0]),
                                  float(image_position_patient[1]),
                                  float(image_position_patient[2]))

@@ -5,13 +5,7 @@ import numpy as np
 import SimpleITK as sitk
 from scipy import ndimage
 
-
-SLICE_LOCATION_TAG = '0020|1041'
-IMAGE_POSITION_PATIENT_TAG = '0020|0032'
-RESCALE_INTERCEPT_TAG = '0028|1052'
-RESCALE_SLOPE_TAG = '0028|1053'
-RESCALE_TYPE_TAG = '0028|1054'
-PIXEL_SPACING_TAG = '0028|0030'
+from medtagger.definitions import DicomTags
 
 
 def convert_slice_to_normalized_8bit_array(dicom_file: sitk.Image) -> np.ndarray:
@@ -21,11 +15,11 @@ def convert_slice_to_normalized_8bit_array(dicom_file: sitk.Image) -> np.ndarray
     :return numpy array of pixels
     """
     pixel_array = sitk.GetArrayViewFromImage(dicom_file)[0]
-    intercept = float(dicom_file.GetMetaData(RESCALE_INTERCEPT_TAG))
-    slope = float(dicom_file.GetMetaData(RESCALE_SLOPE_TAG))
+    intercept = float(dicom_file.GetMetaData(DicomTags.RESCALE_INTERCEPT))
+    slope = float(dicom_file.GetMetaData(DicomTags.RESCALE_SLOPE))
 
     try:
-        rescale_type = dicom_file.GetMetaData(RESCALE_TYPE_TAG)
+        rescale_type = dicom_file.GetMetaData(DicomTags.RESCALE_TYPE)
     except RuntimeError:
         rescale_type = None
 
@@ -47,11 +41,11 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[sitk.Image], output_
     :param output_x_size: (optional) X axis size for output shape
     :return: 3D numpy array with normalized pixels
     """
-    dicom_files = sorted(dicom_files, key=lambda _slice: float(_slice.GetMetaData(SLICE_LOCATION_TAG)), reverse=True)
+    dicom_files = sorted(dicom_files, key=lambda _slice: float(_slice.GetMetaData(DicomTags.SLICE_LOCATION)), reverse=True)
     thickness = _get_scan_slice_thickness(dicom_files)
-    spacing = float(dicom_files[0].GetMetaData(PIXEL_SPACING_TAG).split('\\')[0])
-    intercept = float(dicom_files[0].GetMetaData(RESCALE_INTERCEPT_TAG))
-    slope = float(dicom_files[0].GetMetaData(RESCALE_SLOPE_TAG))
+    spacing = float(dicom_files[0].GetMetaData(DicomTags.PIXEL_SPACING).split('\\')[0])
+    intercept = float(dicom_files[0].GetMetaData(DicomTags.RESCALE_INTERCEPT))
+    slope = float(dicom_files[0].GetMetaData(DicomTags.RESCALE_SLOPE))
 
     # Read all Dicom images and retrieve pixel values for each slice
     pixel_array = np.array(np.stack(sitk.GetArrayViewFromImage(_slice)[0] for _slice in dicom_files))
@@ -113,8 +107,8 @@ def _get_scan_slice_thickness(dicom_files: List[Any]) -> float:
     :return: float value with Scan's Slice thickness
     """
     try:
-        first_location = float(dicom_files[0].GetMetaData(SLICE_LOCATION_TAG))
-        second_location = float(dicom_files[1].GetMetaData(SLICE_LOCATION_TAG))
+        first_location = float(dicom_files[0].GetMetaData(DicomTags.SLICE_LOCATION))
+        second_location = float(dicom_files[1].GetMetaData(DicomTags.SLICE_LOCATION))
         return abs(second_location - first_location)
     except IndexError:
         return 1.0  # It seems that there is only one Slice. Thickness >=1.0 will be fine for all of the computations.
