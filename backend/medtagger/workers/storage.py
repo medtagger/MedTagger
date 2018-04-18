@@ -1,7 +1,8 @@
 """Module responsible for asynchronous data storage."""
-import io
+import os
+from tempfile import NamedTemporaryFile
 
-import pydicom
+import SimpleITK as sitk
 from celery.utils.log import get_task_logger
 
 from medtagger.types import ScanID, SliceID, SlicePosition, SliceLocation
@@ -11,6 +12,9 @@ from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.slices import SlicesRepository
 
 logger = get_task_logger(__name__)
+
+SLICE_LOCATION_TAG = '0020|1041'
+IMAGE_POSITION_PATIENT_TAG = '0020|0032'
 
 
 @celery_app.task
@@ -22,20 +26,32 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
     logger.debug('Parsing Dicom file from HBase for given Slice ID: %s.', slice_id)
     _slice = SlicesRepository.get_slice_by_id(slice_id)
     image = SlicesRepository.get_slice_original_image(_slice.id)
-    image_bytes = io.BytesIO(image)
+
+    # We've got to store above DICOM image bytes on disk due to the fact that SimpleITK does not support
+    # reading files from memory. It has to work on a file stored on a hard drive.
+    temp_file = NamedTemporaryFile(delete=False)
+    temp_file.write(image)
+    temp_file.close()
 
     try:
-        dicom_image = pydicom.read_file(image_bytes, stop_before_pixels=True, force=True)
-        location = SliceLocation(float(dicom_image.SliceLocation))
-        position = SlicePosition(float(dicom_image.ImagePositionPatient[0]),
-                                 float(dicom_image.ImagePositionPatient[1]),
-                                 float(dicom_image.ImagePositionPatient[2]))
-    except AttributeError:
+        reader = sitk.ImageFileReader()
+        reader.SetFileName(temp_file.name)
+        reader.ReadImageInformation()
+
+        location = SliceLocation(float(reader.GetMetaData(SLICE_LOCATION_TAG)))
+        image_position_patient = reader.GetMetaData(IMAGE_POSITION_PATIENT_TAG).split('\\')
+        position = SlicePosition(float(image_position_patient[0]),
+                                 float(image_position_patient[1]),
+                                 float(image_position_patient[2]))
+    except Exception:  # TODO: Check what can it throw...
         logger.error('User sent a file that is not a DICOM.')
         SlicesRepository.delete_slice_by_id(_slice.id)
         ScansRepository.reduce_number_of_declared_slices(_slice.scan_id)
         trigger_scan_conversion_if_needed(_slice.scan_id)
         return
+
+    # Remove temporary file
+    os.unlink(temp_file.name)
 
     _slice.update_location(location)
     _slice.update_position(position)

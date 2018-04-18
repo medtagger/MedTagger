@@ -1,22 +1,35 @@
 """Module responsible for conversion of Dicom files."""
-from typing import List, Optional
+from typing import List, Any, Optional
 
 import numpy as np
+import SimpleITK as sitk
 from scipy import ndimage
-from pydicom.dataset import FileDataset
 
 
-def convert_slice_to_normalized_8bit_array(dicom_file: FileDataset) -> np.ndarray:
+SLICE_LOCATION_TAG = '0020|1041'
+IMAGE_POSITION_PATIENT_TAG = '0020|0032'
+RESCALE_INTERCEPT_TAG = '0028|1052'
+RESCALE_SLOPE_TAG = '0028|1053'
+RESCALE_TYPE_TAG = '0028|1054'
+PIXEL_SPACING_TAG = '0028|0030'
+
+
+def convert_slice_to_normalized_8bit_array(dicom_file: sitk.Image) -> np.ndarray:
     """Convert Dicom file to 8bit pixel array.
 
     :param: dicom_file: Dicom file that will be converted to a pixel array
     :return numpy array of pixels
     """
-    pixel_array = dicom_file.pixel_array
-    intercept = dicom_file.RescaleIntercept
-    slope = dicom_file.RescaleSlope
+    pixel_array = sitk.GetArrayViewFromImage(dicom_file)[0]
+    intercept = float(dicom_file.GetMetaData(RESCALE_INTERCEPT_TAG))
+    slope = float(dicom_file.GetMetaData(RESCALE_SLOPE_TAG))
 
-    if hasattr(dicom_file, 'RescaleType') and dicom_file.RescaleType != 'normalized':
+    try:
+        rescale_type = dicom_file.GetMetaData(RESCALE_TYPE_TAG)
+    except RuntimeError:
+        rescale_type = None
+
+    if rescale_type != 'normalized':
         hu_units_array = convert_to_hounsfield_units(pixel_array, intercept, slope)
         normalized_hu_array = normalize(hu_units_array)
         pixel_array = normalized_hu_array
@@ -26,7 +39,7 @@ def convert_slice_to_normalized_8bit_array(dicom_file: FileDataset) -> np.ndarra
     return pixel_array
 
 
-def convert_scan_to_normalized_8bit_array(dicom_files: List[FileDataset], output_x_size: Optional[int] = None) \
+def convert_scan_to_normalized_8bit_array(dicom_files: List[sitk.Image], output_x_size: Optional[int] = None) \
         -> np.ndarray:
     """Convert list of Dicom files to 8bit pixel array with output X axis size.
 
@@ -34,14 +47,14 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[FileDataset], output
     :param output_x_size: (optional) X axis size for output shape
     :return: 3D numpy array with normalized pixels
     """
-    dicom_files = sorted(dicom_files, key=lambda _slice: _slice.SliceLocation, reverse=True)
+    dicom_files = sorted(dicom_files, key=lambda _slice: float(_slice.GetMetaData(SLICE_LOCATION_TAG)), reverse=True)
     thickness = _get_scan_slice_thickness(dicom_files)
-    spacing = float(dicom_files[0].PixelSpacing.pop())
-    intercept = dicom_files[0].RescaleIntercept
-    slope = dicom_files[0].RescaleSlope
+    spacing = float(dicom_files[0].GetMetaData(PIXEL_SPACING_TAG).split('\\')[0])
+    intercept = float(dicom_files[0].GetMetaData(RESCALE_INTERCEPT_TAG))
+    slope = float(dicom_files[0].GetMetaData(RESCALE_SLOPE_TAG))
 
     # Read all Dicom images and retrieve pixel values for each slice
-    pixel_array = np.array(np.stack(_slice.pixel_array for _slice in dicom_files))
+    pixel_array = np.array(np.stack(sitk.GetArrayViewFromImage(_slice)[0] for _slice in dicom_files))
 
     # Calculate scale factor that should be applied to the input 3D scan
     real_shape = np.array([thickness, spacing, spacing]) * pixel_array.shape  # Shape after applying voxel's size
@@ -93,13 +106,15 @@ def normalize(hu_array: np.ndarray, min_bound: int = -360, max_bound: int = 440)
     return hu_array
 
 
-def _get_scan_slice_thickness(dicom_files: List[FileDataset]) -> float:
+def _get_scan_slice_thickness(dicom_files: List[Any]) -> float:
     """Calculate Scan's Slice thickness.
 
     :param dicom_files: list of all Dicom files related to given Scan
     :return: float value with Scan's Slice thickness
     """
     try:
-        return abs(dicom_files[0].SliceLocation - dicom_files[1].SliceLocation)
+        first_location = float(dicom_files[0].GetMetaData(SLICE_LOCATION_TAG))
+        second_location = float(dicom_files[1].GetMetaData(SLICE_LOCATION_TAG))
+        return abs(second_location - first_location)
     except IndexError:
         return 1.0  # It seems that there is only one Slice. Thickness >=1.0 will be fine for all of the computations.
