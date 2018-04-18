@@ -43,7 +43,7 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
         position = SlicePosition(float(image_position_patient[0]),
                                  float(image_position_patient[1]),
                                  float(image_position_patient[2]))
-    except Exception:  # TODO: Check what can it throw...
+    except RuntimeError:
         logger.error('User sent a file that is not a DICOM.')
         SlicesRepository.delete_slice_by_id(_slice.id)
         ScansRepository.reduce_number_of_declared_slices(_slice.scan_id)

@@ -2,12 +2,10 @@
 import io
 import os
 from tempfile import NamedTemporaryFile
-from subprocess import call
-from typing import List, Optional
+from typing import List
 
 import numpy as np
 import SimpleITK as sitk
-from pydicom.dataset import FileDataset
 from PIL import Image
 from celery.utils.log import get_task_logger
 
@@ -57,7 +55,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
     logger.info('Converting each Slice in Z axis.')
     for dicom_image, _slice in zip(dicom_images, slices):
-        slice_pixels = sitk.GetArrayViewFromImage(dicom_image)[0]
+        slice_pixels = convert_slice_to_normalized_8bit_array(dicom_image)
         _convert_to_png_and_store(_slice, slice_pixels)
 
     # Prepare a preview size and convert 3D scan to fit its max X's axis shape
