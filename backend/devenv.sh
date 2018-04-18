@@ -2,7 +2,6 @@
 
 # That's needed for Python to understand where is the root directory for parsing
 export PYTHONPATH=`pwd`
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/lib64:/usr/lib:/lib
 
 if [ -e venv ]
 then

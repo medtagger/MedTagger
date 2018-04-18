@@ -92,8 +92,6 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_rest
-      args:
-        - INSTALL_SYSTEM_DEPENDENCIES=${MEDTAGGER__BACKEND_INSTALL_SYSTEM_DEPENDENCIES}
     depends_on:
       - hbase
       - rabbitmq
@@ -124,8 +122,6 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_websocket
-      args:
-        - INSTALL_SYSTEM_DEPENDENCIES=${MEDTAGGER__BACKEND_INSTALL_SYSTEM_DEPENDENCIES}
     depends_on:
       - hbase
       - rabbitmq
@@ -156,8 +152,6 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_worker
-      args:
-        - INSTALL_SYSTEM_DEPENDENCIES=${MEDTAGGER__BACKEND_INSTALL_SYSTEM_DEPENDENCIES}
     depends_on:
       - hbase
       - rabbitmq
