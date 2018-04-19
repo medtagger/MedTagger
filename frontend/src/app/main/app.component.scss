@@ -83,12 +83,18 @@ mat-sidenav {
 
     .user-name {
         margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     .user-login {
         margin: 0;
         position: relative;
         top: -0.3em;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
 }
