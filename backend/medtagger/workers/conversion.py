@@ -20,6 +20,7 @@ from medtagger.repositories.slices import SlicesRepository
 
 logger = get_task_logger(__name__)
 
+CONVERT_IN_OTHER_AXES = False  # Disabled until Frontend will enable support for such Slices
 MAX_PREVIEW_X_SIZE = 256
 
 
@@ -47,20 +48,8 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         dicom_images.append(dicom_image)
         temp_files_to_remove.extend(files_to_remove)
 
-    # Correlate Dicom files with Slices and convert all Slices in the Z axis orientation
-    logger.info('Converting each Slice in Z axis.')
-    for dicom_image, _slice in zip(dicom_images, slices):
-        slice_pixels = convert_slice_to_normalized_8bit_array(dicom_image)
-        _convert_to_png_and_store(_slice, slice_pixels)
-
-    # Prepare a preview size and convert 3D scan to fit its max X's axis shape
-    logger.info('Normalizing Scan in 3D. This may take a while...')
-    normalized_scan = convert_scan_to_normalized_8bit_array(dicom_images, output_x_size=MAX_PREVIEW_X_SIZE)
-
-    # Prepare Slices in other orientations
-    logger.info('Preparing Slices in other axis.')
-    _prepare_slices_in_y_orientation(normalized_scan, scan)
-    _prepare_slices_in_x_orientation(normalized_scan, scan)
+    # Correlate Dicom files with Slices and convert all Slices
+    _convert_scan_in_all_axes(dicom_images, slices, scan)
 
     logger.info('Marking whole Scan as converted.')
     scan.mark_as_converted()
@@ -111,6 +100,32 @@ def _create_temporary_file(image: Optional[bytes] = None) -> str:
         if image:
             temp_file.write(image)
     return temp_file_name
+
+
+def _convert_scan_in_all_axes(dicom_images: List[FileDataset], slices: List[Slice], scan: Scan) -> None:
+    """Convert Scan in X, Y and Z axes.
+
+    NOTE: X & Y axes are now disabled (until Frontend will support it).
+
+    :param dicom_images: list of all Dicom images
+    :param slices: list of all Slices in given Scan
+    :param scan: Scan object to which new Slices should be added
+    """
+    logger.info('Converting each Slice in Z axis.')
+    for dicom_image, _slice in zip(dicom_images, slices):
+        slice_pixels = convert_slice_to_normalized_8bit_array(dicom_image)
+        _convert_to_png_and_store(_slice, slice_pixels)
+
+    # Convert only if it's enabled
+    if CONVERT_IN_OTHER_AXES:
+        # Prepare a preview size and convert 3D scan to fit its max X's axis shape
+        logger.info('Normalizing Scan in 3D. This may take a while...')
+        normalized_scan = convert_scan_to_normalized_8bit_array(dicom_images, output_x_size=MAX_PREVIEW_X_SIZE)
+
+        # Prepare Slices in other orientations
+        logger.info('Preparing Slices in other axis.')
+        _prepare_slices_in_y_orientation(normalized_scan, scan)
+        _prepare_slices_in_x_orientation(normalized_scan, scan)
 
 
 def _prepare_slices_in_y_orientation(normalized_scan: np.ndarray, scan: Scan) -> None:
