@@ -64,7 +64,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         os.unlink(file_name)
 
 
-def _convert_scan_in_all_axes(dicom_images: List[FileDataset], slices: List[Slice], scan: Scan) -> None:
+def _convert_scan_in_all_axes(dicom_images: List[sitk.Image], slices: List[Slice], scan: Scan) -> None:
     """Convert Scan in X, Y and Z axes.
 
     NOTE: X & Y axes are now disabled (until Frontend will support it).
