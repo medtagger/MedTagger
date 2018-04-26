@@ -1,8 +1,9 @@
 """Module responsible for defining ORM layer."""
+from datetime import datetime
 from typing import Generator
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, func, MetaData, Column, DateTime
 from sqlalchemy.orm import scoped_session, sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from flask_sqlalchemy import SQLAlchemy
@@ -12,6 +13,10 @@ from medtagger.config import AppConfiguration
 
 class MedTaggerBase(object):  # pylint: disable=too-few-public-methods
     """Base class for all of the models."""
+
+    _created = Column(DateTime, nullable=False, server_default=func.now(), default=datetime.utcnow)
+    _modified = Column(DateTime, nullable=False, server_default=func.now(), default=datetime.utcnow,
+                       onupdate=datetime.utcnow)
 
     def save(self) -> None:
         """Save the model into the database after changes."""
