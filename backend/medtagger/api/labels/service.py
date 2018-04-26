@@ -5,7 +5,7 @@ from flask import request
 from flask_restplus import Resource
 
 from medtagger.types import LabelID
-from medtagger.database.models import LabelElementStatus
+from medtagger.database.models import LabelStatus
 from medtagger.api import api, InvalidArgumentsException, NotFoundException
 from medtagger.api.labels import business, serializers
 from medtagger.api.security import login_required, role_required
@@ -52,7 +52,7 @@ class ChangeLabelStatus(Resource):
         payload = request.json
         raw_status = payload['status']
         try:
-            status = LabelElementStatus[raw_status]
+            status = LabelStatus[raw_status]
         except KeyError:
             raise InvalidArgumentsException('Label Status "{}" is not available.'.format(raw_status))
 

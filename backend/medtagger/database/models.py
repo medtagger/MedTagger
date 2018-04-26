@@ -248,12 +248,12 @@ class Label(Base):
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
-        return '<{}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
-                                              self.labeling_time, self.owner)
+        return '<{}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id,
+                                           self.labeling_time, self.owner)
 
 
 class LabelTag(Base):
-    """Definition of tag for label"""
+    """Definition of tag for label."""
 
     __tablename__ = 'LabelTags'
     id: LabelTagID = Column(String, autoincrement=True, primary_key=True)
@@ -304,9 +304,11 @@ class LabelElement(Base):
     tag_id: LabelTagID = Column(String, ForeignKey('LabelTags.id'))
     tag: 'LabelTag' = relationship('LabelTag', back_populates="label_element")
 
-    status: LabelElementStatus = Column(Enum(LabelElementStatus), nullable=False, server_default=LabelElementStatus.NOT_VERIFIED.value)
+    status: LabelElementStatus = Column(Enum(LabelElementStatus), nullable=False,
+                                        server_default=LabelElementStatus.NOT_VERIFIED.value)
 
-    def __init__(self, position: LabelPosition, shape: LabelShape, label_tag: LabelTag, has_binary_mask: bool = False) -> None:
+    def __init__(self, position: LabelPosition, shape: LabelShape, label_tag: LabelTag,
+                 has_binary_mask: bool = False) -> None:
         """Initialize Label Element.
 
         :param position: position (x, y, slice_index) of the label
