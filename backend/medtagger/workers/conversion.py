@@ -1,13 +1,11 @@
 """Module responsible for asynchronous data conversion."""
 import io
 import os
-import tempfile
-from subprocess import call
-from typing import List, Optional
+from tempfile import NamedTemporaryFile
+from typing import List
 
 import numpy as np
-import pydicom
-from pydicom.dataset import FileDataset
+import SimpleITK as sitk
 from PIL import Image
 from celery.utils.log import get_task_logger
 
@@ -44,9 +42,16 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     dicom_images = []
     for _slice in slices:
         image = SlicesRepository.get_slice_original_image(_slice.id)
-        dicom_image, files_to_remove = _get_dicom_image(image)
+
+        # We've got to store above DICOM image bytes on disk due to the fact that SimpleITK does not support
+        # reading files from memory. It has to work on a file stored on a hard drive.
+        temp_file = NamedTemporaryFile(delete=False)
+        temp_file.write(image)
+        temp_file.close()
+
+        dicom_image = sitk.ReadImage(temp_file.name)
         dicom_images.append(dicom_image)
-        temp_files_to_remove.extend(files_to_remove)
+        temp_files_to_remove.append(temp_file.name)
 
     # Correlate Dicom files with Slices and convert all Slices
     _convert_scan_in_all_axes(dicom_images, slices, scan)
@@ -56,50 +61,7 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
 
     # Remove all temporarily created files for applying workaround
     for file_name in temp_files_to_remove:
-        os.remove(file_name)
-
-
-def _get_dicom_image(image: bytes) -> FileDataset:
-    """Return PyDICOM image based on image from HBase.
-
-    This workaround enables support for compressed DICOMs as GDCM wrapper does not support Python3 well.
-
-    :param image: bytes with DICOM image (eg. from HBase)
-    :return: PyDICOM Image
-    """
-    # UGLY WORKAROUND FOR COMPRESSED DICOMs - Start
-    temp_file_name = _create_temporary_file(image)
-    try:
-        dicom_image = pydicom.read_file(temp_file_name, force=True)
-        dicom_image.pixel_array  # pylint: disable=pointless-statement; Try to read pixel array from DICOM...
-        return dicom_image, [temp_file_name]
-    except Exception:  # pylint: disable=broad-except;  Intended - too much cases to cover...
-        # In case of any Exception - try to uncompress data from DICOM first
-        temp_file_uncompressed = _create_temporary_file()
-        call(["gdcmconv", "--raw", "-i", temp_file_name, "-o", temp_file_uncompressed])  # Convert to RAW DICOMs
-        dicom_image = pydicom.read_file(temp_file_uncompressed, force=True)
-        return dicom_image, [temp_file_name, temp_file_uncompressed]
-    # UGLY WORKAROUND - Stop
-
-
-def _create_temporary_file(image: Optional[bytes] = None) -> str:
-    """Create new temporary file based on given DICOM image.
-
-    This workaround enable support for compressed DICOMs that will be read by the GDCM
-    low-level library. Please remove this workaround as soon as this FIX ME notice
-    will be removed:
-       https://github.com/pydicom/pydicom/blob/master/pydicom/pixel_data_handlers/gdcm_handler.py#L77
-    and this Issue will be closed:
-       https://github.com/pydicom/pydicom/issues/233
-
-    :param image: (optional) bytes with DICOM image
-    :return: path to temporary file
-    """
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        temp_file_name = temp_file.name
-        if image:
-            temp_file.write(image)
-    return temp_file_name
+        os.unlink(file_name)
 
 
 def _convert_scan_in_all_axes(dicom_images: List[FileDataset], slices: List[Slice], scan: Scan) -> None:

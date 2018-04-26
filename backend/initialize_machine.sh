@@ -11,11 +11,8 @@ then
     apt install -y python3-pip
 fi
 
-echo "Installing all system dependencies..."
-cd /vagrant/backend
-sudo make install_system_dependencies
-
 echo "Applying environment variables..."
+cd /vagrant/backend
 . ./devenv.sh
 
 if [ ! -e /usr/local/bin/docker-compose ]

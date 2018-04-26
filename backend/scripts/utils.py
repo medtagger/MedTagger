@@ -1,13 +1,13 @@
 """Storage for all utility functions."""
 from starbase import Connection
 from retrying import retry
-import requests
+from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from medtagger.config import AppConfiguration
 
 
 @retry(stop_max_attempt_number=5, wait_random_min=200, wait_random_max=1000,
-       retry_on_exception=lambda ex: isinstance(ex, requests.ConnectionError))
+       retry_on_exception=lambda ex: isinstance(ex, RequestsConnectionError))
 def get_connection_to_hbase() -> Connection:
     """Fetch configuration data and create HBase connection.
 
