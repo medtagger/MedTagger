@@ -9,19 +9,9 @@ $canvas-size: 100%;
     user-select: none;
 }
 
-#markerBackgroundImage {
-    max-width: $canvas-size;
-    height: auto;
-    max-height: $canvas-size;
-    position: absolute;
-    user-select: none;
-    background-color: black;
-}
-
 #markerSlider {
     position: absolute;
-    left: $canvas-size;
-    height: $canvas-size;
+    right: 0;
 }
 
 #markerAcceptButton {
