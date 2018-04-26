@@ -5,8 +5,8 @@ from sqlalchemy.sql.expression import func
 
 from medtagger.clients.hbase_client import HBaseClient
 from medtagger.database import db_session
-from medtagger.database.models import Label, LabelStatus, LabelSelection, User
-from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelSelectionID, ScanID, \
+from medtagger.database.models import Label, LabelElementStatus, LabelElement, User
+from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelElementID, ScanID, \
     LabelingTime
 
 
@@ -28,7 +28,7 @@ class LabelsRepository(object):
         return label
 
     @staticmethod
-    def get_random_label(status: LabelStatus = None, fetch_binary_masks: bool = False) -> Label:
+    def get_random_label(status: LabelElementStatus = None, fetch_binary_masks: bool = False) -> Label:
         """Fetch random Label from database.
 
         :param status: (optional) status for Label
@@ -56,7 +56,7 @@ class LabelsRepository(object):
 
     @staticmethod
     def add_new_label_selection(label_id: LabelID, position: LabelPosition, shape: LabelShape,
-                                binary_mask: LabelSelectionBinaryMask = None) -> LabelSelectionID:
+                                binary_mask: LabelSelectionBinaryMask = None) -> LabelElementID:
         """Add new Selection for given Label.
 
         :param label_id: Label's ID
@@ -66,7 +66,7 @@ class LabelsRepository(object):
         :return: ID of a Selection
         """
         with db_session() as session:
-            new_label_selection = LabelSelection(position, shape, has_binary_mask=bool(binary_mask))
+            new_label_selection = LabelElement(position, shape, has_binary_mask=bool(binary_mask))
             new_label_selection.label_id = label_id
             session.add(new_label_selection)
 
@@ -84,7 +84,7 @@ class LabelsRepository(object):
         return label
 
     @staticmethod
-    def _get_label_selection_binary_mask(label_selection_id: LabelSelectionID) -> LabelSelectionBinaryMask:
+    def _get_label_selection_binary_mask(label_selection_id: LabelElementID) -> LabelSelectionBinaryMask:
         """Return binary mask for given Label Selection."""
         hbase_client = HBaseClient()
         data = hbase_client.get(HBaseClient.LABEL_SELECTION_BINARY_MASK_TABLE, label_selection_id,
@@ -92,7 +92,7 @@ class LabelsRepository(object):
         return LabelSelectionBinaryMask(data[b'binary_mask:value'].decode('utf-8'))
 
     @staticmethod
-    def _store_label_selection_binary_mask(label_selection_id: LabelSelectionID,
+    def _store_label_selection_binary_mask(label_selection_id: LabelElementID,
                                            binary_mask: LabelSelectionBinaryMask) -> None:
         """Store Label's Selection binary mask into HBase.
 

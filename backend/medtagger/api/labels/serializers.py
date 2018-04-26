@@ -2,11 +2,11 @@
 from flask_restplus import fields
 
 from medtagger.api import api
-from medtagger.database.models import LabelStatus
+from medtagger.database.models import LabelElementStatus
 
 
 in__label_status = api.model("Status for label", {
-    'status': fields.String(description='New status for label', enum=[status.name for status in LabelStatus],
+    'status': fields.String(description='New status for label', enum=[status.name for status in LabelElementStatus],
                             required=True),
 })
 

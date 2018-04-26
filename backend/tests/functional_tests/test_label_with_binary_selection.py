@@ -2,7 +2,7 @@
 import json
 from typing import Any
 
-from medtagger.database.models import LabelStatus
+from medtagger.database.models import LabelElementStatus
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
@@ -58,7 +58,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
     assert isinstance(json_response, dict)
     assert json_response['label_id'] == label_id
     assert json_response['labeling_time'] == 34.56
-    assert json_response['status'] == LabelStatus.NOT_VERIFIED.value
+    assert json_response['status'] == LabelElementStatus.NOT_VERIFIED.value
     assert json_response['scan_id'] == scan_id
     assert json_response['selections'] == [{
         'x': 0.5,
