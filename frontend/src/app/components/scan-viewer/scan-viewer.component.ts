@@ -64,6 +64,14 @@ export class ScanViewerComponent implements OnInit {
         return this.canvas;
     }
 
+    public setCanvasWidth(newWidth: number): void {
+        this.canvas.width = newWidth;
+    }
+
+    public setCanvasHeight(newHeight: number): void {
+        this.canvas.height = newHeight;
+    }
+
     get currentSlice() {
         return this._currentSlice;
     }

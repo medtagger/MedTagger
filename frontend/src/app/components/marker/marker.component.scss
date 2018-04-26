@@ -1,30 +1,34 @@
 @import '../../../app-theme.scss';
 
-$canvas-size: 600px;
+$canvas-size: 100%;
 $slider-offset: 20px;
 $spinner-radius: 50px;
 
 #markerCanvas {
-    width: $canvas-size;
-    height: $canvas-size;
+    //width: $canvas-size;
+    //height: $canvas-size;
     position: absolute;
     user-select: none;
 }
 
 #markerBackgroundImage {
-    @extend #markerCanvas;
+    max-width: $canvas-size;
+    height: auto;
+    max-height: $canvas-size;
+    position: absolute;
+    user-select: none;
     background-color: black;
 }
 
 #markerSpinner {
     @extend #markerCanvas;
-    left: $canvas-size / 3 + $spinner-radius;
-    top: $canvas-size / 3 + $spinner-radius;
+    left: calc($canvas-size / 3 + $spinner-radius);
+    top: calc($canvas-size / 3 + $spinner-radius);
 }
 
 #markerSlider {
     position: absolute;
-    left: $canvas-size + $slider-offset;
+    left: calc($canvas-size + $slider-offset);
     height: $canvas-size;
 }
 

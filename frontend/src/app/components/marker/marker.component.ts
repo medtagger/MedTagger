@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild, HostListener} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs';
@@ -116,6 +116,13 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.initCanvasSelectionTool();
 
+    }
+
+    @HostListener('window:resize', ['$event'])
+    onResize(event) {
+        console.log('window resize:', event.target.innerWidth, event.target.innerHeight);
+        this.setCanvasWidth(event.target.innerWidth - 300 - 48);
+        this.setCanvasHeight(event.target.innerHeight - 64);
     }
 
     private initCanvasSelectionTool(): void {

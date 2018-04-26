@@ -1,16 +1,20 @@
 @import '../../../app-theme.scss';
 
-$canvas-size: 600px;
+$canvas-size: 100%;
 
 #markerCanvas {
-    width: $canvas-size;
-    height: $canvas-size;
+    //width: $canvas-size;
+    //height: $canvas-size;
     position: absolute;
     user-select: none;
 }
 
 #markerBackgroundImage {
-    @extend #markerCanvas;
+    max-width: $canvas-size;
+    height: auto;
+    max-height: $canvas-size;
+    position: absolute;
+    user-select: none;
     background-color: black;
 }
 
