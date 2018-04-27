@@ -1,5 +1,6 @@
 """Module responsible for defining all of the relational database models."""
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
+import enum
 import uuid
 from typing import List, Optional
 
@@ -7,9 +8,9 @@ from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Tabl
 from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session
-from medtagger.definitions import LabelStatus, ScanStatus, SliceStatus, SliceOrientation
-from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
-    LabelPosition, LabelShape, LabelingTime
+from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation
+from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, LabelPosition, \
+    LabelShape, LabelingTime, LabelTagID
 
 users_roles = Table('Users_Roles', Base.metadata,
                     Column('user_id', Integer, ForeignKey('Users.id')),
@@ -83,6 +84,8 @@ class ScanCategory(Base):
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
     image_path: str = Column(String(100), nullable=False)
+
+    available_tags: List['LabelTag'] = relationship("LabelTag", back_populates="scan_category")
 
     def __init__(self, key: str, name: str, image_path: str) -> None:
         """Initialize Scan Category.
@@ -250,10 +253,10 @@ class Label(Base):
     id: LabelID = Column(String, primary_key=True)
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     labeling_time: LabelingTime = Column(Float, nullable=True)
-    status: LabelStatus = Column(Enum(LabelStatus), nullable=False, server_default=LabelStatus.NOT_VERIFIED.value)
 
     scan: Scan = relationship('Scan', back_populates='labels')
-    selections: 'LabelSelection' = relationship('LabelSelection', back_populates='label')
+
+    elements: 'LabelElement' = relationship('LabelElement', back_populates='label')
 
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
     owner: User = relationship('User', back_populates='labels')
@@ -264,53 +267,98 @@ class Label(Base):
         By default all of the labels are not verified
         """
         self.id = LabelID(str(uuid.uuid4()))
-        self.status = LabelStatus.NOT_VERIFIED
         self.owner = user
         self.labeling_time = labeling_time
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
-        return '<{}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
-                                              self.labeling_time, self.owner)
+        return '<{}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id,
+                                           self.labeling_time, self.owner)
 
-    def update_status(self, status: LabelStatus) -> 'Label':
-        """Update Label's status.
 
-        :param status: new status for this Label
-        :return: Label object
+class LabelTag(Base):
+    """Definition of tag for label."""
+
+    __tablename__ = 'LabelTags'
+    id: LabelTagID = Column(String, autoincrement=True, primary_key=True)
+    key: str = Column(String(50), nullable=False, unique=True)
+    name: str = Column(String(100), nullable=False)
+
+    scan_category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
+    scan_category: ScanCategory = relationship('ScanCategory', back_populates="available_tags")
+
+    def __init__(self, key: str, name: str) -> None:
+        """Initialize Label Tag.
+        :param key: unique key representing Label Tag
+        :param name: name which describes this Label Tag
         """
-        self.status = status
-        self.save()
-        return self
+        self.key = key
+        self.name = name
+
+    def __repr__(self) -> str:
+        """Return string representation for Label Tag."""
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
 
 
-class LabelSelection(Base):
-    """Definition of a selection for Label."""
+class LabelElementStatus(enum.Enum):
+    """Defines available status for Label Element."""
 
-    __tablename__ = 'LabelSelections'
-    id: LabelSelectionID = Column(String, primary_key=True)
+    VALID = 'VALID'
+    INVALID = 'INVALID'
+    NOT_VERIFIED = 'NOT_VERIFIED'
+
+
+class LabelElement(Base):
+    """Definition of a Label Element."""
+
+    __tablename__ = 'LabelElements'
+    id: LabelElementID = Column(String, primary_key=True)
     position_x: float = Column(Float, nullable=False)
     position_y: float = Column(Float, nullable=False)
     slice_index: int = Column(Integer, nullable=False)
     shape_width: float = Column(Float, nullable=False)
     shape_height: float = Column(Float, nullable=False)
+    has_binary_mask: bool = Column(Boolean, nullable=False)
 
     label_id: LabelID = Column(String, ForeignKey('Labels.id'))
     label: Label = relationship('Label', back_populates='selections')
 
-    def __init__(self, position: LabelPosition, shape: LabelShape) -> None:
-        """Initialize Label Selection.
+    tag_id: LabelTagID = Column(String, ForeignKey('LabelTags.id'))
+    tag: 'LabelTag' = relationship('LabelTag', back_populates="label_element")
+
+    status: LabelElementStatus = Column(Enum(LabelElementStatus), nullable=False,
+                                        server_default=LabelElementStatus.NOT_VERIFIED.value)
+
+    def __init__(self, position: LabelPosition, shape: LabelShape, label_tag: LabelTag,
+                 has_binary_mask: bool = False) -> None:
+        """Initialize Label Element.
 
         :param position: position (x, y, slice_index) of the label
         :param shape: shape (width, height) of the label
+        :param label_tag: tag of the label
+        :param has_binary_mask: boolean information if such Label Element has binary mask or not
         """
-        self.id = LabelSelectionID(str(uuid.uuid4()))
+        self.id = LabelElementID(str(uuid.uuid4()))
         self.position_x = position.x
         self.position_y = position.y
         self.slice_index = position.slice_index
         self.shape_width = shape.width
         self.shape_height = shape.height
+        self.label_tag = label_tag
+        self.has_binary_mask = has_binary_mask
+        self.status = LabelElementStatus.NOT_VERIFIED
 
     def __repr__(self) -> str:
-        """Return string representation for Label Selection."""
-        return '<{}: {}>'.format(self.__class__.__name__, self.id)
+        """Return string representation for Label Element."""
+        _has_binary_mask = 'WITH BINARY MASK' if self.has_binary_mask else 'WITHOUT BINARY MASK'
+        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, _has_binary_mask)
+
+    def update_status(self, status: LabelElementStatus) -> 'LabelElement':
+        """Update Label's element status.
+
+        :param status: new status for this Label Element
+        :return: Label Element object
+        """
+        self.status = status
+        self.save()
+        return self

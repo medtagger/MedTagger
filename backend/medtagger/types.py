@@ -5,7 +5,8 @@ from typing import NewType, NamedTuple
 ScanID = NewType('ScanID', str)
 SliceID = NewType('SliceID', str)
 LabelID = NewType('LabelID', str)
-LabelSelectionID = NewType('LabelSelectionID', str)
+LabelElementID = NewType('LabelElementID', str)
+LabelTagID = NewType('LabelTagID', str)
 
 SliceLocation = NewType('SliceLocation', float)
 SlicePosition = NamedTuple('SlicePosition', [('x', float), ('y', float), ('z', float)])
