@@ -71,7 +71,7 @@ class ScanCategory(Base):
     name: str = Column(String(100), nullable=False)
     image_path: str = Column(String(100), nullable=False)
 
-    tags: List['LabelTag'] = relationship("LabelTag", back_populates="scan_category")
+    available_tags: List['LabelTag'] = relationship("LabelTag", back_populates="scan_category")
 
     def __init__(self, key: str, name: str, image_path: str) -> None:
         """Initialize Scan Category.
@@ -260,10 +260,8 @@ class LabelTag(Base):
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
 
-    label_elements: 'LabelElement' = relationship("LabelElement", back_populates="tag")
-
     scan_category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
-    scan_category: ScanCategory = relationship('ScanCategory', back_populates="tags")
+    scan_category: ScanCategory = relationship('ScanCategory', back_populates="available_tags")
 
     def __init__(self, key: str, name: str) -> None:
         """Initialize Label Tag.
@@ -313,7 +311,7 @@ class LabelElement(Base):
 
         :param position: position (x, y, slice_index) of the label
         :param shape: shape (width, height) of the label
-        :param: label_tag: tag of the label
+        :param label_tag: tag of the label
         :param has_binary_mask: boolean information if such Label Element has binary mask or not
         """
         self.id = LabelElementID(str(uuid.uuid4()))
