@@ -13,6 +13,7 @@ button {
     grid-template-columns: $toolbox-width auto;
     width: 100vw;
     height: calc(100vh - #{$top-header-size});
+    overflow: hidden;
 }
 
 .marker-toolbox {

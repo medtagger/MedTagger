@@ -40,4 +40,7 @@ export interface Selector<SliceSelection> {
 
     clearSelections(): any;
 
+    updateCanvasWidth(width: number): void;
+
+    updateCanvasHeight(height: number): void;
 }

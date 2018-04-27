@@ -5,16 +5,12 @@ $slider-offset: 20px;
 $spinner-radius: 50px;
 
 #markerCanvas {
-    //width: $canvas-size;
-    //height: $canvas-size;
     position: absolute;
     user-select: none;
 }
 
 #markerBackgroundImage {
     max-width: $canvas-size;
-    height: 100%;
-    max-height: calc(100vh - 64px);
     user-select: none;
     background-color: black;
     position: absolute;
@@ -22,8 +18,8 @@ $spinner-radius: 50px;
 
 #markerSpinner {
     @extend #markerCanvas;
-    left: calc($canvas-size / 3 + $spinner-radius);
-    top: calc($canvas-size / 3 + $spinner-radius);
+    left: calc(#{$canvas-size} / 3 + #{$spinner-radius});
+    top: calc(#{$canvas-size} / 3 + #{$spinner-radius});
 }
 
 #markerSlider {

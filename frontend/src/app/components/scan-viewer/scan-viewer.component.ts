@@ -41,6 +41,18 @@ export class ScanViewerComponent implements OnInit {
     constructor() {
     }
 
+	@HostListener('window:resize', ['$event'])
+	onResize(event) {
+		this.updateCanvasSize();
+	}
+
+	protected updateCanvasSize(): void {
+		//this.setCanvasWidth(event.target.innerWidth - 300 - 48 - 20);
+		//this.setCanvasHeight(event.target.innerHeight - 64);
+		this.setCanvasWidth(this.currentImage.width);
+		this.setCanvasHeight(this.currentImage.height);
+	}
+
     ngAfterViewInit() {
         console.log('ScanViewer | ngAfterViewInit');
         this.sliderFocus();
@@ -66,10 +78,12 @@ export class ScanViewerComponent implements OnInit {
 
     public setCanvasWidth(newWidth: number): void {
         this.canvas.width = newWidth;
+        this.selector.updateCanvasWidth(this.canvas.width);
     }
 
     public setCanvasHeight(newHeight: number): void {
         this.canvas.height = newHeight;
+        this.selector.updateCanvasHeight(this.canvas.height);
     }
 
     get currentSlice() {
@@ -181,6 +195,9 @@ export class ScanViewerComponent implements OnInit {
     protected setCanvasImage(): void {
         if (this.slices.has(this._currentSlice)) {
             this.currentImage.src = this.slices.get(this._currentSlice).source;
+            this.currentImage.onload = (event: Event) => {
+				this.updateCanvasSize();
+			};
         }
     }
 }

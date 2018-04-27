@@ -99,8 +99,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.hookUpStateChangeSubscription();
 
         this.initializeCanvas();
-        this.updateCanvasSize();
-
         this.setCanvasImage();
 
         this.slider.registerOnChange((sliderValue: number) => {
@@ -119,18 +117,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     }
 
-    @HostListener('window:resize', ['$event'])
-    onResize(event) {
-        this.updateCanvasSize();
-    }
-
-    private updateCanvasSize(): void {
-        //this.setCanvasWidth(event.target.innerWidth - 300 - 48 - 20);
-        //this.setCanvasHeight(event.target.innerHeight - 64);
-        this.setCanvasWidth(this.currentImage.width);
-        this.setCanvasHeight(this.currentImage.height);
-    }
-
     private initCanvasSelectionTool(): void {
         console.log('Marker | initCanvasSelectionTool');
 
@@ -140,6 +126,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         };
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
+			console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
             this.selector.onMouseUp(mouseEvent);
         };
 
