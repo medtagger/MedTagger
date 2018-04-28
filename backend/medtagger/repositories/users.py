@@ -1,6 +1,9 @@
 """Module responsible for definition of Users' Repository."""
 from typing import List, Optional
 
+from sqlalchemy.orm.exc import NoResultFound
+
+from medtagger.api import InvalidArgumentsException
 from medtagger.database import db_session
 from medtagger.database.models import User
 
@@ -35,3 +38,15 @@ class UsersRepository(object):
     def get_user_by_id(user_id: int) -> User:
         """Get user with given id."""
         return User.query.filter(User.id == user_id).one()
+
+    @staticmethod
+    def set_user_info(user_id: int, firstName: str, lastName: str) -> User:
+        """Set user's info."""
+        try:
+            user = UsersRepository.get_user_by_id(user_id)
+        except NoResultFound:
+            raise InvalidArgumentsException('User with this id does not exist.')
+        with db_session() as session:
+            user.first_name = firstName
+            user.last_name = lastName
+            session.add(user)

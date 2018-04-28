@@ -42,6 +42,21 @@ export class SettingsPageComponent implements OnInit {
             })
     }
 
+    private updateUserDetails() {
+        if(!this.validateUserInput()) return;
+        this.usersService.setUserDetails(this.currentUser.id, this.userName.value, this.userSurname.value)
+            .then(() => {
+              this.currentUser.firstName = this.userName.value;
+              this.currentUser.lastName = this.userSurname.value;
+              sessionStorage.setItem('userInfo', JSON.stringify(this.currentUser));
+            });
+    }
+
+    private validateUserInput() {
+      if(this.userName.value == "" || this.userSurname.value == "" || this.userEmail.value == "") return false;
+      return true;
+    }
+
     showInvalidFormMessage() {
         this.snackBar.open("Nieprawidłowe dane formularza!", "Zamknij", {
             duration: 5000,
@@ -68,4 +83,5 @@ export class SettingsPageComponent implements OnInit {
     getUserPasswordConfirmationErrorMessage() {
         return this.userPasswordConfirmation.hasError('required') ? 'Potwierdzenie hasła jest wymagane!' : '';
     }
+
 }

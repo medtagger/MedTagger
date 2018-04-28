@@ -6,7 +6,7 @@ from flask_restplus import Resource
 
 from medtagger.api import api
 from medtagger.api.users import serializers
-from medtagger.api.users.business import get_all_users, set_user_role
+from medtagger.api.users.business import get_all_users, set_user_role, set_user_info
 from medtagger.api.utils import get_current_user
 from medtagger.api.security import login_required, role_required
 
@@ -55,3 +55,15 @@ class GetUserInfo(Resource):
         """Get user info."""
         user = get_current_user()
         return user, 200
+
+@users_ns.route('/<int:user_id>/')
+class SetUserInfo(Resource):
+    """Set user's information (first name and last name)"""
+
+    @staticmethod
+    @login_required
+    @users_ns.doc(security='token')
+    def put(user_id: int) -> Any:
+        """Set user info."""
+        set_user_info(user_id, request.json['firstName'], request.json['lastName'])
+        return {}, 204

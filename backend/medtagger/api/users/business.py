@@ -14,3 +14,8 @@ def get_all_users() -> List[User]:
 def set_user_role(user_id: int, role_name: str) -> None:
     """Set user's role. Old role is being replaced."""
     RolesRepository.set_user_role(user_id, role_name)
+
+
+def set_user_info(user_id: int, firstName: str, lastName: str) -> None:
+    """Set user's information."""
+    UsersRepository.set_user_info(user_id, firstName, lastName)
