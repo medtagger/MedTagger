@@ -99,6 +99,11 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.hookUpStateChangeSubscription();
 
         this.initializeCanvas();
+
+        this.initializeImage(() => {
+        	this.afterImageLoad();
+		});
+
         this.setCanvasImage();
 
         this.slider.registerOnChange((sliderValue: number) => {
@@ -106,16 +111,18 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
             this.requestSlicesIfNeeded(sliderValue);
             this.changeMarkerImage(sliderValue);
-
-            this.selector.clearCanvasSelection();
-
-            this.selector.drawPreviousSelections();
-            this.updateSelectionState();
         });
 
         this.initCanvasSelectionTool();
 
     }
+
+    private afterImageLoad(): void {
+		this.selector.clearCanvasSelection();
+
+		this.selector.drawPreviousSelections();
+		this.updateSelectionState();
+	}
 
     private initCanvasSelectionTool(): void {
         console.log('Marker | initCanvasSelectionTool');

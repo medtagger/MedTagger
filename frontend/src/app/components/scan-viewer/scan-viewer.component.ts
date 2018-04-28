@@ -145,6 +145,10 @@ export class ScanViewerComponent implements OnInit {
 
         this.initializeCanvas();
 
+        this.initializeImage( ()=> {
+			this.selector.drawPreviousSelections();
+		});
+
         this.setCanvasImage();
 
         this.slider.registerOnChange((sliderValue: number) => {
@@ -154,7 +158,6 @@ export class ScanViewerComponent implements OnInit {
             this.requestSlicesIfNeeded(sliderValue);
 
             this.changeMarkerImage(sliderValue);
-            this.selector.drawPreviousSelections();
         });
     }
 
@@ -177,6 +180,15 @@ export class ScanViewerComponent implements OnInit {
         this.selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
     }
 
+    protected initializeImage( afterImageLoad?:()=> void): void {
+		this.currentImage.onload = (event: Event) => {
+			this.updateCanvasSize();
+			if (afterImageLoad) {
+				afterImageLoad();
+			}
+		};
+	}
+
     @HostListener('window:resize', [])
     protected updateCanvasPositionOnWindowResize(): void {
         this.selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
@@ -195,9 +207,6 @@ export class ScanViewerComponent implements OnInit {
     protected setCanvasImage(): void {
         if (this.slices.has(this._currentSlice)) {
             this.currentImage.src = this.slices.get(this._currentSlice).source;
-            this.currentImage.onload = (event: Event) => {
-				this.updateCanvasSize();
-			};
         }
     }
 }
