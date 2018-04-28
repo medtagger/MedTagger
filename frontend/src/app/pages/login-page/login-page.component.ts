@@ -35,7 +35,7 @@ export class LoginPageComponent implements OnInit {
             firstName: new FormControl(null, [Validators.required]),
             lastName: new FormControl(null, [Validators.required]),
             email: new FormControl(null, [Validators.required, Validators.email]),
-            password: new FormControl(null, [Validators.required]),
+            password: new FormControl(null, [Validators.required, Validators.minLength(8)]),
             confirmPassword: new FormControl(null, [Validators.required, passwordValidator()])
         });
     }
@@ -95,9 +95,9 @@ export class LoginPageComponent implements OnInit {
     }
 
     getPasswordErrorMessage() {
-        if (this.userForm.get('password').hasError('required')) {
-            return 'Field required.';
-        }
+        return this.userForm.get('password').hasError('required') ? 'Field required.' :
+            this.userForm.get('password').hasError('minlength') ? 'Password should be longer than 8 characters.' :
+                '';
     }
 
     getConfirmPasswordErrorMessage() {
