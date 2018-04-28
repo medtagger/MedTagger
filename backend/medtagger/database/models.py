@@ -222,6 +222,13 @@ class Slice(Base):
         return self
 
 
+class LabelVerificationStatus(enum.Enum):
+    """Defines available verification status for Label."""
+
+    VERIFIED = 'VERIFIED'
+    NOT_VERIFIED = 'NOT_VERIFIED'
+
+
 class Label(Base):
     """Definition of a Label."""
 
@@ -236,6 +243,9 @@ class Label(Base):
 
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
     owner: User = relationship('User', back_populates='labels')
+
+    status: LabelVerificationStatus = Column(Enum(LabelVerificationStatus), nullable=False,
+                                             server_default=LabelVerificationStatus.NOT_VERIFIED.value)
 
     def __init__(self, user: User, labeling_time: LabelingTime) -> None:
         """Initialize Label.
