@@ -66,11 +66,11 @@ export class SettingsPageComponent implements OnInit {
         });
     }
 
-    getUserNameErrorMessage() {
+    getUserFirstNameErrorMessage() {
         return this.userFirstName.hasError('required') ? 'First name is required!' : '';
     }
 
-    getUserSurnameErrorMessage() {
+    getUserLastNameErrorMessage() {
         return this.userLastName.hasError('required') ? 'Last name is required!' : '';
     }
 
