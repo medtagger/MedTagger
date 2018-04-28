@@ -5,7 +5,7 @@ from sqlalchemy.sql.expression import func
 
 from medtagger.clients.hbase_client import HBaseClient
 from medtagger.database import db_session
-from medtagger.database.models import Label, LabelElement, LabelTag, User
+from medtagger.database.models import Label, LabelElement, LabelTag, User, LabelVerificationStatus
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelElementID, ScanID, \
     LabelingTime
 
@@ -28,14 +28,17 @@ class LabelsRepository(object):
         return label
 
     @staticmethod
-    def get_random_label(fetch_binary_masks: bool = False) -> Label:
+    def get_random_label(status: LabelVerificationStatus = None, fetch_binary_masks: bool = False) -> Label:
         """Fetch random Label from database.
 
+        :param status: (optional) verification status for Label
         :param fetch_binary_masks: (optional) switch for fetching Label's Elements binary masks
         :return: Label object
         """
         with db_session() as session:
             query = session.query(Label)
+            if status:
+                query = query.filter(Label.status == status)
             query = query.order_by(func.random())
             label = query.first()
         if label and fetch_binary_masks:
