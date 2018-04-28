@@ -223,7 +223,7 @@ class Slice(Base):
 
 
 class LabelVerificationStatus(enum.Enum):
-    """Defines available status for Label."""
+    """Defines available verification status for Label."""
 
     VERIFIED = 'VERIFIED'
     NOT_VERIFIED = 'NOT_VERIFIED'
