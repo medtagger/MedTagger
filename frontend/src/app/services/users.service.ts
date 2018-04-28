@@ -50,11 +50,11 @@ export class UsersService {
         })
     }
 
-    public setUserDetails(userId: number, userName: string, userSurname: string): Promise<void> {
+    public setUserDetails(userId: number, userFirstName: string, userLastName: string): Promise<void> {
       let url = environment.API_URL + `/users/${userId}`;
       let payload = {
-        firstName: userName,
-        lastName: userSurname
+        firstName: userFirstName,
+        lastName: userLastName
       };
       return new Promise<void>((resolve, reject) => {
         this.http.put(url, payload)
