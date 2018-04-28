@@ -40,7 +40,7 @@ class UsersRepository(object):
         return User.query.filter(User.id == user_id).one()
 
     @staticmethod
-    def set_user_info(user_id: int, firstName: str, lastName: str) -> User:
+    def set_user_info(user_id: int, firstName: str, lastName: str) -> None:
         """Set user's info."""
         try:
             user = UsersRepository.get_user_by_id(user_id)
