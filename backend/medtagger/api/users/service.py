@@ -57,7 +57,7 @@ class GetUserInfo(Resource):
         return user, 200
 
 
-@users_ns.route('/<int:user_id>/')
+@users_ns.route('/<int:user_id>')
 class SetUserInfo(Resource):
     """Set user's information (first name and last name)"""
 
