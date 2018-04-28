@@ -42,7 +42,7 @@ export class SettingsPageComponent implements OnInit {
             })
     }
 
-    private updateUserDetails() {
+    updateUserDetails() {
         if(!this.validateUserInput()) return;
         this.usersService.setUserDetails(this.currentUser.id, this.userName.value, this.userSurname.value)
             .then(() => {
@@ -52,7 +52,7 @@ export class SettingsPageComponent implements OnInit {
             });
     }
 
-    private validateUserInput() {
+    validateUserInput() {
       if(this.userName.value == "" || this.userSurname.value == "" || this.userEmail.value == "") return false;
       return true;
     }
