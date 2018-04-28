@@ -43,7 +43,12 @@ export class SettingsPageComponent implements OnInit {
     }
 
     updateUserDetails() {
-        if(!this.validateUserInput()) return;
+        if(!this.validateUserInput()) {
+          this.snackBar.open("User data has not been updated due to a validation failure.", "Dismiss", {
+            duration: 3000,
+          });
+          return;
+        }
         this.usersService.setUserDetails(this.currentUser.id, this.userFirstName.value, this.userLastName.value)
             .then(() => {
               this.currentUser.firstName = this.userFirstName.value;
@@ -56,7 +61,12 @@ export class SettingsPageComponent implements OnInit {
     }
 
     validateUserInput() {
-      if(this.userFirstName.value == "" || this.userLastName.value == "" || this.userEmail.value == "" || (this.userFirstName.value == this.currentUser.firstName && this.userLastName.value == this.currentUser.lastName)) return false;
+      if(this.userFirstName.value == "" ||
+         this.userLastName.value == "" ||
+         this.userEmail.value == "" ||
+         (this.userFirstName.value == this.currentUser.firstName && this.userLastName.value == this.currentUser.lastName)) {
+        return false;
+      }
       return true;
     }
 
