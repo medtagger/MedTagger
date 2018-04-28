@@ -59,7 +59,7 @@ class GetUserInfo(Resource):
 
 @users_ns.route('/<int:user_id>')
 class SetUserInfo(Resource):
-    """Set user's information (first name and last name)"""
+    """Set user's information (first name and last name)."""
 
     @staticmethod
     @login_required
