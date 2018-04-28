@@ -66,5 +66,7 @@ class SetUserInfo(Resource):
     @users_ns.doc(security='token')
     def put(user_id: int) -> Any:
         """Set user info."""
+        if get_current_user().id != user_id:
+            return {}, 403
         set_user_info(user_id, request.json['firstName'], request.json['lastName'])
         return {}, 204
