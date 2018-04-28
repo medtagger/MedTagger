@@ -56,6 +56,7 @@ class GetUserInfo(Resource):
         user = get_current_user()
         return user, 200
 
+
 @users_ns.route('/<int:user_id>/')
 class SetUserInfo(Resource):
     """Set user's information (first name and last name)"""
