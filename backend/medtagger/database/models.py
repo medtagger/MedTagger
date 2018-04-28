@@ -2,14 +2,23 @@
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
 import enum
 import uuid
-from typing import List, cast, Optional
+from typing import List, Dict, cast, Optional, Any
 
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session, db
 from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
-    LabelPosition, LabelShape, LabelingTime
+    LabelPosition, LabelShape, LabelingTime, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
+    SurveyResponseID
+
+
+#########################
+#
+#  Users related models
+#
+#########################
 
 users_roles = db.Table('Users_Roles', Base.metadata,
                        Column('user_id', Integer, ForeignKey('Users.id')),
@@ -61,6 +70,12 @@ class User(Base):
         """Return role for User."""
         return self.roles[0]
 
+
+#########################
+#
+#  Scans related models
+#
+#########################
 
 class ScanCategory(Base):
     """Definition of a Scan Category."""
@@ -220,6 +235,12 @@ class Slice(Base):
         return self
 
 
+##########################
+#
+#  Labels related models
+#
+##########################
+
 class LabelStatus(enum.Enum):
     """Defines available status for label."""
 
@@ -303,3 +324,199 @@ class LabelSelection(Base):
         """Return string representation for Label Selection."""
         _has_binary_mask = 'WITH BINARY MASK' if self.has_binary_mask else 'WITHOUT BINARY MASK'
         return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, _has_binary_mask)
+
+
+###########################
+#
+#  Actions related models
+#
+###########################
+
+class Action(Base):
+    """Definition of a high level Action."""
+
+    __tablename__ = 'Actions'
+    id: ActionID = Column(Integer, autoincrement=True, primary_key=True)
+    name: str = Column(String(255), nullable=False)
+    action_type: str = Column(String(50), nullable=False)
+
+    # TODO: Add LabelTag, which is necessary to assign action for given Tag!
+
+    responses: List['ActionResponse'] = relationship('ActionResponse', back_populates='action')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'Action',
+        'polymorphic_on': action_type,
+    }
+
+    def __init__(self, name: str) -> None:
+        """Initialize Action.
+
+        :param name: name that should identify such actions for given Scan Category
+        """
+        self.name = name
+
+    def __repr__(self) -> str:
+        """Return string representation for Action."""
+        return '<{}: {}: "{}">'.format(self.__class__.__name__, self.id, self.name)
+
+
+class Survey(Action):
+    """Definition of a Survey."""
+
+    __tablename__ = 'Surveys'
+    id: SurveyID = Column(Integer, ForeignKey('Actions.id'), primary_key=True)
+    initial_element_key: SurveyElementKey = Column(String(50), nullable=False)
+
+    elements: List['SurveyElement'] = relationship('SurveyElement', back_populates='survey')
+    responses: List['SurveyResponse'] = relationship('SurveyResponse', back_populates='survey')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'Survey',
+    }
+
+    def __init__(self, name: str, initial_element_key: str) -> None:
+        """Initialize Action.
+
+        :param name: name that should identify such actions for given Scan Category
+        :param initial_element_key: key for an element that is initial for whole Survey
+        """
+        super(Survey, self).__init__(name)
+        self.initial_element_key = initial_element_key
+
+    def get_details(self) -> Dict:
+        """Return dictionary details about this Survey."""
+        return {
+            'name': self.name,
+            'initial_element_key': self.initial_element_key,
+            'elements': [element.get_details() for element in self.elements],
+        }
+
+    def validate_response(self, response: Dict) -> bool:
+        elements_keys = {element.key for element in self.elements}
+        response_keys = set(response)
+        print(response_keys, elements_keys)
+        return response_keys.issubset(elements_keys)
+
+
+class SurveyElement(Base):
+    """Definition of a single element in Survey."""
+
+    __tablename__ = 'SurveyElements'
+    id: SurveyElementID = Column(Integer, autoincrement=True, primary_key=True)
+    key: SurveyElementKey = Column(String(50), nullable=False)
+    instant_next_element: SurveyElementKey = Column(String(50), nullable=True)
+    survey_element_type: str = Column(String(50), nullable=False)
+
+    survey_id: SurveyID = Column(Integer, ForeignKey('Surveys.id'))
+    survey: Survey = relationship('Survey', back_populates='elements')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'SurveyElement',
+        'polymorphic_on': survey_element_type,
+    }
+
+    def __init__(self, key: SurveyElementKey, instant_next_element: SurveyElementKey) -> None:
+        """Initialize an element in Survey.
+
+        :param key: key that will identify this Element in whole Survey
+        :param instant_next_element: key for next Survey Element that should show instantaneously
+        """
+        self.key = key
+        self.instant_next_element = instant_next_element
+
+    def get_details(self) -> Dict:
+        """Return dictionary details about this Element from Survey."""
+        return {
+            'key': self.key,
+            'instant_next_element': self.instant_next_element,
+            'type': self.survey_element_type,
+        }
+
+
+class SurveySingleChoiceQuestion(SurveyElement):
+    """Definition of a Single Choise Question in Survey."""
+
+    __tablename__ = 'SurveySingleChoiceQuestions'
+    id: SurveyElementID = Column(Integer, ForeignKey('SurveyElements.id'), primary_key=True)
+    title: str = Column(String(255), nullable=False)
+    possible_answers: Dict[str, SurveyElementKey] = Column(JSONB, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'SurveySingleChoiceQuestion',
+    }
+
+    def __init__(self, key: str, title: str, possible_answers: Dict[str, SurveyElementKey],
+                 instant_next_element: SurveyElementKey = None) -> None:
+        """Initialize a Single Choice Question in Survey.
+
+        :param key: key that will identify this Question in whole Survey
+        :param title: title for this question
+        :param possible_answers: dictionary of possible answers and their next elements in Survey
+        :param instant_next_element: key for next Survey Element that should show instantaneously
+        """
+        super(SurveySingleChoiceQuestion, self).__init__(key, instant_next_element)
+        self.title = title
+        self.possible_answers = possible_answers
+
+    def __repr__(self) -> str:
+        """Return string representation for SurveySingleChoiceQuestion."""
+        return '<{}: {}: "{}">'.format(self.__class__.__name__, self.id, self.title)
+
+    def get_details(self) -> Dict:
+        """Return dictionary details about this Question."""
+        details = super(SurveySingleChoiceQuestion, self).get_details()
+        details.update({
+            'title': self.title,
+            'possible_answers': self.possible_answers,
+        })
+        return details
+
+
+class ActionResponse(Base):
+    """Definition of a Response for Action."""
+
+    __tablename__ = 'ActionResponses'
+    id: ActionID = Column(Integer, autoincrement=True, primary_key=True)
+    action_response_type: str = Column(String(50), nullable=False)
+
+    action_id: ActionID = Column(Integer, ForeignKey('Actions.id'))
+    action: Action = relationship('Action', back_populates='responses')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ActionResponse',
+        'polymorphic_on': action_response_type,
+    }
+
+    def get_details(self) -> Dict:
+        """Return dictionary details about this Action Response."""
+        return {}
+
+
+class SurveyResponse(ActionResponse):
+    """Definition of a Response for Survey."""
+
+    __tablename__ = 'SurveyResponses'
+    id: SurveyResponseID = Column(Integer, ForeignKey('ActionResponses.id'), primary_key=True)
+    data: Dict[SurveyElementKey, Any] = Column(JSONB, nullable=False)
+
+    survey: Survey = relationship('Survey', back_populates='responses', foreign_keys=ActionResponse.action_id)
+
+    # TODO: Add LabelElement with which it will be connected
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'SurveyResponse',
+    }
+
+    def __init__(self, survey_id: SurveyID, data: Dict[SurveyElementKey, Any]) -> None:
+        """Initialize Response for a given Survey.
+
+        :param survey_id: ID of a Survey with which this Response is connected with
+        :param data: dictionary representation of all answers where key is a Survey Element Key
+        """
+        self.action_id = cast(ActionID, survey_id)
+        self.data = data
+
+    def get_details(self) -> Dict:
+        """Return dictionary details about this Survey Response."""
+        return self.data

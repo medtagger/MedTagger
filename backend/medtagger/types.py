@@ -16,3 +16,9 @@ LabelShape = NamedTuple('LabelShape', [('width', float), ('height', float)])
 LabelSelectionBinaryMask = NewType('LabelSelectionBinaryMask', str)
 
 LabelingTime = NewType('LabelingTime', float)
+
+ActionID = NewType('ActionID', int)
+SurveyID = NewType('SurveyID', ActionID)
+SurveyElementID = NewType('SurveyElementID', int)
+SurveyElementKey = NewType('SurveyElementKey', str)
+SurveyResponseID = NewType('SurveyResponseID', int)

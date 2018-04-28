@@ -4,7 +4,7 @@ from typing import Any
 from flask import request
 from flask_restplus import Resource
 
-from medtagger.types import LabelID
+from medtagger.types import LabelID, ActionID
 from medtagger.database.models import LabelStatus
 from medtagger.api import api, InvalidArgumentsException, NotFoundException
 from medtagger.api.labels import business, serializers
@@ -57,3 +57,30 @@ class ChangeLabelStatus(Resource):
             raise InvalidArgumentsException('Label Status "{}" is not available.'.format(raw_status))
 
         return business.change_label_status(label_id, status)
+
+
+@labels_ns.route('/actions/<int:action_id>')
+class ActionDetails(Resource):
+    """Endpoint that handles all operations on Actions."""
+
+    @staticmethod
+    # TODO: @login_required
+    @labels_ns.marshal_with(serializers.out__action)
+    # TODO: @labels_ns.doc(security='token')
+    @labels_ns.doc(description='Returns details about Action that user should do with Label.')
+    @labels_ns.doc(responses={200: 'Success', 404: 'Could not find such Action'})
+    def get(action_id: ActionID) -> Any:
+        """Return details about given Action."""
+        return business.get_action_details(action_id)
+
+    @staticmethod
+    # TODO: @login_required
+    @labels_ns.expect(serializers.in__action_response)
+    @labels_ns.marshal_with(serializers.out__action_response)
+    # TODO: @labels_ns.doc(security='token')
+    @labels_ns.doc(description='Add new Response for given Action.')
+    @labels_ns.doc(responses={200: 'Success', 404: 'Could not find such Action'})
+    def post(action_id: ActionID) -> Any:
+        """Add new Response for given Action."""
+        payload = request.json
+        return business.add_action_response(action_id, payload)
