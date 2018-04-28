@@ -5,7 +5,7 @@ from sqlalchemy.sql.expression import func
 
 from medtagger.clients.hbase_client import HBaseClient
 from medtagger.database import db_session
-from medtagger.database.models import Label, LabelElement, User, LabelTag
+from medtagger.database.models import Label, LabelElement, LabelTag, User
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelElementID, ScanID, \
     LabelingTime
 
@@ -24,7 +24,7 @@ class LabelsRepository(object):
         with db_session() as session:
             label = session.query(Label).filter(Label.id == label_id).one()
         if fetch_binary_masks:
-            label = LabelsRepository._fetch_label_element_binary_masks(label)
+            label = LabelsRepository._fetch_label_elements_binary_masks(label)
         return label
 
     @staticmethod
@@ -39,7 +39,7 @@ class LabelsRepository(object):
             query = query.order_by(func.random())
             label = query.first()
         if label and fetch_binary_masks:
-            label = LabelsRepository._fetch_label_element_binary_masks(label)
+            label = LabelsRepository._fetch_label_elements_binary_masks(label)
         return label
 
     @staticmethod
@@ -74,7 +74,7 @@ class LabelsRepository(object):
         return new_label_element.id
 
     @staticmethod
-    def _fetch_label_element_binary_masks(label: Label) -> Label:
+    def _fetch_label_elements_binary_masks(label: Label) -> Label:
         """Fetch and fill given Label's Elements with binary masks."""
         for element in label.elements:
             if element.has_binary_mask:
