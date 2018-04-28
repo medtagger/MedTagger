@@ -49,11 +49,14 @@ export class SettingsPageComponent implements OnInit {
               this.currentUser.firstName = this.userName.value;
               this.currentUser.lastName = this.userSurname.value;
               sessionStorage.setItem('userInfo', JSON.stringify(this.currentUser));
+              this.snackBar.open("Dane użytkownika zostały zaktualizowane.", "Zamknij", {
+                duration: 3000,
+              });
             });
     }
 
     validateUserInput() {
-      if(this.userName.value == "" || this.userSurname.value == "" || this.userEmail.value == "") return false;
+      if(this.userName.value == "" || this.userSurname.value == "" || this.userEmail.value == "" || (this.userName.value == this.currentUser.firstName && this.userSurname.value == this.currentUser.lastName)) return false;
       return true;
     }
 
