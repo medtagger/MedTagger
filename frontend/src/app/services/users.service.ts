@@ -51,7 +51,7 @@ export class UsersService {
     }
 
     public setUserDetails(userId: number, userName: string, userSurname: string): Promise<void> {
-      let url = environment.API_URL + `/users/${userId}/`;
+      let url = environment.API_URL + `/users/${userId}`;
       let payload = {
         firstName: userName,
         lastName: userSurname
