@@ -79,7 +79,7 @@ class ActionDetails(Resource):
     @labels_ns.marshal_with(serializers.out__action_response)
     @labels_ns.doc(security='token')
     @labels_ns.doc(description='Add new Response for given Action.')
-    @labels_ns.doc(responses={200: 'Success', 404: 'Could not find such Action'})
+    @labels_ns.doc(responses={200: 'Success', 400: 'Invalid Action Response', 404: 'Could not find such Action'})
     def post(action_id: ActionID) -> Any:
         """Add new Response for given Action."""
         payload = request.json
