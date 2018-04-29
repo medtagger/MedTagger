@@ -1,13 +1,13 @@
 """Module responsible for defining all of the relational database models."""
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
-import enum
 import uuid
-from typing import List, cast, Optional
+from typing import List, Optional
 
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
 from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session, db
+from medtagger.definitions import LabelStatus, ScanStatus, SliceStatus, SliceOrientation
 from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime
 
@@ -87,20 +87,12 @@ class ScanCategory(Base):
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
 
 
-class SliceOrientation(enum.Enum):
-    """Defines available Slice orientation."""
-
-    X = 'X'
-    Y = 'Y'
-    Z = 'Z'
-
-
 class Scan(Base):
     """Definition of a Scan."""
 
     __tablename__ = 'Scans'
     id: ScanID = Column(String, primary_key=True)
-    converted: bool = Column(Boolean, default=False)
+    status: ScanStatus = Column(Enum(ScanStatus), nullable=False, default=ScanStatus.NEW)
     declared_number_of_slices: int = Column(Integer, nullable=False)
 
     category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
@@ -131,11 +123,10 @@ class Scan(Base):
     @property
     def stored_slices(self) -> List['Slice']:
         """Return all Slices which were already stored."""
-        _slice_stored_column = cast(Boolean, Slice.stored)  # MyPy understands stored as 'bool' type
         with db_session() as session:
             query = session.query(Slice)
             query = query.filter(Slice.scan_id == self.id)
-            query = query.filter(_slice_stored_column.is_(True))
+            query = query.filter(Slice.status == SliceStatus.STORED)
             return query.all()
 
     def add_slice(self, orientation: SliceOrientation = SliceOrientation.Z) -> 'Slice':
@@ -149,9 +140,13 @@ class Scan(Base):
             session.add(new_slice)
         return new_slice
 
-    def mark_as_converted(self) -> 'Scan':
-        """Mark Scan as 3D converted."""
-        self.converted = True
+    def update_status(self, status: ScanStatus) -> 'Scan':
+        """Update Scan's status.
+
+        :param status: new status for this Scan
+        :return: Scan object
+        """
+        self.status = status
         self.save()
         return self
 
@@ -161,13 +156,12 @@ class Slice(Base):
 
     __tablename__ = 'Slices'
     id: SliceID = Column(String, primary_key=True)
+    status: SliceStatus = Column(Enum(SliceStatus), nullable=False, default=SliceStatus.NEW)
     orientation: SliceOrientation = Column(Enum(SliceOrientation), nullable=False, default=SliceOrientation.Z)
     location: float = Column(Float, nullable=True)
     position_x: float = Column(Float, nullable=True)
     position_y: float = Column(Float, nullable=True)
     position_z: float = Column(Float, nullable=True)
-    stored: bool = Column(Boolean, default=False)
-    converted: bool = Column(Boolean, default=False)
 
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     scan: Scan = relationship('Scan', back_populates='slices')
@@ -207,25 +201,15 @@ class Slice(Base):
         self.save()
         return self
 
-    def mark_as_stored(self) -> 'Slice':
-        """Mark Slice as stored in HBase."""
-        self.stored = True
+    def update_status(self, status: SliceStatus) -> 'Slice':
+        """Update Slice's status.
+
+        :param status: new status for this Slice
+        :return: Slice object
+        """
+        self.status = status
         self.save()
         return self
-
-    def mark_as_converted(self) -> 'Slice':
-        """Mark Slice as converted in HBase."""
-        self.converted = True
-        self.save()
-        return self
-
-
-class LabelStatus(enum.Enum):
-    """Defines available status for label."""
-
-    VALID = 'VALID'
-    INVALID = 'INVALID'
-    NOT_VERIFIED = 'NOT_VERIFIED'
 
 
 class Label(Base):

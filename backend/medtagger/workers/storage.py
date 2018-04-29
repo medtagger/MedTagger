@@ -5,7 +5,7 @@ from tempfile import NamedTemporaryFile
 import SimpleITK as sitk
 from celery.utils.log import get_task_logger
 
-from medtagger.definitions import DicomTags
+from medtagger.definitions import DicomTags, ScanStatus, SliceStatus
 from medtagger.types import ScanID, SliceID, SlicePosition, SliceLocation
 from medtagger.workers import celery_app
 from medtagger.workers.conversion import convert_scan_to_png
@@ -53,7 +53,7 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
 
     _slice.update_location(location)
     _slice.update_position(position)
-    _slice.mark_as_stored()
+    _slice.update_status(SliceStatus.STORED)
     logger.info('"%s" updated.', _slice)
 
     # Run conversion to PNG if this is the latest uploaded Slice
@@ -66,4 +66,5 @@ def trigger_scan_conversion_if_needed(scan_id: ScanID) -> None:
     logger.debug('Stored %s Slices. Waiting for %s Slices.', len(scan.stored_slices), scan.declared_number_of_slices)
     if scan.declared_number_of_slices == len(scan.stored_slices):
         logger.debug('All Slices uploaded for %s! Running conversion...', scan)
+        scan.update_status(ScanStatus.STORED)
         convert_scan_to_png.delay(scan.id)
