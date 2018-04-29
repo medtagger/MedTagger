@@ -126,7 +126,7 @@ class Scan(Base):
         with db_session() as session:
             query = session.query(Slice)
             query = query.filter(Slice.scan_id == self.id)
-            query = query.filter(Slice.status == SliceStatus.STORED)
+            query = query.filter(Slice.status.in_([SliceStatus.STORED, SliceStatus.PROCESSED]))
             return query.all()
 
     def add_slice(self, orientation: SliceOrientation = SliceOrientation.Z) -> 'Slice':

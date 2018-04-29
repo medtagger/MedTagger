@@ -38,7 +38,7 @@ class ScansRepository(object):
             labelled_scans = Label.query.filter(Label.owner == user).all()
             labelled_scans_ids = [label.scan_id for label in labelled_scans]
             query = query.filter(~Scan.id.in_(labelled_scans_ids))  # type: ignore  # "ScanID" has no attribute "in_"
-        query = query.filter(Scan.status == ScanStatus.CONVERTED)
+        query = query.filter(Scan.status == ScanStatus.AVAILABLE)
         query = query.order_by(func.random())
         return query.first()
 
