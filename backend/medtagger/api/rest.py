@@ -49,6 +49,7 @@ app.config['SWAGGER_UI_DOC_EXPANSION'] = 'list'
 app.config['SQLALCHEMY_DATABASE_URI'] = configuration.get('db', 'database_uri')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['RESTPLUS_VALIDATE'] = True
+app.config['ERROR_404_HELP'] = False
 
 with app.app_context():
     create_hbase_connection_pool()

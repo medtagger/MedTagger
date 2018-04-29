@@ -87,6 +87,15 @@ def test_adding_new_survey(prepare_environment: Any) -> None:
         },
     }
 
+    # Check if we can fetch any unavailable Action through API
+    response = api_client.get('/api/v1/labels/actions/2', headers=get_headers(token=user_token))
+    assert response.status_code == 404
+    json_response = json.loads(response.data)
+    assert json_response == {
+        'message': 'Requested object does not exist.',
+        'details': 'Action "2" not found.',
+    }
+
 
 def test_adding_new_response_for_survey(prepare_environment: Any) -> None:
     """Test for adding new Response for Survey."""
@@ -131,4 +140,15 @@ def test_adding_new_response_for_survey(prepare_environment: Any) -> None:
             'FIRST_QUESTION': 'Red',
             'SECOND_QUESTION': 'Love it',
         },
+    }
+
+    # Check if user can post invalid Response (keys that were not in Survey)
+    payload = {'FIRST_QUESTION': 'Red', 'THIRD_QUESTION': 'I am a hacker!'}
+    response = api_client.post('/api/v1/labels/actions/1', data=json.dumps(payload),
+                               headers=get_headers(token=user_token, json=True))
+    assert response.status_code == 400
+    json_response = json.loads(response.data)
+    assert json_response == {
+        'message': 'Invalid arguments.',
+        'details': 'Your answers does not match keys in Survey.',
     }
