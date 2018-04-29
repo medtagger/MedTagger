@@ -32,7 +32,7 @@ def upgrade():
     op.create_table('LabelTags',
                     sa.Column('_created', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
                     sa.Column('_modified', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-                    sa.Column('id', sa.String(), nullable=False),
+                    sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('key', sa.String(length=50), nullable=False),
                     sa.Column('name', sa.String(length=100), nullable=False),
                     sa.Column('scan_category_id', sa.Integer(), nullable=True),
@@ -43,7 +43,7 @@ def upgrade():
                     )
 
     op.rename_table('LabelSelections', 'LabelElements')
-    op.add_column('LabelElements', sa.Column('tag_id', sa.String(), nullable=True))
+    op.add_column('LabelElements', sa.Column('tag_id', sa.Integer(), nullable=True))
     op.add_column('LabelElements', sa.Column('status', label_element_status_enum,
                                              server_default='NOT_VERIFIED', nullable=False))
     op.create_foreign_key(op.f('fk_LabelElements_tag_id_LabelTags'), 'LabelElements', 'LabelTags', ['tag_id'], ['id'])

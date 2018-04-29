@@ -290,7 +290,7 @@ class LabelTag(Base):
     """Definition of tag for label."""
 
     __tablename__ = 'LabelTags'
-    id: LabelTagID = Column(String, autoincrement=True, primary_key=True)
+    id: LabelTagID = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
 
@@ -331,10 +331,9 @@ class LabelElement(Base):
     has_binary_mask: bool = Column(Boolean, nullable=False)
 
     label_id: LabelID = Column(String, ForeignKey('Labels.id'))
-    label: Label = relationship('Label', back_populates='selections')
+    label: Label = relationship('Label', back_populates='elements')
 
-    tag_id: LabelTagID = Column(String, ForeignKey('LabelTags.id'))
-    tag: 'LabelTag' = relationship('LabelTag', back_populates="label_element")
+    tag_id: LabelTagID = Column(Integer, ForeignKey('LabelTags.id'))
 
     status: LabelElementStatus = Column(Enum(LabelElementStatus), nullable=False,
                                         server_default=LabelElementStatus.NOT_VERIFIED.value)
