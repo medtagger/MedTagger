@@ -49,4 +49,24 @@ export class UsersService {
                 })
         })
     }
+
+    public setUserDetails(userId: number, userFirstName: string, userLastName: string): Promise<void> {
+      let url = environment.API_URL + `/users/${userId}`;
+      let payload = {
+        firstName: userFirstName,
+        lastName: userLastName
+      };
+      return new Promise<void>((resolve, reject) => {
+        this.http.put(url, payload)
+            .toPromise()
+            .then(response => {
+                console.log("UsersService | setUserDetails | response: ", response);
+                resolve();
+            })
+            .catch(error => {
+                console.log("UsersService | setUserDetails | response: ", error);
+                reject(error);
+            })
+      })
+    }
 }
