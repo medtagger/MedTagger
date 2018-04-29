@@ -5,6 +5,7 @@ from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
 from medtagger.database.models import ScanCategory, Scan, User, Label
+from medtagger.definitions import ScanStatus
 from medtagger.types import ScanID
 
 
@@ -37,7 +38,7 @@ class ScansRepository(object):
             labelled_scans = Label.query.filter(Label.owner == user).all()
             labelled_scans_ids = [label.scan_id for label in labelled_scans]
             query = query.filter(~Scan.id.in_(labelled_scans_ids))  # type: ignore  # "ScanID" has no attribute "in_"
-        query = query.filter(Scan.converted)
+        query = query.filter(Scan.status == ScanStatus.AVAILABLE)
         query = query.order_by(func.random())
         return query.first()
 
