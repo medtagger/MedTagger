@@ -102,21 +102,22 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
         yield _slice, image
 
 
-def add_label(scan_id: ScanID, selections: List[Dict], labeling_time: LabelingTime) -> Label:
+def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime, tag: str) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
-    :param selections: List of JSONs describing selections for a single label
+    :param elements: List of JSONs describing elements for a single label
     :param labeling_time: time in seconds that user spent on labeling
+    :param tag: key of the Label Tag that label was made with
     :return: Label object
     """
     user = get_current_user()
     label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
-    for selection in selections:
-        position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
-        shape = LabelShape(width=selection['width'], height=selection['height'])
-        binary_mask = LabelSelectionBinaryMask(selection['binary_mask']) if selection.get('binary_mask') else None
-        LabelsRepository.add_new_label_selection(label.id, position, shape, binary_mask)
+    for element in elements:
+        position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
+        shape = LabelShape(width=element['width'], height=element['height'])
+        binary_mask = LabelSelectionBinaryMask(element['binary_mask']) if element.get('binary_mask') else None
+        LabelsRepository.add_new_label_element(label.id, position, shape, tag, binary_mask)
     return label
 
 

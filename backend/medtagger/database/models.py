@@ -261,6 +261,16 @@ class Label(Base):
         return '<{}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id,
                                            self.labeling_time, self.owner)
 
+    def update_status(self, status: LabelVerificationStatus) -> 'Label':
+        """Update Label's verification status.
+
+        :param status: new status for this Label
+        :return: Label object
+        """
+        self.status = status
+        self.save()
+        return self
+
 
 class LabelTag(Base):
     """Definition of tag for label."""
@@ -314,13 +324,13 @@ class LabelElement(Base):
     status: LabelElementStatus = Column(Enum(LabelElementStatus), nullable=False,
                                         server_default=LabelElementStatus.NOT_VERIFIED.value)
 
-    def __init__(self, position: LabelPosition, shape: LabelShape, label_tag: LabelTag,
+    def __init__(self, position: LabelPosition, shape: LabelShape, tag: LabelTag,
                  has_binary_mask: bool = False) -> None:
         """Initialize Label Element.
 
         :param position: position (x, y, slice_index) of the label
         :param shape: shape (width, height) of the label
-        :param label_tag: tag of the label
+        :param tag: tag of the label
         :param has_binary_mask: boolean information if such Label Element has binary mask or not
         """
         self.id = LabelElementID(str(uuid.uuid4()))
@@ -329,7 +339,7 @@ class LabelElement(Base):
         self.slice_index = position.slice_index
         self.shape_width = shape.width
         self.shape_height = shape.height
-        self.label_tag = label_tag
+        self.tag_id = tag.id
         self.has_binary_mask = has_binary_mask
         self.status = LabelElementStatus.NOT_VERIFIED
 

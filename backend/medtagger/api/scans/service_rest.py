@@ -105,8 +105,9 @@ class Label(Resource):
         payload = request.json
         selections = payload['selections']
         labeling_time = payload['labeling_time']
+        tag = payload['tag']
 
-        label = business.add_label(scan_id, selections, labeling_time)
+        label = business.add_label(scan_id, selections, labeling_time, tag)
         return label, 201
 
 

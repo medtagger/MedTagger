@@ -2,23 +2,26 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
+from medtagger.database.models import LabelVerificationStatus
 
 in__new_scan = api.model('New Scan model', {
     'category': fields.String(description='Scan\'s category', required=True),
     'number_of_slices': fields.Integer(description='Number of Slices that will be uploaded', required=True),
 })
 
-in__label_selection = api.model('Label\'s Selection model', {
-    'x': fields.Float(description='Selection\'s X position', min=0.0, max=1.0, required=True),
-    'y': fields.Float(description='Selection\'s Y position', min=0.0, max=1.0, required=True),
+in__label_element = api.model('Label\'s Element model', {
+    'x': fields.Float(description='Element\'s X position', min=0.0, max=1.0, required=True),
+    'y': fields.Float(description='Element\'s Y position', min=0.0, max=1.0, required=True),
     'slice_index': fields.Integer(description='Slice\'s order index', min=0, required=True),
-    'width': fields.Float(description='Selection\'s width', min=0.0, max=1.0, required=True),
-    'height': fields.Float(description='Selection\'s height', min=0.0, max=1.0, required=True),
+    'width': fields.Float(description='Element\'s width', min=0.0, max=1.0, required=True),
+    'height': fields.Float(description='Element\'s height', min=0.0, max=1.0, required=True),
     'binary_mask': fields.String(description='Selection\'s binary mask'),
+    'tag': fields.String(description='Element\'s tag'),
+    'status': fields.String(description='Element\'s status', enum=[status.name for status in LabelVerificationStatus]),
 })
 
 in__label = api.model('Label model', {
-    'selections': fields.List(fields.Nested(in__label_selection)),
+    'elements': fields.List(fields.Nested(in__label_element)),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
 })
 

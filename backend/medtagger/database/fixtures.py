@@ -1,6 +1,5 @@
 """Insert all database fixtures."""
 import logging.config
-from typing import List
 
 from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
