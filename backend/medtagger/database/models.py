@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship
 from medtagger.database import Base, db_session, db
 from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
-    SurveyResponseID
+    ActionResponseID, SurveyResponseID
 
 
 #########################
@@ -375,7 +375,7 @@ class Survey(Action):
         'polymorphic_identity': 'Survey',
     }
 
-    def __init__(self, name: str, initial_element_key: str) -> None:
+    def __init__(self, name: str, initial_element_key: SurveyElementKey) -> None:
         """Initialize Action.
 
         :param name: name that should identify such actions for given Scan Category
@@ -393,9 +393,9 @@ class Survey(Action):
         }
 
     def validate_response(self, response: Dict) -> bool:
+        """Validate incoming Response for this Survey."""
         elements_keys = {element.key for element in self.elements}
         response_keys = set(response)
-        print(response_keys, elements_keys)
         return response_keys.issubset(elements_keys)
 
 
@@ -405,7 +405,7 @@ class SurveyElement(Base):
     __tablename__ = 'SurveyElements'
     id: SurveyElementID = Column(Integer, autoincrement=True, primary_key=True)
     key: SurveyElementKey = Column(String(50), nullable=False)
-    instant_next_element: SurveyElementKey = Column(String(50), nullable=True)
+    instant_next_element: Optional[SurveyElementKey] = Column(String(50), nullable=True)
     survey_element_type: str = Column(String(50), nullable=False)
 
     survey_id: SurveyID = Column(Integer, ForeignKey('Surveys.id'))
@@ -416,7 +416,7 @@ class SurveyElement(Base):
         'polymorphic_on': survey_element_type,
     }
 
-    def __init__(self, key: SurveyElementKey, instant_next_element: SurveyElementKey) -> None:
+    def __init__(self, key: SurveyElementKey, instant_next_element: Optional[SurveyElementKey] = None) -> None:
         """Initialize an element in Survey.
 
         :param key: key that will identify this Element in whole Survey
@@ -440,13 +440,13 @@ class SurveySingleChoiceQuestion(SurveyElement):
     __tablename__ = 'SurveySingleChoiceQuestions'
     id: SurveyElementID = Column(Integer, ForeignKey('SurveyElements.id'), primary_key=True)
     title: str = Column(String(255), nullable=False)
-    possible_answers: Dict[str, SurveyElementKey] = Column(JSONB, nullable=False)
+    possible_answers: Dict[str, Optional[SurveyElementKey]] = Column(JSONB, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'SurveySingleChoiceQuestion',
     }
 
-    def __init__(self, key: str, title: str, possible_answers: Dict[str, SurveyElementKey],
+    def __init__(self, key: SurveyElementKey, title: str, possible_answers: Dict[str, Optional[SurveyElementKey]],
                  instant_next_element: SurveyElementKey = None) -> None:
         """Initialize a Single Choice Question in Survey.
 
@@ -477,7 +477,7 @@ class ActionResponse(Base):
     """Definition of a Response for Action."""
 
     __tablename__ = 'ActionResponses'
-    id: ActionID = Column(Integer, autoincrement=True, primary_key=True)
+    id: ActionResponseID = Column(Integer, autoincrement=True, primary_key=True)
     action_response_type: str = Column(String(50), nullable=False)
 
     action_id: ActionID = Column(Integer, ForeignKey('Actions.id'))
@@ -488,7 +488,7 @@ class ActionResponse(Base):
         'polymorphic_on': action_response_type,
     }
 
-    def get_details(self) -> Dict:
+    def get_details(self) -> Dict:  # pylint: disable=no-self-use
         """Return dictionary details about this Action Response."""
         return {}
 
@@ -514,6 +514,7 @@ class SurveyResponse(ActionResponse):
         :param survey_id: ID of a Survey with which this Response is connected with
         :param data: dictionary representation of all answers where key is a Survey Element Key
         """
+        super(SurveyResponse, self).__init__()
         self.action_id = cast(ActionID, survey_id)
         self.data = data
 

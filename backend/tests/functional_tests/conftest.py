@@ -6,7 +6,7 @@ import pytest
 
 from medtagger.api import InvalidArgumentsException
 from medtagger.api.rest import app
-from medtagger.database import Base, session
+from medtagger.database import Base, session, db_session
 from medtagger.database.fixtures import apply_all_fixtures
 from medtagger.clients.hbase_client import HBaseClient
 from medtagger.api.auth.business import create_user, sign_in_user
@@ -16,7 +16,7 @@ from medtagger.repositories.roles import RolesRepository
 logger = logging.getLogger(__name__)
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def prepare_environment() -> Any:
     """Prepare environment for testing purpose (setup DBs, fixtures) and clean up after the tests."""
     logger.info('Applying fixtures to PostgreSQL.')
@@ -25,22 +25,21 @@ def prepare_environment() -> Any:
     # Run the test
     yield
 
-    logger.info('Removing all data from PostgreSQL.')
-    for table in reversed(Base.metadata.sorted_tables):
-        session.execute(table.delete())
-    session.commit()
-    session.close_all()
-
-    logger.info('Removing all data from HBase.')
-    for table_name in HBaseClient.HBASE_SCHEMA:
-        for key in HBaseClient().get_all_keys(table_name):
-            HBaseClient().delete(table_name, key)
+    logger.info('Clearing databases.')
+    _clear_databases()
 
 
 @pytest.fixture
 def synchronous_celery(mocker: Any) -> Any:
     """Set Celery to executing tasks eagerly (each time tasks are called/delayed)."""
     mocker.patch('medtagger.workers.celery_configuration.task_always_eager', True, create=True)
+
+
+def pytest_keyboard_interrupt(excinfo: Any) -> None:
+    """Clear database after tests that were interrupted with keyboard."""
+    logger.error('Tests interrupted!')
+    logger.info('Clearing databases.')
+    _clear_databases()
 
 
 def get_token_for_logged_in_user(role: str) -> str:
@@ -64,3 +63,16 @@ def get_token_for_logged_in_user(role: str) -> str:
 
     with app.app_context():
         return sign_in_user(email, password)
+
+
+def _clear_databases() -> None:
+    logger.info('Removing all data from PostgreSQL.')
+    with db_session() as sess:
+        for table in reversed(Base.metadata.sorted_tables):
+            sess.execute('TRUNCATE TABLE "{}" RESTART IDENTITY CASCADE;'.format(table.name))
+    session.close_all()
+
+    logger.info('Removing all data from HBase.')
+    for table_name in HBaseClient.HBASE_SCHEMA:
+        for key in HBaseClient().get_all_keys(table_name):
+            HBaseClient().delete(table_name, key)

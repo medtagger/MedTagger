@@ -64,9 +64,9 @@ class ActionDetails(Resource):
     """Endpoint that handles all operations on Actions."""
 
     @staticmethod
-    # TODO: @login_required
+    @login_required
     @labels_ns.marshal_with(serializers.out__action)
-    # TODO: @labels_ns.doc(security='token')
+    @labels_ns.doc(security='token')
     @labels_ns.doc(description='Returns details about Action that user should do with Label.')
     @labels_ns.doc(responses={200: 'Success', 404: 'Could not find such Action'})
     def get(action_id: ActionID) -> Any:
@@ -74,10 +74,10 @@ class ActionDetails(Resource):
         return business.get_action_details(action_id)
 
     @staticmethod
-    # TODO: @login_required
+    @login_required
     @labels_ns.expect(serializers.in__action_response)
     @labels_ns.marshal_with(serializers.out__action_response)
-    # TODO: @labels_ns.doc(security='token')
+    @labels_ns.doc(security='token')
     @labels_ns.doc(description='Add new Response for given Action.')
     @labels_ns.doc(responses={200: 'Success', 404: 'Could not find such Action'})
     def post(action_id: ActionID) -> Any:

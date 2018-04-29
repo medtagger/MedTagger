@@ -7,10 +7,11 @@ SCRIPTS_DIRECTORY = scripts
 COVERAGE_LIMIT = 0
 MAX_CYCLOMATIC_COMPLEXITY = 5
 UNIT_TESTS_MODULE = tests/unit_tests
-UNIT_TEST = $(UNIT_TESTS_MODULE)
+RUN_UNIT_TEST = $(UNIT_TESTS_MODULE)
 FUNCTIONAL_TESTS_MODULE = tests/functional_tests
 FUNCTIONAL_TESTS_DOCKER_COMPOSE = ../.travis/backend_functional_tests_docker-compose.yml
-FUNCTIONAL_TEST = $(FUNCTIONAL_TESTS_MODULE)
+RUN_FUNCTIONAL_TEST = $(FUNCTIONAL_TESTS_MODULE)
+PYTEST_SLOWEST_TESTS=0
 
 # Third party configuration files
 PYLINT_CONFIG_FILE = .pylintrc
@@ -81,14 +82,14 @@ test_mypy:
 	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(FUNCTIONAL_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
 
 unit_tests:
-	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TEST)
+	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) --durations=$(PYTEST_SLOWEST_TESTS) $(RUN_UNIT_TEST)
 
 functional_tests:
 	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d hbase postgres rabbitmq
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic upgrade head
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && $(PYTHON) ./$(SCRIPTS_DIRECTORY)/migrate_hbase.py -y
-	@if . $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ! pytest $(FUNCTIONAL_TEST) ; then\
+	@if . $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ! pytest --durations=$(PYTEST_SLOWEST_TESTS) $(RUN_FUNCTIONAL_TEST) ; then\
 		docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down;\
 		echo "Functional tests failed!";\
 		exit 1;\
@@ -101,7 +102,7 @@ functional_tests_docker:
 	./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
 	alembic upgrade head
 	$(PYTHON) ./$(SCRIPTS_DIRECTORY)/migrate_hbase.py -y
-	pytest $(FUNCTIONAL_TESTS_MODULE)
+	pytest --durations=$(PYTEST_SLOWEST_TESTS) $(FUNCTIONAL_TESTS_MODULE)
 
 #
 # Utilities

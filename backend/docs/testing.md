@@ -27,7 +27,7 @@ _**TIP!**_ You can also run specific tool by:
 _**TIP!**_ You can also specify which unit test should be executed by:
 
 ```bash
-(venv) $ make unit_tests UNIT_TEST=tests/unit_tests/api/core/test_business.py
+(venv) $ make unit_tests RUN_UNIT_TEST=tests/unit_tests/api/core/test_business.py
 ```
 
 ## Functional tests
@@ -44,6 +44,6 @@ To run such tests please execute:
 _**TIP!**_ You can also specify which functional test should be executed by:
 
 ```bash
-(venv) $ make functional_tests FUNCTIONAL_TEST=tests/functional_tests/test_basic_flow.py 
+(venv) $ make functional_tests RUN_FUNCTIONAL_TEST=tests/functional_tests/test_basic_flow.py 
 ```
 

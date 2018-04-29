@@ -1,9 +1,9 @@
 """Module responsible for definition of Actions' Repository."""
-from typing import Dict
+from typing import Dict, cast
 
 from medtagger.database import db_session
 from medtagger.database.models import Action, ActionResponse, SurveyResponse
-from medtagger.types import ActionID
+from medtagger.types import ActionID, SurveyID
 
 
 class UnsupportedActionException(Exception):
@@ -35,7 +35,8 @@ class ActionsRepository(object):
             if not valid:
                 raise InvalidResponseException('Your answers does not match keys in Survey.')
             with db_session() as session:
-                action_response = SurveyResponse(action_id, response)
+                survey_id = cast(SurveyID, action_id)
+                action_response = SurveyResponse(survey_id, response)
                 session.add(action_response)
         else:
             raise UnsupportedActionException('Action does not support returning Respose.')
