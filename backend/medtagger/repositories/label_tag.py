@@ -25,7 +25,7 @@ class LabelTagRepository(object):
         """Add new Label Tag to the database.
 
         :param key: key that will identify such Label Tag
-        :param name: name that will be used in the Use Interface for such Label Tag
+        :param name: name that will be used in the User Interface for such Label Tag
         :return: Label Tag object
         """
         with db_session() as session:

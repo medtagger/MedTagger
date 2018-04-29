@@ -5,6 +5,7 @@ from typing import Iterable, Dict, List, Tuple
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api.exceptions import NotFoundException
+from medtagger.repositories.label_tag import LabelTagRepository
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata, LabelingTime
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
 from medtagger.repositories.labels import LabelsRepository
@@ -102,13 +103,12 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
         yield _slice, image
 
 
-def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime, tag: str) -> Label:
+def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
     :param elements: List of JSONs describing elements for a single label
     :param labeling_time: time in seconds that user spent on labeling
-    :param tag: key of the Label Tag that label was made with
     :return: Label object
     """
     user = get_current_user()
@@ -117,7 +117,11 @@ def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime
         position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
         shape = LabelShape(width=element['width'], height=element['height'])
         binary_mask = LabelSelectionBinaryMask(element['binary_mask']) if element.get('binary_mask') else None
-        LabelsRepository.add_new_label_element(label.id, position, shape, tag, binary_mask)
+        try:
+            label_tag = LabelTagRepository.get_label_tag_by_key(element['tag'])
+        except NoResultFound:
+            raise NotFoundException('Could not find any Label Tag for that key!')
+        LabelsRepository.add_new_label_element(label.id, position, shape, label_tag, binary_mask)
     return label
 
 

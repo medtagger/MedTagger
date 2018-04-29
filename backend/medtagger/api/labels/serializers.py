@@ -17,8 +17,9 @@ out__label_element = api.model('Label Element', {
     'width': fields.Float(description='Element\'s width', min=0.0, max=1.0, attribute='shape_width'),
     'height': fields.Float(description='Element\'s height', min=0.0, max=1.0, attribute='shape_height'),
     'binary_mask': fields.String(description='Element\'s binary mask'),
-    'tag': fields.String(description='Element\'s tag'),
-    'status': fields.String(description='Element\'s status', enum=[status.name for status in LabelElementStatus]),
+    'tag': fields.String(description='Element\'s tag', attribute='tag.key'),
+    'status': fields.String(description='Element\'s status', attribute='status.value',
+                            enum=[status.name for status in LabelElementStatus]),
 })
 
 out__label_status = api.model('Label status and ID', {

@@ -23,7 +23,7 @@ def change_label_status(label_id: LabelID, status: LabelVerificationStatus) -> L
 
 
 def get_random_label() -> Label:
-    """Fetch random label that has the NOT_VERIFIED verification status.
+    """Fetch random label that has the NOT_VERIFIED status.
 
     :return: dictionary with details about label
     """

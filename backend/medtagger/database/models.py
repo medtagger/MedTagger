@@ -239,7 +239,7 @@ class Label(Base):
 
     scan: Scan = relationship('Scan', back_populates='labels')
 
-    elements: 'LabelElement' = relationship('LabelElement', back_populates='label')
+    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label')
 
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
     owner: User = relationship('User', back_populates='labels')
@@ -255,6 +255,7 @@ class Label(Base):
         self.id = LabelID(str(uuid.uuid4()))
         self.owner = user
         self.labeling_time = labeling_time
+        self.status = LabelVerificationStatus.NOT_VERIFIED
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
@@ -285,6 +286,7 @@ class LabelTag(Base):
 
     def __init__(self, key: str, name: str) -> None:
         """Initialize Label Tag.
+
         :param key: unique key representing Label Tag
         :param name: name which describes this Label Tag
         """
@@ -320,6 +322,7 @@ class LabelElement(Base):
     label: Label = relationship('Label', back_populates='elements')
 
     tag_id: LabelTagID = Column(Integer, ForeignKey('LabelTags.id'))
+    tag: LabelTag = relationship('LabelTag')
 
     status: LabelElementStatus = Column(Enum(LabelElementStatus), nullable=False,
                                         server_default=LabelElementStatus.NOT_VERIFIED.value)

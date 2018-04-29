@@ -55,19 +55,18 @@ class LabelsRepository(object):
         return label
 
     @staticmethod
-    def add_new_label_element(label_id: LabelID, position: LabelPosition, shape: LabelShape, label_tag_key: str,
+    def add_new_label_element(label_id: LabelID, position: LabelPosition, shape: LabelShape, label_tag: LabelTag,
                               binary_mask: LabelSelectionBinaryMask = None) -> LabelElementID:
         """Add new Element for given Label.
 
         :param label_id: Label's ID
         :param position: position (x, y, slice_index) of the Label
         :param shape: shape (width, height, depth) of the Label
-        :param label_tag_key: key of the label tag of the element
+        :param label_tag: Label Tag object
         :param binary_mask: binary mask of the new Element
         :return: ID of a Element
         """
         with db_session() as session:
-            label_tag = LabelTag.query.filter(LabelTag.key == label_tag_key).one()
             new_label_element = LabelElement(position, shape, label_tag, has_binary_mask=bool(binary_mask))
             new_label_element.label_id = label_id
             session.add(new_label_element)
