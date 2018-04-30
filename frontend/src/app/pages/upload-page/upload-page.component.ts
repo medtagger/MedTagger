@@ -112,7 +112,6 @@ export class UploadPageComponent implements OnInit {
 
                 // Check Scan status and move it to appropiate state if needed
                 this.scanService.getScanForScanId(scanToMonitor.id).then((metadata: ScanMetadata) => {
-                    console.log(metadata);
                     if (metadata.status == 'STORED' || metadata.status == 'PROCESSING') {
                         scanToMonitor.status = UploadingScanStatus.PROCESSING;
                     }
@@ -156,8 +155,6 @@ export class UploadPageComponent implements OnInit {
         for (let scan of this.scans) {
             this.queuedScans.push(new UploadingScan(scan));
         }
-
-        console.log(this.scans, this.queuedScans, this.uploadingAndProcessingScans, this.availableScans, this.errorScans);
 
         // Run polling of Scans upload progress in parallel to the uploading Scans
         this.pollScanUploadStatus();

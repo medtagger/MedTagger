@@ -73,6 +73,7 @@ def get_random_scan(category_key: str) -> Scan:
         scan = ScansRepository.get_random_scan(category, user)
         if not scan:
             raise NotFoundException('Could not find any Scan for this category!')
+        return scan
     except NoResultFound:
         raise NotFoundException('Could not find any Scan for this category!')
 

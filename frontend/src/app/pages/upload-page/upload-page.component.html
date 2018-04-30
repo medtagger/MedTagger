@@ -213,7 +213,7 @@
                     </section>
 
                     <!-- List all errors that took place during upload -->
-                    <section *ngIf="errorScans">
+                    <section *ngIf="errorScans.length > 0">
                         <h3 class="scans-with-issues">Scans with issues</h3>
                         <button class="selector-button-error-scans" mat-button color="primary-color" (click)="scansForRetry.selectAll()">
                             Select all
@@ -237,7 +237,7 @@
                         <mat-icon>navigate_before</mat-icon>
                         Upload more Scans
                     </button>
-                    <button mat-raised-button class="upload-again-button" color="primary-color" (click)="uploadAgain()" *ngIf="!!scansForRetry && errorScans" [disabled]="scansForRetry.selectedOptions.selected.length == 0">
+                    <button mat-raised-button class="upload-again-button" color="primary-color" (click)="uploadAgain()" *ngIf="!!scansForRetry && errorScans.length > 0" [disabled]="scansForRetry.selectedOptions.selected.length == 0">
                         <mat-icon>replay</mat-icon>
                         Upload selected Scans again
                     </button>
