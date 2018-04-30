@@ -139,7 +139,6 @@ class ScanSlices(Resource):
     @scans_ns.doc(responses={201: 'Success', 400: 'Invalid arguments'})
     def post(scan_id: ScanID) -> Any:
         """Upload Slice for given Scan."""
-        return {}, 400
         image = request.files['image']
         image_data = image.read()
         new_slice = business.add_new_slice(scan_id, image_data)
