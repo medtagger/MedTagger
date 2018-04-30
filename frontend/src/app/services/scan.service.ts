@@ -15,11 +15,13 @@ import {SliceSelection} from "../model/SliceSelection";
 
 interface RandomScanResponse {
     scan_id: string;
+    status: string;
     number_of_slices: number;
 }
 
 interface ScanForScanIDResponse {
     scan_id: string;
+    status: string;
     number_of_slices: number;
 }
 
@@ -65,7 +67,7 @@ export class ScanService {
                 .subscribe(
                     (response) => {
                         console.log('ScanService | getRandomScan | response: ', response);
-                        resolve(new ScanMetadata(response.scan_id, response.number_of_slices));
+                        resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices));
                     },
                     (error) => {
                         console.log('ScanService | getRandomScan | error: ', error);
@@ -82,7 +84,7 @@ export class ScanService {
             this.http.get<ScanForScanIDResponse>(environment.API_URL + '/scans/' + scanId).toPromise().then(
                 response => {
                     console.log('ScanService | getScanForScanId | response: ', response);
-                    resolve(new ScanMetadata(response.scan_id, response.number_of_slices));
+                    resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices));
                 },
                 error => {
                     console.log('ScanService | getRandomScan | error: ', error);

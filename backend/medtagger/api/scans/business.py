@@ -67,8 +67,11 @@ def get_metadata(scan_id: ScanID) -> ScanMetadata:
     :param scan_id: ID of a given scan
     :return: Scan Metadata object
     """
-    scan = ScansRepository.get_scan_by_id(scan_id)
-    return ScanMetadata(scan_id=scan.id, number_of_slices=scan.declared_number_of_slices)
+    try:
+        scan = ScansRepository.get_scan_by_id(scan_id)
+    except NoResultFound:
+        raise NotFoundException('Scan "{}" not found.'.format(scan_id))
+    return ScanMetadata(scan_id=scan.id, status=scan.status, number_of_slices=scan.declared_number_of_slices)
 
 
 def get_random_scan(category_key: str) -> ScanMetadata:
@@ -83,7 +86,7 @@ def get_random_scan(category_key: str) -> ScanMetadata:
     if not scan:
         raise NotFoundException('Could not find any Scan for this category!')
 
-    return ScanMetadata(scan_id=scan.id, number_of_slices=scan.declared_number_of_slices)
+    return ScanMetadata(scan_id=scan.id, status=scan.status, number_of_slices=scan.declared_number_of_slices)
 
 
 def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
@@ -140,7 +143,10 @@ def get_scan(scan_id: ScanID) -> Scan:
     :param scan_id: ID of a Scan which should be returned
     :return: Scan object
     """
-    return ScansRepository.get_scan_by_id(scan_id)
+    try:
+        return ScansRepository.get_scan_by_id(scan_id)
+    except NoResultFound:
+        raise NotFoundException('Scan "{}" not found.'.format(scan_id))
 
 
 def get_scan_metadata(scan_id: ScanID) -> ScanMetadata:
@@ -149,5 +155,8 @@ def get_scan_metadata(scan_id: ScanID) -> ScanMetadata:
     :param scan_id: ID of a Scan which should be returned
     :return: Scan Metadata object
     """
-    scan = ScansRepository.get_scan_by_id(scan_id)
-    return ScanMetadata(scan_id=scan.id, number_of_slices=scan.declared_number_of_slices)
+    try:
+        scan = ScansRepository.get_scan_by_id(scan_id)
+        return ScanMetadata(scan_id=scan.id, status=scan.status, number_of_slices=scan.declared_number_of_slices)
+    except NoResultFound:
+        raise NotFoundException('Scan "{}" not found.'.format(scan_id))

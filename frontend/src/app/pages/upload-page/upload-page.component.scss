@@ -1,12 +1,58 @@
+$duration: 1.4s;
+
+.spinner {
+    animation: rotationAnimation $duration linear infinite;
+}
+
+@keyframes rotationAnimation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.overall-status {
+    margin: 0 0 0 auto;
+    display: block;
+    line-height: 36px;
+}
+
+.progress-color {
+    color: rgb(5, 113, 255);
+}
+
+.success-color {
+    color: green;
+}
+
+.error-color {
+    color: red;
+}
+
+.queue-color {
+    color: gray;
+}
+
+mat-icon.upload-status {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+    margin-right: 4px;
+}
+
 .pull-right {
     float: right;
 }
 
+.middle-screen-width {
+    width: 60%;
+    min-width: 400px;
+    max-width: 700px;
+    margin: 5px auto 60px auto;
+    display: block;
+}
+
 .upload-mode {
-    width: 40%;
-    max-width: 450px;
-    float: left;
-    margin: 1.5em;
+    margin-bottom: 20px;
 }
 
 .mat-card-title {
@@ -16,32 +62,12 @@
     right: 0.5em;
 }
 
-.enable-card-border {
-    margin: 5px;
-}
-
-.category-selection {
-    width: 60%;
-    min-width: 400px;
-    max-width: 600px;
-    margin: 5px auto;
-    display: block;
-}
-
 .button-wrapper {
     display: -webkit-flex;
     -webkit-flex-wrap: wrap;
     display: flex;
     flex-wrap: wrap;
     float: right;
-}
-
-.choose-files {
-    width: 60%;
-    min-width: 500px;
-    max-width: 700px;
-    margin: 5px auto;
-    display: block;
 }
 
 .progress-spinner {
@@ -53,9 +79,7 @@
     margin-top: 15px;
 }
 
-.success-message {
-    background: #4caf50;
-    color: white;
+.box-message {
     padding: 1.6em;
     min-width: 50%;
     max-width: 800px;
@@ -64,10 +88,27 @@
     p {
         margin: 0;
     }
+
+    mat-icon {
+        float: left;
+        margin-right: 15px;
+        vertical-align: middle !important;
+    }
 }
 
-.success-indicator {
-    vertical-align: middle !important;
+.success-message {
+    background: #4caf50;
+    color: white;
+}
+
+.warning-message {
+    background: #dba604;
+    color: white;
+}
+
+.error-message {
+    background: #ba4304;
+    color: white;
 }
 
 .restart-button {

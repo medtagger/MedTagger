@@ -1,5 +1,10 @@
 import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@angular/core';
 
+export class SelectedScan {
+    directory: string = '';
+    files: File[] = [];
+}
+
 @Component({
     selector: 'upload-scans-selector',
     templateUrl: './upload-scans-selector.component.html'
@@ -9,27 +14,21 @@ export class UploadScansSelectorComponent {
     @Output() onFileSelect: EventEmitter<object> = new EventEmitter();
 
     @ViewChild('inputFile') nativeInputFile: ElementRef;
+    private userSelectedFiles: File[];
 
-    private _files: File[];
-
-    public numberOfSlices: number = 0;
-    public numberOfScans: number = 0;
-    public scans: object = {};  // TODO: Convert this dictionary (key: path, value: files) to list of stuctures
+    public scans: Array<SelectedScan> = [];
+    public totalNumberOfSlices: number = 0;
 
     prepareScans() {
         // User didn't select any files
-        if (!this._files || this._files.length == 0) {
-            this.numberOfScans = 0;
-            this.numberOfSlices = 0;
-            this.scans = {};
+        if (!this.userSelectedFiles || this.userSelectedFiles.length == 0) {
+            this.scans = [];
         }
 
         // User selected single scan upload
         if (!this.multipleScans) {
-            this.scans = {
-                "singleScan": []
-            };
-            for (let sliceFile of this._files) {
+            var singleScan = new SelectedScan();
+            for (let sliceFile of this.userSelectedFiles) {
                 // Skip all files that are not DICOMs
                 if (sliceFile.type != "application/dicom") {
                     continue;
@@ -41,18 +40,18 @@ export class UploadScansSelectorComponent {
                 }
 
                 // File seems to be fine
-                this.scans["singleScan"].push(sliceFile);
+                this.totalNumberOfSlices += 1;
+                singleScan.files.push(sliceFile);
             }
-            this.numberOfScans = 1;
-            this.numberOfSlices = this.scans["singleScan"] && this.scans["singleScan"].length || 0;
+            singleScan.directory = 'Unknown directory';
+            this.scans.push(singleScan);
             return;
         }
 
         // User selected multiple scans for upload, so let's group them into the Scans
-        this.numberOfScans = 0;
-        this.numberOfSlices = 0;
         var lastScanDirectory: String;
-        for (let sliceFile of this._files) {
+        var currentScan;
+        for (let sliceFile of this.userSelectedFiles) {
             // Skip all files that are not DICOMs
             if (sliceFile.type != "application/dicom") {
                 continue;
@@ -67,20 +66,31 @@ export class UploadScansSelectorComponent {
             var slicePath = sliceFile.webkitRelativePath;
             var currentScanDirectory = slicePath.split("/").slice(0, -1).join("/");
             if (currentScanDirectory != lastScanDirectory) {
+                // If this is not the first iteration of the whole loop over files -> save current Scan
+                if (!!lastScanDirectory) {
+                    this.scans.push(currentScan);
+                }
+
                 // If we found Slice from new directory - we consider this as another Scan
+                currentScan = new SelectedScan();
+                currentScan.directory = currentScanDirectory;
+                currentScan.files = [];
                 lastScanDirectory = currentScanDirectory;
-                this.scans[currentScanDirectory] = [];
-                this.numberOfScans++;
             }
 
             // Store given Slice to the Scan which is defined as current Scan Directory
-            this.numberOfSlices++;
-            this.scans[currentScanDirectory].push(sliceFile);
+            this.totalNumberOfSlices += 1;
+            currentScan.files.push(sliceFile);
         }
+
+        // Don't forget about current scan!
+        this.scans.push(currentScan);
     }
 
     onNativeInputFileSelect($event) {
-        this._files = $event.target.files || $event.scrElement.files;
+        this.scans = [];
+        this.totalNumberOfSlices = 0;
+        this.userSelectedFiles = $event.target.files || $event.scrElement.files;
         this.prepareScans();
         this.onFileSelect.emit(this);
     }
@@ -90,10 +100,8 @@ export class UploadScansSelectorComponent {
     }
 
     public reinitialize(): void {
-        this._files = [];
-
-        this.numberOfSlices = 0;
-        this.numberOfScans = 0;
-        this.scans = {};
+        this.userSelectedFiles = [];
+        this.totalNumberOfSlices = 0;
+        this.scans = [];
     }
 }

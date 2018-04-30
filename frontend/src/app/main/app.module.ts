@@ -97,7 +97,7 @@ import {InfoDialog} from "../dialogs/info.dialog";
         MatSelectModule,
         HttpModule,
         HttpClientModule,
-        MatChipsModule
+        MatChipsModule,
     ],
     entryComponents: [
         InfoDialog
