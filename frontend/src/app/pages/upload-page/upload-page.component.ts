@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {MatHorizontalStepper, MatStep} from '@angular/material';
+import {MatHorizontalStepper, MatStep, MatSelectionList} from '@angular/material';
 import {FormBuilder, FormGroup, FormControl, Validators} from '@angular/forms';
 import {Observable} from 'rxjs/Rx';
 
@@ -40,6 +40,7 @@ class UploadingScan {
 })
 export class UploadPageComponent implements OnInit {
 
+    @ViewChild('scansForRetry') scansForRetry: MatSelectionList;
     @ViewChild('stepper') stepper: MatHorizontalStepper;
     @ViewChild('chooseModeStep') chooseModeStep: MatStep;
     @ViewChild('chooseFilesStep') chooseFilesStep: MatStep;
@@ -151,10 +152,12 @@ export class UploadPageComponent implements OnInit {
         this.queuedScans = [];
         this.uploadingAndProcessingScans = [];
         this.availableScans = [];
-        this.errorScans= [];
+        this.errorScans = [];
         for (let scan of this.scans) {
             this.queuedScans.push(new UploadingScan(scan));
         }
+
+        console.log(this.scans, this.queuedScans, this.uploadingAndProcessingScans, this.availableScans, this.errorScans);
 
         // Run polling of Scans upload progress in parallel to the uploading Scans
         this.pollScanUploadStatus();
@@ -231,7 +234,7 @@ export class UploadPageComponent implements OnInit {
         this.queuedScans = [];
         this.uploadingAndProcessingScans = [];
         this.availableScans = [];
-        this.errorScans= [];
+        this.errorScans = [];
         this.totalNumberOfSlices = 0;
         this.slicesSent = 0;
 
@@ -239,7 +242,26 @@ export class UploadPageComponent implements OnInit {
         this.chooseFilesStep.completed = false;
         this.sendingFilesStep.completed = false;
         this.uploadCompletedStep.completed = false;
+        this.scansForRetry.selectedOptions.clear();
         this.stepper.selectedIndex = 0;
+    }
+
+    public uploadAgain(): void {
+        this.scans = [];
+        this.totalNumberOfSlices = 0;
+        for (let listElement of this.scansForRetry.selectedOptions.selected) {
+            this.totalNumberOfSlices += listElement.value.scan.files.length;
+            this.scans.push(listElement.value.scan);
+        }
+
+        // Clear Upload and Summary page and go to the Uploading view triggering upload
+        this.resetFormGroup(this.sendingFilesFormGroup);
+        this.resetFormGroup(this.uploadCompletedFormGroup);
+        this.sendingFilesStep.completed = false;
+        this.uploadCompletedStep.completed = false;
+        this.scansForRetry.selectedOptions.clear();
+        this.stepper.selectedIndex = 3;
+        this.uploadFiles();
     }
 
     public isGoogleChrome(): boolean {

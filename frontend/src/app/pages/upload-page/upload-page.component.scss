@@ -111,7 +111,27 @@ mat-icon.upload-status {
     color: white;
 }
 
-.restart-button {
-    margin: 20px auto;
+.scans-with-issues {
+    margin-top: 15px;
+    margin-bottom: 0px;
+    float: left;
+    display: inline-block;
+}
+
+.selector-button-error-scans {
+    margin: 10px 0 0 auto;
     display: block;
+    float: right;
+}
+
+.restart-button {
+    margin: 20px 0 10px 0;
+    display: block;
+    float: left;
+}
+
+.upload-again-button {
+    margin: 20px 0 10px 0;
+    display: block;
+    float: right;
 }

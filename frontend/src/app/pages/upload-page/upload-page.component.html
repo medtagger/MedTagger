@@ -131,7 +131,7 @@
     </mat-step>
 
     <!-- Upload step -->
-    <mat-step [stepControl]="sendingFilesFormGroup" [editable]="false" #sendingFilesStep>
+    <mat-step [stepControl]="sendingFilesFormGroup" #sendingFilesStep>
         <ng-template matStepLabel>Upload</ng-template>
         <div class="middle-screen-width">
             <mat-card>
@@ -189,6 +189,7 @@
                     <mat-card-title>Upload Summary</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
+                    <!-- Big box with success/warning/error message inside -->
                     <section class="box-message success-message" *ngIf="availableScans.length == scans.length">
                         <mat-icon>check</mat-icon>
                         <p>
@@ -210,10 +211,37 @@
                             Your files may be corrupted or incompatible with MedTagger.
                         </p>
                     </section>
+
+                    <!-- List all errors that took place during upload -->
+                    <section *ngIf="errorScans">
+                        <h3 class="scans-with-issues">Scans with issues</h3>
+                        <button class="selector-button-error-scans" mat-button color="primary-color" (click)="scansForRetry.selectAll()">
+                            Select all
+                        </button>
+                        <button class="selector-button-error-scans" mat-button color="primary-color" (click)="scansForRetry.deselectAll()">
+                            Deselect all
+                        </button>
+                        <div style="clear: both;"></div>
+
+                        <!-- Then show all Scans with Errors -->
+                        <mat-selection-list dense #scansForRetry>
+                            <mat-list-option *ngFor="let uploadingScan of errorScans" [value]="uploadingScan">
+                                <!-- TODO: It would be nice to add mat-icon here but Material Design has a bug... -->
+                                {{uploadingScan.scan.directory}}
+                            </mat-list-option>
+                        </mat-selection-list>
+                    </section>
+                    
+                    <!-- Buttons with actions that can be taken -->
                     <button mat-raised-button class="restart-button" color="primary-color" (click)="restart()">
-                        <mat-icon>replay</mat-icon>
+                        <mat-icon>navigate_before</mat-icon>
                         Upload more Scans
                     </button>
+                    <button mat-raised-button class="upload-again-button" color="primary-color" (click)="uploadAgain()" *ngIf="!!scansForRetry && errorScans" [disabled]="scansForRetry.selectedOptions.selected.length == 0">
+                        <mat-icon>replay</mat-icon>
+                        Upload selected Scans again
+                    </button>
+                    <div style="clear: both;"></div>
                 </mat-card-content>
             </mat-card>
         </div>
