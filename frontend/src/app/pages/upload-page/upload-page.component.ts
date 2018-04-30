@@ -212,7 +212,7 @@ export class UploadPageComponent implements OnInit {
         });
     }
 
-    private restart() {
+    public restart() {
         this.resetFormGroup(this.chooseCategoryFormGroup);
         this.resetFormGroup(this.chooseModeFormGroup);
         this.resetFormGroup(this.chooseFilesFormGroup);

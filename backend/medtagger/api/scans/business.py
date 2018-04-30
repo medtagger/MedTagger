@@ -5,7 +5,7 @@ from typing import Iterable, Dict, List, Tuple
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api.exceptions import NotFoundException
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata, LabelingTime
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, LabelingTime
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
@@ -61,20 +61,7 @@ def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan
     return ScansRepository.add_new_scan(category, declared_number_of_slices, user)
 
 
-def get_metadata(scan_id: ScanID) -> ScanMetadata:
-    """Fetch metadata for given scan.
-
-    :param scan_id: ID of a given scan
-    :return: Scan Metadata object
-    """
-    try:
-        scan = ScansRepository.get_scan_by_id(scan_id)
-    except NoResultFound:
-        raise NotFoundException('Scan "{}" not found.'.format(scan_id))
-    return ScanMetadata(scan_id=scan.id, status=scan.status, number_of_slices=scan.declared_number_of_slices)
-
-
-def get_random_scan(category_key: str) -> ScanMetadata:
+def get_random_scan(category_key: str) -> Scan:
     """Fetch random scan for labeling.
 
     :param category_key: unique key identifying category
@@ -82,11 +69,10 @@ def get_random_scan(category_key: str) -> ScanMetadata:
     """
     user = get_current_user()
     category = ScanCategoriesRepository.get_category_by_key(category_key)
-    scan = ScansRepository.get_random_scan(category, user)
-    if not scan:
+    try:
+        return ScansRepository.get_random_scan(category, user)
+    except NoResultFound:
         raise NotFoundException('Could not find any Scan for this category!')
-
-    return ScanMetadata(scan_id=scan.id, status=scan.status, number_of_slices=scan.declared_number_of_slices)
 
 
 def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
@@ -145,18 +131,5 @@ def get_scan(scan_id: ScanID) -> Scan:
     """
     try:
         return ScansRepository.get_scan_by_id(scan_id)
-    except NoResultFound:
-        raise NotFoundException('Scan "{}" not found.'.format(scan_id))
-
-
-def get_scan_metadata(scan_id: ScanID) -> ScanMetadata:
-    """Return ScanMetadata for given scan_id.
-
-    :param scan_id: ID of a Scan which should be returned
-    :return: Scan Metadata object
-    """
-    try:
-        scan = ScansRepository.get_scan_by_id(scan_id)
-        return ScanMetadata(scan_id=scan.id, status=scan.status, number_of_slices=scan.declared_number_of_slices)
     except NoResultFound:
         raise NotFoundException('Scan "{}" not found.'.format(scan_id))
