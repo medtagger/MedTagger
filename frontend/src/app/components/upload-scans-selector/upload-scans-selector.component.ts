@@ -43,7 +43,9 @@ export class UploadScansSelectorComponent {
                 this.totalNumberOfSlices += 1;
                 singleScan.files.push(sliceFile);
             }
-            singleScan.directory = 'Unknown directory';
+
+            // As we cannot fetch these files' directory, we've got to display something on the UI
+            singleScan.directory = 'Single 3D Scan (' + this.totalNumberOfSlices + ' DICOMs)';
             this.scans.push(singleScan);
             return;
         }
