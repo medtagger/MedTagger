@@ -38,8 +38,8 @@ export class ScanService {
 
     websocket: Socket;
 
-    constructor(private http: HttpClient) {
-        this.websocket = new Socket({url: environment.WEBSOCKET_URL + '/slices', options: {path: environment.WEBSOCKET_PATH}});
+    constructor(private http: HttpClient, private socket: Socket) {
+        this.websocket = socket;
     }
 
     public sendSelection(scanId: string, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {
