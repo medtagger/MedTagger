@@ -38,6 +38,8 @@ export interface Selector<SliceSelection> {
 
     removeCurrentSelection(): any;
 
+    removeSelection(selectionId: number): void;
+
     clearSelections(): any;
 
     updateCanvasWidth(width: number): void;

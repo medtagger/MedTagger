@@ -47,8 +47,6 @@ export class ScanViewerComponent implements OnInit {
 	}
 
 	protected updateCanvasSize(): void {
-		//this.setCanvasWidth(event.target.innerWidth - 300 - 48 - 20);
-		//this.setCanvasHeight(event.target.innerHeight - 64);
 		this.setCanvasWidth(this.currentImage.width);
 		this.setCanvasHeight(this.currentImage.height);
 	}

@@ -56,6 +56,7 @@ import {DialogService} from "../services/dialog.service";
 import {InfoDialog} from "../dialogs/info.dialog";
 import {MedTaggerWebSocket} from "../services/websocket.service";
 
+import {LabelExplorerComponent} from "../components/label-explorer/label-explorer.component";
 
 @NgModule({
     declarations: [
@@ -65,6 +66,7 @@ import {MedTaggerWebSocket} from "../services/websocket.service";
         HomePageComponent,
         CategoryPageComponent,
         MarkerComponent,
+		LabelExplorerComponent,
         ScanViewerComponent,
         MarkerTutorialPageComponent,
         UploadScansSelectorComponent,

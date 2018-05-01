@@ -4,6 +4,7 @@ import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
+import {LabelExplorerComponent} from "../label-explorer/label-explorer.component";
 
 @Component({
     selector: 'app-marker-component',
@@ -33,6 +34,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     public selectionState: {isValid: boolean, is2d: boolean, hasArchive: boolean} = { isValid: false, is2d: false, hasArchive: false};
 
     public observableSliceRequest: Subject<number>;
+
+    private labelExplorer: LabelExplorerComponent;
+
+    //TODO: dynamic context and tool changes
+    private currentTaggingContext: string = "ALL";
+    private currentTool: string = "RECTANGLE";
 
     constructor() {
         super();
@@ -77,9 +84,13 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     private hookUpStateChangeSubscription(): void {
-        this.selector.getStateChangeEmitter().subscribe(() => {
+        this.selector.getStateChangeEmitter().subscribe((addedSlice: number) => {
             console.log('Marker | getStateChange event from selector!');
             this.updateSelectionState();
+            if (this.labelExplorer) {
+				console.log('Marker | getStateChange adding new slice to label explorer, sliceId: ', addedSlice);
+            	this.labelExplorer.addLabel(addedSlice, this.currentTaggingContext, this.currentTool);
+			}
         });
     }
 
@@ -141,4 +152,8 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             this.selector.onMouseMove(mouseEvent);
         };
     }
+
+    public setLabelExplorer(labelExplorerRef: LabelExplorerComponent): void {
+    	this.labelExplorer = labelExplorerRef;
+	}
 }

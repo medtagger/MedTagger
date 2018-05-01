@@ -147,7 +147,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
 		if (this.selectedArea) {
 			console.log("RectROISelector | addCurrentSelection");
 			this.selections.set(this.currentSlice, this.selectedArea);
-			this.stateChange.emit();
+			this.stateChange.emit(this.currentSlice);
 			this.clearSelectedArea();
 		}
 	}
@@ -214,5 +214,11 @@ export class RectROISelector implements Selector<ROISelection2D> {
 		}
 	}
 
+	removeSelection(selectionId: number): void {
+		if(selectionId == this.currentSlice) {
 
+		} else {
+			this.selections.delete(selectionId);
+		}
+	}
 }
