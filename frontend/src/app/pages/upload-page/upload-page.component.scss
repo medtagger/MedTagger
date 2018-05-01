@@ -9,6 +9,45 @@ $duration: 1.4s;
     100% { transform: rotate(360deg); }
 }
 
+.pull-right {
+    float: right;
+}
+
+.middle-screen-width {
+    width: 60%;
+    min-width: 470px;
+    max-width: 800px;
+    margin: 5px auto 60px auto;
+    display: block;
+}
+
+//
+// Select Upload Mode stage
+//
+
+.upload-mode {
+    margin-bottom: 20px;
+}
+
+.mat-card-title {
+    width: 100%;
+    font-size: 1.5em;
+    position: relative;
+    right: 0.5em;
+}
+
+.button-wrapper {
+    display: -webkit-flex;
+    -webkit-flex-wrap: wrap;
+    display: flex;
+    flex-wrap: wrap;
+    float: right;
+}
+
+//
+// Uploading stage
+//
+
 .overall-status {
     margin: 0 0 0 auto;
     display: block;
@@ -39,45 +78,20 @@ mat-icon.upload-status {
     margin-right: 4px;
 }
 
-.pull-right {
-    float: right;
+.scan-directory {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.middle-screen-width {
-    width: 60%;
-    min-width: 400px;
-    max-width: 700px;
-    margin: 5px auto 60px auto;
-    display: block;
+.scan-status {
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.upload-mode {
-    margin-bottom: 20px;
-}
-
-.mat-card-title {
-    width: 100%;
-    font-size: 1.5em;
-    position: relative;
-    right: 0.5em;
-}
-
-.button-wrapper {
-    display: -webkit-flex;
-    -webkit-flex-wrap: wrap;
-    display: flex;
-    flex-wrap: wrap;
-    float: right;
-}
-
-.progress-spinner {
-    float: left;
-    margin-right: 10px;
-}
-
-.uploading-header {
-    margin-top: 15px;
-}
+//
+// Upload summary stage
+//
 
 .box-message {
     padding: 1.6em;

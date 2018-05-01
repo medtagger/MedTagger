@@ -87,7 +87,7 @@ export class ScanService {
                     resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices));
                 },
                 error => {
-                    console.log('ScanService | getRandomScan | error: ', error);
+                    console.log('ScanService | getScanForScanId | error: ', error);
                     reject(error);
                 }
             );
@@ -130,14 +130,23 @@ export class ScanService {
                 category: category,
                 number_of_slices: numberOfSlices,
             };
-            this.http.post<NewScanResponse>(environment.API_URL + '/scans/', payload).toPromise().then(
-                response => {
-                    resolve(response.scan_id);
-                },
-                error => {
-                    reject(error);
-                }
-            );
+            var retryAttempt = 0;
+            this.http.post<NewScanResponse>(environment.API_URL + '/scans/', payload)
+                .retryWhen(error => {
+                    return error.flatMap((error: any) => {
+                        console.warn('Retrying request for creating new Scan (attempt: ' + (++retryAttempt) + ').');
+                        return Observable.of(error.status).delay(5000);  // Let's give it a try after 5 seconds
+                    })
+                    .take(5)  // Let's give it 5 retrys (each after 5 seconds)
+                    .concat(Observable.throw({error: 'Cannot create new Scan.'}));
+                }).toPromise().then(
+                    response => {
+                        resolve(response.scan_id);
+                    },
+                    error => {
+                        reject(error);
+                    }
+                );
         });
     }
 
@@ -146,10 +155,19 @@ export class ScanService {
 
         return Observable.from(files)
             .map((file) => {
+                var retryAttempt = 0;
                 let form = new FormData();
                 form.append('image', file, file.name);
                 return Observable.defer(
                     () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
+                        .retryWhen(error => {
+                            return error.flatMap((error: any) => {
+                                console.warn('Retrying request for uploading a single Slice (' + file.name + ', attempt: ' + (++retryAttempt) + ').');
+                                return Observable.of(error.status).delay(5000);  // Let's give it a try after 5 seconds
+                            })
+                            .take(5)  // Let's give it 5 retrys (each after 5 seconds)
+                            .concat(Observable.throw({error: 'Cannot upload Slice ' + file.name }));
+                        })
                 );
             })
             .mergeAll(CONCURRENT_API_CALLS);

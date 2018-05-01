@@ -20,9 +20,12 @@ export class UploadScansSelectorComponent {
     public totalNumberOfSlices: number = 0;
 
     prepareScans() {
+        // Always start with empty list and we will fill it by iterating over files
+        this.scans = [];
+
         // User didn't select any files
         if (!this.userSelectedFiles || this.userSelectedFiles.length == 0) {
-            this.scans = [];
+            return;
         }
 
         // User selected single scan upload
@@ -86,7 +89,9 @@ export class UploadScansSelectorComponent {
         }
 
         // Don't forget about current scan!
-        this.scans.push(currentScan);
+        if (!!currentScan) {
+            this.scans.push(currentScan);
+        }
     }
 
     onNativeInputFileSelect($event) {

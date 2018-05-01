@@ -146,9 +146,13 @@
                         <!-- At the top of the list show all Uploading and Processing Scans -->
                         <mat-list-item *ngFor="let uploadingScan of uploadingAndProcessingScans">
                             <mat-icon matListIcon>recent_actors</mat-icon>
-                            <p matLine>{{uploadingScan.scan.directory}}</p>
+                            <p class="scan-directory" matLine>{{uploadingScan.scan.directory}}</p>
                             <mat-icon class="spinner upload-status progress-color">autorenew</mat-icon>
-                            <span>{{uploadingScan.status == UploadingScanStatus.UPLOADING ? "UPLOADING" : "PROCESSING"}}</span>
+                            <span [ngSwitch]="uploadingScan.status">
+                                <span class="scan-status" *ngSwitchCase="UploadingScanStatus.UPLOADING">UPLOADING</span>
+                                <span class="scan-status" *ngSwitchCase="UploadingScanStatus.WAITING_FOR_PROCESSING">WAITING FOR PROCESSING</span>
+                                <span class="scan-status" *ngSwitchDefault>PROCESSING</span>
+                            </span>
                         </mat-list-item>
 
                         <!-- Then show all Scans with Errors -->
@@ -156,7 +160,7 @@
                             <mat-icon matListIcon>recent_actors</mat-icon>
                             <p matLine>{{uploadingScan.scan.directory}}</p>
                             <mat-icon class="upload-status error-color">error</mat-icon>
-                            <span>ERROR</span>
+                            <span class="scan-status">ERROR</span>
                         </mat-list-item>
 
                         <!-- After Errors show all Available Scans -->
@@ -164,7 +168,7 @@
                             <mat-icon matListIcon>recent_actors</mat-icon>
                             <p matLine>{{uploadingScan.scan.directory}}</p>
                             <mat-icon class="upload-status success-color">done</mat-icon>
-                            <span>AVAILABLE</span>
+                            <span class="scan-status">AVAILABLE</span>
                         </mat-list-item>
 
                         <!-- At the end of the list show all Queued Scans -->
@@ -172,7 +176,7 @@
                             <mat-icon matListIcon>recent_actors</mat-icon>
                             <p matLine>{{uploadingScan.scan.directory}}</p>
                             <mat-icon class="upload-status queue-color">timer</mat-icon>
-                            <span>QUEUED</span>
+                            <span class="scan-status">QUEUED</span>
                         </mat-list-item>
                     </mat-list>
                 </mat-card-content>

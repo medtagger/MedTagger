@@ -1,6 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatHorizontalStepper, MatStep, MatSelectionList} from '@angular/material';
 import {FormBuilder, FormGroup, FormControl, Validators} from '@angular/forms';
+import {HttpErrorResponse} from '@angular/common/http';
 import {Observable} from 'rxjs/Rx';
 
 import {ScanService} from '../../services/scan.service';
@@ -16,6 +17,7 @@ enum UploadMode {
 enum UploadingScanStatus {
     QUEUED,
     UPLOADING,
+    WAITING_FOR_PROCESSING,
     PROCESSING,
     AVAILABLE,
     ERROR
@@ -25,6 +27,7 @@ class UploadingScan {
     id: string = '';
     status: UploadingScanStatus = UploadingScanStatus.QUEUED;
     scan: SelectedScan;
+    errorsDuringUpload: number = 0;
 
     constructor(scan: SelectedScan) {
         this.scan = scan;
@@ -112,15 +115,20 @@ export class UploadPageComponent implements OnInit {
 
                 // Check Scan status and move it to appropiate state if needed
                 this.scanService.getScanForScanId(scanToMonitor.id).then((metadata: ScanMetadata) => {
-                    if (metadata.status == 'STORED' || metadata.status == 'PROCESSING') {
+                    if (metadata.status == 'STORED') {
+                        scanToMonitor.status = UploadingScanStatus.WAITING_FOR_PROCESSING;
+                    }
+                    else if (metadata.status == 'PROCESSING') {
                         scanToMonitor.status = UploadingScanStatus.PROCESSING;
                     }
-                    if (metadata.status == 'AVAILABLE') {
+                    else if (metadata.status == 'AVAILABLE') {
                         scanToMonitor.status = UploadingScanStatus.AVAILABLE;
                     }
-                }, _ => {
+                }, (error: HttpErrorResponse) => {
                     // Scan was removed from MedTagger due to all files corrupted
-                    scanToMonitor.status = UploadingScanStatus.ERROR;
+                    if (error.status == 404) {
+                        scanToMonitor.status = UploadingScanStatus.ERROR;
+                    }
                 });
 
                 // Move all errored and available Scans to uploaded array, so we won't monitor them again
@@ -176,30 +184,37 @@ export class UploadPageComponent implements OnInit {
         let numberOfAllSlices = uploadingScan.scan.files.length;
         var numberOfSlicesSent = 0;
         return new Promise<void>((resolve, reject) => {
-            this.uploadSingleScan(uploadingScan).subscribe(
-                _ => {
-                    this.updateProgressBar();
-                    numberOfSlicesSent += 1;
-                },
-                _ => {
-                    this.updateProgressBar(numberOfAllSlices - numberOfSlicesSent);
-                    reject();
-                },
-                () => resolve(),
-            );
+            this.uploadSingleScan(uploadingScan).then((newScan) => {
+                console.log('Upload has started!');
+                newScan.subscribe(
+                    _ => {
+                        this.updateProgressBar();
+                        numberOfSlicesSent += 1;
+                    },
+                    _ => {
+                        this.updateProgressBar(numberOfAllSlices - numberOfSlicesSent);
+                        reject();
+                    },
+                    () => resolve(),
+                );
+            }, (error) => {
+                console.log('Could not create new Scan.');
+                reject();
+            });
         });
     }
 
-    private uploadSingleScan(uploadingScan: UploadingScan): Observable<any> {
+    private uploadSingleScan(uploadingScan: UploadingScan): Promise<Observable<any>> {
         let category = this.chooseCategoryFormGroup.get('category').value;
         let numberOfSlices = uploadingScan.scan.files.length;
 
-        return Observable.defer(
-            () => this.scanService.createNewScan(category, numberOfSlices)
-        ).flatMap((scanId: string) => {
+        return this.scanService.createNewScan(category, numberOfSlices).then((scanId: string) => {
             console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
             uploadingScan.id = scanId;
             return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
+        },
+        _ => {
+            return Observable.throw({error: 'Could not create Scan.'});
         });
     }
 
@@ -239,7 +254,9 @@ export class UploadPageComponent implements OnInit {
         this.chooseFilesStep.completed = false;
         this.sendingFilesStep.completed = false;
         this.uploadCompletedStep.completed = false;
-        this.scansForRetry.selectedOptions.clear();
+        if (!!this.scansForRetry && !!this.scansForRetry.selectedOptions) {
+            this.scansForRetry.selectedOptions.clear();
+        }
         this.stepper.selectedIndex = 0;
     }
 

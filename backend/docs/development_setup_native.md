@@ -72,3 +72,15 @@ To make sure that your databases are up-to-date use:
 (venv) $ make update_dependencies
 ```
 
+### How to clear dependencies?
+
+There may be some cases during development that you would like to clear all databases and all information that
+is currently stored in MedTagger. To do so, you can use:
+
+```bash
+(venv) $ make clear_dependencies
+```
+
+It will stop all running databases and remove volumes that are attatched to them.
+
+**WATCH OUT! Keep in mind that this will erase all data that is stored in MedTagger! Use with caution!**
