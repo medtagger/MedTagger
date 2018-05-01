@@ -1,5 +1,7 @@
 export interface SliceSelection {
     sliceIndex: number;
+	pinned: boolean;
+	hidden: boolean;
 
-    scaleToView(scalar: number): void;
+    scaleToView(scalarX: number, scalarY: number): void;
 }

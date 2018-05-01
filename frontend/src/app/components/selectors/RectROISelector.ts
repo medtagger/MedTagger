@@ -1,6 +1,7 @@
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {Selector} from './Selector';
 import {EventEmitter} from "@angular/core";
+import {SliceSelection} from "../../model/SliceSelection";
 
 export class RectROISelector implements Selector<ROISelection2D> {
 	readonly STYLE = {
@@ -20,7 +21,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
 	protected canvasPosition: ClientRect;
 	canvasSize: { width: number, height: number };
 
-	public stateChange: EventEmitter<void>;
+	public stateChange: EventEmitter<number>;
 
 	constructor(canvas: HTMLCanvasElement) {
 		this.canvasCtx = canvas.getContext('2d');
@@ -32,10 +33,10 @@ export class RectROISelector implements Selector<ROISelection2D> {
 		this.archivedSelections = [];
 		this.selectedArea = undefined;
 		this.currentSlice = undefined;
-		this.stateChange = new EventEmitter<void>();
+		this.stateChange = new EventEmitter<number>();
 	}
 
-	public getStateChangeEmitter(): EventEmitter<void> {
+	public getStateChangeEmitter(): EventEmitter<number> {
 		return this.stateChange;
 	}
 
@@ -45,7 +46,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
 
 	public formArchivedSelections(selectionMap: ROISelection2D[]): ROISelection2D[] {
 		selectionMap.forEach((selection: ROISelection2D) => {
-			selection.scaleToView(this.canvasSize.height);
+			selection.scaleToView(this.canvasSize.width, this.canvasSize.height);
 			this.drawSelection(selection, this.STYLE.ARCHIVED_SELECTION_COLOR);
 			console.log('RectROISelector | scaleToView selection: ', selection);
 		});
@@ -56,17 +57,21 @@ export class RectROISelector implements Selector<ROISelection2D> {
 		console.log('RectROISelector | drawPreviousSelections | selection: ', this.selections);
 		this.selections.forEach((selection: ROISelection2D) => {
 			let color: string;
-			if (selection.sliceIndex === this.currentSlice) {
+			let isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
+			if (isCurrent) {
 				color = this.STYLE.CURRENT_SELECTION_COLOR;
 			} else {
 				color = this.STYLE.OTHER_SELECTION_COLOR;
 			}
-			this.drawSelection(selection, color);
+			if((selection.pinned || isCurrent) && (!selection.hidden)) {
+				this.drawSelection(selection, color);
+			}
 		});
 		console.log('RectROISelector | drawPreviousSelections | archived: ', this.archivedSelections);
-		this.archivedSelections.forEach((selection: ROISelection2D) => {
-			this.drawSelection(selection, this.STYLE.ARCHIVED_SELECTION_COLOR);
-		});
+		//TODO: decide whether to draw archived selections or not
+		// this.archivedSelections.forEach((selection: ROISelection2D) => {
+		// 	this.drawSelection(selection, this.STYLE.ARCHIVED_SELECTION_COLOR);
+		// });
 	}
 
 	public drawSelection(selection: ROISelection2D, color: string): void {
@@ -86,7 +91,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
 		console.log('RectROISelector | startMouseSelection | event: ', event);
 		const selectionStartX = (event.clientX) - this.canvasPosition.left;
 		const selectionStartY = (event.clientY) - this.canvasPosition.top;
-		this.selectedArea = new ROISelection2D(selectionStartX, selectionStartY, this.currentSlice);
+		this.selectedArea = new ROISelection2D(selectionStartX, selectionStartY, this.currentSlice, this.canvasSize.width, this.canvasSize.height);
 		this.selections.delete(this.currentSlice);
 		this.mouseDrag = true;
 	}
@@ -131,7 +136,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
 
 	public clearCanvasSelection(): void {
 		console.log("RectROISelector | clearCanvasSelection");
-		this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height); //TODO: problem z czyszczeniem
+		this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
 		this.drawPreviousSelections();
 	}
 
@@ -139,7 +144,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
 		this.selectedArea = undefined;
 		this.selections = new Map<number, ROISelection2D>();
 		this.archivedSelections = [];
-		this.stateChange = new EventEmitter<void>();
+		this.stateChange = new EventEmitter<number>();
 		this.clearCanvasSelection();
 	}
 
@@ -198,7 +203,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
 		this.selections.clear();
 	}
 
-	updateCanvasHeight(height: number): void {
+	public updateCanvasHeight(height: number): void {
 		if (height && height > 0) {
 			this.canvasSize.height = height;
 		} else {
@@ -206,7 +211,7 @@ export class RectROISelector implements Selector<ROISelection2D> {
 		}
 	}
 
-	updateCanvasWidth(width: number): void {
+	public updateCanvasWidth(width: number): void {
 		if (width && width > 0) {
 			this.canvasSize.width = width;
 		} else {
@@ -214,11 +219,42 @@ export class RectROISelector implements Selector<ROISelection2D> {
 		}
 	}
 
-	removeSelection(selectionId: number): void {
+	public removeSelection(selectionId: number): void {
 		if(selectionId == this.currentSlice) {
-
+			this.removeCurrentSelection();
 		} else {
 			this.selections.delete(selectionId);
+			this.clearCanvasSelection();
 		}
+	}
+
+	public hideSelection(selectionId: number, newValue: boolean): void {
+		let selection: SliceSelection = this.selections.get(selectionId);
+		if(selection) {
+			if (selection.hidden != newValue) {
+				selection.hidden = newValue;
+				this.redrawSelections();
+			}
+		} else {
+			console.warn('RectROISelector | hideSelection | cannot hide non present selection!');
+		}
+	}
+
+	public pinSelection(selectionId: number, newValue: boolean): void {
+		let selection: SliceSelection = this.selections.get(selectionId);
+		if(selection) {
+			if (selection.pinned != newValue) {
+				selection.pinned = newValue;
+				this.redrawSelections();
+			}
+		} else {
+			console.warn('RectROISelector | hideSelection | cannot pin non present selection!');
+		}
+	}
+
+	private redrawSelections(): void {
+		this.clearCanvasSelection();
+
+		this.drawPreviousSelections();
 	}
 }

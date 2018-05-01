@@ -16,7 +16,7 @@ export interface Selector<SliceSelection> {
 
     clearData(): any;
 
-    getStateChangeEmitter(): EventEmitter<void>;
+    getStateChangeEmitter(): EventEmitter<number>;
 
     addCurrentSelection(): any;
 
@@ -45,4 +45,10 @@ export interface Selector<SliceSelection> {
     updateCanvasWidth(width: number): void;
 
     updateCanvasHeight(height: number): void;
+
+    // Show selection on all slice images
+    pinSelection(selectionId: number, newValue: boolean): void;
+
+    // Hides selection from user view without deleting from memory
+    hideSelection(selectionId: number, newValue: boolean): void;
 }

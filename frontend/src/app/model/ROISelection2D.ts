@@ -48,46 +48,44 @@ export class ROISelection2D implements SliceSelection {
         this._height = newHeight;
     }
 
-    public toJSON(): SelectionData {
-        // TODO: Avoid using scalar or provide it by some static context
-        const scalar = 600;
+	public toJSON(): SelectionData {
 
-        let correctPositionX = this._positionX;
-        let correctPositionY = this._positionY;
-        let correctWidth = this._width;
-        let correctHeight = this._height;
+		let correctPositionX = this._positionX;
+		let correctPositionY = this._positionY;
+		let correctWidth = this._width;
+		let correctHeight = this._height;
 
-        if (this._width < 0) {
-            correctPositionX += this._width;
-            correctWidth = Math.abs(this._width);
-        }
-        if (this._height < 0) {
-            correctPositionY += this._height;
-            correctHeight = Math.abs(this._height);
-        }
-        return new SelectionData(
-            this.sliceIndex,
-            this.normalize(correctPositionX, scalar),
-            this.normalize(correctPositionY, scalar),
-            this.normalize(correctWidth, scalar),
-            this.normalize(correctHeight, scalar),
+		if (this._width < 0) {
+			correctPositionX += this._width;
+			correctWidth = Math.abs(this._width);
+		}
+		if (this._height < 0) {
+			correctPositionY += this._height;
+			correctHeight = Math.abs(this._height);
+		}
+		return new SelectionData(
+			this.sliceIndex,
+			this.normalize(correctPositionX, this._scalarX),
+			this.normalize(correctPositionY, this._scalarY),
+			this.normalize(correctWidth, this._scalarX),
+			this.normalize(correctHeight, this._scalarY),
             this.label_tag,
             this.label_tool
-        );
-    }
+		);
+	}
 
-    private normalize(arg: number, scalar: number): number {
-        return arg / scalar;
-    }
+	private normalize(arg: number, scalar: number): number {
+		return arg / scalar;
+	}
 
-    public scaleToView(scalar: number): void {
-        this._positionX = this.scale(this._positionX, scalar);
-        this._positionY = this.scale(this._positionY, scalar);
-        this._width = this.scale(this._width, scalar);
-        this._height = this.scale(this._height, scalar);
-    }
+	public scaleToView(scalarX: number, scalarY: number): void {
+		this._positionX = this.scale(this._positionX, scalarX);
+		this._positionY = this.scale(this._positionY, scalarY);
+		this._width = this.scale(this._width, scalarX);
+		this._height = this.scale(this._height, scalarY);
+	}
 
-    private scale(arg: number, scalar: number): number {
-        return arg * scalar;
-    }
+	private scale(arg: number, scalar: number): number {
+		return arg * scalar;
+	}
 }

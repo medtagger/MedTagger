@@ -5,6 +5,7 @@ import {Subject} from 'rxjs';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
 import {LabelExplorerComponent} from "../label-explorer/label-explorer.component";
+import {LabelListItem} from "../../model/LabelListItem";
 
 @Component({
     selector: 'app-marker-component',
@@ -94,8 +95,25 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         });
     }
 
+    private hookUpExplorerLabelChangeSubscription(): void {
+    	if(this.labelExplorer) {
+    		this.labelExplorer.getLabelChangeEmitter().subscribe( (labelChanged: LabelListItem)=> {
+				console.log('Marker | getLabelChange event from label-explorer!');
+				if(labelChanged.toDelete) {
+					this.selector.removeSelection(labelChanged.sliceIndex);
+				} else {
+					this.selector.pinSelection(labelChanged.sliceIndex, labelChanged.pinned);
+					this.selector.hideSelection(labelChanged.sliceIndex, labelChanged.hidden);
+				}
+			});
+		} else {
+			console.warn(`Marker | hookUpExplorerLabelChangeSubscription cannot hook up observer when labelExplorer isn't present!`);
+		}
+	}
+
     public prepareForNewScan(): void {
         this.clearData();
+        this.labelExplorer.reinitializeExplorer();
         this.hookUpStateChangeSubscription();
     }
 
@@ -155,5 +173,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setLabelExplorer(labelExplorerRef: LabelExplorerComponent): void {
     	this.labelExplorer = labelExplorerRef;
+    	this.hookUpExplorerLabelChangeSubscription();
 	}
 }

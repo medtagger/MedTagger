@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit} from '@angular/core';
 import {LabelTag} from "../../model/LabelTag";
 import {LabelListItem} from "../../model/LabelListItem";
 
@@ -11,30 +11,24 @@ export class LabelExplorerComponent implements OnInit {
 
 	protected tags: Array<LabelTag> = [];
 
-	// new LabelTag("Left Kidney", "LEFT_KIDNEY", ["RECTANGLE"]),
-	// new LabelTag("Right Kidney", "RIGHT_KIDNEY", ["RECTANGLE"]),
-
 	protected labels: Array<LabelListItem> = [];
 
-	// new LabelListItem(25, this.tags[0]),
-	// new LabelListItem(26, this.tags[0]),
-	// new LabelListItem(27, this.tags[0]),
-	// new LabelListItem(22, this.tags[1]),
+	public labelChange: EventEmitter<LabelListItem> = new EventEmitter<LabelListItem>();
 
 	constructor() {
 	}
 
-	ngOnInit() {
-		// Mock-up!
-		// this.labels[0].visible = false;
-		// this.labels[1].pinned = true;
+	ngOnInit() {}
+
+	public getLabelChangeEmitter(): EventEmitter<LabelListItem> {
+		return this.labelChange;
 	}
 
 	public getLabelsLength(): number {
 		return this.labels.length;
 	}
 
-	private reinitializeExplorer(): void {
+	public reinitializeExplorer(): void {
 		this.labels = [];
 		this.tags = [];
 	}
@@ -48,13 +42,18 @@ export class LabelExplorerComponent implements OnInit {
 		if (index > -1) {
 			this.labels.splice(index, 1);
 		}
+		label.toDelete = true;
+		this.emitLabelChange(label);
 	}
 
 	//TODO: tagKey should be part of dict stored in backend (labelling context)
 	//TODO: tools should be part of dict stored in backend (available tools)
 	public addLabel(labelSlice: number, tagKey: string, tool: string): void {
 		let tag: LabelTag = this.getLabelTag(tagKey, tool);
-		this.labels.push(new LabelListItem(labelSlice, tag));
+		let newItem: LabelListItem = new LabelListItem(labelSlice, tag);
+		if(!this.labels.find(label => label.sliceIndex == newItem.sliceIndex)) {
+			this.labels.push(new LabelListItem(labelSlice, tag));
+		}
 	}
 
 	private getLabelTag(tagKey: string, tool: string): LabelTag {
@@ -68,5 +67,19 @@ export class LabelExplorerComponent implements OnInit {
 			this.tags.push(created);
 			return created;
 		}
+	}
+
+	public hideLabel(label: LabelListItem, newValue: boolean): void {
+		label.hidden = newValue;
+		this.emitLabelChange(label);
+	}
+
+	public pinLabel(label: LabelListItem, newValue: boolean): void {
+		label.pinned = newValue;
+		this.emitLabelChange(label);
+	}
+
+	private emitLabelChange(label: LabelListItem): void {
+		this.labelChange.emit(label);
 	}
 }

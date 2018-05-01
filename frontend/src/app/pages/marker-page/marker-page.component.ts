@@ -145,6 +145,8 @@ export class MarkerPageComponent implements OnInit {
             });
         this.startMeasuringLabelingTime();
         this.indicateLabelHasBeenSend();
+
+        this.labelExplorer.reinitializeExplorer();
         return;
     }
 
