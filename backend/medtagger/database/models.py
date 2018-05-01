@@ -38,6 +38,7 @@ class User(Base):
     first_name: str = Column(String(50), nullable=False)
     last_name: str = Column(String(50), nullable=False)
     active: bool = Column(Boolean, nullable=False)
+    skip_tutorial: bool = Column(Boolean, nullable=False)
 
     roles: List[Role] = db.relationship('Role', secondary=users_roles)
 
@@ -51,6 +52,7 @@ class User(Base):
         self.first_name = first_name
         self.last_name = last_name
         self.active = False
+        self.skip_tutorial = False
 
     def __repr__(self) -> str:
         """Return string representation for User."""

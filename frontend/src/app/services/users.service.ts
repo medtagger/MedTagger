@@ -20,7 +20,7 @@ export class UsersService {
                 .then(response => {
                     console.log("UsersService | getAllUsers | response: ", response);
                     let users = response.users.map((u: UserInfo) => {
-                        return new UserInfo(u.id, u.email, u.firstName, u.lastName, u.role);
+                        return new UserInfo(u.id, u.email, u.firstName, u.lastName, u.role, u.skipTutorial);
                     });
                     resolve(users);
                 })
@@ -68,5 +68,24 @@ export class UsersService {
                 reject(error);
             })
       })
+    }
+
+    public setSkipTutorial(userId: number, skipTutorial: boolean): Promise<void> {
+        let url = environment.API_URL + `/users/${userId}/skip-tutorial`;
+        let payload = {
+            skipTutorial: true
+        };
+        return new Promise<void>((resolve, reject) => {
+            this.http.post(url, payload)
+                .toPromise()
+                .then(response => {
+                    console.log("UserService | setSkipTutorial | response: ", response);
+                    resolve();
+                })
+                .catch(error => {
+                    console.log("UserService | setSkipTutorial | response: ", error);
+                    reject(error);
+                })
+        })
     }
 }

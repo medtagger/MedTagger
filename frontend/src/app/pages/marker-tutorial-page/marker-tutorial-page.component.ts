@@ -1,12 +1,16 @@
 import {Component, ViewChild, OnInit} from '@angular/core';
 import {MatHorizontalStepper} from '@angular/material';
 import {FormBuilder, FormGroup} from "@angular/forms";
+import {Router} from "@angular/router";
+import {UsersService} from "../../services/users.service";
+import {UserInfo} from "../../model/UserInfo";
 
 
 @Component({
     selector: 'marker-tutorial-page',
     templateUrl: './marker-tutorial-page.component.html',
-    styleUrls: ['./marker-tutorial-page.component.scss']
+    styleUrls: ['./marker-tutorial-page.component.scss'],
+    providers: [UsersService]
 })
 export class MarkerTutorialPageComponent implements OnInit {
 
@@ -18,7 +22,10 @@ export class MarkerTutorialPageComponent implements OnInit {
     formGroup: FormGroup;
     @ViewChild('stepper') stepper: MatHorizontalStepper;
 
-    constructor(private _formBuilder: FormBuilder) {
+    private user: UserInfo;
+
+    constructor(private _formBuilder: FormBuilder, private router: Router, private usersService: UsersService) {
+        this.user = JSON.parse(sessionStorage.getItem('userInfo'));
     }
 
     ngOnInit() {
@@ -75,4 +82,11 @@ export class MarkerTutorialPageComponent implements OnInit {
         this.fourthStepVideo.nativeElement.play();
     }
 
+    endTutorial() {
+        this.usersService.setSkipTutorial(this.user.id, true).then(() => {
+            this.user.skipTutorial = true;
+            sessionStorage.setItem('userInfo', JSON.stringify(this.user));
+            this.router.navigateByUrl("/labelling/choose-category");
+        });
+    }
 }

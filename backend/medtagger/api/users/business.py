@@ -26,3 +26,12 @@ def set_user_info(user_id: int, firstName: str, lastName: str) -> None:
         UsersRepository.set_user_info(user, firstName, lastName)
     except NoResultFound:
         raise InvalidArgumentsException('User with this id does not exist.')
+
+
+def set_skip_tutorial(user_id: int, skip_tutorial: bool) -> None:
+    """If skip_tutorial is true, user should not see tutorial"""
+    try:
+        user = UsersRepository.get_user_by_id(user_id)
+        UsersRepository.set_skip_tutorial(user, skip_tutorial)
+    except NoResultFound:
+        raise InvalidArgumentsException('User with this id does not exist.')

@@ -6,7 +6,7 @@ from flask_restplus import Resource
 
 from medtagger.api import api
 from medtagger.api.users import serializers
-from medtagger.api.users.business import get_all_users, set_user_role, set_user_info
+from medtagger.api.users.business import get_all_users, set_user_role, set_user_info, set_skip_tutorial
 from medtagger.api.utils import get_current_user
 from medtagger.api.security import login_required, role_required
 
@@ -55,6 +55,21 @@ class GetUserInfo(Resource):
         """Get user info."""
         user = get_current_user()
         return user, 200
+
+
+@users_ns.route('/<int:user_id>/skip-tutorial')
+class SkipTutorial(Resource):
+    """If skip_tutorial is true, user should not see tutorial."""
+
+    @staticmethod
+    @login_required
+    @users_ns.doc(security='token')
+    def post(user_id: int) -> Any:
+        """Set skip_tutorial."""
+        if get_current_user().id != user_id:
+            return {}, 403
+        set_skip_tutorial(user_id, request.json['skipTutorial'])
+        return {}, 204
 
 
 @users_ns.route('/<int:user_id>')

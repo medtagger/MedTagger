@@ -13,6 +13,7 @@ interface UserInfoResponse {
     firstName: string;
     lastName: string;
     role: string;
+    skipTutorial: boolean;
 }
 
 @Injectable()
@@ -65,7 +66,7 @@ export class AccountService {
             this.http.get<UserInfoResponse>(url).toPromise()
                 .then(response => {
                     console.log("AccountService | getCurrentUserInfo | response: ", response);
-                    let userInfo = new UserInfo(response.id, response.email, response.firstName, response.lastName, response.role);
+                    let userInfo = new UserInfo(response.id, response.email, response.firstName, response.lastName, response.role, response.skipTutorial);
                     resolve(userInfo);
                 })
                 .catch(error => {
