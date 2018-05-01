@@ -46,7 +46,7 @@ class UsersRepository(object):
 
     @staticmethod
     def set_skip_tutorial(user: User, skip_tutorial: bool) -> None:
-        """If skip_tutorial is true, user should not see tutorial"""
+        """If skip_tutorial is true, user should not see tutorial."""
         with db_session() as session:
             user.skip_tutorial = skip_tutorial
             session.add(user)

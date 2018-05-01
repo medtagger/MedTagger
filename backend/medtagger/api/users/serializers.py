@@ -9,7 +9,7 @@ user = api.model('User model', {
     'firstName': fields.String(attribute='first_name', description='First name'),
     'lastName': fields.String(attribute='last_name', description='Last name'),
     'role': fields.String(attribute='role.name', description='User\'s role'),
-    'skipTutorial': fields.Boolean(attribute='skip_tutorial', description='Should tutorial be skipped?')
+    'skipTutorial': fields.Boolean(attribute='skip_tutorial', description='Should tutorial be skipped?'),
 })
 users_list = api.model('Users list', {
     'users': fields.List(fields.Nested(user)),
