@@ -1,6 +1,6 @@
 # Dev requirements - these should always be latest
 mypy
-pylint
+pylint==1.8.4
 flake8
 flake8-docstrings
 flake8-logging-format
