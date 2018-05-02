@@ -68,7 +68,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert isinstance(response['args'][0]['image'], bytes)
 
     # Step 6. Label it
-    tag_key: str = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', category_key)
+    tag = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', category_key)
     payload = {
         'elements': [{
             'x': 0.5,
@@ -76,7 +76,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
             'slice_index': 0,
             'width': 0.1,
             'height': 0.1,
-            'tag': tag_key,
+            'tag': tag.key,
         }],
         'labeling_time': 12.34,
     }
@@ -105,7 +105,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
         'width': 0.1,
         'height': 0.1,
         'binary_mask': None,
-        'tag': tag_key,
+        'tag': tag.key,
         'status': LabelElementStatus.NOT_VERIFIED.value,
     }]
 

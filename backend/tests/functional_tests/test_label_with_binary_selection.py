@@ -11,7 +11,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
     """Test application for adding and verifying Labels with Selections that have binary masks."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
-    tag_key: str = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'LUNGS')
+    tag = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'LUNGS')
 
     # Step 1. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 1}
@@ -41,7 +41,7 @@ def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celer
             'slice_index': 0,
             'width': 0.1,
             'height': 0.1,
-            'tag': tag_key,
+            'tag': tag.key,
             'binary_mask': 'THIS_IS_BASE64_REPRESENTATION',
         }],
         'labeling_time': 34.56,
