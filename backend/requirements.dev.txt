@@ -7,7 +7,7 @@ flake8-logging-format
 flake8-pep257
 flake8-print
 flake8-single-quotes
-flake8-commas
+flake8-commas==2.0.0
 pytest
 pytest-cov
 pytest-mock
