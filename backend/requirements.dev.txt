@@ -11,5 +11,5 @@ flake8-commas
 pytest
 pytest-cov
 pytest-mock
-jupyter
+jupyter==1.0.0
 matplotlib
