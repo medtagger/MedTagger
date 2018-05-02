@@ -4,7 +4,7 @@ pylint
 flake8
 flake8-docstrings
 flake8-logging-format
-flake8-pep257
+flake8-pep257==1.0.5
 flake8-print
 flake8-single-quotes
 flake8-commas
