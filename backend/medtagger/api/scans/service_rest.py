@@ -42,7 +42,7 @@ class ScanCategories(Resource):
 
     @staticmethod
     @login_required
-    @scans_ns.marshal_with(serializers.inout__scan_category)
+    @scans_ns.marshal_with(serializers.out__scan_category)
     @scans_ns.doc(security='token')
     @scans_ns.doc(description='Returns all available scan categories.')
     @scans_ns.doc(responses={200: 'Success'})
@@ -53,13 +53,13 @@ class ScanCategories(Resource):
     @staticmethod
     @login_required
     @role_required('doctor', 'admin')
-    @scans_ns.expect(serializers.inout__scan_category)
-    @scans_ns.marshal_with(serializers.inout__scan_category)
+    @scans_ns.expect(serializers.in__scan_category)
+    @scans_ns.marshal_with(serializers.in__scan_category)
     @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Returns all available scan categories.')
+    @scans_ns.doc(description='Create new Scan Category.')
     @scans_ns.doc(responses={201: 'Success'})
     def post() -> Any:
-        """Create empty scan."""
+        """Create Scan Category."""
         payload = request.json
         key = payload['key']
         name = payload['name']
