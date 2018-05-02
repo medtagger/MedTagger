@@ -1,3 +1,5 @@
+"""Helpers functions for functional tests."""
+
 from medtagger.repositories.label_tag import LabelTagRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
 
