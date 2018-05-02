@@ -2,12 +2,13 @@
 import json
 from typing import Any
 
-# pylint: disable=too-many-locals
 from medtagger.database.models import LabelVerificationStatus, LabelElementStatus
 from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
-from tests.functional_tests.conftest import get_token_for_logged_in_user, create_tag_and_assign_to_category
+from tests.functional_tests.conftest import get_token_for_logged_in_user
+from tests.functional_tests.helpers import create_tag_and_assign_to_category
 
 
+# pylint: disable=too-many-locals
 def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application with basic flow."""
     api_client = get_api_client()

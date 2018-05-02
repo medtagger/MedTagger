@@ -3,7 +3,7 @@ import json
 from typing import Dict, Any
 
 from tests.functional_tests import get_api_client, get_headers
-from tests.functional_tests.conftest import create_tag_and_assign_to_category
+from tests.functional_tests.helpers import create_tag_and_assign_to_category
 from medtagger.api.users.business import set_user_role
 from medtagger.api.auth.business import create_user
 

@@ -3,7 +3,8 @@ import json
 from typing import Any
 
 from tests.functional_tests import get_api_client, get_headers
-from tests.functional_tests.conftest import get_token_for_logged_in_user, create_tag_and_assign_to_category
+from tests.functional_tests.conftest import get_token_for_logged_in_user
+from tests.functional_tests.helpers import create_tag_and_assign_to_category
 
 
 def test_label_selection_binary_mask(prepare_environment: Any, synchronous_celery: Any) -> None:
