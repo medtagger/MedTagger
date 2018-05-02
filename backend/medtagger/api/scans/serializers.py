@@ -22,15 +22,27 @@ in__label_element = api.model('Label\'s Element model', {
     'height': fields.Float(description='Selection\'s height', min=0.0, max=1.0, required=True),
 })
 
+in__label_tag_element = api.model('Label Element model', {
+    'key': fields.String(),
+    'name': fields.String(),
+})
+
 in__label = api.model('Label model', {
     'elements': fields.List(fields.Nested(in__label_element)),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
 })
 
-inout__scan_category = api.model('Scan Category model', {
+in__scan_category = api.model('New Scan Category model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
+})
+
+out__scan_category = api.model('Scan Category model', {
+    'key': fields.String(),
+    'name': fields.String(),
+    'image_path': fields.String(),
+    'tags': fields.List(fields.Nested(in__label_tag_element), attribute='available_tags'),
 })
 
 out__scan = api.model('Scan model', {
