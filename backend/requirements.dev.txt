@@ -1,5 +1,5 @@
 # Dev requirements - these should always be latest
-mypy
+mypy==0.590
 pylint
 flake8
 flake8-docstrings
