@@ -1,6 +1,5 @@
 """Insert all database fixtures."""
 import logging.config
-from typing import List
 
 from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
@@ -77,7 +76,7 @@ def insert_labels_tags() -> None:
                 logger.info('Label Tag exists with key "%s"', tag_key)
                 continue
 
-            tag = LabelTag(row.get('key'), row.get('name'))
+            tag = LabelTag(row.get('key', ''), row.get('name', ''))
             tag_category_key = row.get('category_key', '')
             category = session.query(ScanCategory).filter(ScanCategory.key == tag_category_key).one()
             tag.scan_category_id = category.id
@@ -103,10 +102,10 @@ def insert_user_roles() -> None:
 
 def apply_all_fixtures() -> None:
     """Apply all available fixtures."""
-    logger.info('Applying fixtures for Label Tags...')
-    insert_labels_tags()
     logger.info('Applying fixtures for Scan Categories...')
     insert_scan_categories()
+    logger.info('Applying fixtures for Label Tags...')
+    insert_labels_tags()
     logger.info('Applying fixtures for user Roles...')
     insert_user_roles()
 

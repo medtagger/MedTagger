@@ -60,7 +60,7 @@ class LabelsRepository(object):
         :param label_id: Label's ID
         :param position: position (x, y, slice_index) of the Label
         :param shape: shape (width, height, depth) of the Label
-        :param label_tag: label tag of the element
+        :param label_tag: Label Tag object
         :param binary_mask: binary mask of the new Element
         :return: ID of a Element
         """
