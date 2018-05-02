@@ -8,7 +8,7 @@ flake8-pep257
 flake8-print
 flake8-single-quotes
 flake8-commas
-pytest
+pytest==3.5.1
 pytest-cov
 pytest-mock
 jupyter
