@@ -99,11 +99,11 @@ class Label(Resource):
     @scans_ns.marshal_with(serializers.out__label)
     @scans_ns.doc(security='token')
     @scans_ns.doc(description='Stores label and assigns it to given scan.')
-    @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan'})
+    @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan or tag'})
     def post(scan_id: ScanID) -> Any:
         """Save new label for given scan."""
         payload = request.json
-        selections = payload['selections']
+        selections = payload['elements']
         labeling_time = payload['labeling_time']
 
         label = business.add_label(scan_id, selections, labeling_time)
