@@ -10,6 +10,6 @@ flake8-single-quotes
 flake8-commas
 pytest
 pytest-cov
-pytest-mock
+pytest-mock==1.10.0
 jupyter
 matplotlib
