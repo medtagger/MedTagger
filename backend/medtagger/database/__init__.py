@@ -6,7 +6,6 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine, func, MetaData, Column, DateTime
 from sqlalchemy.orm import scoped_session, sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
-from flask_sqlalchemy import SQLAlchemy
 
 from medtagger.config import AppConfiguration
 
@@ -23,8 +22,6 @@ class MedTaggerBase(object):  # pylint: disable=too-few-public-methods
         with db_session() as _session:
             _session.add(self)
 
-
-db = SQLAlchemy()
 
 configuration = AppConfiguration()
 db_uri = configuration.get('db', 'database_uri')

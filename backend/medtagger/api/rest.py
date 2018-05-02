@@ -11,6 +11,7 @@ It is also a great entry point for running this app. To do so, you can use:
 # pylint: disable=unused-import;  It's used by Flask
 # pylint: disable=wrong-import-position;  Python logging should be configured ASAP
 import logging.config
+from typing import Any
 
 # Setup logging as fast as possible, so imported libraries __init__.py will
 # be able to log using our configuration of logging
@@ -21,7 +22,7 @@ from flask_cors import CORS  # noqa
 from medtagger.api import blueprint  # noqa
 from medtagger.config import AppConfiguration  # noqa
 from medtagger.clients.hbase_client import create_hbase_connection_pool  # noqa
-from medtagger.database import db  # noqa
+from medtagger.database import session  # noqa
 from medtagger.database.models import User, Role  # noqa
 
 # Import all REST services
@@ -46,13 +47,17 @@ app.register_blueprint(blueprint)
 # Application config
 app.config['RESTPLUS_MASK_SWAGGER'] = False
 app.config['SWAGGER_UI_DOC_EXPANSION'] = 'list'
-app.config['SQLALCHEMY_DATABASE_URI'] = configuration.get('db', 'database_uri')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['RESTPLUS_VALIDATE'] = True
 
 with app.app_context():
     create_hbase_connection_pool()
-    db.init_app(app)
+
+
+@app.teardown_appcontext
+def shutdown_session(exception: Any = None) -> None:  # pylint: disable=unused-argument
+    """Remove Session on each Request end."""
+    session.remove()
+
 
 if __name__ == '__main__':
     # Run the application
