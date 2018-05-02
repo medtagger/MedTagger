@@ -9,7 +9,7 @@ flake8-print
 flake8-single-quotes
 flake8-commas
 pytest
-pytest-cov
+pytest-cov==2.5.1
 pytest-mock
 jupyter
 matplotlib
