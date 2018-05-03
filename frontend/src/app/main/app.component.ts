@@ -5,6 +5,7 @@ import 'rxjs/add/operator/mergeMap';
 import {Component, OnInit} from '@angular/core';
 import {Router, NavigationEnd, ActivatedRoute} from '@angular/router';
 import {UserInfo} from '../model/UserInfo';
+import {MatSnackBar} from "@angular/material";
 
 @Component({
     selector: 'app-root',
@@ -16,7 +17,7 @@ export class AppComponent implements OnInit {
     pageTitle = '';
     public currentUser: UserInfo;
 
-    constructor(private router: Router, private activatedRoute: ActivatedRoute) {
+    constructor(private router: Router, private activatedRoute: ActivatedRoute, private snackBar: MatSnackBar) {
         router.events.subscribe(() => {
             this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));
             console.log(this.currentUser);
@@ -46,4 +47,8 @@ export class AppComponent implements OnInit {
         sessionStorage.removeItem('userInfo');
         this.router.navigate(['login']);
     }
+
+    private indicateValidationPageIsUnavailable(): void {
+      this.snackBar.open('Validation Page is temporarily unavailable.', '', {duration: 2000, });
+  }
 }
