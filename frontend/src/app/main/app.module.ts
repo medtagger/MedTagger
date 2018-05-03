@@ -3,7 +3,7 @@ import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
-import {SocketIoModule, SocketIoConfig} from 'ng-socket-io';
+import {SocketIoModule} from 'ng-socket-io';
 
 import {AppComponent} from './app.component';
 import {LoginPageComponent} from '../pages/login-page/login-page.component';
@@ -51,9 +51,8 @@ import {AuthGuard} from "../guards/auth.guard";
 import {AccountService} from "../services/account.service";
 import {DialogService} from "../services/dialog.service";
 import {InfoDialog} from "../dialogs/info.dialog";
-import {environment} from '../../environments/environment';
+import {MedTaggerWebSocket} from "../services/websocket.service";
 
-const config: SocketIoConfig = {url: environment.WEBSOCKET_URL + '/slices', options: {path: environment.WEBSOCKET_PATH}};
 
 @NgModule({
     declarations: [
@@ -93,7 +92,7 @@ const config: SocketIoConfig = {url: environment.WEBSOCKET_URL + '/slices', opti
         BrowserAnimationsModule,
         FormsModule,
         ReactiveFormsModule,
-        SocketIoModule.forRoot(config),
+        SocketIoModule,
         ReactiveFormsModule,
         MatExpansionModule,
         MatSnackBarModule,
@@ -114,7 +113,8 @@ const config: SocketIoConfig = {url: environment.WEBSOCKET_URL + '/slices', opti
         AuthGuard,
         AccountService,
         DialogService,
-        MatDialog
+        MatDialog,
+        MedTaggerWebSocket,
     ],
     bootstrap: [AppComponent]
 })
