@@ -120,16 +120,6 @@ class Scan(Base):
         """Return string representation for Scan."""
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
 
-    @property
-    def stored_slices(self) -> List['Slice']:
-        """Return all Slices which were already stored."""
-        with db_session() as session:
-            query = session.query(Slice)
-            query = query.filter(Slice.scan_id == self.id)
-            query = query.filter(Slice.status.in_(  # type: ignore  # "SliceStatus" has no attribute "in_"
-                [SliceStatus.STORED, SliceStatus.PROCESSED]))
-            return query.all()
-
     def add_slice(self, orientation: SliceOrientation = SliceOrientation.Z) -> 'Slice':
         """Add new slice into this Scan.
 
