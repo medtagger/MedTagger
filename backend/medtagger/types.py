@@ -7,6 +7,7 @@ SliceID = NewType('SliceID', str)
 LabelID = NewType('LabelID', str)
 LabelElementID = NewType('LabelElementID', str)
 LabelTagID = NewType('LabelTagID', int)
+RectangularLabelElementID = NewType('RectangularLabelElementID', str)
 
 ScanMetadata = NamedTuple('ScanMetadata', [('scan_id', ScanID), ('number_of_slices', int)])
 
