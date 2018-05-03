@@ -1,3 +1,7 @@
+before_install:
+  - git remote set-branches --add origin master
+  - git fetch
+
 matrix:
   include:
     # Backend - linters & unit tests
