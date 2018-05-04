@@ -7,7 +7,7 @@ Create Date: 2018-05-03 22:33:59.012448
 """
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy import table, column
+from sqlalchemy import table, column, select
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -28,7 +28,7 @@ def upgrade():
                     sa.Column('position_y', sa.Float(), nullable=False),
                     sa.Column('shape_width', sa.Float(), nullable=False),
                     sa.Column('shape_height', sa.Float(), nullable=False),
-                    sa.Column('has_binary_mask', sa.Boolean(), nullable=True),
+                    sa.Column('has_binary_mask', sa.Boolean(), nullable=False),
                     sa.ForeignKeyConstraint(['id'], ['LabelElements.id'],
                                             name=op.f('fk_RectangularLabelElements_id_LabelElements')),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_RectangularLabelElements'))
@@ -54,19 +54,39 @@ def upgrade():
 
 
 def downgrade():
-    op.add_column('LabelElements', sa.Column('has_binary_mask', sa.BOOLEAN(), autoincrement=False, nullable=True))
+    op.add_column('LabelElements', sa.Column('has_binary_mask', sa.BOOLEAN(), autoincrement=False, nullable=False))
     op.add_column('LabelElements',
                   sa.Column('position_x', postgresql.DOUBLE_PRECISION(precision=53), autoincrement=False,
-                            nullable=True))
+                            nullable=False))
     op.add_column('LabelElements',
                   sa.Column('shape_height', postgresql.DOUBLE_PRECISION(precision=53), autoincrement=False,
-                            nullable=True))
+                            nullable=False))
     op.add_column('LabelElements',
                   sa.Column('shape_width', postgresql.DOUBLE_PRECISION(precision=53), autoincrement=False,
-                            nullable=True))
+                            nullable=False))
     op.add_column('LabelElements',
                   sa.Column('position_y', postgresql.DOUBLE_PRECISION(precision=53), autoincrement=False,
-                            nullable=True))
+                            nullable=False))
+
     op.drop_column('LabelElements', 'tool')
+
+    old_label_elements = table('LabelElements', column('id'), column('position_x'), column('position_y'),
+                               column('shape_width'), column('shape_height'), column('has_binary_mask'))
+    new_rectangular_elements = table('RectangularLabelElements', column('id'), column('position_x'),
+                                     column('position_y'), column('shape_width'), column('shape_height'),
+                                     column('has_binary_mask'))
+
+    op.execute(
+        old_label_elements.insert().from_select(['position_x', 'position_y', 'shape_width', 'shape_height',
+                                                 'has_binary_mask'],
+                                                select([new_rectangular_elements.c.position_x,
+                                                        new_rectangular_elements.c.position_y,
+                                                        new_rectangular_elements.c.shape_width,
+                                                        new_rectangular_elements.c.shape_height,
+                                                        new_rectangular_elements.c.has_binary_mask]).where(
+                                                    old_label_elements.c.id == new_rectangular_elements.c.id))
+    )
+
     op.drop_table('RectangularLabelElements')
+
     label_tool.drop(op.get_bind(), checkfirst=True)
