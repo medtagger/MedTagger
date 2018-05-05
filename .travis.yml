@@ -22,7 +22,7 @@ matrix:
       if: branch = master
       script:
         - ./.travis/run_tests_if_subproject_changed.py backend --command="
-           docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml up -d hbase postgres rabbitmq &&
+           docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml up -d cassandra postgres rabbitmq &&
            docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run medtagger_backend_functional_tests &&
            docker-compose down"
 
