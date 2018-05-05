@@ -4,8 +4,8 @@ from typing import Optional, List
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, Scan, User, Label
-from medtagger.definitions import ScanStatus
+from medtagger.database.models import ScanCategory, Scan, Slice, User, Label
+from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.types import ScanID
 
 
@@ -69,3 +69,23 @@ class ScansRepository(object):
             query = session.query(Scan)
             query = query.filter(Scan.id == scan_id)
             query.update({"declared_number_of_slices": (Scan.declared_number_of_slices - 1)})
+
+    @staticmethod
+    def try_to_mark_scan_as_stored(scan_id: ScanID) -> bool:
+        """Mark Scan as STORED only if all Slices were STORED.
+
+        :param scan_id: ID of a Scan which should be tried to mark as STORED
+        :return: boolean information if Scan was marked or not
+        """
+        with db_session() as session:
+            stored_slices_subquery = session.query(func.count(Slice.id).label('count'))
+            stored_slices_subquery = stored_slices_subquery.filter(Slice.scan_id == scan_id)
+            stored_slices_subquery = stored_slices_subquery.filter(Slice.status == SliceStatus.STORED)
+            stored_slices_subquery = stored_slices_subquery.subquery()
+
+            query = session.query(Scan)
+            query = query.filter(Scan.id == scan_id)
+            query = query.filter(Scan.status != ScanStatus.STORED)
+            query = query.filter(Scan.declared_number_of_slices == stored_slices_subquery.c.count)
+            updated = query.update({"status": (ScanStatus.STORED)}, synchronize_session=False)
+            return bool(updated)

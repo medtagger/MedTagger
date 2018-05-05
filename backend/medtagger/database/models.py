@@ -3,17 +3,17 @@
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Table, Enum
 from sqlalchemy.orm import relationship
 
-from medtagger.database import Base, db_session, db
+from medtagger.database import Base, db_session
 from medtagger.definitions import LabelStatus, ScanStatus, SliceStatus, SliceOrientation
 from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime
 
-users_roles = db.Table('Users_Roles', Base.metadata,
-                       Column('user_id', Integer, ForeignKey('Users.id')),
-                       Column('role_id', Integer, ForeignKey('Roles.id')))
+users_roles = Table('Users_Roles', Base.metadata,
+                    Column('user_id', Integer, ForeignKey('Users.id')),
+                    Column('role_id', Integer, ForeignKey('Roles.id')))
 
 
 class Role(Base):
@@ -39,7 +39,7 @@ class User(Base):
     last_name: str = Column(String(50), nullable=False)
     active: bool = Column(Boolean, nullable=False)
 
-    roles: List[Role] = db.relationship('Role', secondary=users_roles)
+    roles: List[Role] = relationship('Role', secondary=users_roles)
 
     scans: List['Scan'] = relationship('Scan', back_populates='owner')
     labels: List['Label'] = relationship('Label', back_populates='owner')
@@ -119,16 +119,6 @@ class Scan(Base):
     def __repr__(self) -> str:
         """Return string representation for Scan."""
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
-
-    @property
-    def stored_slices(self) -> List['Slice']:
-        """Return all Slices which were already stored."""
-        with db_session() as session:
-            query = session.query(Slice)
-            query = query.filter(Slice.scan_id == self.id)
-            query = query.filter(Slice.status.in_(  # type: ignore  # "SliceStatus" has no attribute "in_"
-                [SliceStatus.STORED, SliceStatus.PROCESSED]))
-            return query.all()
 
     def add_slice(self, orientation: SliceOrientation = SliceOrientation.Z) -> 'Slice':
         """Add new slice into this Scan.
