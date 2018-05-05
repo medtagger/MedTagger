@@ -2,8 +2,8 @@ Setup with Docker Compose
 -------------------------
 
 Docker Compose is great to set up all environment with one command. It is also great
- for setting up all depended services. Docker Compose can setup things like Hadoop,
- HBase and RabbitMQ easily!
+ for setting up all depended services. Docker Compose can setup things like Cassandra,
+ PostgreSQL and RabbitMQ easily!
 
 **But...** it's not a good idea to develop the project inside of it. Changes in the
  code will require rebuilding whole Docker images. Instead, consider using Vagrant
@@ -65,7 +65,7 @@ $ docker-compose up -d --no-deps --build medtagger_frontend medtagger_backend_re
 It's really easy to start all needed external dependencies with:
 
 ```bash
-$ docker-compose up -d hbase postgres rabbitmq
+$ docker-compose up -d cassandra postgres rabbitmq
 ```
 
 For more information about usage please read the [documentation](https://docs.docker.com/compose/).

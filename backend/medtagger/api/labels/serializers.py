@@ -16,7 +16,6 @@ out__label_selection = api.model('Label Selection', {
     'slice_index': fields.Integer(description='Slice\'s order index', min=0),
     'width': fields.Float(description='Selection\'s width', min=0.0, max=1.0, attribute='shape_width'),
     'height': fields.Float(description='Selection\'s height', min=0.0, max=1.0, attribute='shape_height'),
-    'binary_mask': fields.String(description='Selection\'s binary mask'),
 })
 
 out__label_status = api.model('Label status and ID', {

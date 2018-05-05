@@ -25,7 +25,7 @@ MAX_PREVIEW_X_SIZE = 256
 
 @celery_app.task
 def convert_scan_to_png(scan_id: ScanID) -> None:
-    """Store Scan in HBase database.
+    """Convert DICOM Scan to PNG and save it into Storage.
 
     :param scan_id: ID of a Scan
     """

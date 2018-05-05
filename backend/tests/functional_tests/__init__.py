@@ -1,5 +1,7 @@
 """Module for global methods that may be useful during application testing."""
 from typing import Mapping, Any
+from gevent import monkey
+monkey.patch_all()
 
 
 def get_api_client() -> Any:

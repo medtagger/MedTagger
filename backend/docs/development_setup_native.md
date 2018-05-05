@@ -32,7 +32,7 @@ $ make venv
 $ . ./devenv.sh
 ```
 
-You can now run all dependencies like HBase, PostgreSQL and RabbitMQ with just one command:
+You can now run all dependencies like Cassandra, PostgreSQL and RabbitMQ with just one command:
 ```bash
 (venv) $ make start_dependencies
 ```
@@ -40,7 +40,7 @@ You can now run all dependencies like HBase, PostgreSQL and RabbitMQ with just o
 Now, your backend is ready to be used, so let's try to run it!
 
 Open three separate windows with activated virtual environment. In the first one we'll run Celery workers which are
-responsible for adding and converting Dicoms to our HBase. To run it, please execute such command:
+responsible for adding and converting DICOMs to our storage. To run it, please execute such command:
 
 ```bash
 $ . ./devenv.sh

@@ -11,9 +11,7 @@ Flask-HTTPAuth==3.2.3
 passlib==1.7.1
 uWSGI==2.0.17
 gevent==1.2.2
-hdfs3==0.3.0
-starbase==0.3.3
-happybase==1.1.0
+cassandra-driver==3.14.0
 SimpleITK==1.1.0
 numpy==1.14.3
 celery==4.1.0
