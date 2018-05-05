@@ -11,7 +11,7 @@
     <input type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden multiple webkitdirectory directory/>
     <button type="button" mat-raised-button (click)="selectFile()">
         <mat-icon>folder</mat-icon>
-        <span *ngIf="!scans.length">Select directory with Scans</span>
-        <span *ngIf="scans.length">Selected <span>{{scans.length}}</span> Scans</span>
+        <span [hidden]="scans.length">Select directory with Scans</span>
+        <span [hidden]="!scans.length">Selected <span>{{scans.length}}</span> Scans</span>
     </button>
 </section>

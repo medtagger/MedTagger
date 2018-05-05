@@ -5,6 +5,16 @@ export class SelectedScan {
     files: File[] = [];
 }
 
+export class UserFiles {
+    scans: SelectedScan[];
+    numberOfSlices: number;
+
+    constructor(scans: SelectedScan[], numberOfSlices: number) {
+        this.scans = scans;
+        this.numberOfSlices = numberOfSlices;
+    }
+}
+
 @Component({
     selector: 'upload-scans-selector',
     templateUrl: './upload-scans-selector.component.html'
@@ -14,9 +24,9 @@ export class UploadScansSelectorComponent {
     @Output() onFileSelect: EventEmitter<object> = new EventEmitter();
 
     @ViewChild('inputFile') nativeInputFile: ElementRef;
-    private userSelectedFiles: File[];
+    private userSelectedFiles: File[] = [];
 
-    public scans: Array<SelectedScan> = [];
+    public scans: SelectedScan[] = [];
     public totalNumberOfSlices: number = 0;
 
     prepareScans() {
@@ -30,7 +40,7 @@ export class UploadScansSelectorComponent {
 
         // User selected single scan upload
         if (!this.multipleScans) {
-            var singleScan = new SelectedScan();
+            let singleScan = new SelectedScan();
             for (let sliceFile of this.userSelectedFiles) {
                 // Skip all files that are not DICOMs
                 if (sliceFile.type != "application/dicom") {
@@ -54,8 +64,8 @@ export class UploadScansSelectorComponent {
         }
 
         // User selected multiple scans for upload, so let's group them into the Scans
-        var lastScanDirectory: String;
-        var currentScan;
+        let lastScanDirectory: String;
+        let currentScan;
         for (let sliceFile of this.userSelectedFiles) {
             // Skip all files that are not DICOMs
             if (sliceFile.type != "application/dicom") {
@@ -68,8 +78,8 @@ export class UploadScansSelectorComponent {
             }
 
             // Slices that are in the same directory as others (previous ones) are considered as a single Scan
-            var slicePath = sliceFile.webkitRelativePath;
-            var currentScanDirectory = slicePath.split("/").slice(0, -1).join("/");
+            let slicePath = sliceFile.webkitRelativePath;
+            let currentScanDirectory = slicePath.split("/").slice(0, -1).join("/");
             if (currentScanDirectory != lastScanDirectory) {
                 // If this is not the first iteration of the whole loop over files -> save current Scan
                 if (!!lastScanDirectory) {
@@ -99,7 +109,7 @@ export class UploadScansSelectorComponent {
         this.totalNumberOfSlices = 0;
         this.userSelectedFiles = $event.target.files || $event.scrElement.files;
         this.prepareScans();
-        this.onFileSelect.emit(this);
+        this.onFileSelect.emit(new UserFiles(this.scans, this.totalNumberOfSlices));
     }
 
     selectFile() {

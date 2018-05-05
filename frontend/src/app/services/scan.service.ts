@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Response} from '@angular/http';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 
 import {Socket} from 'ng-socket-io';
 import 'rxjs/add/operator/map';
@@ -133,18 +133,18 @@ export class ScanService {
             };
             var retryAttempt = 0;
             this.http.post<NewScanResponse>(environment.API_URL + '/scans/', payload)
-                .retryWhen(error => {
-                    return error.flatMap((error: any) => {
+                .retryWhen((error: Observable<HttpErrorResponse>) => {
+                    return error.flatMap((error: HttpErrorResponse) => {
                         console.warn('Retrying request for creating new Scan (attempt: ' + (++retryAttempt) + ').');
                         return Observable.of(error.status).delay(5000);  // Let's give it a try after 5 seconds
                     })
                     .take(5)  // Let's give it 5 retrys (each after 5 seconds)
                     .concat(Observable.throw({error: 'Cannot create new Scan.'}));
                 }).toPromise().then(
-                    response => {
+                    (response: NewScanResponse) => {
                         resolve(response.scan_id);
                     },
-                    error => {
+                    (error: HttpErrorResponse) => {
                         reject(error);
                     }
                 );
@@ -156,13 +156,14 @@ export class ScanService {
 
         return Observable.from(files)
             .map((file) => {
+                console.log('uploading...', file);
                 var retryAttempt = 0;
                 let form = new FormData();
                 form.append('image', file, file.name);
                 return Observable.defer(
                     () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
-                        .retryWhen(error => {
-                            return error.flatMap((error: any) => {
+                        .retryWhen((error: Observable<HttpErrorResponse>) => {
+                            return error.flatMap((error: HttpErrorResponse) => {
                                 console.warn('Retrying request for uploading a single Slice (' + file.name + ', attempt: ' + (++retryAttempt) + ').');
                                 return Observable.of(error.status).delay(5000);  // Let's give it a try after 5 seconds
                             })

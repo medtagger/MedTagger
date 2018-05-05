@@ -6,7 +6,7 @@ import {Observable} from 'rxjs/Rx';
 
 import {ScanService} from '../../services/scan.service';
 import {ScanMetadata} from '../../model/ScanMetadata';
-import {UploadScansSelectorComponent, SelectedScan} from "../../components/upload-scans-selector/upload-scans-selector.component";
+import {UploadScansSelectorComponent, SelectedScan, UserFiles} from "../../components/upload-scans-selector/upload-scans-selector.component";
 
 
 enum UploadMode {
@@ -23,6 +23,14 @@ enum UploadingScanStatus {
     ERROR
 }
 
+enum UploadStep {
+    SELECT_CATEGORY,
+    SELECT_UPLOAD_MODE,
+    SELECT_SCAN,
+    UPLOADING,
+    SUMMARY
+}
+
 class UploadingScan {
     id: string = '';
     status: UploadingScanStatus = UploadingScanStatus.QUEUED;
@@ -32,6 +40,24 @@ class UploadingScan {
     constructor(scan: SelectedScan) {
         this.scan = scan;
     }
+
+    public updateStatus(scanMetadata: ScanMetadata): void {
+        switch (scanMetadata.status) {
+            case 'STORED': {
+                this.status = UploadingScanStatus.WAITING_FOR_PROCESSING;
+                break;
+            }
+            case 'PROCESSING': {
+                this.status = UploadingScanStatus.PROCESSING;
+                break;
+            }
+            case 'AVAILABLE': {
+                this.status = UploadingScanStatus.AVAILABLE;
+                break;
+            }
+        }
+    }
+
 }
 
 
@@ -91,9 +117,9 @@ export class UploadPageComponent implements OnInit {
         });
     }
 
-    public chooseFiles($event): void {
-        this.scans = $event.scans;
-        this.totalNumberOfSlices = $event.totalNumberOfSlices;
+    public chooseFiles(userFiles: UserFiles): void {
+        this.scans = userFiles.scans;
+        this.totalNumberOfSlices = userFiles.numberOfSlices;
     }
 
     private updateProgressBar(numberOfSlicesSent: number = 1): void {
@@ -115,15 +141,7 @@ export class UploadPageComponent implements OnInit {
 
                 // Check Scan status and move it to appropiate state if needed
                 this.scanService.getScanForScanId(scanToMonitor.id).then((metadata: ScanMetadata) => {
-                    if (metadata.status == 'STORED') {
-                        scanToMonitor.status = UploadingScanStatus.WAITING_FOR_PROCESSING;
-                    }
-                    else if (metadata.status == 'PROCESSING') {
-                        scanToMonitor.status = UploadingScanStatus.PROCESSING;
-                    }
-                    else if (metadata.status == 'AVAILABLE') {
-                        scanToMonitor.status = UploadingScanStatus.AVAILABLE;
-                    }
+                    scanToMonitor.updateStatus(metadata);
                 }, (error: HttpErrorResponse) => {
                     // Scan was removed from MedTagger due to all files corrupted
                     if (error.status == 404) {
@@ -132,13 +150,17 @@ export class UploadPageComponent implements OnInit {
                 });
 
                 // Move all errored and available Scans to uploaded array, so we won't monitor them again
-                if (scanToMonitor.status === UploadingScanStatus.ERROR) {
-                    this.uploadingAndProcessingScans.splice(i, 1);
-                    this.errorScans.push(scanToMonitor);
-                }
-                if (scanToMonitor.status === UploadingScanStatus.AVAILABLE) {
-                    this.uploadingAndProcessingScans.splice(i, 1);
-                    this.availableScans.push(scanToMonitor);
+                switch (scanToMonitor.status) {
+                    case UploadingScanStatus.ERROR: {
+                        this.uploadingAndProcessingScans.splice(i, 1);
+                        this.errorScans.push(scanToMonitor);
+                        break;
+                    }
+                    case UploadingScanStatus.AVAILABLE: {
+                        this.uploadingAndProcessingScans.splice(i, 1);
+                        this.availableScans.push(scanToMonitor);
+                        break;
+                    }
                 }
             }
 
@@ -197,14 +219,14 @@ export class UploadPageComponent implements OnInit {
                     },
                     () => resolve(),
                 );
-            }, (error) => {
+            }, (error: HttpErrorResponse) => {
                 console.log('Could not create new Scan.');
                 reject();
             });
         });
     }
 
-    private uploadSingleScan(uploadingScan: UploadingScan): Promise<Observable<any>> {
+    private uploadSingleScan(uploadingScan: UploadingScan): Promise<Observable<Response | Error>> {
         let category = this.chooseCategoryFormGroup.get('category').value;
         let numberOfSlices = uploadingScan.scan.files.length;
 
@@ -227,7 +249,7 @@ export class UploadPageComponent implements OnInit {
         });
     }
 
-    public restart() {
+    public restart(): void {
         this.resetFormGroup(this.chooseCategoryFormGroup);
         this.resetFormGroup(this.chooseModeFormGroup);
         this.resetFormGroup(this.chooseFilesFormGroup);
@@ -257,7 +279,7 @@ export class UploadPageComponent implements OnInit {
         if (!!this.scansForRetry && !!this.scansForRetry.selectedOptions) {
             this.scansForRetry.selectedOptions.clear();
         }
-        this.stepper.selectedIndex = 0;
+        this.stepper.selectedIndex = UploadStep.SELECT_CATEGORY;
     }
 
     public uploadAgain(): void {
@@ -274,7 +296,7 @@ export class UploadPageComponent implements OnInit {
         this.sendingFilesStep.completed = false;
         this.uploadCompletedStep.completed = false;
         this.scansForRetry.selectedOptions.clear();
-        this.stepper.selectedIndex = 3;
+        this.stepper.selectedIndex = UploadStep.UPLOADING;
         this.uploadFiles();
     }
 
