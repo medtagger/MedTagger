@@ -12,6 +12,7 @@ import {MarkerSlice} from '../model/MarkerSlice';
 import {environment} from '../../environments/environment';
 import {ScanSelection} from "../model/ScanSelection";
 import {SliceSelection} from "../model/SliceSelection";
+import {MedTaggerWebSocket} from "../services/websocket.service";
 
 interface RandomScanResponse {
     scan_id: string;
@@ -36,9 +37,9 @@ interface NewScanResponse {
 @Injectable()
 export class ScanService {
 
-    websocket: Socket;
+    websocket: MedTaggerWebSocket;
 
-    constructor(private http: HttpClient, private socket: Socket) {
+    constructor(private http: HttpClient, private socket: MedTaggerWebSocket) {
         this.websocket = socket;
     }
 
