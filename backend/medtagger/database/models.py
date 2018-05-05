@@ -370,30 +370,25 @@ class RectangularLabelElement(LabelElement):
     position_y: float = Column(Float, nullable=False)
     shape_width: float = Column(Float, nullable=False)
     shape_height: float = Column(Float, nullable=False)
-    has_binary_mask: bool = Column(Boolean, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': LabelTool.RECTANGLE,
     }
 
-    def __init__(self, position: LabelPosition, shape: LabelShape, tag: LabelTag,
-                 has_binary_mask: bool = False):
+    def __init__(self, position: LabelPosition, shape: LabelShape, tag: LabelTag):
         """Initialize LabelElement.
 
         :param position: position (x, y, slice_index) of the label
         :param shape: shape (width, height) of the label
         :param tag: tag of the label
-        :param has_binary_mask: boolean information if such Label Element has binary mask or not
         """
-        super(LabelElement, self).__init__(tag)
+        super(RectangularLabelElement, self).__init__(tag)
         self.position_x = position.x
         self.position_y = position.y
         self.slice_index = position.slice_index
         self.shape_width = shape.width
         self.shape_height = shape.height
-        self.has_binary_mask = has_binary_mask
 
     def __repr__(self) -> str:
-        """Return string representation for Label Element."""
-        _has_binary_mask = 'WITH BINARY MASK' if self.has_binary_mask else 'WITHOUT BINARY MASK'
-        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, _has_binary_mask)
+        """Return string representation for  Rectangular Label Element."""
+        return '<{}: {}>'.format(self.__class__.__name__, self.id)

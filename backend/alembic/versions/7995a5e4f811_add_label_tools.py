@@ -28,7 +28,6 @@ def upgrade():
                     sa.Column('position_y', sa.Float(), nullable=False),
                     sa.Column('shape_width', sa.Float(), nullable=False),
                     sa.Column('shape_height', sa.Float(), nullable=False),
-                    sa.Column('has_binary_mask', sa.Boolean(), nullable=False),
                     sa.ForeignKeyConstraint(['id'], ['LabelElements.id'],
                                             name=op.f('fk_RectangularLabelElements_id_LabelElements')),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_RectangularLabelElements'))
@@ -37,56 +36,41 @@ def upgrade():
     op.add_column('LabelElements', sa.Column('tool', label_tool, server_default='RECTANGLE'))
 
     old_label_elements = table('LabelElements', column('id'), column('position_x'), column('position_y'),
-                               column('shape_width'), column('shape_height'), column('has_binary_mask'))
+                               column('shape_width'), column('shape_height'))
     new_rectangular_elements = table('RectangularLabelElements', column('id'), column('position_x'),
-                                     column('position_y'), column('shape_width'), column('shape_height'),
-                                     column('has_binary_mask'))
+                                     column('position_y'), column('shape_width'), column('shape_height'))
 
     op.execute(
-        new_rectangular_elements.insert().from_select(['id', 'position_x', 'position_y', 'shape_width', 'shape_height',
-                                                       'has_binary_mask'], old_label_elements.select()))
+        new_rectangular_elements.insert().from_select(['id', 'position_x', 'position_y', 'shape_width', 'shape_height'],
+                                                      old_label_elements.select()))
 
     op.drop_column('LabelElements', 'position_y')
     op.drop_column('LabelElements', 'shape_width')
     op.drop_column('LabelElements', 'shape_height')
     op.drop_column('LabelElements', 'position_x')
-    op.drop_column('LabelElements', 'has_binary_mask')
 
 
 def downgrade():
-    op.add_column('LabelElements', sa.Column('has_binary_mask', sa.BOOLEAN(), autoincrement=False, nullable=False))
-    op.add_column('LabelElements',
-                  sa.Column('position_x', postgresql.DOUBLE_PRECISION(precision=53), autoincrement=False,
-                            nullable=False))
-    op.add_column('LabelElements',
-                  sa.Column('shape_height', postgresql.DOUBLE_PRECISION(precision=53), autoincrement=False,
-                            nullable=False))
-    op.add_column('LabelElements',
-                  sa.Column('shape_width', postgresql.DOUBLE_PRECISION(precision=53), autoincrement=False,
-                            nullable=False))
-    op.add_column('LabelElements',
-                  sa.Column('position_y', postgresql.DOUBLE_PRECISION(precision=53), autoincrement=False,
-                            nullable=False))
+    op.add_column('LabelElements', sa.Column('position_x', sa.Float(), nullable=True))
+    op.add_column('LabelElements', sa.Column('shape_height', sa.Float(), nullable=True))
+    op.add_column('LabelElements', sa.Column('shape_width', sa.Float(), nullable=True))
+    op.add_column('LabelElements', sa.Column('position_y', sa.Float(), nullable=True))
 
     op.drop_column('LabelElements', 'tool')
 
     old_label_elements = table('LabelElements', column('id'), column('position_x'), column('position_y'),
-                               column('shape_width'), column('shape_height'), column('has_binary_mask'))
+                               column('shape_width'), column('shape_height'))
     new_rectangular_elements = table('RectangularLabelElements', column('id'), column('position_x'),
-                                     column('position_y'), column('shape_width'), column('shape_height'),
-                                     column('has_binary_mask'))
+                                     column('position_y'), column('shape_width'), column('shape_height'))
 
-    op.execute(
-        old_label_elements.insert().from_select(['position_x', 'position_y', 'shape_width', 'shape_height',
-                                                 'has_binary_mask'],
-                                                select([new_rectangular_elements.c.position_x,
-                                                        new_rectangular_elements.c.position_y,
-                                                        new_rectangular_elements.c.shape_width,
-                                                        new_rectangular_elements.c.shape_height,
-                                                        new_rectangular_elements.c.has_binary_mask]).where(
-                                                    old_label_elements.c.id == new_rectangular_elements.c.id))
-    )
+    op.execute(old_label_elements.update().where(new_rectangular_elements.c.id == old_label_elements.c.id).values(
+        {
+            old_label_elements.c.position_x: new_rectangular_elements.c.position_x,
+            old_label_elements.c.position_y: new_rectangular_elements.c.position_y,
+            old_label_elements.c.shape_width: new_rectangular_elements.c.shape_width,
+            old_label_elements.c.shape_height: new_rectangular_elements.c.shape_height,
+        }
+    ))
 
     op.drop_table('RectangularLabelElements')
-
     label_tool.drop(op.get_bind(), checkfirst=True)

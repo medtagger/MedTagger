@@ -6,8 +6,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api.exceptions import NotFoundException
 from medtagger.repositories.label_tag import LabelTagRepository
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata, LabelingTime
-from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
+from medtagger.types import ScanID, LabelPosition, LabelShape, ScanMetadata, LabelingTime
+from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation, LabelTool
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.scans import ScansRepository
@@ -112,16 +112,20 @@ def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime
     :return: Label object
     """
     user = get_current_user()
+    scan = ScansRepository.get_scan_by_id(scan_id)
+    if not scan:
+        raise NotFoundException('Could not find any Scan for that id!')
     label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
     for element in elements:
-        position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
-        shape = LabelShape(width=element['width'], height=element['height'])
-        binary_mask = LabelSelectionBinaryMask(element['binary_mask']) if element.get('binary_mask') else None
-        try:
-            label_tag = LabelTagRepository.get_label_tag_by_key(element['tag'])
-        except NoResultFound:
-            raise NotFoundException('Could not find any Label Tag for that key!')
-        LabelsRepository.add_new_label_element(label.id, position, shape, label_tag, binary_mask)
+        tool = element['tool']
+        if tool == LabelTool.RECTANGLE.value:
+            position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
+            shape = LabelShape(width=element['width'], height=element['height'])
+            try:
+                label_tag = LabelTagRepository.get_label_tag_by_key(element['tag'])
+            except NoResultFound:
+                raise NotFoundException('Could not find any Label Tag for that key!')
+            LabelsRepository.add_new_rectangular_label_element(label.id, position, shape, label_tag)
     return label
 
 

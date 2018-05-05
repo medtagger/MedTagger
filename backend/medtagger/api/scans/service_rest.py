@@ -2,12 +2,14 @@
 from typing import Any
 from flask import request
 from flask_restplus import Resource
+from jsonschema import validate, ValidationError
 
 from medtagger.types import ScanID
 from medtagger.api import api
 from medtagger.api.exceptions import InvalidArgumentsException
 from medtagger.api.scans import business, serializers
 from medtagger.api.security import login_required, role_required
+from medtagger.api.scans.serializers import elements_schema
 
 scans_ns = api.namespace('scans', 'Methods related with scans')
 
@@ -103,10 +105,16 @@ class Label(Resource):
     def post(scan_id: ScanID) -> Any:
         """Save new label for given scan."""
         payload = request.json
-        selections = payload['elements']
+        elements = payload['elements']
+        try:
+            validate(elements, elements_schema)
+        except ValidationError as x:
+            print(x.cause)
+            raise InvalidArgumentsException('Wrong elements schema.')
+
         labeling_time = payload['labeling_time']
 
-        label = business.add_label(scan_id, selections, labeling_time)
+        label = business.add_label(scan_id, elements, labeling_time)
         return label, 201
 
 

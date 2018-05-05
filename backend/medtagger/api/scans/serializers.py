@@ -2,23 +2,37 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
-from medtagger.database.models import LabelVerificationStatus
+from medtagger.database.models import LabelVerificationStatus, LabelElementStatus, LabelTool
 
 in__new_scan = api.model('New Scan model', {
     'category': fields.String(description='Scan\'s category', required=True),
     'number_of_slices': fields.Integer(description='Number of Slices that will be uploaded', required=True),
 })
 
-in__label_element = api.model('Label\'s Element model', {
-    'x': fields.Float(description='Element\'s X position', min=0.0, max=1.0, required=True),
-    'y': fields.Float(description='Element\'s Y position', min=0.0, max=1.0, required=True),
-    'slice_index': fields.Integer(description='Slice\'s order index', min=0, required=True),
-    'width': fields.Float(description='Element\'s width', min=0.0, max=1.0, required=True),
-    'height': fields.Float(description='Element\'s height', min=0.0, max=1.0, required=True),
-    'binary_mask': fields.String(description='Selection\'s binary mask'),
-    'tag': fields.String(description='Element\'s tag'),
-    'status': fields.String(description='Element\'s status', enum=[status.name for status in LabelVerificationStatus]),
-})
+elements_schema = {
+    'type': 'array',
+    'properties': {
+        'elements': {
+            'oneOf': [
+                {'$ref': '#/definitions/rectangular_label_element_schema'},
+            ]
+        }
+    },
+    'definitions': {
+        'rectangular_label_element_schema': {
+            'properties': {
+                'x': {'type': 'number'},
+                'y': {'type': 'number'},
+                'width': {'type': 'number'},
+                'height': {'type': 'number'},
+                'slice_index': {'type': 'integer'},
+                'tag': {'type': 'string'},
+                'tool': {'enum': [tool.name for tool in LabelTool]},
+            },
+            'required': ['x', 'y', 'width', 'height', 'slice_index', 'tag', 'tool'],
+        }
+    }
+}
 
 in__label_tag_element = api.model('Label Element model', {
     'key': fields.String(),
@@ -26,7 +40,7 @@ in__label_tag_element = api.model('Label Element model', {
 })
 
 in__label = api.model('Label model', {
-    'elements': fields.List(fields.Nested(in__label_element)),
+    'elements': fields.List(fields.Raw),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
 })
 
@@ -52,6 +66,7 @@ out__label = api.model('Newly created Label model', {
     'label_id': fields.String(description='Label\'s ID', attribute='id'),
     'owner_id': fields.Integer(description='ID of user that created label'),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
+    'status': fields.String(description='Label\'s status', enum=[status.name for status in LabelVerificationStatus]),
 })
 
 out__new_scan = api.model('Newly created Scan model', {
