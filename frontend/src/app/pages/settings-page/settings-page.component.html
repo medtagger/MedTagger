@@ -16,18 +16,22 @@
                     </mat-expansion-panel-header>
 
                     <mat-form-field>
-                        <input matInput placeholder="First name" type="text" [formControl]="userName" required readonly>
-                        <mat-error *ngIf="userName.invalid">{{getUserNameErrorMessage()}}</mat-error>
+                        <input matInput placeholder="First name" type="text" [formControl]="userFirstName" required>
+                        <mat-error *ngIf="userFirstName.invalid">{{getUserFirstNameErrorMessage()}}</mat-error>
                     </mat-form-field>
                     <mat-form-field>
-                        <input matInput placeholder="Last name" type="text" [formControl]="userSurname" required
-                               readonly>
-                        <mat-error *ngIf="userSurname.invalid">{{getUserSurnameErrorMessage()}}</mat-error>
+                        <input matInput placeholder="Last name" type="text" [formControl]="userLastName" required>
+                        <mat-error *ngIf="userLastName.invalid">{{getUserLastNameErrorMessage()}}</mat-error>
                     </mat-form-field>
                     <mat-form-field>
                         <input matInput placeholder="E-mail" type="text" [formControl]="userEmail" required readonly>
                         <mat-error *ngIf="userEmail.invalid">{{getUserEmailErrorMessage()}}</mat-error>
                     </mat-form-field>
+
+                    <button mat-button color="primary" (click)="updateUserDetails()" [disabled]="!validateUserInput()">
+                      Save
+                    </button>
+
                 </mat-expansion-panel>
             </mat-accordion>
         </mat-card-content>

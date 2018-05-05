@@ -20,7 +20,7 @@ CATEGORIES = [{
     'image_path': '../../../assets/icon/liver_category_icon.svg',
 }, {
     'key': 'HEART',
-    'name': 'Hearth',
+    'name': 'Heart',
     'image_path': '../../../assets/icon/heart_category_icon.svg',
 }, {
     'key': 'LUNGS',

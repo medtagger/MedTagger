@@ -12,6 +12,7 @@ from celery.utils.log import get_task_logger
 from medtagger.types import ScanID
 from medtagger.workers import celery_app
 from medtagger.conversion import convert_slice_to_normalized_8bit_array, convert_scan_to_normalized_8bit_array
+from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.database.models import SliceOrientation, Slice, Scan
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.slices import SlicesRepository
@@ -37,6 +38,9 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         ScansRepository.delete_scan_by_id(scan_id)
         return
 
+    logger.info('Marking Scan as processing.')
+    scan.update_status(ScanStatus.PROCESSING)
+
     # At first, collect all Dicom images for given Scan
     logger.info('Reading all Slices for this Scan... This may take a while...')
     dicom_images = []
@@ -56,8 +60,8 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     # Correlate Dicom files with Slices and convert all Slices
     _convert_scan_in_all_axes(dicom_images, slices, scan)
 
-    logger.info('Marking whole Scan as converted.')
-    scan.mark_as_converted()
+    logger.info('Marking Scan as available to use.')
+    scan.update_status(ScanStatus.AVAILABLE)
 
     # Remove all temporarily created files for applying workaround
     for file_name in temp_files_to_remove:
@@ -126,7 +130,7 @@ def _convert_to_png_and_store(_slice: Slice, slice_pixels: np.ndarray) -> None:
     """
     converted_image = _convert_slice_pixels_to_png(slice_pixels)
     SlicesRepository.store_converted_image(_slice.id, converted_image)
-    _slice.mark_as_converted()
+    _slice.update_status(SliceStatus.PROCESSED)
     logger.info('%s converted and stored.', _slice)
 
 

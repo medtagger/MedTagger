@@ -1,0 +1,12 @@
+requirements:
+  - backend/requirements.txt:
+      # update all dependencies and pin them
+      update: all
+      pin: True
+  - backend/requirements.dev.txt:
+      # don't update dependencies, use global 'pin' default
+      update: False
+      pin: False
+
+# set a global prefix for PRs
+pr_prefix: "[Backend Dependencies Update]"
