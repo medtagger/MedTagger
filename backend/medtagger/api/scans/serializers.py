@@ -2,7 +2,7 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
-from medtagger.database.models import LabelVerificationStatus, LabelElementStatus, LabelTool
+from medtagger.database.models import LabelVerificationStatus, LabelTool
 
 in__new_scan = api.model('New Scan model', {
     'category': fields.String(description='Scan\'s category', required=True),
@@ -15,8 +15,8 @@ elements_schema = {
         'elements': {
             'oneOf': [
                 {'$ref': '#/definitions/rectangular_label_element_schema'},
-            ]
-        }
+            ],
+        },
     },
     'definitions': {
         'rectangular_label_element_schema': {
@@ -30,8 +30,8 @@ elements_schema = {
                 'tool': {'enum': [tool.name for tool in LabelTool]},
             },
             'required': ['x', 'y', 'width', 'height', 'slice_index', 'tag', 'tool'],
-        }
-    }
+        },
+    },
 }
 
 in__label_tag_element = api.model('Label Element model', {

@@ -8,8 +8,8 @@ from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
 from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session, db
-from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
-    LabelPosition, LabelShape, LabelingTime, LabelTagID, RectangularLabelElementID
+from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, LabelPosition, \
+    LabelShape, LabelingTime, LabelTagID
 
 users_roles = db.Table('Users_Roles', Base.metadata,
                        Column('user_id', Integer, ForeignKey('Users.id')),
@@ -337,7 +337,7 @@ class LabelElement(Base):
     }
 
     def __init__(self, tag: LabelTag) -> None:
-        """Initialize Label Element
+        """Initialize Label Element.
 
         :param tag: tag of the label
         """
@@ -364,7 +364,7 @@ class RectangularLabelElement(LabelElement):
     """Definition of a Label Element made with Rectangle Tool."""
 
     __tablename__ = 'RectangularLabelElements'
-    id: RectangularLabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
 
     position_x: float = Column(Float, nullable=False)
     position_y: float = Column(Float, nullable=False)
@@ -375,7 +375,7 @@ class RectangularLabelElement(LabelElement):
         'polymorphic_identity': LabelTool.RECTANGLE,
     }
 
-    def __init__(self, position: LabelPosition, shape: LabelShape, tag: LabelTag):
+    def __init__(self, position: LabelPosition, shape: LabelShape, tag: LabelTag) -> None:
         """Initialize LabelElement.
 
         :param position: position (x, y, slice_index) of the label

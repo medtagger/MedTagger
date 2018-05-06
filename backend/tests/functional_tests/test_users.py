@@ -6,6 +6,7 @@ from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.helpers import create_tag_and_assign_to_category
 from medtagger.api.users.business import set_user_role
 from medtagger.api.auth.business import create_user
+from medtagger.database.models import LabelTool
 
 EXAMPLE_USER_EMAIL = 'test@mail.com'
 EXAMPLE_USER_PASSWORD = 'medtagger1'
@@ -147,6 +148,7 @@ def test_ownership(prepare_environment: Any) -> None:
             'width': 0.1,
             'height': 0.1,
             'tag': tag.key,
+            'tool': LabelTool.RECTANGLE.value,
         }],
         'labeling_time': 12.34,
     }

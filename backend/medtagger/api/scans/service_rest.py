@@ -108,8 +108,7 @@ class Label(Resource):
         elements = payload['elements']
         try:
             validate(elements, elements_schema)
-        except ValidationError as x:
-            print(x.cause)
+        except ValidationError:
             raise InvalidArgumentsException('Wrong elements schema.')
 
         labeling_time = payload['labeling_time']
