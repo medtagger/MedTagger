@@ -3,7 +3,7 @@
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Table, Enum
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Table, Enum, and_
 from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session
@@ -120,6 +120,24 @@ class Scan(Base):
         """Return string representation for Scan."""
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
 
+    @property
+    def width(self) -> Optional[int]:
+        """Return width of a Scan/Slices in Z axis."""
+        random_slice = Slice.query.filter(and_(
+            Slice.scan_id == self.id,
+            Slice.orientation == SliceOrientation.Z,
+        )).first()
+        return random_slice.width if random_slice else None
+
+    @property
+    def height(self) -> Optional[int]:
+        """Return height of a Scan/Slices in Z axis."""
+        random_slice = Slice.query.filter(and_(
+            Slice.scan_id == self.id,
+            Slice.orientation == SliceOrientation.Z,
+        )).first()
+        return random_slice.height if random_slice else None
+
     def add_slice(self, orientation: SliceOrientation = SliceOrientation.Z) -> 'Slice':
         """Add new slice into this Scan.
 
@@ -153,6 +171,8 @@ class Slice(Base):
     position_x: float = Column(Float, nullable=True)
     position_y: float = Column(Float, nullable=True)
     position_z: float = Column(Float, nullable=True)
+    width: int = Column(Integer, nullable=True)
+    height: int = Column(Integer, nullable=True)
 
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     scan: Scan = relationship('Scan', back_populates='slices')
@@ -189,6 +209,13 @@ class Slice(Base):
         self.position_x = new_position.x
         self.position_y = new_position.y
         self.position_z = new_position.z
+        self.save()
+        return self
+
+    def update_size(self, height: int, width: int) -> 'Slice':
+        """Update height & width in the Slice."""
+        self.height = height
+        self.width = width
         self.save()
         return self
 

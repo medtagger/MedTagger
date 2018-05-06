@@ -41,6 +41,9 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
         position = SlicePosition(float(image_position_patient[0]),
                                  float(image_position_patient[1]),
                                  float(image_position_patient[2]))
+        height = int(reader.GetMetaData(DicomTags.ROWS.value))
+        width = int(reader.GetMetaData(DicomTags.COLUMNS.value))
+
     except RuntimeError:
         logger.error('User sent a file that is not a DICOM.')
         SlicesRepository.delete_slice_by_id(_slice.id)
@@ -54,6 +57,7 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
 
     _slice.update_location(location)
     _slice.update_position(position)
+    _slice.update_size(height, width)
     _slice.update_status(SliceStatus.STORED)
     logger.info('"%s" updated.', _slice)
 

@@ -30,6 +30,8 @@ inout__scan_category = api.model('Scan Category model', {
 
 out__scan = api.model('Scan model', {
     'scan_id': fields.String(description='Scan\'s ID'),
+    'width': fields.Integer(description='Scan\'s width in Z axis'),
+    'height': fields.Integer(description='Scan\'s height in Z axis'),
     'number_of_slices': fields.Integer(description='Total number of slices in given scan'),
 })
 
