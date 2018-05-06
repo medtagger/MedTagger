@@ -80,12 +80,12 @@ class Random(Resource):
     @scans_ns.doc(description='Returns random scan.')
     @scans_ns.doc(responses={200: 'Success', 400: 'Invalid arguments', 404: 'No Scans available'})
     def get() -> Any:
-        """Return random scan's metadata."""
+        """Return random Scan."""
         args = serializers.args__random_scan.parse_args(request)
         category_key = args.category
         if not business.scan_category_is_valid(category_key):
             raise InvalidArgumentsException('Category "{}" is not available.'.format(category_key))
-        return business.get_random_scan(category_key)._asdict()
+        return business.get_random_scan(category_key)
 
 
 @scans_ns.route('/<string:scan_id>/label')
@@ -123,7 +123,7 @@ class Scan(Resource):
     @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
     def get(scan_id: ScanID) -> Any:
         """Return scan for the given scan_id."""
-        return business.get_scan_metadata(scan_id)._asdict()
+        return business.get_scan(scan_id)
 
 
 @scans_ns.route('/<string:scan_id>/slices')

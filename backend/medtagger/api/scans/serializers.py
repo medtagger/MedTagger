@@ -2,6 +2,8 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
+from medtagger.definitions import ScanStatus
+
 
 in__new_scan = api.model('New Scan model', {
     'category': fields.String(description='Scan\'s category', required=True),
@@ -28,8 +30,11 @@ inout__scan_category = api.model('Scan Category model', {
 })
 
 out__scan = api.model('Scan model', {
-    'scan_id': fields.String(description='Scan\'s ID'),
-    'number_of_slices': fields.Integer(description='Total number of slices in given scan'),
+    'scan_id': fields.String(description='Scan\'s ID', attribute='id'),
+    'status': fields.String(description='Scan\'s status', enum=[status.name for status in ScanStatus],
+                            attribute='status.name'),
+    'number_of_slices': fields.Integer(description='Total number of Slices in given scan',
+                                       attribute='declared_number_of_slices'),
 })
 
 out__label = api.model('Newly created Label model', {

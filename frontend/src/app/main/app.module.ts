@@ -99,7 +99,7 @@ import {MedTaggerWebSocket} from "../services/websocket.service";
         MatSelectModule,
         HttpModule,
         HttpClientModule,
-        MatChipsModule
+        MatChipsModule,
     ],
     entryComponents: [
         InfoDialog

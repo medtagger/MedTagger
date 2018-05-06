@@ -1,12 +1,32 @@
+$duration: 1.4s;
+
+.spinner {
+    animation: rotationAnimation $duration linear infinite;
+}
+
+@keyframes rotationAnimation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .pull-right {
     float: right;
 }
 
+.middle-screen-width {
+    width: 60%;
+    min-width: 470px;
+    max-width: 800px;
+    margin: 5px auto 60px auto;
+    display: block;
+}
+
+//
+// Select Upload Mode stage
+//
+
 .upload-mode {
-    width: 40%;
-    max-width: 450px;
-    float: left;
-    margin: 1.5em;
+    margin-bottom: 20px;
 }
 
 .mat-card-title {
@@ -14,18 +34,6 @@
     font-size: 1.5em;
     position: relative;
     right: 0.5em;
-}
-
-.enable-card-border {
-    margin: 5px;
-}
-
-.category-selection {
-    width: 60%;
-    min-width: 400px;
-    max-width: 600px;
-    margin: 5px auto;
-    display: block;
 }
 
 .button-wrapper {
@@ -36,26 +44,68 @@
     float: right;
 }
 
-.choose-files {
-    width: 60%;
-    min-width: 500px;
-    max-width: 700px;
-    margin: 5px auto;
-    display: block;
-}
+//
+// Select Scan files stage
+//
 
-.progress-spinner {
-    float: left;
-    margin-right: 10px;
-}
-
-.uploading-header {
-    margin-top: 15px;
-}
-
-.success-message {
-    background: #4caf50;
+.incompatible-file {
     color: white;
+
+    .mat-icon {
+        margin-right: 0;
+    }
+}
+
+//
+// Uploading stage
+//
+
+.overall-status {
+    margin: 0 0 0 auto;
+    display: block;
+    line-height: 36px;
+}
+
+.progress-color {
+    color: rgb(5, 113, 255);
+}
+
+.success-color {
+    color: green;
+}
+
+.error-color {
+    color: red;
+}
+
+.queue-color {
+    color: gray;
+}
+
+mat-icon.upload-status {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
+    margin-right: 4px;
+}
+
+.scan-directory {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.scan-status {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+//
+// Upload summary stage
+//
+
+.box-message {
     padding: 1.6em;
     min-width: 50%;
     max-width: 800px;
@@ -64,13 +114,50 @@
     p {
         margin: 0;
     }
+
+    mat-icon {
+        float: left;
+        margin-right: 15px;
+        vertical-align: middle;
+    }
 }
 
-.success-indicator {
-    vertical-align: middle !important;
+.success-message {
+    background: #4caf50;
+    color: white;
+}
+
+.warning-message {
+    background: #dba604;
+    color: white;
+}
+
+.error-message {
+    background: #ba4304;
+    color: white;
+}
+
+.scans-with-issues {
+    margin-top: 15px;
+    margin-bottom: 0px;
+    float: left;
+    display: inline-block;
+}
+
+.selector-button-error-scans {
+    margin: 10px 0 0 auto;
+    display: block;
+    float: right;
 }
 
 .restart-button {
-    margin: 20px auto;
+    margin: 20px 0 10px 0;
     display: block;
+    float: left;
+}
+
+.upload-again-button {
+    margin: 20px 0 10px 0;
+    display: block;
+    float: right;
 }
