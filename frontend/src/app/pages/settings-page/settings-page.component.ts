@@ -13,8 +13,8 @@ import {UsersService} from '../../services/users.service';
 })
 export class SettingsPageComponent implements OnInit {
 
-    userName = new FormControl('', [Validators.required]);
-    userSurname = new FormControl('', [Validators.required]);
+    userFirstName = new FormControl('', [Validators.required]);
+    userLastName = new FormControl('', [Validators.required]);
     userEmail = new FormControl('', [Validators.required, Validators.email]);
     userPassword = new FormControl('', [Validators.required]);
     userPasswordConfirmation = new FormControl('', [Validators.required]);
@@ -30,8 +30,8 @@ export class SettingsPageComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.userName.setValue(this.currentUser.firstName);
-        this.userSurname.setValue(this.currentUser.lastName);
+        this.userFirstName.setValue(this.currentUser.firstName);
+        this.userLastName.setValue(this.currentUser.lastName);
         this.userEmail.setValue(this.currentUser.email);
     }
 
@@ -42,30 +42,59 @@ export class SettingsPageComponent implements OnInit {
             })
     }
 
+    updateUserDetails() {
+        if(!this.validateUserInput()) {
+          this.snackBar.open("User data has not been updated due to a validation failure.", "Dismiss", {
+            duration: 3000,
+          });
+          return;
+        }
+        this.usersService.setUserDetails(this.currentUser.id, this.userFirstName.value, this.userLastName.value)
+            .then(() => {
+              this.currentUser.firstName = this.userFirstName.value;
+              this.currentUser.lastName = this.userLastName.value;
+              sessionStorage.setItem('userInfo', JSON.stringify(this.currentUser));
+              this.snackBar.open("User data has been updated.", "Dismiss", {
+                duration: 3000,
+              });
+            });
+    }
+
+    validateUserInput() {
+      if(this.userFirstName.value == "" ||
+         this.userLastName.value == "" ||
+         this.userEmail.value == "" ||
+         (this.userFirstName.value == this.currentUser.firstName && this.userLastName.value == this.currentUser.lastName)) {
+        return false;
+      }
+      return true;
+    }
+
     showInvalidFormMessage() {
-        this.snackBar.open("Nieprawidłowe dane formularza!", "Zamknij", {
+        this.snackBar.open("Incorrect form data!", "Dismiss", {
             duration: 5000,
         });
     }
 
-    getUserNameErrorMessage() {
-        return this.userName.hasError('required') ? 'Imię jest wymagane!' : '';
+    getUserFirstNameErrorMessage() {
+        return this.userFirstName.hasError('required') ? 'First name is required!' : '';
     }
 
-    getUserSurnameErrorMessage() {
-        return this.userSurname.hasError('required') ? 'Nazwisko jest wymagane!' : '';
+    getUserLastNameErrorMessage() {
+        return this.userLastName.hasError('required') ? 'Last name is required!' : '';
     }
 
     getUserEmailErrorMessage() {
-        return this.userEmail.hasError('required') ? 'Adres e-mail jest wymagany!' :
-            this.userEmail.hasError('email') ? 'Nieprawidłowy adres e-mail' : '';
+        return this.userEmail.hasError('required') ? 'E-mail address is required!' :
+            this.userEmail.hasError('email') ? 'Incorrect e-mail address' : '';
     }
 
     getUserPasswordErrorMessage() {
-        return this.userPassword.hasError('required') ? 'Hasło jest wymagane!' : '';
+        return this.userPassword.hasError('required') ? 'Password is required!' : '';
     }
 
     getUserPasswordConfirmationErrorMessage() {
-        return this.userPasswordConfirmation.hasError('required') ? 'Potwierdzenie hasła jest wymagane!' : '';
+        return this.userPasswordConfirmation.hasError('required') ? 'Password confirmation is required!' : '';
     }
+
 }

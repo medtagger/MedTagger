@@ -51,6 +51,8 @@ import {AuthGuard} from "../guards/auth.guard";
 import {AccountService} from "../services/account.service";
 import {DialogService} from "../services/dialog.service";
 import {InfoDialog} from "../dialogs/info.dialog";
+import {MedTaggerWebSocket} from "../services/websocket.service";
+
 
 @NgModule({
     declarations: [
@@ -111,7 +113,8 @@ import {InfoDialog} from "../dialogs/info.dialog";
         AuthGuard,
         AccountService,
         DialogService,
-        MatDialog
+        MatDialog,
+        MedTaggerWebSocket,
     ],
     bootstrap: [AppComponent]
 })

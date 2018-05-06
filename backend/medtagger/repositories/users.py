@@ -35,3 +35,11 @@ class UsersRepository(object):
     def get_user_by_id(user_id: int) -> User:
         """Get user with given id."""
         return User.query.filter(User.id == user_id).one()
+
+    @staticmethod
+    def set_user_info(user: User, firstName: str, lastName: str) -> None:
+        """Set user's info."""
+        with db_session() as session:
+            user.first_name = firstName
+            user.last_name = lastName
+            session.add(user)

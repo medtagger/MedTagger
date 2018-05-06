@@ -39,7 +39,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert isinstance(json_response, dict)
     user_token = json_response['token']
     assert isinstance(user_token, str)
-    assert len(user_token) == 122
+    assert len(user_token) > 100
 
     # Step 3. Get user account information
     response = api_client.get('/api/v1/users/info', headers=get_headers(token=user_token))
@@ -72,7 +72,7 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     assert isinstance(json_response, dict)
     admin_user_token = json_response['token']
     assert isinstance(admin_user_token, str)
-    assert len(admin_user_token) == 122
+    assert len(admin_user_token) > 100
 
     # Step 2. Admin gets all users
     response = api_client.get('/api/v1/users/', headers=get_headers(token=admin_user_token))

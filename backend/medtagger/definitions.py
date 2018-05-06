@@ -11,3 +11,36 @@ class DicomTags(Enum):
     RESCALE_SLOPE = '0028|1053'
     RESCALE_TYPE = '0028|1054'
     PIXEL_SPACING = '0028|0030'
+
+
+class SliceOrientation(Enum):
+    """Define available Slice orientations."""
+
+    X = 'X'
+    Y = 'Y'
+    Z = 'Z'
+
+
+class LabelStatus(Enum):
+    """Define available statuses for Label."""
+
+    VALID = 'VALID'
+    INVALID = 'INVALID'
+    NOT_VERIFIED = 'NOT_VERIFIED'
+
+
+class ScanStatus(Enum):
+    """Define available statuses for Scan."""
+
+    NEW = 'NEW'
+    STORED = 'STORED'
+    PROCESSING = 'PROCESSING'
+    AVAILABLE = 'AVAILABLE'
+
+
+class SliceStatus(Enum):
+    """Define available statuses for Slice."""
+
+    NEW = 'NEW'
+    STORED = 'STORED'
+    PROCESSED = 'PROCESSED'
