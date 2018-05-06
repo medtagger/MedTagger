@@ -23,7 +23,7 @@ then
 fi
 
 echo "Running all Docker dependencies..."
-docker-compose -f /vagrant/docker-compose.yml up -d hbase postgres rabbitmq
+docker-compose -f /vagrant/docker-compose.yml up -d cassandra postgres rabbitmq
 
 echo "Installing all Python packages..."
 make install_packages

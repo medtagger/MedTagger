@@ -100,7 +100,6 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
         'slice_index': 0,
         'width': 0.1,
         'height': 0.1,
-        'binary_mask': None,
     }]
 
     # Step 8. Verify such label

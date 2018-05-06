@@ -22,10 +22,9 @@ Current configuration variables are:
 | `MEDTAGGER__API_DEBUG`                  | 1                                                          |
 | `MEDTAGGER__API_SECRET_KEY`             | SECRET_KEY                                                 |
 | `MEDTAGGER__DB_DATABASE_URI`            | postgresql://medtagger_user:MedTa99er!@localhost/medtagger |
-| `MEDTAGGER__HBASE_HOST`                 | localhost                                                  |
-| `MEDTAGGER__HBASE_PORT`                 | 9090                                                       |
-| `MEDTAGGER__HBASE_REST_PORT`            | 8080                                                       |
-| `MEDTAGGER__HBASE_CONNECTION_POOL_SIZE` | 10                                                         |
+| `MEDTAGGER__DB_CONNECTION_POOL_SIZE`    | 25                                                         |
+| `MEDTAGGER__CASSANDRA_ADDRESSES`        | localhost                                                  |
+| `MEDTAGGER__CASSANDRA_PORT`             | 9042                                                       |
 | `MEDTAGGER__CELERY_BROKER`              | pyamqp://guest:guest@localhost//                           |
 
 Default values are applied by `scripts/dev__configuration.sh` script that runs inside of
