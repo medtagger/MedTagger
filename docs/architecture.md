@@ -18,9 +18,9 @@ Above diagram consists of several components. Each of them has its own responsib
 
  - **Application** - main backend application written in Python 3.6+. It's using Flask as a
    framework for REST API and many extentions that enable WebSocket support, easy
-   input validation and output marshaling. It also use SQLAlchemy as SQL ORM engine and
-   Alembic for SQL database management. It contains clients for HBase data manipulation
-   that uses HappyBase as a framework. It's part of a project in `/backend` directory.
+   input validation and output marshaling. It also use SQLAlchemy as SQL ORM engine,
+   Alembic for databases management and logic for our data storage in Cassandra.
+   It's part of a project in `/backend` directory.
 
  - **Celery Workers** - part of a backend application for long running and performance
    impacting tasks. It uses RabbitMQ as a broker that passes tasks for running. Workers
@@ -30,8 +30,8 @@ Above diagram consists of several components. Each of them has its own responsib
  - **RabbitMQ** - message broker used for communication between main application instance
    and Celery Workers' nodes.
 
- - **HBase** - NoSQL database storage used for aggregation of all Scans and its Slices. It
-   stores data using high-scalable tables and key-value access.
+ - **Cassandra** - NoSQL database storage used for aggregation of all Scans and its Slices. It
+   stores data using high-scalable tables with key-value access.
 
  - **PostgreSQL** - SQL database that stores all of our business models and metadata related
    to medical data.

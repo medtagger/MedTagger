@@ -1,7 +1,7 @@
 """Add width and height to Slices
 
 Revision ID: 729cd1e8cde1
-Revises: 75a3481c4d0c
+Revises: 89c593744804
 Create Date: 2018-05-06 14:32:27.355556
 
 """
@@ -12,7 +12,7 @@ from sqlalchemy import table, column
 
 # revision identifiers, used by Alembic.
 revision = '729cd1e8cde1'
-down_revision = '75a3481c4d0c'
+down_revision = '89c593744804'
 branch_labels = None
 depends_on = None
 

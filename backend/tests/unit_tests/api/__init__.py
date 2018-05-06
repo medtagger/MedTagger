@@ -1,7 +1,6 @@
 """Module for global methods that may be useful during application testing."""
 from typing import Any
 
-import happybase
 from flask.testing import FlaskClient
 
 
@@ -11,8 +10,8 @@ def get_test_application(mocker: Any) -> FlaskClient:
     :param mocker: mocker object from PyTest
     :return: application for testing purpose
     """
-    # IMPORTANT: Mock HBase ConnectionPool BEFORE(!) importing Flask application
-    mocker.patch.object(happybase, 'ConnectionPool')
+    # IMPORTANT: Mock Cassandra Connection BEFORE(!) importing Flask application
+    mocker.patch('medtagger.storage.create_connection')
 
     from medtagger.api.rest import app
 

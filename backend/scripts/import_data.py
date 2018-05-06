@@ -1,4 +1,4 @@
-"""Script that will fill your HBase database with data.
+"""Script that will fill MedTagger with data.
 
 How to use it?
 --------------
@@ -38,7 +38,7 @@ from medtagger.workers.storage import parse_dicom_and_update_slice
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
 
-parser = argparse.ArgumentParser(description='Import data to the HBase Database.')
+parser = argparse.ArgumentParser(description='Import data to the MedTagger.')
 parser.add_argument('--source', type=str, required=True, help='Source directory')
 parser.add_argument('--category', type=str, required=True, help='Category key for these scans')
 args = parser.parse_args()
