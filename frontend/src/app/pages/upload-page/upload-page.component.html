@@ -83,17 +83,38 @@
                         <mat-card-content>
                             <p>Go to the directory containing CT Scan and select all DICOM files (*.dcm).</p>
                             <p><strong>Single file size limit:</strong> 5 MB</p>
+
+                            <!-- Warning about incompatible Files -->
+                            <section class="box-message warning-message" *ngIf="incompatibleFiles.length">
+                                <mat-icon>warning</mat-icon>
+                                <p>
+                                    Not all of your files will be uploaded!<br/>
+                                    Some of them may be corrupted or incompatible with MedTagger.
+                                </p>
+                                <mat-list dense>
+                                    <mat-list-item class="incompatible-file" *ngFor="let incompatibleFile of incompatibleFiles">
+                                        <mat-icon matListIcon>attachment</mat-icon>
+                                        <span matLine>{{incompatibleFile.file.name}}</span>
+                                        <mat-icon [matTooltip]="incompatibleFile.reason">info_outline</mat-icon>
+                                    </mat-list-item>
+                                </mat-list>
+                            </section>
                         </mat-card-content>
                         <mat-card-actions>
                             <upload-scans-selector #uploadSingleScanSelector (onFileSelect)="chooseFiles($event)"
                                                    [multipleScans]="false" style="float: left;"></upload-scans-selector>
                             <button mat-raised-button color="primary" (click)="uploadFiles()"
-                                    *ngIf="totalNumberOfSlices != 0" style="float: right;" matStepperNext>Upload Scan!
+                                    *ngIf="totalNumberOfSlices != 0" style="float: right;" matStepperNext>
+                                <mat-icon>file_upload</mat-icon>
+                                Upload Scan!
                             </button>
                             <span class="button-wrapper" *ngIf="totalNumberOfSlices == 0"
                                   matTooltip="Please select at least one DICOM file" matTooltipPosition="above">
                                 <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" disabled
-                                        matStepperNext>Upload Scan!</button>
+                                        matStepperNext>
+                                    <mat-icon>file_upload</mat-icon>
+                                    Upload Scan!
+                                </button>
                             </span>
                             <div class="clearfix"></div>
                         </mat-card-actions>
@@ -110,17 +131,38 @@
                         <mat-card-content>
                             <p>Select <strong>parent directory</strong> that contains subdirectories with CT Scans.</p>
                             <p><strong>Single file size limit:</strong> 5 MB</p>
+
+                            <!-- Warning about incompatible Files -->
+                            <section class="box-message warning-message" *ngIf="incompatibleFiles.length">
+                                <mat-icon>warning</mat-icon>
+                                <p>
+                                    Not all of your files will be uploaded!<br/>
+                                    Some of them may be corrupted or incompatible with MedTagger.
+                                </p>
+                                <mat-list dense>
+                                    <mat-list-item class="incompatible-file" *ngFor="let incompatibleFile of incompatibleFiles">
+                                        <mat-icon matListIcon>attachment</mat-icon>
+                                        <span matLine>{{incompatibleFile.file.webkitRelativePath}}</span>
+                                        <mat-icon [matTooltip]="incompatibleFile.reason">info_outline</mat-icon>
+                                    </mat-list-item>
+                                </mat-list>
+                            </section>
                         </mat-card-content>
                         <mat-card-actions>
                             <upload-scans-selector #uploadMultipleScansSelector (onFileSelect)="chooseFiles($event)"
                                                    [multipleScans]="true" style="float: left;"></upload-scans-selector>
                             <button mat-raised-button color="primary" (click)="uploadFiles()"
-                                    *ngIf="totalNumberOfSlices != 0" style="float: right;" matStepperNext>Upload Scans!
+                                    *ngIf="totalNumberOfSlices != 0" style="float: right;" matStepperNext>
+                                <mat-icon>file_upload</mat-icon>
+                                Upload Scans!
                             </button>
                             <span class="button-wrapper" *ngIf="totalNumberOfSlices == 0"
                                   matTooltip="Please select directory with all your Scans" matTooltipPosition="above">
                                 <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" disabled
-                                        matStepperNext>Upload Scans!</button>
+                                        matStepperNext>
+                                    <mat-icon>file_upload</mat-icon>
+                                    Upload Scans!
+                                </button>
                             </span>
                             <div class="clearfix"></div>
                         </mat-card-actions>

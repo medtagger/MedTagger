@@ -45,6 +45,18 @@ $duration: 1.4s;
 }
 
 //
+// Select Scan files stage
+//
+
+.incompatible-file {
+    color: white;
+
+    .mat-icon {
+        margin-right: 0;
+    }
+}
+
+//
 // Uploading stage
 //
 

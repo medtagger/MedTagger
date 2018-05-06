@@ -6,7 +6,7 @@ import {Observable} from 'rxjs/Rx';
 
 import {ScanService} from '../../services/scan.service';
 import {ScanMetadata} from '../../model/ScanMetadata';
-import {UploadScansSelectorComponent, SelectedScan, UserFiles} from "../../components/upload-scans-selector/upload-scans-selector.component";
+import {UploadScansSelectorComponent, SelectedScan, UserFiles, IncompatibleFile} from "../../components/upload-scans-selector/upload-scans-selector.component";
 
 
 enum UploadMode {
@@ -83,6 +83,8 @@ export class UploadPageComponent implements OnInit {
     uploadingAndProcessingScans: Array<UploadingScan> = [];
     availableScans: Array<UploadingScan> = [];
     errorScans: Array<UploadingScan> = [];
+
+    incompatibleFiles: IncompatibleFile[] = [];
     
     slicesSent: number = 0;
     totalNumberOfSlices: number = 0;
@@ -120,6 +122,7 @@ export class UploadPageComponent implements OnInit {
     public chooseFiles(userFiles: UserFiles): void {
         this.scans = userFiles.scans;
         this.totalNumberOfSlices = userFiles.numberOfSlices;
+        this.incompatibleFiles = userFiles.incompatibleFiles;
     }
 
     private updateProgressBar(numberOfSlicesSent: number = 1): void {

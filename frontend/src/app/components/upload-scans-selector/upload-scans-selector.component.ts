@@ -1,17 +1,31 @@
 import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@angular/core';
 
+const FILE_SIZE_LIMIT = 5;  // MB
+
 export class SelectedScan {
     directory: string = '';
     files: File[] = [];
 }
 
+export class IncompatibleFile {
+    file: File;
+    reason: string;
+
+    constructor(file: File, reason: string) {
+        this.file = file;
+        this.reason = reason;
+    }
+}
+
 export class UserFiles {
     scans: SelectedScan[];
     numberOfSlices: number;
+    incompatibleFiles: IncompatibleFile[];
 
-    constructor(scans: SelectedScan[], numberOfSlices: number) {
+    constructor(scans: SelectedScan[], numberOfSlices: number, incompatibleFiles: IncompatibleFile[]) {
         this.scans = scans;
         this.numberOfSlices = numberOfSlices;
+        this.incompatibleFiles = incompatibleFiles;
     }
 }
 
@@ -28,10 +42,31 @@ export class UploadScansSelectorComponent {
 
     public scans: SelectedScan[] = [];
     public totalNumberOfSlices: number = 0;
+    public incompatibleFiles: IncompatibleFile[] = [];
 
-    prepareScans() {
+    private isCompatibleSliceFile(sliceFile: File): boolean {
+        // Skip all files that are not DICOMs
+        if (sliceFile.type != "application/dicom") {
+            let reason = 'Incompatible MIME Type! Should be "application/dicom" but File has type "' + sliceFile.type + '".';
+            this.incompatibleFiles.push(new IncompatibleFile(sliceFile, reason));
+            return false;
+        }
+
+        // Check for size limit (5 MB)
+        if (sliceFile.size > FILE_SIZE_LIMIT * 1024 * 1024) {
+            let fileSize = Math.round(sliceFile.size / 1024 / 1024);
+            let reason = 'Too large File! This file has ' + fileSize + 'MB but the limit is ' + FILE_SIZE_LIMIT + 'MB.';
+            this.incompatibleFiles.push(new IncompatibleFile(sliceFile, reason));
+            return false;
+        }
+
+        return true;
+    }
+
+    private prepareScans(): void {
         // Always start with empty list and we will fill it by iterating over files
         this.scans = [];
+        this.incompatibleFiles = [];
 
         // User didn't select any files
         if (!this.userSelectedFiles || this.userSelectedFiles.length == 0) {
@@ -42,17 +77,11 @@ export class UploadScansSelectorComponent {
         if (!this.multipleScans) {
             let singleScan = new SelectedScan();
             for (let sliceFile of this.userSelectedFiles) {
-                // Skip all files that are not DICOMs
-                if (sliceFile.type != "application/dicom") {
+                // Check file compatibility and add it to the list of incompatible files
+                if (!this.isCompatibleSliceFile(sliceFile)) {
                     continue;
                 }
 
-                // Check for size limit (5 MB)
-                if (sliceFile.size > 5 * 1024 * 1024) {
-                    continue;
-                }
-
-                // File seems to be fine
                 this.totalNumberOfSlices += 1;
                 singleScan.files.push(sliceFile);
             }
@@ -67,13 +96,8 @@ export class UploadScansSelectorComponent {
         let lastScanDirectory: String;
         let currentScan;
         for (let sliceFile of this.userSelectedFiles) {
-            // Skip all files that are not DICOMs
-            if (sliceFile.type != "application/dicom") {
-                continue;
-            }
-
-            // Check for size limit (5 MB)
-            if (sliceFile.size > 5 * 1024 * 1024) {
+            // Check file compatibility and add it to the list of incompatible files
+            if (!this.isCompatibleSliceFile(sliceFile)) {
                 continue;
             }
 
@@ -104,15 +128,16 @@ export class UploadScansSelectorComponent {
         }
     }
 
-    onNativeInputFileSelect($event) {
+    public onNativeInputFileSelect($event): void {
         this.scans = [];
+        this.incompatibleFiles = [];
         this.totalNumberOfSlices = 0;
         this.userSelectedFiles = $event.target.files || $event.scrElement.files;
         this.prepareScans();
-        this.onFileSelect.emit(new UserFiles(this.scans, this.totalNumberOfSlices));
+        this.onFileSelect.emit(new UserFiles(this.scans, this.totalNumberOfSlices, this.incompatibleFiles));
     }
 
-    selectFile() {
+    public selectFile(): void {
         this.nativeInputFile.nativeElement.click();
     }
 
@@ -120,5 +145,6 @@ export class UploadScansSelectorComponent {
         this.userSelectedFiles = [];
         this.totalNumberOfSlices = 0;
         this.scans = [];
+        this.incompatibleFiles = [];
     }
 }
