@@ -110,7 +110,10 @@ class Label(Resource):
         try:
             validate(elements, elements_schema)
         except ValidationError:
-            raise InvalidArgumentsException(best_match(Draft4Validator(elements_schema).iter_errors(elements)).message)
+            validator = Draft4Validator(elements_schema)
+            errors = validator.iter_errors(elements)
+            best_error = best_match(errors)
+            raise InvalidArgumentsException(best_error.message)
 
         labeling_time = payload['labeling_time']
 

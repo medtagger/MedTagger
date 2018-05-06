@@ -132,8 +132,9 @@ def add_label_element(element: Dict[str, Any], label_id: LabelID) -> None:
     if tool == LabelTool.RECTANGLE.value:
         position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
         shape = LabelShape(width=element['width'], height=element['height'])
-        label_tag = LabelTagRepository.get_label_tag_by_key(element['tag'])
-        if not label_tag:
+        try:
+            label_tag = LabelTagRepository.get_label_tag_by_key(element['tag'])
+        except NoResultFound:
             raise NotFoundException('Could not find any Label Tag for that key!')
         LabelsRepository.add_new_rectangular_label_element(label_id, position, shape, label_tag)
     else:
