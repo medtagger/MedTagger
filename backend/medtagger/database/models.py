@@ -366,10 +366,10 @@ class RectangularLabelElement(LabelElement):
     __tablename__ = 'RectangularLabelElements'
     id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
 
-    position_x: float = Column(Float, nullable=False)
-    position_y: float = Column(Float, nullable=False)
-    shape_width: float = Column(Float, nullable=False)
-    shape_height: float = Column(Float, nullable=False)
+    x: float = Column(Float, nullable=False)
+    y: float = Column(Float, nullable=False)
+    width: float = Column(Float, nullable=False)
+    height: float = Column(Float, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': LabelTool.RECTANGLE,
@@ -383,11 +383,11 @@ class RectangularLabelElement(LabelElement):
         :param tag: tag of the label
         """
         super(RectangularLabelElement, self).__init__(tag)
-        self.position_x = position.x
-        self.position_y = position.y
+        self.x = position.x
+        self.y = position.y
         self.slice_index = position.slice_index
-        self.shape_width = shape.width
-        self.shape_height = shape.height
+        self.width = shape.width
+        self.height = shape.height
 
     def __repr__(self) -> str:
         """Return string representation for  Rectangular Label Element."""

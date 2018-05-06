@@ -2,7 +2,8 @@
 from typing import Any
 from flask import request
 from flask_restplus import Resource
-from jsonschema import validate, ValidationError
+from jsonschema import validate, ValidationError, Draft4Validator
+from jsonschema.exceptions import best_match
 
 from medtagger.types import ScanID
 from medtagger.api import api
@@ -109,7 +110,7 @@ class Label(Resource):
         try:
             validate(elements, elements_schema)
         except ValidationError:
-            raise InvalidArgumentsException('Wrong elements schema.')
+            raise InvalidArgumentsException(best_match(Draft4Validator(elements_schema).iter_errors(elements)).message)
 
         labeling_time = payload['labeling_time']
 

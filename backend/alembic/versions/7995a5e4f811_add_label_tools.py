@@ -1,6 +1,6 @@
 """ Added Label Tools
 
-Introduced Label Tools enum and specific LabelElement made with specific tool (Rectangle).
+Introduced Label Tools enum and specific
 
 Revision ID: 7995a5e4f811
 Revises: 61737c4342bc
@@ -9,7 +9,8 @@ Create Date: 2018-05-03 22:33:59.012448
 """
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy import table, column
+from sqlalchemy import table, column, select
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import ENUM
 
 revision = '7995a5e4f811'

@@ -2,9 +2,10 @@
 import logging
 from typing import Iterable, Dict, List, Tuple, Any
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
-from medtagger.api.exceptions import NotFoundException
+from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.repositories.label_tag import LabelTagRepository
 from medtagger.types import ScanID, LabelPosition, LabelShape, ScanMetadata, LabelingTime, LabelID
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation, LabelTool
@@ -112,10 +113,10 @@ def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime
     :return: Label object
     """
     user = get_current_user()
-    scan = ScansRepository.get_scan_by_id(scan_id)
-    if not scan:
-        raise NotFoundException('Could not find any Scan for that id!')
-    label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
+    try:
+        label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
+    except IntegrityError:
+        raise NotFoundException('Could not find Scan for that id!')
     for element in elements:
         add_label_element(element, label.id)
     return label
@@ -135,6 +136,8 @@ def add_label_element(element: Dict[str, Any], label_id: LabelID) -> None:
         if not label_tag:
             raise NotFoundException('Could not find any Label Tag for that key!')
         LabelsRepository.add_new_rectangular_label_element(label_id, position, shape, label_tag)
+    else:
+        raise InvalidArgumentsException('That tool is not supported!')
 
 
 def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:

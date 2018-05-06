@@ -11,12 +11,11 @@ in__new_scan = api.model('New Scan model', {
 
 elements_schema = {
     'type': 'array',
-    'properties': {
-        'elements': {
-            'oneOf': [
-                {'$ref': '#/definitions/rectangular_label_element_schema'},
-            ],
-        },
+    "items": {
+        "type": "object",
+        'oneOf': [
+            {'$ref': '#/definitions/rectangular_label_element_schema'},
+        ],
     },
     'definitions': {
         'rectangular_label_element_schema': {

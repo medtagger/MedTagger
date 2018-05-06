@@ -10,18 +10,21 @@ in__label_status = api.model("Status for label", {
                             required=True),
 })
 
-out__rectangular_label_element = api.model('Label Element', {
-    'x': fields.Float(description='Element\'s X position', min=0.0, max=1.0, attribute='position_x'),
-    'y': fields.Float(description='Element\'s Y position', min=0.0, max=1.0, attribute='position_y'),
+COMMON_LABEL_ELEMENT = {
     'slice_index': fields.Integer(description='Slice\'s order index', min=0),
-    'width': fields.Float(description='Element\'s width', min=0.0, max=1.0, attribute='shape_width'),
-    'height': fields.Float(description='Element\'s height', min=0.0, max=1.0, attribute='shape_height'),
     'tag': fields.String(description='Element\'s tag', attribute='tag.key'),
     'tool': fields.String(description='Element\'s tool', attribute='tool.value',
                           enum=[tool.name for tool in LabelTool]),
     'status': fields.String(description='Element\'s status', attribute='status.value',
                             enum=[status.name for status in LabelElementStatus]),
-})
+}
+
+out__rectangular_label_element = api.model('Rectangular Label Element model', dict(COMMON_LABEL_ELEMENT, **{
+    'x': fields.Float(description='Element\'s X position', min=0.0, max=1.0),
+    'y': fields.Float(description='Element\'s Y position', min=0.0, max=1.0),
+    'width': fields.Float(description='Element\'s width', min=0.0, max=1.0),
+    'height': fields.Float(description='Element\'s height', min=0.0, max=1.0),
+}))
 
 out__label_status = api.model('Label status and ID', {
     'label_id': fields.String(description='Label\'s ID', attribute='id'),
