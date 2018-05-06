@@ -5,7 +5,7 @@ from typing import Iterable, Dict, List, Tuple
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api.exceptions import NotFoundException
-from medtagger.types import ScanID, LabelPosition, LabelShape, ScanMetadata, LabelingTime
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
