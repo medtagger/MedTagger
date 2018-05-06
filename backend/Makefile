@@ -55,7 +55,7 @@ run_workers:
 #
 
 start_dependencies:
-	cd .. && docker-compose up -d hbase postgres rabbitmq
+	cd .. && docker-compose up -d cassandra postgres rabbitmq
 	make update_dependencies
 
 stop_dependencies:
@@ -84,10 +84,9 @@ unit_tests:
 	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TEST)
 
 functional_tests:
-	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d hbase postgres rabbitmq
+	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d cassandra postgres rabbitmq
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic upgrade head
-	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && $(PYTHON) ./$(SCRIPTS_DIRECTORY)/migrate_hbase.py -y
 	@if . $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ! pytest $(FUNCTIONAL_TEST) ; then\
 		docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down;\
 		echo "Functional tests failed!";\
@@ -100,7 +99,6 @@ functional_tests:
 functional_tests_docker:
 	./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
 	alembic upgrade head
-	$(PYTHON) ./$(SCRIPTS_DIRECTORY)/migrate_hbase.py -y
 	pytest $(FUNCTIONAL_TESTS_MODULE)
 
 #

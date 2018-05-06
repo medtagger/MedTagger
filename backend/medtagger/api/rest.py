@@ -21,9 +21,9 @@ from flask_cors import CORS  # noqa
 
 from medtagger.api import blueprint  # noqa
 from medtagger.config import AppConfiguration  # noqa
-from medtagger.clients.hbase_client import create_hbase_connection_pool  # noqa
 from medtagger.database import session  # noqa
 from medtagger.database.models import User, Role  # noqa
+from medtagger.storage import create_connection  # noqa
 
 # Import all REST services
 from medtagger.api.core.service import core_ns as core_rest_ns  # noqa
@@ -37,6 +37,9 @@ logger = logging.getLogger(__name__)
 # Load configuration
 logger.info('Loading configuration file...')
 configuration = AppConfiguration()
+host = configuration.get('api', 'host', fallback='localhost')
+port = configuration.getint('api', 'rest_port', fallback=51000)
+debug = configuration.getboolean('api', 'debug', fallback=True)
 
 # Definition of application
 app = Flask(__name__)
@@ -49,8 +52,19 @@ app.config['RESTPLUS_MASK_SWAGGER'] = False
 app.config['SWAGGER_UI_DOC_EXPANSION'] = 'list'
 app.config['RESTPLUS_VALIDATE'] = True
 
-with app.app_context():
-    create_hbase_connection_pool()
+
+try:
+    # This will raise ModuleNotFoundError if app was not run inside uWSGI server
+    from uwsgidecorators import postfork  # noqa
+
+    @postfork
+    def connect_to_cassandra() -> None:
+        """Create a single Session to Cassandra after fork to multiple processes by uWSGI."""
+        create_connection()
+except ModuleNotFoundError:
+    # It seems that application is not running inside uWSGI server, so let's initialize session
+    # in current process as it is highly probable that we are running in Flask's dev server
+    create_connection()
 
 
 @app.teardown_appcontext
@@ -60,8 +74,4 @@ def shutdown_session(exception: Any = None) -> None:  # pylint: disable=unused-a
 
 
 if __name__ == '__main__':
-    # Run the application
-    host = configuration.get('api', 'host', fallback='localhost')
-    port = configuration.getint('api', 'rest_port', fallback=51000)
-    debug = configuration.getboolean('api', 'debug', fallback=True)
     app.run(host=host, port=port, debug=debug)

@@ -5,7 +5,7 @@ from typing import Iterable, Dict, List, Tuple
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api.exceptions import NotFoundException
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata, LabelingTime
+from medtagger.types import ScanID, LabelPosition, LabelShape, ScanMetadata, LabelingTime
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
@@ -115,8 +115,7 @@ def add_label(scan_id: ScanID, selections: List[Dict], labeling_time: LabelingTi
     for selection in selections:
         position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
         shape = LabelShape(width=selection['width'], height=selection['height'])
-        binary_mask = LabelSelectionBinaryMask(selection['binary_mask']) if selection.get('binary_mask') else None
-        LabelsRepository.add_new_label_selection(label.id, position, shape, binary_mask)
+        LabelsRepository.add_new_label_selection(label.id, position, shape)
     return label
 
 
