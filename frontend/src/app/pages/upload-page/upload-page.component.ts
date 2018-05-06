@@ -272,6 +272,7 @@ export class UploadPageComponent implements OnInit {
         this.uploadingAndProcessingScans = [];
         this.availableScans = [];
         this.errorScans = [];
+        this.incompatibleFiles = [];
         this.totalNumberOfSlices = 0;
         this.slicesSent = 0;
 
@@ -287,6 +288,7 @@ export class UploadPageComponent implements OnInit {
 
     public uploadAgain(): void {
         this.scans = [];
+        this.incompatibleFiles = [];
         this.totalNumberOfSlices = 0;
         for (let listElement of this.scansForRetry.selectedOptions.selected) {
             this.totalNumberOfSlices += listElement.value.scan.files.length;

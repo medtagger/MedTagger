@@ -29,6 +29,7 @@ services:
       - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
       - MEDTAGGER__CASSANDRA_ADDRESSES=cassandra
       - MEDTAGGER__CASSANDRA_PORT=9042
+      - MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: ../backend
