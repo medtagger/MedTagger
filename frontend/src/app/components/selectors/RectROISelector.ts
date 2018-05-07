@@ -1,6 +1,5 @@
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {Selector} from './Selector';
-import {Observable} from "rxjs/Observable";
 import {EventEmitter} from "@angular/core";
 
 export class RectROISelector implements Selector<ROISelection2D> {
