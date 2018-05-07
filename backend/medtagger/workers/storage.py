@@ -17,11 +17,11 @@ logger = get_task_logger(__name__)
 
 @celery_app.task
 def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
-    """Parse Dicom from HBase and update Slice for location and position.
+    """Parse DICOM from Storage and update Slice for location and position.
 
     :param slice_id: ID of a slice
     """
-    logger.debug('Parsing Dicom file from HBase for given Slice ID: %s.', slice_id)
+    logger.debug('Parsing DICOM file from Storage for given Slice ID: %s.', slice_id)
     _slice = SlicesRepository.get_slice_by_id(slice_id)
     image = SlicesRepository.get_slice_original_image(_slice.id)
 

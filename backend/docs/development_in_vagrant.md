@@ -17,7 +17,7 @@ Open three SSH connections (in separate windows) to your virtual machine and mak
 ```
  
 In the first window we'll run Celery workers which are responsible for handling difficult tasks (eg. adding and
- converting Dicoms to our HBase DB). To run Celery workers, please execute such command:
+ converting DICOMs to our Storage). To run Celery workers, please execute such command:
 
 ```bash
 $ make run_workers
