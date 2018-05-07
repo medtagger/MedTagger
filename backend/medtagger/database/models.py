@@ -330,17 +330,19 @@ class LabelElementStatus(enum.Enum):
     NOT_VERIFIED = 'NOT_VERIFIED'
 
 
+class LabelTool(enum.Enum):
+    """Defines available Label Tools."""
+
+    RECTANGLE = 'RECTANGLE'
+
+
 class LabelElement(Base):
-    """Definition of a Label Element."""
+    """Definition of high level Label Element."""
 
     __tablename__ = 'LabelElements'
     id: LabelElementID = Column(String, primary_key=True)
-    position_x: float = Column(Float, nullable=False)
-    position_y: float = Column(Float, nullable=False)
+
     slice_index: int = Column(Integer, nullable=False)
-    shape_width: float = Column(Float, nullable=False)
-    shape_height: float = Column(Float, nullable=False)
-    has_binary_mask: bool = Column(Boolean, nullable=False)
 
     label_id: LabelID = Column(String, ForeignKey('Labels.id'))
     label: Label = relationship('Label', back_populates='elements')
@@ -351,29 +353,25 @@ class LabelElement(Base):
     status: LabelElementStatus = Column(Enum(LabelElementStatus), nullable=False,
                                         server_default=LabelElementStatus.NOT_VERIFIED.value)
 
-    def __init__(self, position: LabelPosition, shape: LabelShape, tag: LabelTag,
-                 has_binary_mask: bool = False) -> None:
+    tool: LabelTool = Column(Enum(LabelTool), nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'LabelElement',
+        'polymorphic_on': tool,
+    }
+
+    def __init__(self, tag: LabelTag) -> None:
         """Initialize Label Element.
 
-        :param position: position (x, y, slice_index) of the label
-        :param shape: shape (width, height) of the label
         :param tag: tag of the label
-        :param has_binary_mask: boolean information if such Label Element has binary mask or not
         """
         self.id = LabelElementID(str(uuid.uuid4()))
-        self.position_x = position.x
-        self.position_y = position.y
-        self.slice_index = position.slice_index
-        self.shape_width = shape.width
-        self.shape_height = shape.height
         self.tag_id = tag.id
-        self.has_binary_mask = has_binary_mask
         self.status = LabelElementStatus.NOT_VERIFIED
 
     def __repr__(self) -> str:
         """Return string representation for Label Element."""
-        _has_binary_mask = 'WITH BINARY MASK' if self.has_binary_mask else 'WITHOUT BINARY MASK'
-        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, _has_binary_mask)
+        return '<{}: {}>'.format(self.__class__.__name__, self.id)
 
     def update_status(self, status: LabelElementStatus) -> 'LabelElement':
         """Update Label's element status.
@@ -384,3 +382,37 @@ class LabelElement(Base):
         self.status = status
         self.save()
         return self
+
+
+class RectangularLabelElement(LabelElement):
+    """Definition of a Label Element made with Rectangle Tool."""
+
+    __tablename__ = 'RectangularLabelElements'
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+
+    x: float = Column(Float, nullable=False)
+    y: float = Column(Float, nullable=False)
+    width: float = Column(Float, nullable=False)
+    height: float = Column(Float, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': LabelTool.RECTANGLE,
+    }
+
+    def __init__(self, position: LabelPosition, shape: LabelShape, tag: LabelTag) -> None:
+        """Initialize LabelElement.
+
+        :param position: position (x, y, slice_index) of the label
+        :param shape: shape (width, height) of the label
+        :param tag: tag of the label
+        """
+        super(RectangularLabelElement, self).__init__(tag)
+        self.x = position.x
+        self.y = position.y
+        self.slice_index = position.slice_index
+        self.width = shape.width
+        self.height = shape.height
+
+    def __repr__(self) -> str:
+        """Return string representation for  Rectangular Label Element."""
+        return '<{}: {}>'.format(self.__class__.__name__, self.id)

@@ -1,14 +1,14 @@
 """Module responsible for business logic in all Scans endpoints."""
 import logging
-from typing import Iterable, Dict, List, Tuple
+from typing import Iterable, Dict, List, Tuple, Any
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
-from medtagger.api.exceptions import NotFoundException
+from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.repositories.label_tag import LabelTagRepository
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata, LabelingTime
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime
-from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID
+from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation, LabelTool
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.scans import ScansRepository
@@ -105,17 +105,32 @@ def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime
     :return: Label object
     """
     user = get_current_user()
-    label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
+    try:
+        label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
+    except IntegrityError:
+        raise NotFoundException('Could not find Scan for that id!')
     for element in elements:
+        add_label_element(element, label.id)
+    return label
+
+
+def add_label_element(element: Dict[str, Any], label_id: LabelID) -> None:
+    """Add new Label Element for given Label.
+
+    :param element: JSON describing single element
+    :param label_id: ID of a given Label that the element should be added to
+    """
+    tool = element['tool']
+    if tool == LabelTool.RECTANGLE.value:
         position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
         shape = LabelShape(width=element['width'], height=element['height'])
-        binary_mask = LabelSelectionBinaryMask(element['binary_mask']) if element.get('binary_mask') else None
         try:
             label_tag = LabelTagRepository.get_label_tag_by_key(element['tag'])
         except NoResultFound:
             raise NotFoundException('Could not find any Label Tag for that key!')
-        LabelsRepository.add_new_label_element(label.id, position, shape, label_tag, binary_mask)
-    return label
+        LabelsRepository.add_new_rectangular_label_element(label_id, position, shape, label_tag)
+    else:
+        raise InvalidArgumentsException('Tool is not supported!')
 
 
 def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:

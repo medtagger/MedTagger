@@ -2,7 +2,7 @@
 import json
 from typing import Any
 
-from medtagger.database.models import LabelVerificationStatus, LabelElementStatus
+from medtagger.database.models import LabelVerificationStatus, LabelElementStatus, LabelTool
 from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 from tests.functional_tests.helpers import create_tag_and_assign_to_category
@@ -79,6 +79,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
             'width': 0.1,
             'height': 0.1,
             'tag': tag.key,
+            'tool': LabelTool.RECTANGLE.value,
         }],
         'labeling_time': 12.34,
     }
@@ -106,8 +107,8 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
         'slice_index': 0,
         'width': 0.1,
         'height': 0.1,
-        'binary_mask': None,
         'tag': tag.key,
+        'tool': LabelTool.RECTANGLE.value,
         'status': LabelElementStatus.NOT_VERIFIED.value,
     }]
 

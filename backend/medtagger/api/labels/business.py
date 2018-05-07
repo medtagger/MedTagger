@@ -28,6 +28,6 @@ def get_random_label() -> Label:
     :return: dictionary with details about label
     """
     try:
-        return LabelsRepository.get_random_label(LabelVerificationStatus.NOT_VERIFIED, fetch_binary_masks=True)
+        return LabelsRepository.get_random_label(LabelVerificationStatus.NOT_VERIFIED)
     except NoResultFound:
         raise NotFoundException('No Labels not found.')
