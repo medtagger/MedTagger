@@ -20,10 +20,8 @@ COPY requirements.txt ./requirements.txt
 
 ENV PYTHONPATH /medtagger_backend
 
-ARG CASSANDRA_DRIVER__DISABLE_CYTHON
-RUN if [ "$CASSANDRA_DRIVER__DISABLE_CYTHON" = "true" ]; then export CASS_DRIVER_NO_CYTHON=1; fi
-RUN if [ "$CASSANDRA_DRIVER__DISABLE_EXTENTIONS" = "true" ]; then export CASS_DRIVER_NO_EXTENSIONS=1; fi
-RUN env | sort
+ARG CASS_DRIVER_NO_CYTHON
+ARG CASS_DRIVER_NO_EXTENSIONS
 RUN pip install -r requirements.txt
 
 EXPOSE 51001
