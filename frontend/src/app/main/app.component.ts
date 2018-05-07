@@ -25,13 +25,12 @@ export class AppComponent implements OnInit {
         this.router.events.pipe(
             filter((event) => event instanceof NavigationEnd),
             map(() => this.activatedRoute),
-            map((route) => {
+            map((route: ActivatedRoute) => {
                 while (route.firstChild) route = route.firstChild;
                 return route;
             }),
-            filter((route) => route.outlet === 'primary'),
-            mergeMap((route) => route.data),
-            mergeMap((route) => route.data),
+            filter((route: ActivatedRoute) => route.outlet === 'primary'),
+            mergeMap((route: ActivatedRoute) => route.data)
         ).subscribe((event) => this.pageTitle = event['title']);
     }
 
