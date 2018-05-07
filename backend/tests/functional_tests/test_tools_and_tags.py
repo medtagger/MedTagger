@@ -42,7 +42,7 @@ def test_add_label_non_existing_tag(prepare_environment: Any) -> None:
     assert json_response['details'] == 'Could not find any Label Tag for that key!'
 
 
-def test_add_label_non_existing_tool(prepare_environment: Any) -> None:
+def test_add_label_non_supported_tool(prepare_environment: Any) -> None:
     """Test application for situation when users provides non existing tool."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
