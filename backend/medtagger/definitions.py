@@ -11,6 +11,8 @@ class DicomTags(Enum):
     RESCALE_SLOPE = '0028|1053'
     RESCALE_TYPE = '0028|1054'
     PIXEL_SPACING = '0028|0030'
+    ROWS = '0028|0010'
+    COLUMNS = '0028|0011'
 
 
 class SliceOrientation(Enum):

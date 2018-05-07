@@ -54,6 +54,8 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert isinstance(json_response, dict)
     assert json_response['scan_id'] == scan_id
     assert json_response['number_of_slices'] == 1
+    assert json_response['width'] == 512
+    assert json_response['height'] == 512
 
     # Step 5. Get slices from the server
     web_socket_client.emit('request_slices', {'scan_id': scan_id, 'begin': 0, 'count': 1}, namespace='/slices')
