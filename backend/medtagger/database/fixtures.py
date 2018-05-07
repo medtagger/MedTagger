@@ -13,19 +13,19 @@ logger = logging.getLogger(__name__)
 CATEGORIES = [{
     'key': 'KIDNEYS',
     'name': 'Kidneys',
-    'image_path': '../../../assets/icon/kidneys_category_icon.svg',
+    'image_path': '../../assets/icon/kidneys_category_icon.svg',
 }, {
     'key': 'LIVER',
     'name': 'Liver',
-    'image_path': '../../../assets/icon/liver_category_icon.svg',
+    'image_path': '../../assets/icon/liver_category_icon.svg',
 }, {
     'key': 'HEART',
     'name': 'Heart',
-    'image_path': '../../../assets/icon/heart_category_icon.svg',
+    'image_path': '../../assets/icon/heart_category_icon.svg',
 }, {
     'key': 'LUNGS',
     'name': 'Lungs',
-    'image_path': '../../../assets/icon/lungs_category_icon.svg',
+    'image_path': '../../assets/icon/lungs_category_icon.svg',
 }]
 
 ROLES = [

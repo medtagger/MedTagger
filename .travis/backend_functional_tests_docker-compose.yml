@@ -35,6 +35,6 @@ services:
       context: ../backend
       dockerfile: Dockerfile_rest
       args:
-        - CASSANDRA_DRIVER__DISABLE_CYTHON=1
+        - CASSANDRA_DRIVER__DISABLE_CYTHON=true
     command: /bin/bash -c "make install_dev_packages && make functional_tests_docker"
 
