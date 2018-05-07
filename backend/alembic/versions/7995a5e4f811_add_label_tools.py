@@ -9,8 +9,7 @@ Create Date: 2018-05-03 22:33:59.012448
 """
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy import table, column, select
-from sqlalchemy.dialects import postgresql
+from sqlalchemy import table, column
 from sqlalchemy.dialects.postgresql import ENUM
 
 revision = '7995a5e4f811'
@@ -18,11 +17,11 @@ down_revision = '61737c4342bc'
 branch_labels = None
 depends_on = None
 
-label_tool = ENUM('RECTANGLE', name='label_tool', create_type=False)
+label_tool_enum = ENUM('RECTANGLE', name='label_tool', create_type=False)
 
 
 def upgrade():
-    label_tool.create(op.get_bind(), checkfirst=True)
+    label_tool_enum.create(op.get_bind(), checkfirst=True)
 
     op.create_table('RectangularLabelElements',
                     sa.Column('id', sa.String(), nullable=False),
@@ -35,7 +34,7 @@ def upgrade():
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_RectangularLabelElements'))
                     )
 
-    op.add_column('LabelElements', sa.Column('tool', label_tool, server_default='RECTANGLE'))
+    op.add_column('LabelElements', sa.Column('tool', label_tool_enum, server_default='RECTANGLE'))
 
     old_label_elements = table('LabelElements', column('id'), column('position_x'), column('position_y'),
                                column('shape_width'), column('shape_height'))
@@ -75,4 +74,4 @@ def downgrade():
     ))
 
     op.drop_table('RectangularLabelElements')
-    label_tool.drop(op.get_bind(), checkfirst=True)
+    label_tool_enum.drop(op.get_bind(), checkfirst=True)
