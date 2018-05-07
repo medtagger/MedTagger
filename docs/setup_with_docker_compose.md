@@ -80,7 +80,10 @@ To run MedTagger on a subdirectory export `MEDTAGGER__HOST_ON_SUBDIRECTORY` envi
 Here is an example how to do this:
 
 ```bash
+# Frontend & Backend will be hosted under below subdirectory
 $ export MEDTAGGER__HOST_ON_SUBDIRECTORY=/medtagger/
+
+# Now, you will be able to build & run your containers
 $ docker-compose up ...
 ```
 
@@ -100,4 +103,7 @@ $ export CASSANDRA_DRIVER__DISABLE_CYTHON=0
 
 # This will enable extentions (by default set to 1)
 $ export CASSANDRA_DRIVER__DISABLE_EXTENTIONS=0
+
+# Now, you will be able to build & run your containers
+$ docker-compose up ...
 ```
