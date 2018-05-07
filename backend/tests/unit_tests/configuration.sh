@@ -8,6 +8,7 @@ export MEDTAGGER__DB_DATABASE_URI="sqlite:///:memory:"
 
 export MEDTAGGER__CASSANDRA_ADDRESSES="127.0.0.1"
 export MEDTAGGER__CASSANDRA_PORT=52001
+export MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
 
 export MEDTAGGER__CELERY_BROKER="pyamqp://guest:guest@localhost//"
 

@@ -6,7 +6,7 @@ from typing import List, Any
 from celery.signals import setup_logging, worker_process_init
 
 from medtagger.config import AppConfiguration
-from medtagger.storage import create_session
+from medtagger.storage import create_connection
 
 
 def get_all_modules_with_tasks() -> List[str]:
@@ -29,7 +29,7 @@ def setup_logging_handler(*args: List[Any], **kwargs: List[Any]) -> None:  # pyl
 @worker_process_init.connect
 def process_initialization(*args: List[Any], **kwargs: List[Any]) -> None:  # pylint: disable=unused-argument
     """Initialize given Celery process."""
-    create_session()
+    create_connection()
 
 
 configuration = AppConfiguration()
