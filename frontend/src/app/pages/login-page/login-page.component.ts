@@ -3,7 +3,6 @@ import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {passwordValidator} from '../validators/password-validator.directive';
 import {AccountService} from '../../services/account.service';
-import * as ERRORS from "./login-errors";
 
 enum LoginPageMode {
     LOG_IN,
@@ -80,28 +79,28 @@ export class LoginPageComponent implements OnInit {
     }
 
     getFirstNameErrorMessage(): string {
-        return this.userForm.get('firstName').hasError('required') ? ERRORS.REQUIREMENT : '';
+        return this.userForm.get('firstName').hasError('required') ? 'Field required' : '';
     }
 
     getLastNameErrorMessage(): string {
-        return this.userForm.get('lastName').hasError('required') ? ERRORS.REQUIREMENT : '';
+        return this.userForm.get('lastName').hasError('required') ? 'Field required' : '';
     }
 
     getEmailErrorMessage(): string {
-        return this.userForm.get('email').hasError('required') ? ERRORS.REQUIREMENT :
-            this.userForm.get('email').hasError('email') ? ERRORS.INVALID_MAIL :
+        return this.userForm.get('email').hasError('required') ? 'Field required' :
+            this.userForm.get('email').hasError('email') ? 'Invalid email.' :
                 '';
     }
 
     getPasswordErrorMessage(): string {
-        return this.userForm.get('password').hasError('required') ? ERRORS.REQUIREMENT :
-            this.userForm.get('password').hasError('minlength') ? ERRORS.PASSWORD_LENGTH :
+        return this.userForm.get('password').hasError('required') ? 'Field required' :
+            this.userForm.get('password').hasError('minlength') ? 'Password should be longer than ' + MIN_PASSWORD_LENGTH + ' characters.' :
                 '';
     }
 
     getConfirmPasswordErrorMessage(): string {
-        return this.userForm.get('confirmPassword').hasError('required') ? ERRORS.REQUIREMENT :
-            this.userForm.get('confirmPassword').hasError('passwordValidator') ? ERRORS.PASSWORD_MATCH :
+        return this.userForm.get('confirmPassword').hasError('required') ? 'Field required' :
+            this.userForm.get('confirmPassword').hasError('passwordValidator') ? 'Passwords does not match.' :
                 '';
     }
 
