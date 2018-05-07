@@ -14,3 +14,6 @@ export MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
 
 export MEDTAGGER__CELERY_BROKER="pyamqp://guest:guest@localhost//"
 
+# Disable Cassandra Driver tweaks - not needed in development setup
+export CASS_DRIVER_NO_CYTHON=1
+export CASS_DRIVER_NO_EXTENSIONS=1
