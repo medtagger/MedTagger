@@ -128,7 +128,10 @@ def add_label_element(element: Dict[str, Any], label_id: LabelID) -> None:
     :param element: JSON describing single element
     :param label_id: ID of a given Label that the element should be added to
     """
-    tool = element['tool']
+    try:
+        tool = element['tool']
+    except KeyError:
+        raise InvalidArgumentsException('Tool is required!')
     if tool == LabelTool.RECTANGLE.value:
         position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
         shape = LabelShape(width=element['width'], height=element['height'])
