@@ -25,6 +25,7 @@ Current configuration variables are:
 | `MEDTAGGER__DB_CONNECTION_POOL_SIZE`    | 25                                                         |
 | `MEDTAGGER__CASSANDRA_ADDRESSES`        | localhost                                                  |
 | `MEDTAGGER__CASSANDRA_PORT`             | 9042                                                       |
+| `MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT`  | 30                                                         |
 | `MEDTAGGER__CELERY_BROKER`              | pyamqp://guest:guest@localhost//                           |
 
 Default values are applied by `scripts/dev__configuration.sh` script that runs inside of
