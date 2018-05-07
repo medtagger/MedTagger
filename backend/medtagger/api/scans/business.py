@@ -122,28 +122,12 @@ def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime
     return label
 
 
-def validate_element(element: Dict[str, Any]) -> None:
-    """Validate if element has required fields.
-
-    :param element: JSON describing single element
-    """
-    try:
-        element['tool']
-    except KeyError:
-        raise InvalidArgumentsException('Tool is required!')
-    try:
-        element['tag']
-    except KeyError:
-        raise InvalidArgumentsException('Tag is required!')
-
-
 def add_label_element(element: Dict[str, Any], label_id: LabelID) -> None:
     """Add new Label Element for given Label.
 
     :param element: JSON describing single element
     :param label_id: ID of a given Label that the element should be added to
     """
-    validate_element(element)
     tool = element['tool']
     if tool == LabelTool.RECTANGLE.value:
         position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
