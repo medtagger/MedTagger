@@ -9,7 +9,6 @@ from medtagger.api.users import serializers
 from medtagger.api.users.business import get_all_users, set_user_role, set_user_info, set_user_settings
 from medtagger.api.utils import get_current_user
 from medtagger.api.security import login_required, role_required
-from medtagger.database.models import UserSettings
 
 users_ns = api.namespace('users', 'Users management')
 
