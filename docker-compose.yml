@@ -82,6 +82,9 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_rest
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
     depends_on:
       - cassandra
       - rabbitmq
@@ -111,6 +114,9 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_websocket
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
     depends_on:
       - cassandra
       - rabbitmq
@@ -140,6 +146,9 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile_worker
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
     depends_on:
       - cassandra
       - rabbitmq
