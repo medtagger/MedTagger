@@ -53,8 +53,8 @@ import {AccountService} from "../services/account.service";
 import {DialogService} from "../services/dialog.service";
 import {InfoDialog} from "../dialogs/info.dialog";
 import {environment} from '../../environments/environment';
+import {MedTaggerWebSocket} from "../services/websocket.service";
 
-const config: SocketIoConfig = {url: environment.WEBSOCKET_URL + '/slices', options: {path: environment.WEBSOCKET_PATH}};
 
 @NgModule({
     declarations: [
@@ -116,7 +116,8 @@ const config: SocketIoConfig = {url: environment.WEBSOCKET_URL + '/slices', opti
         AuthGuard,
         AccountService,
         DialogService,
-        MatDialog
+        MatDialog,
+        MedTaggerWebSocket,
     ],
     bootstrap: [AppComponent]
 })

@@ -25,7 +25,7 @@ MAX_PREVIEW_X_SIZE = 256
 
 @celery_app.task
 def convert_scan_to_png(scan_id: ScanID) -> None:
-    """Store Scan in HBase database.
+    """Convert DICOM Scan to PNG and save it into Storage.
 
     :param scan_id: ID of a Scan
     """
@@ -105,6 +105,7 @@ def _prepare_slices_in_y_orientation(normalized_scan: np.ndarray, scan: Scan) ->
         slice_pixels = normalized_scan[:, y, :]
         _slice = scan.add_slice(SliceOrientation.Y)
         _slice.update_location(location)
+        _slice.update_size(*slice_pixels.shape)
         _convert_to_png_and_store(_slice, slice_pixels)
 
 
@@ -119,6 +120,7 @@ def _prepare_slices_in_x_orientation(normalized_scan: np.ndarray, scan: Scan) ->
         slice_pixels = normalized_scan[:, :, x]
         _slice = scan.add_slice(SliceOrientation.X)
         _slice.update_location(location)
+        _slice.update_size(*slice_pixels.shape)
         _convert_to_png_and_store(_slice, slice_pixels)
 
 

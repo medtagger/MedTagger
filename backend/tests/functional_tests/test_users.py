@@ -104,7 +104,7 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     assert json_response['role'] == 'doctor'
 
 
-def test_ownership(prepare_environment: Any) -> None:
+def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test for checking scan and label ownership."""
     api_client = get_api_client()
 

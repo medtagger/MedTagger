@@ -2,11 +2,8 @@
 echo "Waiting for dependencies..."
 . scripts/wait_for_dependencies.sh
 
-echo "Migrating SQL database..."
+echo "Migrating databases..."
 alembic upgrade head
-
-echo "Migrating HBase database..."
-python3.6 scripts/migrate_hbase.py --yes
 
 echo "Apply database fixtures..."
 python3.6 medtagger/database/fixtures.py

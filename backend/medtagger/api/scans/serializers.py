@@ -2,6 +2,8 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
+from medtagger.definitions import ScanStatus
+
 
 in__new_scan = api.model('New Scan model', {
     'category': fields.String(description='Scan\'s category', required=True),
@@ -14,7 +16,6 @@ in__label_selection = api.model('Label\'s Selection model', {
     'slice_index': fields.Integer(description='Slice\'s order index', min=0, required=True),
     'width': fields.Float(description='Selection\'s width', min=0.0, max=1.0, required=True),
     'height': fields.Float(description='Selection\'s height', min=0.0, max=1.0, required=True),
-    'binary_mask': fields.String(description='Selection\'s binary mask'),
 })
 
 in__label = api.model('Label model', {
@@ -29,8 +30,13 @@ inout__scan_category = api.model('Scan Category model', {
 })
 
 out__scan = api.model('Scan model', {
-    'scan_id': fields.String(description='Scan\'s ID'),
-    'number_of_slices': fields.Integer(description='Total number of slices in given scan'),
+    'scan_id': fields.String(description='Scan\'s ID', attribute='id'),
+    'width': fields.Integer(description='Scan\'s width in Z axis'),
+    'height': fields.Integer(description='Scan\'s height in Z axis'),
+    'status': fields.String(description='Scan\'s status', enum=[status.name for status in ScanStatus],
+                            attribute='status.name'),
+    'number_of_slices': fields.Integer(description='Total number of Slices in given scan',
+                                       attribute='declared_number_of_slices'),
 })
 
 out__label = api.model('Newly created Label model', {

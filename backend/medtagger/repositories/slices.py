@@ -3,8 +3,8 @@ from typing import List
 
 from medtagger.database import db_session
 from medtagger.database.models import Slice, SliceOrientation, Scan
+from medtagger.storage.models import OriginalSlice, ProcessedSlice
 from medtagger.types import SliceID, ScanID
-from medtagger.clients.hbase_client import HBaseClient
 
 
 class SlicesRepository(object):
@@ -31,40 +31,30 @@ class SlicesRepository(object):
 
     @staticmethod
     def delete_slice_by_id(slice_id: SliceID) -> None:
-        """Remove Slice from SQL database and HBase."""
+        """Remove Slice from SQL database and Storage."""
         with db_session() as session:
             session.query(Slice).filter(Slice.id == slice_id).delete()
-        hbase_client = HBaseClient()
-        hbase_client.delete(HBaseClient.ORIGINAL_SLICES_TABLE, slice_id)
+        OriginalSlice.filter(id=slice_id).delete()
+        ProcessedSlice.filter(id=slice_id).delete()
 
     @staticmethod
     def get_slice_original_image(slice_id: SliceID) -> bytes:
         """Return original Dicom image as bytes."""
-        hbase_client = HBaseClient()
-        data = hbase_client.get(HBaseClient.ORIGINAL_SLICES_TABLE, slice_id, columns=['image'])
-        return data[b'image:value']
+        original_slice = OriginalSlice.get(id=slice_id)
+        return original_slice.image
 
     @staticmethod
     def get_slice_converted_image(slice_id: SliceID) -> bytes:
         """Return converted image as bytes."""
-        hbase_client = HBaseClient()
-        data = hbase_client.get(HBaseClient.CONVERTED_SLICES_TABLE, slice_id, columns=['image'])
-        return data[b'image:value']
+        original_slice = ProcessedSlice.get(id=slice_id)
+        return original_slice.image
 
     @staticmethod
     def store_original_image(slice_id: SliceID, image: bytes) -> None:
-        """Store original image into HBase."""
-        slice_value = {
-            'image:value': image,
-        }
-        hbase_client = HBaseClient()
-        hbase_client.put(HBaseClient.ORIGINAL_SLICES_TABLE, slice_id, slice_value)
+        """Store original image into Storage."""
+        OriginalSlice.create(id=slice_id, image=image)
 
     @staticmethod
     def store_converted_image(slice_id: SliceID, image: bytes) -> None:
-        """Store converted image into HBase."""
-        slice_value = {
-            'image:value': image,
-        }
-        hbase_client = HBaseClient()
-        hbase_client.put(HBaseClient.CONVERTED_SLICES_TABLE, slice_id, slice_value)
+        """Store converted image into Storage."""
+        ProcessedSlice.create(id=slice_id, image=image)

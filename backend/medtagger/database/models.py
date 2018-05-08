@@ -3,7 +3,7 @@
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Table, Enum
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Table, Enum, and_
 from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session
@@ -38,9 +38,9 @@ class User(Base):
     first_name: str = Column(String(50), nullable=False)
     last_name: str = Column(String(50), nullable=False)
     active: bool = Column(Boolean, nullable=False)
+
     roles: List[Role] = relationship('Role', secondary=users_roles)
     settings = relationship('UserSettings', uselist=False)
-
     scans: List['Scan'] = relationship('Scan', back_populates='owner')
     labels: List['Label'] = relationship('Label', back_populates='owner')
 
@@ -135,14 +135,22 @@ class Scan(Base):
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
 
     @property
-    def stored_slices(self) -> List['Slice']:
-        """Return all Slices which were already stored."""
-        with db_session() as session:
-            query = session.query(Slice)
-            query = query.filter(Slice.scan_id == self.id)
-            query = query.filter(Slice.status.in_(  # type: ignore  # "SliceStatus" has no attribute "in_"
-                [SliceStatus.STORED, SliceStatus.PROCESSED]))
-            return query.all()
+    def width(self) -> Optional[int]:
+        """Return width of a Scan/Slices in Z axis."""
+        random_slice = Slice.query.filter(and_(
+            Slice.scan_id == self.id,
+            Slice.orientation == SliceOrientation.Z,
+        )).first()
+        return random_slice.width if random_slice else None
+
+    @property
+    def height(self) -> Optional[int]:
+        """Return height of a Scan/Slices in Z axis."""
+        random_slice = Slice.query.filter(and_(
+            Slice.scan_id == self.id,
+            Slice.orientation == SliceOrientation.Z,
+        )).first()
+        return random_slice.height if random_slice else None
 
     def add_slice(self, orientation: SliceOrientation = SliceOrientation.Z) -> 'Slice':
         """Add new slice into this Scan.
@@ -177,6 +185,8 @@ class Slice(Base):
     position_x: float = Column(Float, nullable=True)
     position_y: float = Column(Float, nullable=True)
     position_z: float = Column(Float, nullable=True)
+    width: int = Column(Integer, nullable=True)
+    height: int = Column(Integer, nullable=True)
 
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     scan: Scan = relationship('Scan', back_populates='slices')
@@ -213,6 +223,13 @@ class Slice(Base):
         self.position_x = new_position.x
         self.position_y = new_position.y
         self.position_z = new_position.z
+        self.save()
+        return self
+
+    def update_size(self, height: int, width: int) -> 'Slice':
+        """Update height & width in the Slice."""
+        self.height = height
+        self.width = width
         self.save()
         return self
 
@@ -278,17 +295,15 @@ class LabelSelection(Base):
     slice_index: int = Column(Integer, nullable=False)
     shape_width: float = Column(Float, nullable=False)
     shape_height: float = Column(Float, nullable=False)
-    has_binary_mask: bool = Column(Boolean, nullable=False)
 
     label_id: LabelID = Column(String, ForeignKey('Labels.id'))
     label: Label = relationship('Label', back_populates='selections')
 
-    def __init__(self, position: LabelPosition, shape: LabelShape, has_binary_mask: bool = False) -> None:
+    def __init__(self, position: LabelPosition, shape: LabelShape) -> None:
         """Initialize Label Selection.
 
         :param position: position (x, y, slice_index) of the label
         :param shape: shape (width, height) of the label
-        :param has_binary_mask: boolean information if such Label Selection has binary mask or not
         """
         self.id = LabelSelectionID(str(uuid.uuid4()))
         self.position_x = position.x
@@ -296,9 +311,7 @@ class LabelSelection(Base):
         self.slice_index = position.slice_index
         self.shape_width = shape.width
         self.shape_height = shape.height
-        self.has_binary_mask = has_binary_mask
 
     def __repr__(self) -> str:
         """Return string representation for Label Selection."""
-        _has_binary_mask = 'WITH BINARY MASK' if self.has_binary_mask else 'WITHOUT BINARY MASK'
-        return '<{}: {}: {}>'.format(self.__class__.__name__, self.id, _has_binary_mask)
+        return '<{}: {}>'.format(self.__class__.__name__, self.id)

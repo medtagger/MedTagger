@@ -6,7 +6,6 @@ ScanID = NewType('ScanID', str)
 SliceID = NewType('SliceID', str)
 LabelID = NewType('LabelID', str)
 LabelSelectionID = NewType('LabelSelectionID', str)
-ScanMetadata = NamedTuple('ScanMetadata', [('scan_id', ScanID), ('number_of_slices', int)])
 
 SliceLocation = NewType('SliceLocation', float)
 SlicePosition = NamedTuple('SlicePosition', [('x', float), ('y', float), ('z', float)])

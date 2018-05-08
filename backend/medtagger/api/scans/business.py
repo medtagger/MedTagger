@@ -5,7 +5,7 @@ from typing import Iterable, Dict, List, Tuple
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api.exceptions import NotFoundException
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelSelectionBinaryMask, ScanMetadata, LabelingTime
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
@@ -61,17 +61,7 @@ def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan
     return ScansRepository.add_new_scan(category, declared_number_of_slices, user)
 
 
-def get_metadata(scan_id: ScanID) -> ScanMetadata:
-    """Fetch metadata for given scan.
-
-    :param scan_id: ID of a given scan
-    :return: Scan Metadata object
-    """
-    scan = ScansRepository.get_scan_by_id(scan_id)
-    return ScanMetadata(scan_id=scan.id, number_of_slices=scan.declared_number_of_slices)
-
-
-def get_random_scan(category_key: str) -> ScanMetadata:
+def get_random_scan(category_key: str) -> Scan:
     """Fetch random scan for labeling.
 
     :param category_key: unique key identifying category
@@ -79,11 +69,13 @@ def get_random_scan(category_key: str) -> ScanMetadata:
     """
     user = get_current_user()
     category = ScanCategoriesRepository.get_category_by_key(category_key)
-    scan = ScansRepository.get_random_scan(category, user)
-    if not scan:
+    try:
+        scan = ScansRepository.get_random_scan(category, user)
+        if not scan:
+            raise NotFoundException('Could not find any Scan for this category!')
+        return scan
+    except NoResultFound:
         raise NotFoundException('Could not find any Scan for this category!')
-
-    return ScanMetadata(scan_id=scan.id, number_of_slices=scan.declared_number_of_slices)
 
 
 def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
@@ -115,8 +107,7 @@ def add_label(scan_id: ScanID, selections: List[Dict], labeling_time: LabelingTi
     for selection in selections:
         position = LabelPosition(x=selection['x'], y=selection['y'], slice_index=selection['slice_index'])
         shape = LabelShape(width=selection['width'], height=selection['height'])
-        binary_mask = LabelSelectionBinaryMask(selection['binary_mask']) if selection.get('binary_mask') else None
-        LabelsRepository.add_new_label_selection(label.id, position, shape, binary_mask)
+        LabelsRepository.add_new_label_selection(label.id, position, shape)
     return label
 
 
@@ -140,14 +131,7 @@ def get_scan(scan_id: ScanID) -> Scan:
     :param scan_id: ID of a Scan which should be returned
     :return: Scan object
     """
-    return ScansRepository.get_scan_by_id(scan_id)
-
-
-def get_scan_metadata(scan_id: ScanID) -> ScanMetadata:
-    """Return ScanMetadata for given scan_id.
-
-    :param scan_id: ID of a Scan which should be returned
-    :return: Scan Metadata object
-    """
-    scan = ScansRepository.get_scan_by_id(scan_id)
-    return ScanMetadata(scan_id=scan.id, number_of_slices=scan.declared_number_of_slices)
+    try:
+        return ScansRepository.get_scan_by_id(scan_id)
+    except NoResultFound:
+        raise NotFoundException('Scan "{}" not found.'.format(scan_id))

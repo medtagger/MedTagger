@@ -7,25 +7,20 @@ services:
     command: --configFile=/var/traefik/traefik.toml
     ports:
       - 80:80
-      - 7128:8080
+      - 52000:8080
     volumes:
       - $PWD/traefik.toml:/var/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "traefik.enable=false"
 
-  hbase:
-    image: dajobe/hbase
+  cassandra:
+    image: cassandra
     restart: unless-stopped
     volumes:
-      - hbase-data:/data
+      - cassandra-data:/var/lib/cassandra
     ports:
-      - 8080:8080
-      - 8085:8085
-      - 9090:9090
-      - 9095:9095
-      - 2181:2181
-      - 16010:16010
+      - 9042:9042
     labels:
       - "traefik.enable=false"
 
@@ -35,12 +30,8 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq/mnesia
     ports:
-      - 4369:4369
-      - 5671:5671
       - 5672:5672
-      - 15671:15671
       - 15672:15672
-      - 25672:25672
     labels:
       - "traefik.enable=false"
 
@@ -84,16 +75,18 @@ services:
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
       - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
       - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__HBASE_HOST=hbase
-      - MEDTAGGER__HBASE_PORT=9090
-      - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=4
+      - MEDTAGGER__CASSANDRA_ADDRESSES=cassandra
+      - MEDTAGGER__CASSANDRA_PORT=9042
+      - MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: backend
       dockerfile: Dockerfile_rest
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
     depends_on:
-      - hbase
+      - cassandra
       - rabbitmq
       - postgres
       - medtagger_backend_websocket
@@ -114,16 +107,18 @@ services:
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
       - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
       - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__HBASE_HOST=hbase
-      - MEDTAGGER__HBASE_PORT=9090
-      - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=4
+      - MEDTAGGER__CASSANDRA_ADDRESSES=cassandra
+      - MEDTAGGER__CASSANDRA_PORT=9042
+      - MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: backend
       dockerfile: Dockerfile_websocket
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
     depends_on:
-      - hbase
+      - cassandra
       - rabbitmq
       - postgres
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_websocket_production"
@@ -144,16 +139,18 @@ services:
       - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
       - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
       - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__HBASE_HOST=hbase
-      - MEDTAGGER__HBASE_PORT=9090
-      - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=4
+      - MEDTAGGER__CASSANDRA_ADDRESSES=cassandra
+      - MEDTAGGER__CASSANDRA_PORT=9042
+      - MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
       - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
     build:
       context: backend
       dockerfile: Dockerfile_worker
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
     depends_on:
-      - hbase
+      - cassandra
       - rabbitmq
       - postgres
     command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_workers"
@@ -161,6 +158,6 @@ services:
       - "traefik.enable=false"
 
 volumes:
-  hbase-data:
+  cassandra-data:
   rabbitmq-data:
   postgres-data:

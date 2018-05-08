@@ -5,7 +5,7 @@ from tempfile import NamedTemporaryFile
 import SimpleITK as sitk
 from celery.utils.log import get_task_logger
 
-from medtagger.definitions import DicomTags, ScanStatus, SliceStatus
+from medtagger.definitions import DicomTags, SliceStatus
 from medtagger.types import ScanID, SliceID, SlicePosition, SliceLocation
 from medtagger.workers import celery_app
 from medtagger.workers.conversion import convert_scan_to_png
@@ -17,11 +17,11 @@ logger = get_task_logger(__name__)
 
 @celery_app.task
 def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
-    """Parse Dicom from HBase and update Slice for location and position.
+    """Parse DICOM from Storage and update Slice for location and position.
 
     :param slice_id: ID of a slice
     """
-    logger.debug('Parsing Dicom file from HBase for given Slice ID: %s.', slice_id)
+    logger.debug('Parsing DICOM file from Storage for given Slice ID: %s.', slice_id)
     _slice = SlicesRepository.get_slice_by_id(slice_id)
     image = SlicesRepository.get_slice_original_image(_slice.id)
 
@@ -41,10 +41,14 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
         position = SlicePosition(float(image_position_patient[0]),
                                  float(image_position_patient[1]),
                                  float(image_position_patient[2]))
+        height = int(reader.GetMetaData(DicomTags.ROWS.value))
+        width = int(reader.GetMetaData(DicomTags.COLUMNS.value))
+
     except RuntimeError:
         logger.error('User sent a file that is not a DICOM.')
         SlicesRepository.delete_slice_by_id(_slice.id)
         ScansRepository.reduce_number_of_declared_slices(_slice.scan_id)
+        os.unlink(temp_file.name)
         trigger_scan_conversion_if_needed(_slice.scan_id)
         return
 
@@ -53,18 +57,15 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
 
     _slice.update_location(location)
     _slice.update_position(position)
+    _slice.update_size(height, width)
     _slice.update_status(SliceStatus.STORED)
     logger.info('"%s" updated.', _slice)
 
-    # Run conversion to PNG if this is the latest uploaded Slice
     trigger_scan_conversion_if_needed(_slice.scan_id)
 
 
 def trigger_scan_conversion_if_needed(scan_id: ScanID) -> None:
-    """Run conversion if all Slices for given Scan were uploaded."""
-    scan = ScansRepository.get_scan_by_id(scan_id)
-    logger.debug('Stored %s Slices. Waiting for %s Slices.', len(scan.stored_slices), scan.declared_number_of_slices)
-    if scan.declared_number_of_slices == len(scan.stored_slices):
-        logger.debug('All Slices uploaded for %s! Running conversion...', scan)
-        scan.update_status(ScanStatus.STORED)
-        convert_scan_to_png.delay(scan.id)
+    """Mark Scan as STORED and trigger conversion to PNG if this is the latest uploaded Slice."""
+    if ScansRepository.try_to_mark_scan_as_stored(scan_id):
+        logger.debug('All Slices uploaded for Scan ID=%s! Running conversion...', scan_id)
+        convert_scan_to_png.delay(scan_id)
