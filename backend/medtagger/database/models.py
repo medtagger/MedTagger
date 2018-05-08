@@ -71,7 +71,8 @@ class UserSettings(Base):
     user_id: int = Column(Integer, ForeignKey('Users.id'), nullable=False)
     skip_tutorial: bool = Column(Boolean, nullable=False)
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initialize UserSettings."""
         self.skip_tutorial = False
 
 
