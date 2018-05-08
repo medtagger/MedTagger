@@ -11,6 +11,9 @@ then
     apt install -y python3-pip
 fi
 
+# Fix https://github.com/pypa/pip/issues/5367
+apt-get install -y python3-distutils
+
 echo "Applying environment variables..."
 cd /vagrant/backend
 . ./devenv.sh
