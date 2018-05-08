@@ -2,9 +2,14 @@ import {Injectable} from "@angular/core";
 import {environment} from "../../environments/environment";
 import {UserInfo} from "../model/UserInfo";
 import {HttpClient} from '@angular/common/http';
+import {UserSettings} from "../model/UserSettings";
 
 interface LogInResponse {
     token: string;
+}
+
+interface UserSettingsResponse {
+    skipTutorial: boolean;
 }
 
 interface UserInfoResponse {
@@ -13,7 +18,7 @@ interface UserInfoResponse {
     firstName: string;
     lastName: string;
     role: string;
-    skipTutorial: boolean;
+    settings: UserSettingsResponse;
 }
 
 @Injectable()
@@ -66,7 +71,8 @@ export class AccountService {
             this.http.get<UserInfoResponse>(url).toPromise()
                 .then(response => {
                     console.log("AccountService | getCurrentUserInfo | response: ", response);
-                    let userInfo = new UserInfo(response.id, response.email, response.firstName, response.lastName, response.role, response.skipTutorial);
+                    let userSettings = new UserSettings(response.settings.skipTutorial);
+                    let userInfo = new UserInfo(response.id, response.email, response.firstName, response.lastName, response.role, userSettings);
                     resolve(userInfo);
                 })
                 .catch(error => {

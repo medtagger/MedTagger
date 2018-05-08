@@ -2,7 +2,7 @@
 from typing import List, Optional
 
 from medtagger.database import db_session
-from medtagger.database.models import User
+from medtagger.database.models import User, UserSettings
 
 
 class UsersRepository(object):
@@ -45,8 +45,7 @@ class UsersRepository(object):
             session.add(user)
 
     @staticmethod
-    def set_skip_tutorial(user: User, skip_tutorial: bool) -> None:
+    def set_user_settings(settings: UserSettings) -> None:
         """If skip_tutorial is true, user should not see tutorial."""
         with db_session() as session:
-            user.skip_tutorial = skip_tutorial
-            session.add(user)
+            session.add(settings)

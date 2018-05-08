@@ -3,17 +3,17 @@
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Table, Enum
 from sqlalchemy.orm import relationship
 
-from medtagger.database import Base, db_session, db
+from medtagger.database import Base, db_session
 from medtagger.definitions import LabelStatus, ScanStatus, SliceStatus, SliceOrientation
 from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime
 
-users_roles = db.Table('Users_Roles', Base.metadata,
-                       Column('user_id', Integer, ForeignKey('Users.id')),
-                       Column('role_id', Integer, ForeignKey('Roles.id')))
+users_roles = Table('Users_Roles', Base.metadata,
+                    Column('user_id', Integer, ForeignKey('Users.id')),
+                    Column('role_id', Integer, ForeignKey('Roles.id')))
 
 
 class Role(Base):
@@ -38,9 +38,8 @@ class User(Base):
     first_name: str = Column(String(50), nullable=False)
     last_name: str = Column(String(50), nullable=False)
     active: bool = Column(Boolean, nullable=False)
-    skip_tutorial: bool = Column(Boolean, nullable=False)
-
-    roles: List[Role] = db.relationship('Role', secondary=users_roles)
+    roles: List[Role] = relationship('Role', secondary=users_roles)
+    settings = relationship('UserSettings', uselist=False)
 
     scans: List['Scan'] = relationship('Scan', back_populates='owner')
     labels: List['Label'] = relationship('Label', back_populates='owner')
@@ -52,7 +51,7 @@ class User(Base):
         self.first_name = first_name
         self.last_name = last_name
         self.active = False
-        self.skip_tutorial = False
+        self.settings = UserSettings()
 
     def __repr__(self) -> str:
         """Return string representation for User."""
@@ -62,6 +61,18 @@ class User(Base):
     def role(self) -> Role:
         """Return role for User."""
         return self.roles[0]
+
+
+class UserSettings(Base):
+    """Settings of user."""
+
+    __tablename__ = 'UserSettings'
+    id: int = Column(Integer, autoincrement=True, primary_key=True)
+    user_id: int = Column(Integer, ForeignKey('Users.id'), nullable=False)
+    skip_tutorial: bool = Column(Boolean, nullable=False)
+
+    def __init__(self):
+        self.skip_tutorial = False
 
 
 class ScanCategory(Base):

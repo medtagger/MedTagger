@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api import InvalidArgumentsException
-from medtagger.database.models import User
+from medtagger.database.models import User, UserSettings
 from medtagger.repositories.users import UsersRepository
 from medtagger.repositories.roles import RolesRepository
 
@@ -28,10 +28,9 @@ def set_user_info(user_id: int, firstName: str, lastName: str) -> None:
         raise InvalidArgumentsException('User with this id does not exist.')
 
 
-def set_skip_tutorial(user_id: int, skip_tutorial: bool) -> None:
+def set_user_settings(settings: UserSettings) -> None:
     """If skip_tutorial is true, user should not see tutorial."""
     try:
-        user = UsersRepository.get_user_by_id(user_id)
-        UsersRepository.set_skip_tutorial(user, skip_tutorial)
+        UsersRepository.set_user_settings(settings)
     except NoResultFound:
         raise InvalidArgumentsException('User with this id does not exist.')

@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {HttpClient} from '@angular/common/http';
 import {UserInfo} from "../model/UserInfo";
 import {environment} from "../../environments/environment";
+import {UserSettings} from "../model/UserSettings";
 
 interface AllUsersResponse {
     users: Array<UserInfo>;
@@ -20,7 +21,8 @@ export class UsersService {
                 .then(response => {
                     console.log("UsersService | getAllUsers | response: ", response);
                     let users = response.users.map((u: UserInfo) => {
-                        return new UserInfo(u.id, u.email, u.firstName, u.lastName, u.role, u.skipTutorial);
+                        let userSettings = new UserSettings(u.settings.skipTutorial);
+                        return new UserInfo(u.id, u.email, u.firstName, u.lastName, u.role, userSettings);
                     });
                     resolve(users);
                 })
@@ -70,22 +72,19 @@ export class UsersService {
       })
     }
 
-    public setSkipTutorial(userId: number, skipTutorial: boolean): Promise<void> {
-        let url = environment.API_URL + `/users/${userId}/skip-tutorial`;
-        let payload = {
-            skipTutorial: true
-        };
+    public setUserSettings(userId: number, settings: UserSettings): Promise<void> {
+        let url = environment.API_URL + `/users/${userId}/settings`;
         return new Promise<void>((resolve, reject) => {
-            this.http.post(url, payload)
+            this.http.post(url, settings)
                 .toPromise()
                 .then(response => {
-                    console.log("UserService | setSkipTutorial | response: ", response);
+                    console.log("UserService | setUserSettings | response: ", response);
                     resolve();
                 })
                 .catch(error => {
-                    console.log("UserService | setSkipTutorial | response: ", error);
+                    console.log("UserService | setUserSettings | response: ", error);
                     reject(error);
                 })
-        })
+        });
     }
 }

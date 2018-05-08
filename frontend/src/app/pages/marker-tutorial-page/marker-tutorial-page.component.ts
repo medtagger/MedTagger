@@ -82,10 +82,10 @@ export class MarkerTutorialPageComponent implements OnInit {
         this.fourthStepVideo.nativeElement.play();
     }
 
-    endTutorial() {
-        this.usersService.setSkipTutorial(this.user.id, true).then(() => {
-            this.user.skipTutorial = true;
-            sessionStorage.setItem('userInfo', JSON.stringify(this.user));
+    public endTutorial(): void {
+        this.user.settings.skipTutorial = true;
+        sessionStorage.setItem('userInfo', JSON.stringify(this.user));
+        this.usersService.setUserSettings(this.user.id, this.user.settings).then(() => {
             this.router.navigateByUrl("/labelling/choose-category");
         });
     }

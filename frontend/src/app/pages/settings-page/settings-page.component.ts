@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, forwardRef, OnInit} from '@angular/core';
 import {MatSnackBar} from '@angular/material';
-import {FormControl, Validators} from '@angular/forms';
+import {FormControl, NG_VALUE_ACCESSOR, Validators} from '@angular/forms';
 import {UserInfo} from '../../model/UserInfo';
 import {UsersService} from '../../services/users.service';
 
@@ -9,7 +9,7 @@ import {UsersService} from '../../services/users.service';
     selector: 'app-settings-page',
     templateUrl: './settings-page.component.html',
     styleUrls: ['./settings-page.component.scss'],
-    providers: [UsersService]
+    providers: [UsersService],
 })
 export class SettingsPageComponent implements OnInit {
 
@@ -18,6 +18,7 @@ export class SettingsPageComponent implements OnInit {
     userEmail = new FormControl('', [Validators.required, Validators.email]);
     userPassword = new FormControl('', [Validators.required]);
     userPasswordConfirmation = new FormControl('', [Validators.required]);
+    skipTutorial = new FormControl(false);
 
     public currentUser: UserInfo;
     private allUsers: Array<UserInfo>;
@@ -33,6 +34,7 @@ export class SettingsPageComponent implements OnInit {
         this.userFirstName.setValue(this.currentUser.firstName);
         this.userLastName.setValue(this.currentUser.lastName);
         this.userEmail.setValue(this.currentUser.email);
+        this.skipTutorial.setValue(this.currentUser.settings.skipTutorial);
     }
 
     private promoteToDoctor(user: UserInfo): void {
@@ -51,12 +53,15 @@ export class SettingsPageComponent implements OnInit {
         }
         this.usersService.setUserDetails(this.currentUser.id, this.userFirstName.value, this.userLastName.value)
             .then(() => {
-              this.currentUser.firstName = this.userFirstName.value;
-              this.currentUser.lastName = this.userLastName.value;
-              sessionStorage.setItem('userInfo', JSON.stringify(this.currentUser));
-              this.snackBar.open("User data has been updated.", "Dismiss", {
-                duration: 3000,
-              });
+                this.currentUser.settings.skipTutorial = this.skipTutorial.value;
+                this.currentUser.firstName = this.userFirstName.value;
+                this.currentUser.lastName = this.userLastName.value;
+                this.usersService.setUserSettings(this.currentUser.id, this.currentUser.settings).then(() => {
+                    sessionStorage.setItem('userInfo', JSON.stringify(this.currentUser));
+                    this.snackBar.open("User data has been updated.", "Dismiss", {
+                        duration: 3000,
+                    });
+                });
             });
     }
 
@@ -64,7 +69,8 @@ export class SettingsPageComponent implements OnInit {
       if(this.userFirstName.value == "" ||
          this.userLastName.value == "" ||
          this.userEmail.value == "" ||
-         (this.userFirstName.value == this.currentUser.firstName && this.userLastName.value == this.currentUser.lastName)) {
+         (this.userFirstName.value == this.currentUser.firstName && this.userLastName.value == this.currentUser.lastName &&
+          this.skipTutorial.value == this.currentUser.settings.skipTutorial)) {
         return false;
       }
       return true;
