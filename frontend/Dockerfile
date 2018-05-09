@@ -21,7 +21,7 @@ COPY . .
 ARG PRODUCTION
 ARG SUBDIRECTORY
 RUN MEDTAGGER__HOST_ON_SUBDIRECTORY=$SUBDIRECTORY make create_dynamic_environment_configuration
-RUN if [ "$PRODUCTION" = "true" ]; then $(npm bin)/ng build --prod --env=dynamic --base-href "$SUBDIRECTORY" --build-optimizer; else $(npm bin)/ng build --base-href "$SUBDIRECTORY" --env=dynamic; fi
+RUN if [ "$PRODUCTION" = "true" ]; then $(npm bin)/ng build --prod --configuration=dynamic --base-href "$SUBDIRECTORY" --build-optimizer; else $(npm bin)/ng build --base-href "$SUBDIRECTORY" --configuration=dynamic; fi
 
 
 ### STAGE 2: Setup ###
