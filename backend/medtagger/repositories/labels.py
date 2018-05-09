@@ -7,6 +7,7 @@ from medtagger.database import db_session
 from medtagger.database.models import Label, LabelTag, User, LabelVerificationStatus, RectangularLabelElement
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime
 
+
 class LabelsRepository(object):
     """Repository for Labels."""
 
@@ -18,9 +19,7 @@ class LabelsRepository(object):
     @staticmethod
     def get_label_by_id(label_id: LabelID) -> Label:
         """Fetch Label from database."""
-        with db_session() as session:
-            label = session.query(Label).filter(Label.id == label_id).one()
-        return label
+        return Label.query.filter(Label.id == label_id).one()
 
     @staticmethod
     def get_random_label(status: LabelVerificationStatus = None) -> Label:
@@ -29,13 +28,11 @@ class LabelsRepository(object):
         :param status: (optional) verification status for Label
         :return: Label object
         """
-        with db_session() as session:
-            query = session.query(Label)
-            if status:
-                query = query.filter(Label.status == status)
-            query = query.order_by(func.random())
-            label = query.first()
-        return label
+        query = Label.query
+        if status:
+            query = query.filter(Label.status == status)
+        query = query.order_by(func.random())
+        return query.first()
 
     @staticmethod
     def add_new_label(scan_id: ScanID, user: User, labeling_time: LabelingTime) -> Label:

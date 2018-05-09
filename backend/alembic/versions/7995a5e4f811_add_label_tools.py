@@ -34,7 +34,7 @@ def upgrade():
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_RectangularLabelElements'))
                     )
 
-    op.add_column('LabelElements', sa.Column('tool', label_tool_enum, server_default='RECTANGLE'))
+    op.add_column('LabelElements', sa.Column('tool', label_tool_enum, server_default='RECTANGLE', nullable=False))
 
     old_label_elements = table('LabelElements', column('id'), column('position_x'), column('position_y'),
                                column('shape_width'), column('shape_height'))

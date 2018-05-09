@@ -71,6 +71,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
 
     # Step 6. Label it
     tag = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', category_key)
+    print("Basic flow" + tag.key, dir(tag))
     payload = {
         'elements': [{
             'x': 0.5,
@@ -85,15 +86,18 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
+    print("Basic flow" + tag.key)
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     label_id = json_response['label_id']
     assert isinstance(label_id, str)
     assert len(label_id) >= 1
+    print("Basic flow" + tag.key)
 
     # Step 7. Get random label for validation
     response = api_client.get('/api/v1/labels/random', headers=get_headers(token=user_token))
+    print("Basic flow" + tag.key)
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -101,6 +105,8 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert json_response['labeling_time'] == 12.34
     assert json_response['status'] == LabelVerificationStatus.NOT_VERIFIED.value
     assert json_response['scan_id'] == scan_id
+    print(json_response['elements'])
+    print(tag.key)
     assert json_response['elements'] == [{
         'x': 0.5,
         'y': 0.5,

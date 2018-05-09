@@ -16,9 +16,7 @@ class LabelTagRepository(object):
     @staticmethod
     def get_label_tag_by_key(label_tag_key: str) -> LabelTag:
         """Fetch Label Tag from database."""
-        with db_session() as session:
-            tag = session.query(LabelTag).filter(LabelTag.key == label_tag_key).one()
-        return tag
+        return LabelTag.query.filter(LabelTag.key == label_tag_key).one()
 
     @staticmethod
     def add_new_tag(key: str, name: str) -> LabelTag:

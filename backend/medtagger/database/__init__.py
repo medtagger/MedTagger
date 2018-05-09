@@ -19,7 +19,9 @@ class MedTaggerBase(object):  # pylint: disable=too-few-public-methods
 
     def save(self) -> None:
         """Save the model into the database after changes."""
+        print(self)
         with db_session() as _session:
+            print(self)
             _session.add(self)
 
 

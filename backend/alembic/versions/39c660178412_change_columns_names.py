@@ -1,14 +1,14 @@
 """Change columns names of Rectangular Label Elements
 
 Revision ID: 39c660178412
-Revises: 67a86fa2531c
+Revises: 7995a5e4f811
 Create Date: 2018-05-06 19:12:02.135573
 
 """
 from alembic import op
 
 revision = '39c660178412'
-down_revision = '67a86fa2531c'
+down_revision = '7995a5e4f811'
 branch_labels = None
 depends_on = None
 
