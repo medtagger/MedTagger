@@ -42,19 +42,7 @@ CORS(app)
 app.secret_key = configuration.get('api', 'secret_key', fallback='')
 web_socket.init_app(app)
 
-
-try:
-    # This will raise ModuleNotFoundError if app was not run inside uWSGI server
-    from uwsgidecorators import postfork  # noqa
-
-    @postfork
-    def connect_to_cassandra() -> None:
-        """Create a single Session to Cassandra after fork to multiple processes by uWSGI."""
-        create_connection(use_gevent=True)
-except ModuleNotFoundError:
-    # It seems that application is not running inside uWSGI server, so let's initialize session
-    # in current process as it is highly probable that we are running in Flask's dev server
-    create_connection(use_gevent=True)
+create_connection(use_gevent=True)
 
 
 @app.teardown_appcontext
