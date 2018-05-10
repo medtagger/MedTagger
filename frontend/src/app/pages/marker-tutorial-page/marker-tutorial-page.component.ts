@@ -89,7 +89,7 @@ export class MarkerTutorialPageComponent implements OnInit {
 
         let settings: UserSettings = new UserSettings();
         settings.skipTutorial = true;
-        this.usersService.setUserSettings(this.user.id, settings ).then(() => {
+        this.usersService.setUserSettings(this.user.id, settings).then(() => {
             this.router.navigateByUrl("/labelling/choose-category");
         });
     }

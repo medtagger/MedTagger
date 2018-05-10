@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
-import {SocketIoModule, SocketIoConfig} from 'ng-socket-io';
+import {SocketIoModule} from 'ng-socket-io';
 
 import {AppComponent} from './app.component';
 import {LoginPageComponent} from '../pages/login-page/login-page.component';
@@ -22,28 +22,27 @@ import {UploadScansSelectorComponent} from '../components/upload-scans-selector/
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {
-  MatCardModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatStepperModule,
-  MatRadioModule,
-  MatSliderModule,
-  MatButtonModule,
-  MatIconModule,
-  MatFormFieldModule,
-  MatInputModule,
-  MatToolbarModule,
-  MatSidenavModule,
-  MatListModule,
-  MatGridListModule,
-  MatExpansionModule,
-  MatSnackBarModule,
-  MatSelectModule,
-  MatTooltipModule,
-  MatDialog,
-  MatDialogModule,
-  MatChipsModule,
-  MatCheckboxModule,
+    MatCardModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatStepperModule,
+    MatRadioModule,
+    MatSliderModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatListModule,
+    MatGridListModule,
+    MatExpansionModule,
+    MatSnackBarModule,
+    MatSelectModule,
+    MatTooltipModule,
+    MatDialog,
+    MatDialogModule,
+    MatChipsModule,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {routing} from "./app.routes";
@@ -51,7 +50,6 @@ import {AuthGuard} from "../guards/auth.guard";
 import {AccountService} from "../services/account.service";
 import {DialogService} from "../services/dialog.service";
 import {InfoDialog} from "../dialogs/info.dialog";
-import {environment} from '../../environments/environment';
 import {MedTaggerWebSocket} from "../services/websocket.service";
 
 
@@ -93,14 +91,13 @@ import {MedTaggerWebSocket} from "../services/websocket.service";
         BrowserAnimationsModule,
         FormsModule,
         ReactiveFormsModule,
-        SocketIoModule.forRoot(config),
+        SocketIoModule,
         ReactiveFormsModule,
         MatExpansionModule,
         MatSnackBarModule,
         MatSelectModule,
         HttpClientModule,
         MatChipsModule,
-        MatCheckboxModule,
     ],
     entryComponents: [
         InfoDialog

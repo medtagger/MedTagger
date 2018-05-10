@@ -71,9 +71,7 @@ export class AccountService {
             this.http.get<UserInfoResponse>(url).toPromise()
                 .then(response => {
                     console.log("AccountService | getCurrentUserInfo | response: ", response);
-                    let userSettings = new UserSettings();
-                    userSettings.skipTutorial = true;
-                    let userInfo = new UserInfo(response.id, response.email, response.firstName, response.lastName, response.role, userSettings);
+                    let userInfo = new UserInfo(response.id, response.email, response.firstName, response.lastName, response.role, response.settings);
                     resolve(userInfo);
                 })
                 .catch(error => {

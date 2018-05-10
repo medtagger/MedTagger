@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api import InvalidArgumentsException
-from medtagger.database.models import User, UserSettings
+from medtagger.database.models import User
 from medtagger.repositories.users import UsersRepository
 from medtagger.repositories.roles import RolesRepository
 
@@ -28,10 +28,6 @@ def set_user_info(user_id: int, firstName: str, lastName: str) -> None:
         raise InvalidArgumentsException('User with this id does not exist.')
 
 
-def set_user_settings_if_not_none(name: str, value: object) -> None:
-    """Set user's settings parameter of specified name to provided value if value is not None."""
-    try:
-        if value is not None:
-            UsersRepository.set_user_settings(name, object)
-    except NoResultFound:
-        raise InvalidArgumentsException('User with this id does not exist.')
+def set_user_settings(name: str, value: object) -> None:
+    """Set user's settings parameter of specified name to provided value."""
+    UsersRepository.set_user_settings(name, value)

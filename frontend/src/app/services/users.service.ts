@@ -21,9 +21,7 @@ export class UsersService {
                 .then(response => {
                     console.log("UsersService | getAllUsers | response: ", response);
                     let users = response.users.map((u: UserInfo) => {
-                        let userSettings = new UserSettings();
-                        userSettings.skipTutorial = u.settings.skipTutorial;
-                        return new UserInfo(u.id, u.email, u.firstName, u.lastName, u.role, userSettings);
+                        return new UserInfo(u.id, u.email, u.firstName, u.lastName, u.role, u.settings);
                     });
                     resolve(users);
                 })
@@ -76,6 +74,8 @@ export class UsersService {
     public setUserSettings(userId: number, settings: UserSettings): Promise<void> {
         let url = environment.API_URL + `/users/${userId}/settings`;
         return new Promise<void>((resolve, reject) => {
+            // properties with the undefined value will not be sent
+	    // only necessary properties of variable 'settings' should be specified
             this.http.post(url, settings)
                 .toPromise()
                 .then(response => {
