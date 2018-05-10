@@ -131,17 +131,23 @@ for label in LabelsRepository.get_all_labels():
         'labeling_time': label.labeling_time,
         'status': label.status.value,
         'owner_id': label.owner_id,
-        'elements': [{
-            'id': element.id,
-            'position_x': element.position_x,
-            'position_y': element.position_y,
-            'slice_index': element.slice_index,
-            'shape_width': element.shape_width,
-            'shape_height': element.shape_height,
-            'status': element.status.value,
-            'tag_id': element.tag_id,
-        } for element in label.elements],
     })
+    for element in label.elements:
+        if element.tool.value == LabelTool.RECTANGLE
+            print('Saving Rectangle Label Elements')
+            _labels['labels'].append({
+                'elements': {
+                    'id': element.id,
+                    'x': element.x,
+                    'y': element.y,
+                    'slice_index': element.slice_index,
+                    'width': element.width,
+                    'height': element.height,
+                    'status': element.status.value,
+                    'tag_id': element.tag_id,
+                    'tool': element.tool,
+                }
+            })
 print('\nSaving all Labels to file: {}'.format(LABELS_FILE))
 with open(LABELS_FILE, 'w') as json_file:
     json.dump(_labels, json_file)
