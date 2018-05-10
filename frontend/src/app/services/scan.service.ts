@@ -14,16 +14,12 @@ import {of} from "rxjs/internal/observable/of";
 import {from} from "rxjs/internal/observable/from";
 import {defer} from "rxjs/internal/observable/defer";
 
-interface RandomScanResponse {
+interface ScanResponse {
     scan_id: string;
     status: string;
     number_of_slices: number;
-}
-
-interface ScanForScanIDResponse {
-    scan_id: string;
-    status: string;
-    number_of_slices: number;
+    width: number;
+    height: number;
 }
 
 interface AvailableCategoryResponse {
@@ -62,15 +58,15 @@ export class ScanService {
 
     public getRandomScan(category: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
-            var params = new HttpParams();
-            params = params.set('category', category);
-            this.http.get<RandomScanResponse>(environment.API_URL + '/scans/random', {params: params})
+			let params = new HttpParams();
+			params = params.set('category', category);
+            this.http.get<ScanResponse>(environment.API_URL + '/scans/random', {params: params})
                 .subscribe(
-                    (response) => {
+                    (response: ScanResponse) => {
                         console.log('ScanService | getRandomScan | response: ', response);
-                        resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices));
+                        resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices, response.width, response.height));
                     },
-                    (error) => {
+                    (error: Error) => {
                         console.log('ScanService | getRandomScan | error: ', error);
                         reject(error);
                     },
@@ -82,12 +78,12 @@ export class ScanService {
 
     getScanForScanId(scanId: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
-            this.http.get<ScanForScanIDResponse>(environment.API_URL + '/scans/' + scanId).toPromise().then(
-                response => {
+            this.http.get<ScanResponse>(environment.API_URL + '/scans/' + scanId).toPromise().then(
+				(response: ScanResponse) => {
                     console.log('ScanService | getScanForScanId | response: ', response);
-                    resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices));
+                    resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices, response.width, response.height));
                 },
-                error => {
+				(error: Error) => {
                     console.log('ScanService | getScanForScanId | error: ', error);
                     reject(error);
                 }

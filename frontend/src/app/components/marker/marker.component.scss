@@ -9,8 +9,13 @@ $spinner-radius: 50px;
     user-select: none;
 }
 
+#markerWrapper {
+    height: 100%;
+}
+
 #markerBackgroundImage {
     max-width: $canvas-size;
+    max-height: $canvas-size;
     user-select: none;
     background-color: black;
     position: absolute;
@@ -34,7 +39,7 @@ $spinner-radius: 50px;
     top: $canvas-size;
 }
 
-// pretty neat workaround to always show slider thumb
+// pretty neat workaround to always show slider thumb and modified styles
 ::ng-deep {
     .mat-slider-thumb-label {
         transform: rotate(-45deg) !important;
@@ -47,6 +52,10 @@ $spinner-radius: 50px;
 
     .mat-slider-thumb-label-text {
         opacity: 1 !important;
+    }
+
+    .mat-slider-track-background {
+      background-color: whitesmoke !important;
     }
 }
 
