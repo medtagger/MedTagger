@@ -1,18 +1,18 @@
+import {throwError as observableThrowError, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
-import {Response} from '@angular/http';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 
-import {Socket} from 'ng-socket-io';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/toPromise';
-import {Observable} from 'rxjs/Observable';
 import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
 import {ScanSelection} from "../model/ScanSelection";
 import {SliceSelection} from "../model/SliceSelection";
-import {MedTaggerWebSocket} from "../services/websocket.service";
+import {MedTaggerWebSocket} from "./websocket.service";
+import {concat, delay, flatMap, map, mergeAll, retryWhen, take} from "rxjs/operators";
+import {of} from "rxjs/internal/observable/of";
+import {from} from "rxjs/internal/observable/from";
+import {defer} from "rxjs/internal/observable/defer";
 
 interface RandomScanResponse {
     scan_id: string;
@@ -115,9 +115,11 @@ export class ScanService {
     }
 
     slicesObservable(): Observable<MarkerSlice> {
-        return this.websocket.fromEvent<any>('slice').map((slice: { scan_id: string, index: number, image: ArrayBuffer }) => {
-            return new MarkerSlice(slice.scan_id, slice.index, slice.image);
-        });
+        return this.websocket.fromEvent<any>('slice').pipe(
+            map((slice: { scan_id: string, index: number, image: ArrayBuffer }) => {
+                return new MarkerSlice(slice.scan_id, slice.index, slice.image);
+            })
+        );
     }
 
     requestSlices(scanId: string, begin: number, count: number) {
@@ -131,47 +133,60 @@ export class ScanService {
                 category: category,
                 number_of_slices: numberOfSlices,
             };
-            var retryAttempt = 0;
+            let retryAttempt = 0;
             this.http.post<NewScanResponse>(environment.API_URL + '/scans/', payload)
-                .retryWhen((error: Observable<HttpErrorResponse>) => {
-                    return error.flatMap((error: HttpErrorResponse) => {
-                        console.warn('Retrying request for creating new Scan (attempt: ' + (++retryAttempt) + ').');
-                        return Observable.of(error.status).delay(5000);  // Let's give it a try after 5 seconds
+                .pipe(
+                    retryWhen((error: Observable<HttpErrorResponse>) => {
+                        return error.pipe(
+                            flatMap((error: HttpErrorResponse) => {
+                                console.warn('Retrying request for creating new Scan (attempt: ' + (++retryAttempt) + ').');
+                                return of(error.status).pipe(
+                                    delay(5000), // Let's give it a try after 5 seconds
+                                    take(5), // Let's give it 5 retrys (each after 5 seconds)
+                                    concat(observableThrowError({error: 'Cannot create new Scan.'}))
+                                );
+                            }),
+                        )
                     })
-                    .take(5)  // Let's give it 5 retrys (each after 5 seconds)
-                    .concat(Observable.throw({error: 'Cannot create new Scan.'}));
-                }).toPromise().then(
-                    (response: NewScanResponse) => {
-                        resolve(response.scan_id);
-                    },
-                    (error: HttpErrorResponse) => {
-                        reject(error);
-                    }
-                );
+                ).toPromise().then(
+                (response: NewScanResponse) => {
+                    resolve(response.scan_id);
+                },
+                (error: HttpErrorResponse) => {
+                    reject(error);
+                }
+            );
         });
     }
 
     uploadSlices(scanId: string, files: File[]) {
         let CONCURRENT_API_CALLS = 5;
 
-        return Observable.from(files)
-            .map((file) => {
+        return from(files).pipe(
+            map((file: File) => {
                 console.log('uploading...', file);
                 var retryAttempt = 0;
                 let form = new FormData();
                 form.append('image', file, file.name);
-                return Observable.defer(
+                return defer(
                     () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
-                        .retryWhen((error: Observable<HttpErrorResponse>) => {
-                            return error.flatMap((error: HttpErrorResponse) => {
-                                console.warn('Retrying request for uploading a single Slice (' + file.name + ', attempt: ' + (++retryAttempt) + ').');
-                                return Observable.of(error.status).delay(5000);  // Let's give it a try after 5 seconds
+                        .pipe(
+                            retryWhen((error: Observable<HttpErrorResponse>) => {
+                                return error.pipe(
+                                    flatMap((error: HttpErrorResponse) => {
+                                        console.warn('Retrying request for uploading a single Slice (' + file.name + ', attempt: ' + (++retryAttempt) + ').');
+                                        return of(error.status).pipe(
+                                            delay(5000),  // Let's give it a try after 5 seconds
+                                            take(5),  // Let's give it 5 retrys (each after 5 seconds)
+                                            concat(observableThrowError({error: 'Cannot upload Slice ' + file.name })) //TODO: use some new way of dealing with
+                                        );
+                                    })
+                                );
                             })
-                            .take(5)  // Let's give it 5 retrys (each after 5 seconds)
-                            .concat(Observable.throw({error: 'Cannot upload Slice ' + file.name }));
-                        })
+                        )
                 );
-            })
-            .mergeAll(CONCURRENT_API_CALLS);
+            }),
+            mergeAll(CONCURRENT_API_CALLS)
+        )
     }
 }

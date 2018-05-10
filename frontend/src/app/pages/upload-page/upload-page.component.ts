@@ -2,11 +2,13 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatHorizontalStepper, MatStep, MatSelectionList} from '@angular/material';
 import {FormBuilder, FormGroup, FormControl, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
-import {Observable} from 'rxjs/Rx';
 
 import {ScanService} from '../../services/scan.service';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {UploadScansSelectorComponent, SelectedScan, UserFiles, IncompatibleFile} from "../../components/upload-scans-selector/upload-scans-selector.component";
+import {Observable} from "rxjs/internal/Observable";
+import {interval} from "rxjs/internal/observable/interval";
+import {throwError} from "rxjs/internal/observable/throwError";
 
 
 enum UploadMode {
@@ -132,7 +134,7 @@ export class UploadPageComponent implements OnInit {
 
     private pollScanUploadStatus() {
         let TIME_INTERVAL = 5000; // 5 seconds
-        var subscription = Observable.interval(TIME_INTERVAL).subscribe(_ => {
+        var subscription = interval(TIME_INTERVAL).subscribe(_ => {
             // Iteration in reverse order makes it safe to remove elements from this array
             for (let i = this.uploadingAndProcessingScans.length - 1; i >= 0; i--) {
                 let scanToMonitor = this.uploadingAndProcessingScans[i];
@@ -229,17 +231,18 @@ export class UploadPageComponent implements OnInit {
         });
     }
 
-    private uploadSingleScan(uploadingScan: UploadingScan): Promise<Observable<Response | Error>> {
+    private uploadSingleScan(uploadingScan: UploadingScan): Promise<Observable<any | never>> {
         let category = this.chooseCategoryFormGroup.get('category').value;
         let numberOfSlices = uploadingScan.scan.files.length;
+
 
         return this.scanService.createNewScan(category, numberOfSlices).then((scanId: string) => {
             console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
             uploadingScan.id = scanId;
             return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
         },
-        _ => {
-            return Observable.throw({error: 'Could not create Scan.'});
+            () => {
+            return throwError({error: 'Could not create Scan.'});
         });
     }
 

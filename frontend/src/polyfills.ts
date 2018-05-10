@@ -70,3 +70,6 @@ import 'hammerjs';
  * Need to import at least one locale-data with intl.
  */
 // import 'intl/locale-data/jsonp/en';
+
+// Add global to window, assigning the value of window itself. (temp angular6+socket.io fix)
+(window as any).global = window;

@@ -8,7 +8,7 @@ import {
     HttpResponse,
     HttpUserEvent
 } from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 
 @Injectable()

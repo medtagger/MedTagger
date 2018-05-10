@@ -6,7 +6,6 @@ import {MarkerComponent} from '../../components/marker/marker.component';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
-import {Response} from '@angular/http';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {DialogService} from '../../services/dialog.service';

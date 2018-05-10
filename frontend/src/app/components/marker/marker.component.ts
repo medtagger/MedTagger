@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
 
