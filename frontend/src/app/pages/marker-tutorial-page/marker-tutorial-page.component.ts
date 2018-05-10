@@ -4,6 +4,7 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 import {Router} from "@angular/router";
 import {UsersService} from "../../services/users.service";
 import {UserInfo} from "../../model/UserInfo";
+import {UserSettings} from "../../model/UserSettings";
 
 
 @Component({
@@ -85,7 +86,10 @@ export class MarkerTutorialPageComponent implements OnInit {
     public endTutorial(): void {
         this.user.settings.skipTutorial = true;
         sessionStorage.setItem('userInfo', JSON.stringify(this.user));
-        this.usersService.setUserSettings(this.user.id, this.user.settings).then(() => {
+
+        let settings: UserSettings = new UserSettings();
+        settings.skipTutorial = true;
+        this.usersService.setUserSettings(this.user.id, settings ).then(() => {
             this.router.navigateByUrl("/labelling/choose-category");
         });
     }

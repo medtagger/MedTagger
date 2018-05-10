@@ -28,9 +28,10 @@ def set_user_info(user_id: int, firstName: str, lastName: str) -> None:
         raise InvalidArgumentsException('User with this id does not exist.')
 
 
-def set_user_settings(settings: UserSettings) -> None:
-    """If skip_tutorial is true, user should not see tutorial."""
+def set_user_settings_if_not_none(name: str, value: object) -> None:
+    """Set user's settings parameter of specified name to provided value if value is not None."""
     try:
-        UsersRepository.set_user_settings(settings)
+        if value is not None:
+            UsersRepository.set_user_settings(name, object)
     except NoResultFound:
         raise InvalidArgumentsException('User with this id does not exist.')

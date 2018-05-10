@@ -67,8 +67,7 @@ class UserSettings(Base):
     """Settings of user."""
 
     __tablename__ = 'UserSettings'
-    id: int = Column(Integer, autoincrement=True, primary_key=True)
-    user_id: int = Column(Integer, ForeignKey('Users.id'), nullable=False)
+    id: int = Column(Integer, ForeignKey('Users.id'), primary_key=True)
     skip_tutorial: bool = Column(Boolean, nullable=False)
 
     def __init__(self) -> None:

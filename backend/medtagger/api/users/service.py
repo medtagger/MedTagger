@@ -5,10 +5,12 @@ from flask import request
 from flask_restplus import Resource
 
 from medtagger.api import api
+from medtagger.api.exceptions import AccessForbiddenException
 from medtagger.api.users import serializers
-from medtagger.api.users.business import get_all_users, set_user_role, set_user_info, set_user_settings
+from medtagger.api.users.business import get_all_users, set_user_role, set_user_info, set_user_settings_if_not_none
 from medtagger.api.utils import get_current_user
 from medtagger.api.security import login_required, role_required
+
 
 users_ns = api.namespace('users', 'Users management')
 
@@ -68,9 +70,8 @@ class SetUserSettings(Resource):
         """Set current user's settings."""
         user = get_current_user()
         if user.id != user_id:
-            return {}, 403
-        user.settings.skip_tutorial = request.json['skipTutorial']
-        set_user_settings(user.settings)
+            raise AccessForbiddenException("Cannot update Settings for someone else.")
+        set_user_settings_if_not_none('skip_tutorial', request.json['skipTutorial'])
         return {}, 204
 
 
@@ -84,6 +85,6 @@ class SetUserInfo(Resource):
     def put(user_id: int) -> Any:
         """Set user info."""
         if get_current_user().id != user_id:
-            return {}, 403
+            raise AccessForbiddenException("Cannot update user's information for someone else.")
         set_user_info(user_id, request.json['firstName'], request.json['lastName'])
         return {}, 204

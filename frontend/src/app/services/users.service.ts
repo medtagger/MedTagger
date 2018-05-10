@@ -21,7 +21,8 @@ export class UsersService {
                 .then(response => {
                     console.log("UsersService | getAllUsers | response: ", response);
                     let users = response.users.map((u: UserInfo) => {
-                        let userSettings = new UserSettings(u.settings.skipTutorial);
+                        let userSettings = new UserSettings();
+                        userSettings.skipTutorial = u.settings.skipTutorial;
                         return new UserInfo(u.id, u.email, u.firstName, u.lastName, u.role, userSettings);
                     });
                     resolve(users);

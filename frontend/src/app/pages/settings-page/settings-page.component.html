@@ -27,7 +27,7 @@
                         <input matInput placeholder="E-mail" type="text" [formControl]="userEmail" required readonly>
                         <mat-error *ngIf="userEmail.invalid">{{getUserEmailErrorMessage()}}</mat-error>
                     </mat-form-field>
-                    <mat-checkbox [formControl]="skipTutorial">Skip tutorial</mat-checkbox>
+
                     <button mat-button color="primary" (click)="updateUserDetails()" [disabled]="!validateUserInput()">
                       Save
                     </button>
