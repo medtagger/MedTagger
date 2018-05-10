@@ -1,6 +1,6 @@
 import {Component, HostListener, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';

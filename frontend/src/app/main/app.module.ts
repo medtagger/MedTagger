@@ -1,7 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HttpModule} from '@angular/http';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import {SocketIoModule, SocketIoConfig} from 'ng-socket-io';
 
@@ -99,7 +98,6 @@ import {MedTaggerWebSocket} from "../services/websocket.service";
         MatExpansionModule,
         MatSnackBarModule,
         MatSelectModule,
-        HttpModule,
         HttpClientModule,
         MatChipsModule,
         MatCheckboxModule,
