@@ -1,6 +1,6 @@
 """Tests for user's settings."""
 import json
-from typing import Any
+from typing import Any, Dict
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.test_users import EXAMPLE_USER_EMAIL, EXAMPLE_USER_PASSWORD, EXAMPLE_USER_LAST_NAME, \
@@ -12,8 +12,8 @@ def test_do_not_show_tutorial_again(prepare_environment: Any) -> None:
     api_client = get_api_client()
 
     # Step 1. User creates an account
-    payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD,
-               'firstName': EXAMPLE_USER_FIRST_NAME, 'lastName': EXAMPLE_USER_LAST_NAME}
+    payload: Dict[str, Any] = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD,
+                               'firstName': EXAMPLE_USER_FIRST_NAME, 'lastName': EXAMPLE_USER_LAST_NAME}
     api_client.post('/api/v1/auth/register', data=json.dumps(payload), headers=get_headers(json=True))
 
     # Step 2. User logs in
