@@ -30,7 +30,7 @@ def test_do_not_show_tutorial_again(prepare_environment: Any) -> None:
     assert json_response['settings']['skipTutorial'] is False
 
     # Step 4. Set 'skipTutorial' parameter to True
-    payload = {'skipTutorial': 'true'}
+    payload = {'skipTutorial': True}
     response = api_client.post('/api/v1/users/' + str(user_id) + '/settings', data=json.dumps(payload),
                                headers=get_headers(json=True, token=user_token))
     assert response.status_code == 204
