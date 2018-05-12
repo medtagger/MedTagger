@@ -1,6 +1,6 @@
 import {Component, ViewChild, OnInit} from '@angular/core';
 import {MatHorizontalStepper} from '@angular/material';
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {Router} from "@angular/router";
 import {UsersService} from "../../services/users.service";
 import {UserInfo} from "../../model/UserInfo";
@@ -22,6 +22,8 @@ export class MarkerTutorialPageComponent implements OnInit {
 
     formGroup: FormGroup;
     @ViewChild('stepper') stepper: MatHorizontalStepper;
+
+    doNotShowAgain = new FormControl(true);
 
     private user: UserInfo;
 
@@ -84,13 +86,17 @@ export class MarkerTutorialPageComponent implements OnInit {
     }
 
     public endTutorial(): void {
-        this.user.settings.skipTutorial = true;
-        sessionStorage.setItem('userInfo', JSON.stringify(this.user));
-
-        let settings: UserSettings = new UserSettings();
-        settings.skipTutorial = true;
-        this.usersService.setUserSettings(this.user.id, settings).then(() => {
+        if (this.doNotShowAgain.value) {
+            let settings = new UserSettings();
+            settings.skipTutorial = true;
+            this.usersService.setUserSettings(this.user.id, settings).then(() => {
+                this.user.settings.skipTutorial = true;
+                sessionStorage.setItem('userInfo', JSON.stringify(this.user));
+                this.router.navigateByUrl("/labelling/choose-category");
+            });
+        }
+        else {
             this.router.navigateByUrl("/labelling/choose-category");
-        });
+        }
     }
 }

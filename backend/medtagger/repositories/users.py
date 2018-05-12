@@ -1,7 +1,6 @@
 """Module responsible for definition of Users' Repository."""
 from typing import List, Optional
 
-from medtagger.api.utils import get_current_user
 from medtagger.database import db_session
 from medtagger.database.models import User
 
@@ -46,9 +45,8 @@ class UsersRepository(object):
             session.add(user)
 
     @staticmethod
-    def set_user_settings(name: str, value: object) -> None:
+    def set_user_settings(user: User, name: str, value: object) -> None:
         """Set user's settings parameter of specified name to provided value."""
         with db_session() as session:
-            settings = get_current_user().settings
-            setattr(settings, name, value)
-            session.add(settings)
+            setattr(user.settings, name, value)
+            session.add(user.settings)

@@ -26,6 +26,12 @@ def upgrade():
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_UserSettings'))
                     )
 
+    conn = op.get_bind()
+    conn.execute("""
+        INSERT INTO "UserSettings"(id, skip_tutorial)
+        SELECT id, false FROM "Users"
+    """)
+
 
 def downgrade():
     op.drop_table('UserSettings')
