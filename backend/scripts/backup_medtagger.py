@@ -3,13 +3,14 @@ import os
 import json
 from typing import Dict, List  # pylint: disable=unused-import
 
-from medtagger.repositories.label_tag import LabelTagRepository
+from backend.medtagger.database.models import LabelTool
 from medtagger.repositories.roles import RolesRepository
 from medtagger.repositories.users import UsersRepository
 from medtagger.repositories.scans import ScansRepository
-from medtagger.repositories.scan_categories import ScanCategoriesRepository
 from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.labels import LabelsRepository
+from medtagger.repositories.label_tag import LabelTagRepository
+from medtagger.repositories.scan_categories import ScanCategoriesRepository
 
 BACKUP_DIRECTORY = 'medtagger_backup/'
 SCANS_DIRECTORY = BACKUP_DIRECTORY + 'dicoms/'
@@ -133,7 +134,7 @@ for label in LabelsRepository.get_all_labels():
         'owner_id': label.owner_id,
     })
     for element in label.elements:
-        if element.tool.value == LabelTool.RECTANGLE
+        if element.tool.value == LabelTool.RECTANGLE:
             print('Saving Rectangle Label Elements')
             _labels['labels'].append({
                 'elements': {
