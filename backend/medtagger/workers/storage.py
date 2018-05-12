@@ -39,7 +39,7 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
 
         location = SliceLocation(read_float(reader, DicomTag.SLICE_LOCATION, default=0.0))
         position = SlicePosition(*list(map(float, read_list(reader, DicomTag.IMAGE_POSITION_PATIENT,
-                                                            default=[0., 0., 0.]))))
+                                                            default=[0.0, 0.0, 0.0]))))
         height = read_int(reader, DicomTag.ROWS)
         width = read_int(reader, DicomTag.COLUMNS)
 

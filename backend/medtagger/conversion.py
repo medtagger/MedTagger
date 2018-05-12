@@ -31,7 +31,7 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[sitk.Image], output_
     """
     dicom_files = sorted(dicom_files, key=lambda _slice: read_float(_slice, DicomTag.SLICE_LOCATION), reverse=True)
     thickness = _get_scan_slice_thickness(dicom_files)
-    spacing = read_float(dicom_files[0], DicomTag.PIXEL_SPACING)
+    spacing = float(read_list(dicom_files[0], DicomTag.PIXEL_SPACING)[0])
 
     # Read all Dicom images and retrieve pixel values for each slice
     pixel_array = np.array(np.stack(sitk.GetArrayFromImage(_slice)[0] for _slice in dicom_files))
@@ -56,8 +56,8 @@ def _get_scan_slice_thickness(dicom_files: List[Any]) -> float:
     :return: float value with Scan's Slice thickness
     """
     try:
-        first_location = read_float(dicom_files[0], DicomTag.SLICE_LOCATION, default=0.)
-        second_location = read_float(dicom_files[1], DicomTag.SLICE_LOCATION, default=0.)
+        first_location = read_float(dicom_files[0], DicomTag.SLICE_LOCATION, default=0.0)
+        second_location = read_float(dicom_files[1], DicomTag.SLICE_LOCATION, default=0.0)
         return abs(second_location - first_location)
     except IndexError:
         return 1.0  # It seems that there is only one Slice. Thickness >=1.0 will be fine for all of the computations.
