@@ -6,7 +6,7 @@ import SimpleITK as sitk
 from scipy import ndimage
 
 from medtagger.definitions import DicomTag
-from medtagger.dicoms import read_float
+from medtagger.dicoms import read_float, read_list
 
 
 def convert_slice_to_normalized_8bit_array(dicom_file: sitk.Image) -> np.ndarray:
