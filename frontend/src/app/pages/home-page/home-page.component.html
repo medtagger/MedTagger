@@ -1,6 +1,6 @@
 <div class="menu">
     <div class="button-row">
-        <button mat-fab routerLink="/labelling/tutorial">
+        <button mat-fab routerLink="{{ user.settings.skipTutorial ? '/labelling/choose-category' : '/labelling/tutorial' }}">
             <mat-icon>label_outline</mat-icon>
             <div>Labelling</div>
         </button>

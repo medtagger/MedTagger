@@ -43,3 +43,10 @@ class UsersRepository(object):
             user.first_name = firstName
             user.last_name = lastName
             session.add(user)
+
+    @staticmethod
+    def set_user_settings(user: User, name: str, value: object) -> None:
+        """Set user's settings parameter of specified name to provided value."""
+        with db_session() as session:
+            setattr(user.settings, name, value)
+            session.add(user.settings)

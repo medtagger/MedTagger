@@ -8,7 +8,7 @@ from flask_restplus import Api
 from flask_socketio import SocketIO, emit
 
 from medtagger.api.exceptions import UnauthorizedException, InvalidArgumentsException, NotFoundException, \
-    BusinessLogicException
+    BusinessLogicException, AccessForbiddenException
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +83,18 @@ def rest_invalid_arguments_error_handler(exception: Exception) -> Tuple[Dict, in
     logger.warning(traceback.format_exc())
     details = str(exception)
     return {'message': 'Invalid arguments.', 'details': details}, 400
+
+
+@api.errorhandler(AccessForbiddenException)
+def rest_access_forbidden_error_handel(exception: Exception) -> Tuple[Dict, int]:
+    """Handle access forbidden errors.
+
+    :param exception: Python Exception
+    :return: tuple with response and status code
+    """
+    logger.warning(traceback.format_exc())
+    details = str(exception)
+    return {'message': 'Access forbidden', 'details': details}, 403
 
 
 @web_socket.on_error_default

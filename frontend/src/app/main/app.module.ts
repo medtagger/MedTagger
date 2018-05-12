@@ -43,6 +43,7 @@ import {
     MatDialog,
     MatDialogModule,
     MatChipsModule,
+    MatCheckboxModule,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {routing} from "./app.routes";
@@ -98,6 +99,7 @@ import {MedTaggerWebSocket} from "../services/websocket.service";
         MatSelectModule,
         HttpClientModule,
         MatChipsModule,
+        MatCheckboxModule,
     ],
     entryComponents: [
         InfoDialog

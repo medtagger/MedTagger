@@ -40,7 +40,7 @@ class User(Base):
     active: bool = Column(Boolean, nullable=False)
 
     roles: List[Role] = relationship('Role', secondary=users_roles)
-
+    settings = relationship('UserSettings', uselist=False)
     scans: List['Scan'] = relationship('Scan', back_populates='owner')
     labels: List['Label'] = relationship('Label', back_populates='owner')
 
@@ -51,6 +51,7 @@ class User(Base):
         self.first_name = first_name
         self.last_name = last_name
         self.active = False
+        self.settings = UserSettings()
 
     def __repr__(self) -> str:
         """Return string representation for User."""
@@ -60,6 +61,18 @@ class User(Base):
     def role(self) -> Role:
         """Return role for User."""
         return self.roles[0]
+
+
+class UserSettings(Base):
+    """Settings of user."""
+
+    __tablename__ = 'UserSettings'
+    id: int = Column(Integer, ForeignKey('Users.id'), primary_key=True)
+    skip_tutorial: bool = Column(Boolean, nullable=False)
+
+    def __init__(self) -> None:
+        """Initialize UserSettings."""
+        self.skip_tutorial = False
 
 
 class ScanCategory(Base):
