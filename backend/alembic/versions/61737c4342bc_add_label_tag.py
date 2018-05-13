@@ -4,7 +4,7 @@ Add label tag table. Changed LabelSelection to Label Elements with two additiona
 and element status (label_element_status_enum). Changed Label state type to new enum (label_verification_status_enum).
 
 Revision ID: 61737c4342bc
-Revises: 729cd1e8cde1
+Revises: 6d69756a1476
 Create Date: 2018-04-28 14:29:43.351037
 
 """
@@ -14,7 +14,7 @@ from sqlalchemy import table, column
 from sqlalchemy.dialects.postgresql import ENUM
 
 revision = '61737c4342bc'
-down_revision = '729cd1e8cde1'
+down_revision = '6d69756a1476'
 branch_labels = None
 depends_on = None
 
