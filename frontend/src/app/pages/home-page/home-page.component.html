@@ -8,7 +8,7 @@
             <mat-icon>add</mat-icon>
             <div>Upload new Scans</div>
         </button>
-        <button mat-fab routerLink="/validation" *ngIf="user.role !== 'volunteer'">
+        <button mat-fab (click)="indicateValidationPageIsUnavailable()" *ngIf="user.role !== 'volunteer'">
             <mat-icon>assignment_turned_in</mat-icon>
             <div>Validation</div>
         </button>

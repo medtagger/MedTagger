@@ -21,6 +21,9 @@ PYLINT_UNIT_TESTS_CONFIG_FILE = .test.pylintrc
 #
 
 venv:
+	# Disable Cassandra Driver tweaks - not needed in development setup
+	export CASS_DRIVER_NO_CYTHON=1
+	export CASS_DRIVER_NO_EXTENSIONS=1
 	virtualenv -p $(PYTHON) venv
 	venv/bin/pip install -r requirements.txt
 	venv/bin/pip install -r requirements.dev.txt

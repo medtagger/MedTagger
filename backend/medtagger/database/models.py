@@ -7,9 +7,10 @@ from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Tabl
 from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session
-from medtagger.definitions import LabelStatus, ScanStatus, SliceStatus, SliceOrientation
-from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
-    LabelPosition, LabelShape, LabelingTime
+from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
+    LabelElementStatus, LabelTool
+from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, LabelPosition, \
+    LabelShape, LabelingTime, LabelTagID
 
 users_roles = Table('Users_Roles', Base.metadata,
                     Column('user_id', Integer, ForeignKey('Users.id')),
@@ -83,6 +84,8 @@ class ScanCategory(Base):
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
     image_path: str = Column(String(100), nullable=False)
+
+    available_tags: List['LabelTag'] = relationship("LabelTag", back_populates="scan_category")
 
     def __init__(self, key: str, name: str, image_path: str) -> None:
         """Initialize Scan Category.
@@ -250,13 +253,16 @@ class Label(Base):
     id: LabelID = Column(String, primary_key=True)
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     labeling_time: LabelingTime = Column(Float, nullable=True)
-    status: LabelStatus = Column(Enum(LabelStatus), nullable=False, server_default=LabelStatus.NOT_VERIFIED.value)
 
     scan: Scan = relationship('Scan', back_populates='labels')
-    selections: 'LabelSelection' = relationship('LabelSelection', back_populates='label')
+
+    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label')
 
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
     owner: User = relationship('User', back_populates='labels')
+
+    status: LabelVerificationStatus = Column(Enum(LabelVerificationStatus), nullable=False,
+                                             server_default=LabelVerificationStatus.NOT_VERIFIED.value)
 
     def __init__(self, user: User, labeling_time: LabelingTime) -> None:
         """Initialize Label.
@@ -264,17 +270,17 @@ class Label(Base):
         By default all of the labels are not verified
         """
         self.id = LabelID(str(uuid.uuid4()))
-        self.status = LabelStatus.NOT_VERIFIED
         self.owner = user
         self.labeling_time = labeling_time
+        self.status = LabelVerificationStatus.NOT_VERIFIED
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
-        return '<{}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.status,
-                                              self.labeling_time, self.owner)
+        return '<{}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id,
+                                           self.labeling_time, self.owner)
 
-    def update_status(self, status: LabelStatus) -> 'Label':
-        """Update Label's status.
+    def update_status(self, status: LabelVerificationStatus) -> 'Label':
+        """Update Label's verification status.
 
         :param status: new status for this Label
         :return: Label object
@@ -284,33 +290,108 @@ class Label(Base):
         return self
 
 
-class LabelSelection(Base):
-    """Definition of a selection for Label."""
+class LabelTag(Base):
+    """Definition of tag for label."""
 
-    __tablename__ = 'LabelSelections'
-    id: LabelSelectionID = Column(String, primary_key=True)
-    position_x: float = Column(Float, nullable=False)
-    position_y: float = Column(Float, nullable=False)
+    __tablename__ = 'LabelTags'
+    id: LabelTagID = Column(Integer, autoincrement=True, primary_key=True)
+    key: str = Column(String(50), nullable=False, unique=True)
+    name: str = Column(String(100), nullable=False)
+
+    scan_category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
+    scan_category: ScanCategory = relationship('ScanCategory', back_populates="available_tags")
+
+    def __init__(self, key: str, name: str) -> None:
+        """Initialize Label Tag.
+
+        :param key: unique key representing Label Tag
+        :param name: name which describes this Label Tag
+        """
+        self.key = key
+        self.name = name
+
+    def __repr__(self) -> str:
+        """Return string representation for Label Tag."""
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
+
+
+class LabelElement(Base):
+    """Definition of high level Label Element."""
+
+    __tablename__ = 'LabelElements'
+    id: LabelElementID = Column(String, primary_key=True)
+
     slice_index: int = Column(Integer, nullable=False)
-    shape_width: float = Column(Float, nullable=False)
-    shape_height: float = Column(Float, nullable=False)
 
     label_id: LabelID = Column(String, ForeignKey('Labels.id'))
-    label: Label = relationship('Label', back_populates='selections')
+    label: Label = relationship('Label', back_populates='elements')
 
-    def __init__(self, position: LabelPosition, shape: LabelShape) -> None:
-        """Initialize Label Selection.
+    tag_id: LabelTagID = Column(Integer, ForeignKey('LabelTags.id'))
+    tag: LabelTag = relationship('LabelTag')
+
+    status: LabelElementStatus = Column(Enum(LabelElementStatus), nullable=False,
+                                        server_default=LabelElementStatus.NOT_VERIFIED.value)
+
+    tool: LabelTool = Column(Enum(LabelTool), nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'LabelElement',
+        'polymorphic_on': tool,
+    }
+
+    def __init__(self, tag: LabelTag) -> None:
+        """Initialize Label Element.
+
+        :param tag: tag of the label
+        """
+        self.id = LabelElementID(str(uuid.uuid4()))
+        self.tag_id = tag.id
+        self.status = LabelElementStatus.NOT_VERIFIED
+
+    def __repr__(self) -> str:
+        """Return string representation for Label Element."""
+        return '<{}: {}>'.format(self.__class__.__name__, self.id)
+
+    def update_status(self, status: LabelElementStatus) -> 'LabelElement':
+        """Update Label's element status.
+
+        :param status: new status for this Label Element
+        :return: Label Element object
+        """
+        self.status = status
+        self.save()
+        return self
+
+
+class RectangularLabelElement(LabelElement):
+    """Definition of a Label Element made with Rectangle Tool."""
+
+    __tablename__ = 'RectangularLabelElements'
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+
+    x: float = Column(Float, nullable=False)
+    y: float = Column(Float, nullable=False)
+    width: float = Column(Float, nullable=False)
+    height: float = Column(Float, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': LabelTool.RECTANGLE,
+    }
+
+    def __init__(self, position: LabelPosition, shape: LabelShape, tag: LabelTag) -> None:
+        """Initialize LabelElement.
 
         :param position: position (x, y, slice_index) of the label
         :param shape: shape (width, height) of the label
+        :param tag: tag of the label
         """
-        self.id = LabelSelectionID(str(uuid.uuid4()))
-        self.position_x = position.x
-        self.position_y = position.y
+        super(RectangularLabelElement, self).__init__(tag)
+        self.x = position.x
+        self.y = position.y
         self.slice_index = position.slice_index
-        self.shape_width = shape.width
-        self.shape_height = shape.height
+        self.width = shape.width
+        self.height = shape.height
 
     def __repr__(self) -> str:
-        """Return string representation for Label Selection."""
+        """Return string representation for  Rectangular Label Element."""
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
