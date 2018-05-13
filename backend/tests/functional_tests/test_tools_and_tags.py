@@ -4,7 +4,7 @@ from typing import Any
 
 from flask import json
 
-from medtagger.database.models import LabelTool
+from medtagger.definitions import LabelTool
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 

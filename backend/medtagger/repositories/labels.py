@@ -4,7 +4,8 @@ from typing import List
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import Label, LabelTag, User, LabelVerificationStatus, RectangularLabelElement
+from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement
+from medtagger.definitions import LabelVerificationStatus
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime
 
 

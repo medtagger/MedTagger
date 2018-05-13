@@ -2,7 +2,7 @@
 import json
 from typing import Any
 
-from medtagger.database.models import LabelVerificationStatus, LabelElementStatus, LabelTool
+from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
 from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 from tests.functional_tests.helpers import create_tag_and_assign_to_category

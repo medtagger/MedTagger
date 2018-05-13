@@ -1,5 +1,5 @@
 export interface ScanSelection<SliceSelection> {
-    _selections: SliceSelection[];
+    _elements: SliceSelection[];
 
     toJSON(): Object;
 }

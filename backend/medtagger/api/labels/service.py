@@ -5,7 +5,7 @@ from flask import request
 from flask_restplus import Resource
 
 from medtagger.types import LabelID
-from medtagger.database.models import LabelVerificationStatus
+from medtagger.definitions import LabelVerificationStatus
 from medtagger.api import api, InvalidArgumentsException, NotFoundException
 from medtagger.api.labels import business, serializers
 from medtagger.api.security import login_required, role_required

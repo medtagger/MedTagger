@@ -1,6 +1,5 @@
 """Module responsible for defining all of the relational database models."""
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
-import enum
 import uuid
 from typing import List, Optional
 
@@ -8,7 +7,8 @@ from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Tabl
 from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session
-from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation
+from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
+    LabelElementStatus, LabelTool
 from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, LabelPosition, \
     LabelShape, LabelingTime, LabelTagID
 
@@ -246,13 +246,6 @@ class Slice(Base):
         return self
 
 
-class LabelVerificationStatus(enum.Enum):
-    """Defines available verification status for Label."""
-
-    VERIFIED = 'VERIFIED'
-    NOT_VERIFIED = 'NOT_VERIFIED'
-
-
 class Label(Base):
     """Definition of a Label."""
 
@@ -320,20 +313,6 @@ class LabelTag(Base):
     def __repr__(self) -> str:
         """Return string representation for Label Tag."""
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
-
-
-class LabelElementStatus(enum.Enum):
-    """Defines available status for Label Element."""
-
-    VALID = 'VALID'
-    INVALID = 'INVALID'
-    NOT_VERIFIED = 'NOT_VERIFIED'
-
-
-class LabelTool(enum.Enum):
-    """Defines available Label Tools."""
-
-    RECTANGLE = 'RECTANGLE'
 
 
 class LabelElement(Base):

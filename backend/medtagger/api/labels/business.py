@@ -3,7 +3,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.types import LabelID
 from medtagger.api.exceptions import NotFoundException
-from medtagger.database.models import Label, LabelVerificationStatus
+from medtagger.database.models import Label
+from medtagger.definitions import LabelVerificationStatus
 from medtagger.repositories.labels import LabelsRepository
 
 

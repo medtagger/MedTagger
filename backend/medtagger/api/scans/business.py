@@ -8,7 +8,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.repositories.label_tag import LabelTagRepository
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID
-from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation, LabelTool
+from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
+from medtagger.definitions import LabelTool
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.scans import ScansRepository
@@ -130,7 +131,7 @@ def add_label_element(element: Dict[str, Any], label_id: LabelID) -> None:
             raise NotFoundException('Could not find any Label Tag for that key!')
         LabelsRepository.add_new_rectangular_label_element(label_id, position, shape, label_tag)
     else:
-        raise InvalidArgumentsException('Tool is not supported!')
+        raise InvalidArgumentsException('{} tool is not supported!'.format(tool))
 
 
 def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:

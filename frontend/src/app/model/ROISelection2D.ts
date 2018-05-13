@@ -7,6 +7,8 @@ export class ROISelection2D implements SliceSelection {
     _width: number;
     _height: number;
     sliceIndex: number;
+    label_tool: string;
+    label_tag: string;
 
     constructor(x: number, y: number, depth: number, width?: number, height?: number) {
         this._positionX = x;
@@ -14,6 +16,8 @@ export class ROISelection2D implements SliceSelection {
         this._width = width ? width : 0;
         this._height = height ? height : 0;
         this.sliceIndex = depth;
+        this.label_tag = 'LEFT_KIDNEY'; // TODO: Change these when introducing new marker page
+        this.label_tool = 'RECTANGLE';
     }
 
     public get positionX() {
@@ -66,7 +70,9 @@ export class ROISelection2D implements SliceSelection {
             this.normalize(correctPositionX, scalar),
             this.normalize(correctPositionY, scalar),
             this.normalize(correctWidth, scalar),
-            this.normalize(correctHeight, scalar)
+            this.normalize(correctHeight, scalar),
+            this.label_tag,
+            this.label_tool
         );
     }
 

@@ -1,4 +1,5 @@
 """Module responsible for storage of all definitions that may appear across whole project."""
+import enum
 from enum import Enum
 
 
@@ -46,3 +47,24 @@ class SliceStatus(Enum):
     NEW = 'NEW'
     STORED = 'STORED'
     PROCESSED = 'PROCESSED'
+
+
+class LabelVerificationStatus(enum.Enum):
+    """Defines available verification status for Label."""
+
+    VERIFIED = 'VERIFIED'
+    NOT_VERIFIED = 'NOT_VERIFIED'
+
+
+class LabelElementStatus(enum.Enum):
+    """Defines available status for Label Element."""
+
+    VALID = 'VALID'
+    INVALID = 'INVALID'
+    NOT_VERIFIED = 'NOT_VERIFIED'
+
+
+class LabelTool(enum.Enum):
+    """Defines available Label Tools."""
+
+    RECTANGLE = 'RECTANGLE'

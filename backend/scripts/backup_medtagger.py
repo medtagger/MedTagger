@@ -3,7 +3,7 @@ import os
 import json
 from typing import Dict, List  # pylint: disable=unused-import
 
-from backend.medtagger.database.models import LabelTool
+from medtagger.definitions import LabelTool
 from medtagger.repositories.roles import RolesRepository
 from medtagger.repositories.users import UsersRepository
 from medtagger.repositories.scans import ScansRepository

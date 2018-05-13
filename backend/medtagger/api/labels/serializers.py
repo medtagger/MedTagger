@@ -2,7 +2,8 @@
 from flask_restplus import fields
 
 from medtagger.api import api
-from medtagger.database.models import LabelVerificationStatus, RectangularLabelElement, LabelElementStatus, LabelTool
+from medtagger.database.models import RectangularLabelElement
+from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
 
 in__label_status = api.model("Status for label", {
     'status': fields.String(description='New status for label',
