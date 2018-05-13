@@ -124,7 +124,17 @@
                         </td>
                         <td>
                             <mat-card-actions>
-                                <button mat-raised-button color="primary" (click)="register()">Register</button>
+                                <button mat-raised-button color="primary"
+                                        *ngIf="!registrationInProgress"
+                                        [disabled]="userForm.invalid"
+                                        (click)="register()">
+                                    Register
+                                </button>
+                                <mat-progress-spinner class="register-spinner"
+                                                      mode="indeterminate"
+                                                      [diameter]="36"
+                                                      strokeWidth="2"
+                                                      *ngIf="registrationInProgress"></mat-progress-spinner>
                             </mat-card-actions>
                         </td>
                     </tr>
