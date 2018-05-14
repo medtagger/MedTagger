@@ -29,3 +29,9 @@ class InvalidArgumentsException(BaseHTTPException):
     """Exception designed to use with invalid arguments (400 status code)."""
 
     pass
+
+
+class AccessForbiddenException(BaseHTTPException):
+    """Exception designed to use while the user does not have a privilege to perform action."""
+
+    pass

@@ -2,12 +2,15 @@
 from typing import Any
 from flask import request
 from flask_restplus import Resource
+from jsonschema import validate, ValidationError, Draft4Validator
+from jsonschema.exceptions import best_match
 
 from medtagger.types import ScanID
 from medtagger.api import api
 from medtagger.api.exceptions import InvalidArgumentsException
 from medtagger.api.scans import business, serializers
 from medtagger.api.security import login_required, role_required
+from medtagger.api.scans.serializers import elements_schema
 
 scans_ns = api.namespace('scans', 'Methods related with scans')
 
@@ -42,7 +45,7 @@ class ScanCategories(Resource):
 
     @staticmethod
     @login_required
-    @scans_ns.marshal_with(serializers.inout__scan_category)
+    @scans_ns.marshal_with(serializers.out__scan_category)
     @scans_ns.doc(security='token')
     @scans_ns.doc(description='Returns all available scan categories.')
     @scans_ns.doc(responses={200: 'Success'})
@@ -53,13 +56,13 @@ class ScanCategories(Resource):
     @staticmethod
     @login_required
     @role_required('doctor', 'admin')
-    @scans_ns.expect(serializers.inout__scan_category)
-    @scans_ns.marshal_with(serializers.inout__scan_category)
+    @scans_ns.expect(serializers.in__scan_category)
+    @scans_ns.marshal_with(serializers.in__scan_category)
     @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Returns all available scan categories.')
+    @scans_ns.doc(description='Create new Scan Category.')
     @scans_ns.doc(responses={201: 'Success'})
     def post() -> Any:
-        """Create empty scan."""
+        """Create Scan Category."""
         payload = request.json
         key = payload['key']
         name = payload['name']
@@ -99,14 +102,22 @@ class Label(Resource):
     @scans_ns.marshal_with(serializers.out__label)
     @scans_ns.doc(security='token')
     @scans_ns.doc(description='Stores label and assigns it to given scan.')
-    @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan'})
+    @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan or tag'})
     def post(scan_id: ScanID) -> Any:
         """Save new label for given scan."""
         payload = request.json
-        selections = payload['selections']
+        elements = payload['elements']
+        try:
+            validate(elements, elements_schema)
+        except ValidationError:
+            validator = Draft4Validator(elements_schema)
+            errors = validator.iter_errors(elements)
+            best_error = best_match(errors)
+            raise InvalidArgumentsException(best_error.message)
+
         labeling_time = payload['labeling_time']
 
-        label = business.add_label(scan_id, selections, labeling_time)
+        label = business.add_label(scan_id, elements, labeling_time)
         return label, 201
 
 

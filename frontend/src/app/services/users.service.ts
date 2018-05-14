@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {HttpClient} from '@angular/common/http';
 import {UserInfo} from "../model/UserInfo";
 import {environment} from "../../environments/environment";
+import {UserSettings} from "../model/UserSettings";
 
 interface AllUsersResponse {
     users: Array<UserInfo>;
@@ -20,7 +21,7 @@ export class UsersService {
                 .then(response => {
                     console.log("UsersService | getAllUsers | response: ", response);
                     let users = response.users.map((u: UserInfo) => {
-                        return new UserInfo(u.id, u.email, u.firstName, u.lastName, u.role);
+                        return new UserInfo(u.id, u.email, u.firstName, u.lastName, u.role, u.settings);
                     });
                     resolve(users);
                 })
@@ -68,5 +69,23 @@ export class UsersService {
                 reject(error);
             })
       })
+    }
+
+    public setUserSettings(userId: number, settings: UserSettings): Promise<void> {
+        let url = environment.API_URL + `/users/${userId}/settings`;
+        return new Promise<void>((resolve, reject) => {
+            // properties with the undefined value will not be sent
+	    // only necessary properties of variable 'settings' should be specified
+            this.http.post(url, settings)
+                .toPromise()
+                .then(response => {
+                    console.log("UserService | setUserSettings | response: ", response);
+                    resolve();
+                })
+                .catch(error => {
+                    console.log("UserService | setUserSettings | response: ", error);
+                    reject(error);
+                })
+        });
     }
 }
