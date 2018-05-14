@@ -53,6 +53,9 @@ run_websocket_production:
 run_workers:
 	PYTHONPATH=`pwd` celery -A medtagger.workers worker --loglevel=info
 
+run_database_migrations:
+	PYTHONPATH=`pwd` alembic upgrade head
+
 #
 # Dependencies
 #
