@@ -11,8 +11,7 @@ matrix:
       env: BACKEND=linters_and_unit_tests
       script:
         - ./.travis/run_tests_if_subproject_changed.py backend --command="
-           docker-compose build medtagger_backend_rest medtagger_backend_websocket medtagger_backend_worker \
-           medtagger_backend_database_migrations &&
+           docker-compose build medtagger_backend_rest medtagger_backend_websocket medtagger_backend_worker medtagger_backend_database_migrations &&
            docker-compose run --no-deps medtagger_backend_rest /bin/bash -c \"make install_dev_packages && make test\""
 
     # Backend - functional tests
