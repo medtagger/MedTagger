@@ -91,7 +91,7 @@ services:
       - postgres
       - medtagger_backend_websocket
       - medtagger_backend_worker
-    command: bash -c "make run_rest_production"
+    command: bash -c "./scripts/wait_for_dependencies.sh && make run_rest_production"
     labels:
       - "traefik.backend=medtagger_backend_rest"
       - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}api/v1/,${MEDTAGGER__HOST_ON_SUBDIRECTORY}swaggerui/; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) /$$1"
@@ -121,7 +121,7 @@ services:
       - cassandra
       - rabbitmq
       - postgres
-    command: bash -c "make run_websocket_production"
+    command: bash -c "./scripts/wait_for_dependencies.sh && make run_websocket_production"
     labels:
       - "traefik.backend=medtagger_backend_websocket"
       - "traefik.backend.loadbalancer.stickiness=true"
@@ -153,7 +153,7 @@ services:
       - cassandra
       - rabbitmq
       - postgres
-    command: bash -c "make run_workers"
+    command: bash -c "./scripts/wait_for_dependencies.sh && make run_workers"
     labels:
       - "traefik.enable=false"
 
