@@ -5,7 +5,8 @@ from tempfile import NamedTemporaryFile
 import SimpleITK as sitk
 from celery.utils.log import get_task_logger
 
-from medtagger.definitions import DicomTags, SliceStatus
+from medtagger.definitions import DicomTag, SliceStatus
+from medtagger.dicoms import read_int, read_float, read_list
 from medtagger.types import ScanID, SliceID, SlicePosition, SliceLocation
 from medtagger.workers import celery_app
 from medtagger.workers.conversion import convert_scan_to_png
@@ -36,13 +37,11 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
         reader.SetFileName(temp_file.name)
         reader.ReadImageInformation()
 
-        location = SliceLocation(float(reader.GetMetaData(DicomTags.SLICE_LOCATION.value)))
-        image_position_patient = reader.GetMetaData(DicomTags.IMAGE_POSITION_PATIENT.value).split('\\')
-        position = SlicePosition(float(image_position_patient[0]),
-                                 float(image_position_patient[1]),
-                                 float(image_position_patient[2]))
-        height = int(reader.GetMetaData(DicomTags.ROWS.value))
-        width = int(reader.GetMetaData(DicomTags.COLUMNS.value))
+        location = SliceLocation(read_float(reader, DicomTag.SLICE_LOCATION, default=0.0))
+        position = SlicePosition(*list(map(float, read_list(reader, DicomTag.IMAGE_POSITION_PATIENT,
+                                                            default=[0.0, 0.0, 0.0]))))
+        height = read_int(reader, DicomTag.ROWS)
+        width = read_int(reader, DicomTag.COLUMNS)
 
     except RuntimeError:
         logger.error('User sent a file that is not a DICOM.')
