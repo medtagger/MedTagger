@@ -246,7 +246,8 @@ export class ScanViewerComponent implements OnInit {
 		this.currentImage.style.left = centerX + "px";
 		this.currentImage.style.top = centerY + "px";
 
-		this.canvas.style.left = centerX + "px";
-		this.canvas.style.top = centerX + "px";
+		//TODO: canvas must be moved not styled...
+		// this.canvas.x = centerX + "px";
+		// this.canvas.style.top = centerY + "px";
 	}
 }
