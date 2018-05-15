@@ -32,7 +32,7 @@ export abstract class SelectorBase<T extends SliceSelection> {
 	public clearCanvasSelection(): void {
 		console.log("RectROISelector | clearCanvasSelection");
 		this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
-		//this.drawPreviousSelections(); TODO: check if its needed here
+		//this.drawSelections(); TODO: check if its needed here
 	}
 
 	public addCurrentSelection(): void {
@@ -139,6 +139,21 @@ export abstract class SelectorBase<T extends SliceSelection> {
 			console.warn('RectROISelector | hideSelection | cannot hide non present selection!');
 		}
 	}
+
+	public normalizeByView(paramX: number, paramY: number): {x: number, y: number} {
+		return {
+			x: paramX / this.canvasSize.width,
+			y: paramY / this.canvasSize.height
+		}
+	}
+
+	public scaleToView(paramX: number, paramY: number): {x: number, y: number} {
+		return {
+			x: paramX * this.canvasSize.width,
+			y: paramY * this.canvasSize.height
+		}
+	}
+
 
 	abstract redrawSelections(): void;
 }

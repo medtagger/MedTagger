@@ -80,7 +80,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.selector.clearSelections();
         this.updateSelectionState();
 
-        this.selector.drawPreviousSelections();
+        this.selector.drawSelections();
 
         return coordinates;
     }
@@ -155,7 +155,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     private afterImageLoad(): void {
 		this.selector.clearCanvasSelection();
 
-		this.selector.drawPreviousSelections();
+		this.selector.drawSelections();
 		this.updateSelectionState();
 	}
 

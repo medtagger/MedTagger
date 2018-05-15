@@ -54,6 +54,7 @@ export class ScanViewerComponent implements OnInit {
 	onResize(event) {
 		this.resizeImageToCurrentWorkspace();
 		this.updateCanvasSize();
+		this.selector.drawSelections();
 	}
 
 	protected updateCanvasSize(): void {
@@ -156,7 +157,7 @@ export class ScanViewerComponent implements OnInit {
 		this.initializeCanvas();
 
 		this.initializeImage(() => {
-			this.selector.drawPreviousSelections();
+			this.selector.drawSelections();
 		});
 
 		this.setCanvasImage();

@@ -30,15 +30,14 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 
 	public formArchivedSelections(selectionMap: ROISelection2D[]): ROISelection2D[] {
 		selectionMap.forEach((selection: ROISelection2D) => {
-			selection.scaleToView(this.canvasSize.width, this.canvasSize.height);
 			this.drawSelection(selection, this.STYLE.ARCHIVED_SELECTION_COLOR);
 			console.log('RectROISelector | scaleToView selection: ', selection);
 		});
 		return selectionMap;
 	}
 
-	public drawPreviousSelections(): void {
-		console.log('RectROISelector | drawPreviousSelections | selection: ', this.selections);
+	public drawSelections(): void {
+		console.log('RectROISelector | drawSelections | selection: ', this.selections);
 		this.selections.forEach((selection: ROISelection2D) => {
 			let color: string;
 			let isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
@@ -47,11 +46,11 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 			} else {
 				color = this.STYLE.OTHER_SELECTION_COLOR;
 			}
-			if((selection.pinned || isCurrent) && (!selection.hidden)) {
+			if ((selection.pinned || isCurrent) && (!selection.hidden)) {
 				this.drawSelection(selection, color);
 			}
 		});
-		console.log('RectROISelector | drawPreviousSelections | archived: ', this.archivedSelections);
+		console.log('RectROISelector | drawSelections | archived: ', this.archivedSelections);
 		//TODO: decide whether to draw archived selections or not
 		// this.archivedSelections.forEach((selection: ROISelection2D) => {
 		// 	this.drawSelection(selection, this.STYLE.ARCHIVED_SELECTION_COLOR);
@@ -62,20 +61,28 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 		console.log('RectROISelector | drawSelection | selection: ', selection);
 		this.canvasCtx.strokeStyle = color;
 		this.canvasCtx.setLineDash(this.STYLE.SELECTION_LINE_DENSITY);
-		this.canvasCtx.strokeRect(selection.positionX, selection.positionY,
-			selection.width, selection.height);
+
+		let scaledStartPoint: { x: number, y: number } = this.scaleToView(selection.positionX, selection.positionY);
+
+		let scaledSelectionValues: { x: number, y: number } = this.scaleToView(selection.width, selection.height);
+
+		this.canvasCtx.strokeRect(scaledStartPoint.x, scaledStartPoint.y,
+			scaledSelectionValues.x, scaledSelectionValues.y);
 
 		const fontSize = this.STYLE.SELECTION_FONT_SIZE;
 		this.canvasCtx.font = `${fontSize}px Arial`;
 		this.canvasCtx.fillStyle = color;
-		this.canvasCtx.fillText(selection.sliceIndex.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
+		this.canvasCtx.fillText(selection.sliceIndex.toString(), scaledStartPoint.x + (fontSize / 4), scaledStartPoint.y + fontSize);
 	}
 
 	public onMouseDown(event: MouseEvent): void {
 		console.log('RectROISelector | startMouseSelection | event: ', event);
 		const selectionStartX = (event.clientX) - this.canvasPosition.left;
 		const selectionStartY = (event.clientY) - this.canvasPosition.top;
-		this.selectedArea = new ROISelection2D(selectionStartX, selectionStartY, this.currentSlice, this.canvasSize.width, this.canvasSize.height);
+
+		let normalizedPoint: { x: number, y: number } = this.normalizeByView(selectionStartX, selectionStartY);
+
+		this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice);
 		this.selections.delete(this.currentSlice);
 		this.mouseDrag = true;
 	}
@@ -95,11 +102,16 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 		console.log('RectROISelector | updateSelection | event: ', event);
 
 		if (this.selectedArea) {
-			const newWidth = (event.clientX - this.canvasPosition.left) - this.selectedArea.positionX;
-			const newHeight = (event.clientY - this.canvasPosition.top) - this.selectedArea.positionY;
 
-			this.selectedArea.updateWidth(newWidth);
-			this.selectedArea.updateHeight(newHeight);
+			let scaledStartPoint: { x: number, y: number } = this.scaleToView(this.selectedArea.positionX, this.selectedArea.positionY);
+
+			const newWidth = (event.clientX - this.canvasPosition.left) - scaledStartPoint.x;
+			const newHeight = (event.clientY - this.canvasPosition.top) - scaledStartPoint.y;
+
+			let normalizedValues: { x: number, y: number } = this.normalizeByView(newWidth, newHeight);
+
+			this.selectedArea.updateWidth(normalizedValues.x);
+			this.selectedArea.updateHeight(normalizedValues.y);
 		}
 	}
 
@@ -123,6 +135,6 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 	public redrawSelections(): void {
 		this.clearCanvasSelection();
 
-		this.drawPreviousSelections();
+		this.drawSelections();
 	}
 }
