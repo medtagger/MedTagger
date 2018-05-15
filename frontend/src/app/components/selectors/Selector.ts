@@ -1,4 +1,5 @@
 import {EventEmitter} from "@angular/core";
+import {SelectionStateMessage} from "../../model/SelectionStateMessage";
 
 export interface Selector<SliceSelection> {
 
@@ -16,7 +17,7 @@ export interface Selector<SliceSelection> {
 
     clearData(): any;
 
-    getStateChangeEmitter(): EventEmitter<number>;
+    getStateChangeEmitter(): EventEmitter<SelectionStateMessage>;
 
     addCurrentSelection(): any;
 

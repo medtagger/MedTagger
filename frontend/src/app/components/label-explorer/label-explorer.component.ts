@@ -18,7 +18,8 @@ export class LabelExplorerComponent implements OnInit {
 	constructor() {
 	}
 
-	ngOnInit() {}
+	ngOnInit() {
+	}
 
 	public getLabelChangeEmitter(): EventEmitter<LabelListItem> {
 		return this.labelChange;
@@ -42,8 +43,28 @@ export class LabelExplorerComponent implements OnInit {
 		if (index > -1) {
 			this.labels.splice(index, 1);
 		}
+
 		label.toDelete = true;
 		this.emitLabelChange(label);
+	}
+
+	public removeLabel(sliceId: number, tagKey: string, tool: string): void {
+		let tag: LabelTag = this.tags.find((item: LabelTag) => item.key == tagKey && item.tools.includes(tool));
+
+		if (tag) {
+			let index = this.labels.findIndex(
+				(item: LabelListItem) =>
+					(item.sliceIndex == sliceId) &&
+					(item.tag == tag)
+			);
+			if (index > -1) {
+				this.labels.splice(index, 1);
+			} else {
+				console.warn(`LabelExplorerComponent | removeLabel: cannot find label for sliceId: ${sliceId} and tag: ${tag}`);
+			}
+		} else {
+			console.warn(`LabelExplorerComponent | removeLabel: cannot find tag for key: ${tagKey} and tool: ${tool}`);
+		}
 	}
 
 	//TODO: tagKey should be part of dict stored in backend (labelling context)
@@ -51,7 +72,7 @@ export class LabelExplorerComponent implements OnInit {
 	public addLabel(labelSlice: number, tagKey: string, tool: string): void {
 		let tag: LabelTag = this.getLabelTag(tagKey, tool);
 		let newItem: LabelListItem = new LabelListItem(labelSlice, tag);
-		if(!this.labels.find(label => label.sliceIndex == newItem.sliceIndex)) {
+		if (!this.labels.find(label => label.sliceIndex == newItem.sliceIndex)) {
 			this.labels.push(new LabelListItem(labelSlice, tag));
 		}
 	}

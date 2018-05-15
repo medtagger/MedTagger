@@ -57,6 +57,7 @@ export class ScanViewerComponent implements OnInit {
 	}
 
 	protected updateCanvasSize(): void {
+		console.log('ScanViewer | updateCanvasSize');
 		this.setCanvasWidth(this.currentImage.width);
 		this.setCanvasHeight(this.currentImage.height);
 	}
@@ -191,16 +192,11 @@ export class ScanViewerComponent implements OnInit {
 
 	protected initializeImage(afterImageLoad?: () => void): void {
 		this.currentImage.onload = (event: Event) => {
-			this.updateCanvasSize();
 			if (afterImageLoad) {
 				afterImageLoad();
 			}
+			this.updateCanvasSize();
 		};
-	}
-
-	@HostListener('window:resize', [])
-	protected updateCanvasPositionOnWindowResize(): void {
-		this.selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
 	}
 
 	protected changeMarkerImage(sliceID: number): void {
@@ -228,10 +224,15 @@ export class ScanViewerComponent implements OnInit {
 
 		let maxImageSize = Math.max(this.scanMetadata.width, this.scanMetadata.height);
 		let minCanvasSize = Math.min(this.canvasWorkspace.clientWidth, this.canvasWorkspace.clientHeight);
-		let ratioScalar = Math.ceil(minCanvasSize / maxImageSize);
+		let ratioScalar = (minCanvasSize / maxImageSize);
 
-		this.currentImage.width *= ratioScalar;
-		this.currentImage.height *= ratioScalar;
+		console.log('ScanViewer | resizeImageToCurrentWorkspace | ratioScalar: ', ratioScalar);
+
+		this.currentImage.style.maxWidth = (this.scanMetadata.width * ratioScalar) + 'px';
+		this.currentImage.style.maxHeight = (this.scanMetadata.height * ratioScalar) + 'px';
+
+		this.currentImage.width = this.scanMetadata.width * ratioScalar;
+		this.currentImage.height = this.scanMetadata.height * ratioScalar;
 
 		this.centerImageAndCanvas();
 	}
@@ -246,8 +247,9 @@ export class ScanViewerComponent implements OnInit {
 		this.currentImage.style.left = centerX + "px";
 		this.currentImage.style.top = centerY + "px";
 
-		//TODO: canvas must be moved not styled...
-		// this.canvas.x = centerX + "px";
-		// this.canvas.style.top = centerY + "px";
+		this.canvas.style.left = centerX + "px";
+		this.canvas.style.top = centerY + "px";
+
+		this.selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
 	}
 }

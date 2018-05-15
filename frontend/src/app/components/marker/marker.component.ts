@@ -6,6 +6,7 @@ import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
 import {LabelExplorerComponent} from "../label-explorer/label-explorer.component";
 import {LabelListItem} from "../../model/LabelListItem";
+import {SelectionStateMessage} from "../../model/SelectionStateMessage";
 
 @Component({
     selector: 'app-marker-component',
@@ -85,12 +86,17 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     private hookUpStateChangeSubscription(): void {
-        this.selector.getStateChangeEmitter().subscribe((addedSlice: number) => {
+        this.selector.getStateChangeEmitter().subscribe((selectionStateMessage: SelectionStateMessage) => {
             console.log('Marker | getStateChange event from selector!');
             this.updateSelectionState();
             if (this.labelExplorer) {
-				console.log('Marker | getStateChange adding new slice to label explorer, sliceId: ', addedSlice);
-            	this.labelExplorer.addLabel(addedSlice, this.currentTaggingContext, this.currentTool);
+            	if(selectionStateMessage.toDelete) {
+					console.log('Marker | getStateChange remove slice from label explorer, sliceId: ', selectionStateMessage.sliceId);
+					this.labelExplorer.removeLabel(selectionStateMessage.sliceId, this.currentTaggingContext, this.currentTool);
+				} else {
+					console.log('Marker | getStateChange adding new slice to label explorer, sliceId: ', selectionStateMessage.sliceId);
+					this.labelExplorer.addLabel(selectionStateMessage.sliceId, this.currentTaggingContext, this.currentTool);
+				}
 			}
         });
     }

@@ -12,7 +12,9 @@
                                (mouseenter)="label.hovered=true"
                                (mouseleave)="label.hovered=false">
                     <p matLine><mat-icon class="size-16px">crop</mat-icon> Slice #{{ label.sliceIndex }}</p>
-                    <button mat-icon-button *ngIf="label.hovered" (click)="deleteLabel(label)"><mat-icon class="size-16px">delete</mat-icon></button>
+                    <button mat-icon-button *ngIf="label.hovered" (click)="deleteLabel(label.sliceIndex)">
+                        <mat-icon class="size-16px">delete</mat-icon>
+                    </button>
                     <button mat-icon-button *ngIf="label.hovered || label.pinned" (click)="pinLabel(label, !label.pinned)">
                         <mat-icon *ngIf="!label.pinned" class="smaller-svg" svgIcon="pin-off"></mat-icon>
                         <mat-icon *ngIf="label.pinned" class="smaller-svg" svgIcon="pin"></mat-icon>

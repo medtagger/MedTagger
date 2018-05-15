@@ -3,6 +3,7 @@ import {Selector} from './Selector';
 import {EventEmitter} from "@angular/core";
 import {SelectorBase} from "./SelectorBase";
 import {SliceSelection} from "../../model/SliceSelection";
+import {SelectionStateMessage} from "../../model/SelectionStateMessage";
 
 export class RectROISelector extends SelectorBase<ROISelection2D> {
 	readonly STYLE = {
@@ -24,7 +25,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 		this.archivedSelections = [];
 		this.selectedArea = undefined;
 		this.currentSlice = undefined;
-		this.stateChange = new EventEmitter<number>();
+		this.stateChange = new EventEmitter<SelectionStateMessage>();
 	}
 
 	public formArchivedSelections(selectionMap: ROISelection2D[]): ROISelection2D[] {
@@ -83,7 +84,8 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 		if (this.mouseDrag && this.selectedArea) {
 			console.log('RectROISelector | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
 			this.updateSelection(mouseEvent);
-			this.clearCanvasSelection();
+
+			this.redrawSelections();
 
 			this.drawSelection(this.selectedArea, this.STYLE.CURRENT_SELECTION_COLOR);
 		}
@@ -111,6 +113,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 			if (this.checkSquareSelection()) {
 				this.addCurrentSelection();
 			} else {
+				this.stateChange.emit(new SelectionStateMessage(this.currentSlice, true));
 				this.clearSelectedArea();
 				this.clearCanvasSelection();
 			}

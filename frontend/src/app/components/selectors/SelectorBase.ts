@@ -1,5 +1,6 @@
 import {EventEmitter} from "@angular/core";
 import {SliceSelection} from "../../model/SliceSelection";
+import {SelectionStateMessage} from "../../model/SelectionStateMessage";
 
 export abstract class SelectorBase<T extends SliceSelection> {
 	selectedArea: T;
@@ -11,8 +12,8 @@ export abstract class SelectorBase<T extends SliceSelection> {
 	protected canvasPosition: ClientRect;
 	canvasSize: { width: number, height: number };
 
-	public stateChange: EventEmitter<number>;
-	public getStateChangeEmitter(): EventEmitter<number> {
+	public stateChange: EventEmitter<SelectionStateMessage>;
+	public getStateChangeEmitter(): EventEmitter<SelectionStateMessage> {
 		return this.stateChange;
 	}
 
@@ -24,7 +25,7 @@ export abstract class SelectorBase<T extends SliceSelection> {
 		this.selectedArea = undefined;
 		this.selections = new Map<number, T>();
 		this.archivedSelections = [];
-		this.stateChange = new EventEmitter<number>();
+		this.stateChange = new EventEmitter<SelectionStateMessage>();
 		this.clearCanvasSelection();
 	}
 
@@ -38,7 +39,7 @@ export abstract class SelectorBase<T extends SliceSelection> {
 		if (this.selectedArea) {
 			console.log("RectROISelector | addCurrentSelection");
 			this.selections.set(this.currentSlice, this.selectedArea);
-			this.stateChange.emit(this.currentSlice);
+			this.stateChange.emit(new SelectionStateMessage(this.currentSlice, false));
 			this.clearSelectedArea();
 		}
 	}
@@ -79,6 +80,7 @@ export abstract class SelectorBase<T extends SliceSelection> {
 	public removeCurrentSelection(): void {
 		if (this.hasSliceSelection()) {
 			this.selections.delete(this.currentSlice);
+
 			this.selectedArea = undefined;
 
 			this.clearCanvasSelection();
