@@ -146,6 +146,8 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
             this.requestSlicesIfNeeded(sliderValue);
             this.changeMarkerImage(sliderValue);
+
+            this.selector.drawSelections();
         });
 
         this.initCanvasSelectionTool();

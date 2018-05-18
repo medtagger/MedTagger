@@ -128,6 +128,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 				this.stateChange.emit(new SelectionStateMessage(this.currentSlice, true));
 				this.clearSelectedArea();
 				this.clearCanvasSelection();
+				this.redrawSelections();
 			}
 		}
 	}

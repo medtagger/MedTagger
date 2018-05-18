@@ -54,13 +54,13 @@ export class ScanViewerComponent implements OnInit {
 	onResize(event) {
 		this.resizeImageToCurrentWorkspace();
 		this.updateCanvasSize();
-		this.selector.drawSelections();
 	}
 
 	protected updateCanvasSize(): void {
 		console.log('ScanViewer | updateCanvasSize');
 		this.setCanvasWidth(this.currentImage.width);
 		this.setCanvasHeight(this.currentImage.height);
+        this.selector.drawSelections();
 	}
 
 	ngAfterViewInit() {
@@ -169,6 +169,8 @@ export class ScanViewerComponent implements OnInit {
 			this.requestSlicesIfNeeded(sliderValue);
 
 			this.changeMarkerImage(sliderValue);
+
+			this.selector.drawSelections();
 		});
 	}
 
@@ -220,8 +222,6 @@ export class ScanViewerComponent implements OnInit {
 	protected resizeImageToCurrentWorkspace(): void {
 		console.log("ScanViewer | resizeImageToCurrentWorkspace | scanMetadata (width, height): ", this.scanMetadata.width, this.scanMetadata.height);
 		console.log("ScanViewer | resizeImageToCurrentWorkspace | canvasWorkspace (client rect): ", this.canvasWorkspace.getClientRects());
-		this.currentImage.width = this.scanMetadata.width;
-		this.currentImage.height = this.scanMetadata.height;
 
 		let maxImageSize = Math.max(this.scanMetadata.width, this.scanMetadata.height);
 		let minCanvasSize = Math.min(this.canvasWorkspace.clientWidth, this.canvasWorkspace.clientHeight);

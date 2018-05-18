@@ -2,10 +2,10 @@ import {EventEmitter} from "@angular/core";
 import {SliceSelection} from "../../model/SliceSelection";
 import {SelectionStateMessage} from "../../model/SelectionStateMessage";
 
-export abstract class SelectorBase<T extends SliceSelection> {
-	selectedArea: T;
-	selections: Map<number, T>;
-	archivedSelections: Array<T>;
+export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> {
+	selectedArea: CustomSliceSelection;
+	selections: Map<number, CustomSliceSelection>;
+	archivedSelections: Array<CustomSliceSelection>;
 	canvasCtx: CanvasRenderingContext2D;
 	protected currentSlice;
 	protected mouseDrag = false;
@@ -17,13 +17,13 @@ export abstract class SelectorBase<T extends SliceSelection> {
 		return this.stateChange;
 	}
 
-	public getSelections(): T[] {
+	public getSelections(): CustomSliceSelection[] {
 		return Array.from(this.selections.values());
 	}
 
 	public clearData(): void {
 		this.selectedArea = undefined;
-		this.selections = new Map<number, T>();
+		this.selections = new Map<number, CustomSliceSelection>();
 		this.archivedSelections = [];
 		this.stateChange = new EventEmitter<SelectionStateMessage>();
 		this.clearCanvasSelection();
@@ -32,7 +32,6 @@ export abstract class SelectorBase<T extends SliceSelection> {
 	public clearCanvasSelection(): void {
 		console.log("RectROISelector | clearCanvasSelection");
 		this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
-		//this.drawSelections(); TODO: check if its needed here
 	}
 
 	public addCurrentSelection(): void {
@@ -68,11 +67,11 @@ export abstract class SelectorBase<T extends SliceSelection> {
 		return !!this.selections.get(this.currentSlice) || !!this.selectedArea;
 	}
 
-	public archiveSelections(selectionMap?: Array<T>): void {
+	public archiveSelections(selectionMap?: Array<CustomSliceSelection>): void {
 		if (!selectionMap) {
 			selectionMap = Array.from(this.selections.values());
 		}
-		selectionMap.forEach((value: T) => {
+		selectionMap.forEach((value: CustomSliceSelection) => {
 			this.archivedSelections.push(value);
 		});
 	}
@@ -82,8 +81,6 @@ export abstract class SelectorBase<T extends SliceSelection> {
 			this.selections.delete(this.currentSlice);
 
 			this.selectedArea = undefined;
-
-			this.clearCanvasSelection();
 		}
 	}
 
@@ -114,10 +111,11 @@ export abstract class SelectorBase<T extends SliceSelection> {
 			this.selections.delete(selectionId);
 			this.clearCanvasSelection();
 		}
+		this.redrawSelections();
 	}
 
 	public pinSelection(selectionId: number, newValue: boolean): void {
-		let selection: T = this.selections.get(selectionId);
+		let selection: CustomSliceSelection = this.selections.get(selectionId);
 		if(selection) {
 			if (selection.pinned != newValue) {
 				selection.pinned = newValue;
@@ -153,7 +151,6 @@ export abstract class SelectorBase<T extends SliceSelection> {
 			y: paramY * this.canvasSize.height
 		}
 	}
-
 
 	abstract redrawSelections(): void;
 }
