@@ -1,22 +1,50 @@
 <div class="marker-page">
-    <div class="innerElement canvasInterface">
-        <app-marker-component #marker></app-marker-component>
-        <div class="button-row">
-            <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="!this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
-                Skip scan
-            </button>
-            <button mat-raised-button color="primary" (click)="skipScan()" *ngIf="this.marker.selectionState.hasArchive" [disabled]="this.marker.downloadingScanInProgress">
-                Next scan
-            </button>
-            <button mat-raised-button color="warn" [disabled]="!this.marker.selectionState.is2d"
-                    (click)="remove2dSelection()">Delete current label
-            </button>
-            <button mat-raised-button color="accent" [disabled]="!this.marker.selectionState.isValid" (click)="sendCompleteLabel()">
-                Send label
-            </button>
-            <button mat-raised-button color="accent" [disabled]="this.marker.selectionState.hasArchive || this.marker.selectionState.isValid || this.marker.downloadingScanInProgress" (click)="sendEmptyLabel()">
-                Nothing to tag
-            </button>
+    <div class="marker-toolbox">
+        <div class="tags">
+            <h3>Available Tags</h3>
+            <mat-form-field>
+                <mat-select placeholder="Current Tag" required>
+                    <mat-option *ngFor="let tag of tags" [value]="tag.key">
+                        {{ tag.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="tools">
+            <h3>Available Tools</h3>
+            <div class="buttons">
+                <button mat-mini-fab><mat-icon>crop</mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon>brush</mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon svgIcon="eraser"></mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon svgIcon="gesture-tap"></mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon>timeline</mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon>zoom_in</mat-icon></button>
+                <button mat-mini-fab disabled><mat-icon>zoom_out</mat-icon></button>
+            </div>
+        </div>
+
+        <h3>Your Labels</h3>
+        <app-label-explorer></app-label-explorer>
+
+        <div class="actions">
+            <h3>Actions</h3>
+            <div class="buttons">
+                <button mat-raised-button color="primary" (click)="skipScan()">
+                    Skip scan
+                </button>
+                <button mat-raised-button color="accent" (click)="sendCompleteLabel()" *ngIf="this.labelExplorer.getLabelsLength() > 0">
+                    Send label
+                </button>
+                <button mat-raised-button color="accent" (click)="sendEmptyLabel()" *ngIf="this.labelExplorer.getLabelsLength() == 0">
+                    Nothing to tag
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="marker-content">
+        <div class="innerElement canvasInterface">
+            <app-marker-component #marker></app-marker-component>
         </div>
     </div>
 </div>
