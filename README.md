@@ -16,29 +16,28 @@ Documentation for the MedTagger can be found [here](/docs).
 
 [![Build Status](https://travis-ci.org/jpowie01/MedTagger.svg?branch=master)](https://travis-ci.org/jpowie01/MedTagger)
 
-## What is currently done?
+## Our technology stack
 
- - [x] User Interface with dynamic 3D scans manipulation
- - [x] Backend architecture ready to be scaled up
- - [x] Basic labeling mechanism ready to be extended with new features
- - [x] Basic validation mechanism
- - [x] Basic users management system
- - [x] Dockerized and virtualized environment (with Vagrant)
+ - User Interface uses Angular 6 with Material Design,
+ - REST API and WebSockets for communication with backend,
+ - Backend written in Python 3.6+,
+ - Flask as a REST API framework,
+ - Celery using RabbitMQ for communication,
+ - PostgreSQL as a storage for metadata,
+ - Cassandra as a storage for images,
+ - Dockerized production setup,
+ - Vagrant for development environment.
 
-## What needs to be done?
+## What are we doing now?
 
- - [ ] Extended labeling mechanism using magic lasso
-   - [ ] Frontend
-   - [x] Backend
- - [ ] Extended labeling mechanism using additional views for 3D scans
-   - [ ] Frontend
-   - [x] Backend
- - [ ] Extended validation mechanism for faster verification of similar labels
-   - [ ] Frontend
-   - [ ] Backend
- - [ ] Generating Machine Learning datasets on demand
-   - [ ] Frontend
-   - [ ] Backend
+ - [ ] Labeling using multiple tools
+   - [x] Rectangular
+   - [ ] Points
+   - [ ] Connected Points
+   - [ ] Brush
+ - [ ] Surveys as additional actions for provided labels,
+ - [ ] Validation mechanism
+ - [ ] On-demand datasets generation
 
 ## MedTagger setup
 
@@ -72,14 +71,20 @@ More about setting up environment with Docker Compose can be found [here](/docs/
 
 Below screenshots show how MedTagger looks like:
 
+#### Login Page
+![Login Page](/docs/assets/login_page.png)
+
 #### Main Page
 ![Main Page](/docs/assets/main_page.png)
 
+#### Navigation Sidebar
+![Navigation Sidebar](/docs/assets/navigation_sidebar.png)
+
+#### Categories Page
+![Categories Page](/docs/assets/categories_page.png)
+
 #### Labeling Page
 ![Labeling Page](/docs/assets/labelling_page.png)
-
-#### Validation Page
-![Validation Page](docs/assets/validation_page.png)
 
 #### Upload Page
 ![Upload Page](docs/assets/upload_page.png)
