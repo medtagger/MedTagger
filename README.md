@@ -18,15 +18,14 @@ Documentation for the MedTagger can be found [here](/docs).
 
 ## Our technology stack
 
- - User Interface uses[TypeScript 2.7+](http://typescriptlang.org/) with [Angular 6](http://angular.io/),
- - User Interface follow style guides from [Material Design](http://material.angular.io/),
+ - User Interface uses [TypeScript 2.7+](http://typescriptlang.org/) with [Angular 6](http://angular.io/) and [Material Design](http://material.angular.io/) style,
  - REST API and WebSockets for communication with Backend,
  - Backend written in [Python 3.6+](https://www.python.org),
  - [Flask](http://flask.pocoo.org/) with [Flask-RESTPlus](http://flask-restplus.readthedocs.io/) as a REST API framework,
- - [Celery](http://www.celeryproject.org/) using [RabbitMQ](https://www.rabbitmq.com/) for communication,
+ - [Celery](http://www.celeryproject.org/) workers using [RabbitMQ](https://www.rabbitmq.com/) for communication,
  - [PostgreSQL](https://www.postgresql.org/) as a storage for metadata,
  - [Cassandra](http://cassandra.apache.org/) as a storage for images,
- - [Docker](http://docker.com/) containers production setup,
+ - [Docker](http://docker.com/) containers for production setup,
  - [Traefik](https://traefik.io/) as a reverse proxy and load balancer for Docker containers,
  - [Vagrant](https://www.vagrantup.com) for development environment,
  - [Travis](http://travis-ci.org/) for Continuous Integration.
@@ -38,6 +37,7 @@ Documentation for the MedTagger can be found [here](/docs).
    - [ ] Points
    - [ ] Connected Points
    - [ ] Brush
+ - [ ] Zoom for labeling small objects
  - [ ] Surveys as additional actions for provided labels
  - [ ] Validation mechanism
  - [ ] On-demand datasets generation
