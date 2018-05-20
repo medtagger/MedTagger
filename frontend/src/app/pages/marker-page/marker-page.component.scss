@@ -1,21 +1,70 @@
 @import '../../components/marker/marker.component.scss';
 
+$top-header-size: 64px;
+$top-header-color: #0277bd;
+$toolbox-width: 300px;
+
 button {
-    position: relative;
-    top: $canvas-size;
-    margin: 1%;
+    margin: 5px;
 }
 
 .marker-page {
-    margin: 10px auto;
+    display: grid;
+    grid-template-columns: $toolbox-width auto;
+    width: 100vw;
+    height: calc(100vh - #{$top-header-size});
+    overflow: hidden;
+}
+
+.marker-toolbox {
+    display: flex;
+    flex-direction: column;
+    background-color: #fafafa;
+    border-right: 1px solid $top-header-color;
+    grid-column: 1;
+    grid-row: 1;
+
+    h3 {
+        color: white;
+        padding: 8px 16px;
+        margin: 0px;
+        background-color: $top-header-color;
+    }
+
+    .tags {
+        mat-form-field {
+            width: $toolbox-width - 30px;
+            margin: 10px 15px 0 15px;
+        }
+    }
+
+    .tools {
+        .buttons {
+            margin: 8px 16px;
+        }
+    }
+
+    .actions {
+        .buttons {
+            display: flex;
+
+            button {
+                flex-basis: 0;
+                flex-grow: 1;
+            }
+        }
+    }
+}
+
+.marker-content {
+    background-color: black;
+    display: inline-grid;
+    grid-column: 2;
+    grid-row: 1;
 }
 
 .canvasInterface {
     position: relative;
-    margin: 0 auto;
     width: $canvas-size;
 }
 
-.button-row {
-    text-align: center;
-}

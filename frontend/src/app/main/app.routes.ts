@@ -11,7 +11,12 @@ import {ModuleWithProviders} from "@angular/core";
 import {AuthGuard} from "../guards/auth.guard";
 
 export const labellingRoutes: Routes = [
-    {path: 'labelling', component: MarkerPageComponent, data: {title: 'Labelling'}, canActivate: [AuthGuard]},
+    {
+        path: 'labelling',
+        component: MarkerPageComponent,
+        data: {title: 'Labelling', disableFooter: true},
+        canActivate: [AuthGuard]
+    },
     {
         path: 'labelling/choose-category',
         component: CategoryPageComponent,

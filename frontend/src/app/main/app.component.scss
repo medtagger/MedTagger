@@ -7,7 +7,7 @@ body {
 
 .dynamicContent {
     height: 100vh;
-    padding: 5em 0;
+    padding: 64px 0;
     box-sizing: border-box;
 }
 
@@ -61,9 +61,8 @@ body {
     background: white;
 }
 
-mat-sidenav {
+mat-drawer {
     width: 300px;
-    z-index: 3 !important;
 
     hr {
         border-top: 1px solid #eeeeee;

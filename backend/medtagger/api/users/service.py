@@ -40,7 +40,7 @@ class SetRole(Resource):
     def put(user_id: int) -> Any:
         """Set user's role."""
         set_user_role(user_id, request.json['role'])
-        return {}, 204
+        return {'success': True}, 200
 
 
 @users_ns.route('/info')
@@ -72,7 +72,7 @@ class SetUserSettings(Resource):
             raise AccessForbiddenException("Cannot update settings for someone else.")
         if request.json.get('skipTutorial', None) is not None:
             set_user_settings('skip_tutorial', request.json['skipTutorial'])
-        return {}, 204
+        return {'success': True}, 200
 
 
 @users_ns.route('/<int:user_id>')
@@ -87,4 +87,4 @@ class SetUserInfo(Resource):
         if get_current_user().id != user_id:
             raise AccessForbiddenException("Cannot update user's information for someone else.")
         set_user_info(user_id, request.json['firstName'], request.json['lastName'])
-        return {}, 204
+        return {'success': True}, 200

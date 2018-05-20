@@ -2,7 +2,7 @@
 from enum import Enum
 
 
-class DicomTags(Enum):
+class DicomTag(Enum):
     """Define all tags supported by MedTagger that can be read from DICOM."""
 
     SLICE_LOCATION = '0020|1041'

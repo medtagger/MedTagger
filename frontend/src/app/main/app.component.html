@@ -1,6 +1,6 @@
-<mat-sidenav-container>
+<mat-drawer-container>
     <!-- Right navigation bar -->
-    <mat-sidenav #sidenav mode="over" align="end" class="right-sidebar mat-typography">
+    <mat-drawer #sidenav mode="over" position="end" class="right-sidebar mat-typography">
         <div *ngIf="!!currentUser">
             <section class="user-profile">
                 <img src="assets/img/user_avatar.png" alt="Avatar" class="user-avatar">
@@ -42,10 +42,10 @@
                 </a>
             </mat-nav-list>
         </div>
-    </mat-sidenav>
+    </mat-drawer>
 
     <!-- Whole page content -->
-    <div class="mat-typography">
+    <mat-drawer-content class="mat-typography">
         <!-- Top header -->
         <mat-toolbar class="mat-elevation-z5 header" color="primary">
             <a routerLink="/home">
@@ -64,8 +64,8 @@
         </div>
 
         <!-- Bottom footer -->
-        <mat-toolbar class="mat-elevation-z5 footer" color="primary">
+        <mat-toolbar class="mat-elevation-z5 footer" color="primary" *ngIf="shouldShowFooter">
             <img src="assets/img/logo_politechnika_gdanska.png">
         </mat-toolbar>
-    </div>
-</mat-sidenav-container>
+    </mat-drawer-content>
+</mat-drawer-container>

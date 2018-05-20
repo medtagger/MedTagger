@@ -13,13 +13,7 @@ class UnauthorizedException(BaseHTTPException):
     pass
 
 
-class BusinessLogicException(BaseHTTPException):
-    """Exception designed to use once there was an error during business logic processing."""
-
-    pass
-
-
-class NotFoundException(BusinessLogicException):
+class NotFoundException(BaseHTTPException):
     """Exception designed to use while the object that user was looking for could not be found."""
 
     pass
