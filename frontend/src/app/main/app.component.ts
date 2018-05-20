@@ -11,7 +11,8 @@ import {filter, map, mergeMap} from "rxjs/operators";
 })
 export class AppComponent implements OnInit {
 
-    pageTitle = '';
+    public pageTitle: string = '';
+    public shouldShowFooter: boolean = true;
     public currentUser: UserInfo;
 
     constructor(private router: Router, private activatedRoute: ActivatedRoute, private snackBar: MatSnackBar) {
@@ -32,7 +33,10 @@ export class AppComponent implements OnInit {
             }),
             filter((route: ActivatedRoute) => route.outlet === 'primary'),
             mergeMap((route: ActivatedRoute) => route.data)
-        ).subscribe((event) => this.pageTitle = event['title']);
+        ).subscribe((event) => {
+            this.pageTitle = event['title'];
+            this.shouldShowFooter = !event['disableFooter'];
+        });
     }
 
     get isLoginPage(): boolean {
