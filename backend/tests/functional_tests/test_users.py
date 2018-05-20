@@ -88,7 +88,7 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     payload = {'role': 'doctor'}
     response = api_client.put('/api/v1/users/{}/role'.format(volunteer_id), data=json.dumps(payload),
                               headers=get_headers(token=admin_user_token, json=True))
-    assert response.status_code == 204
+    assert response.status_code == 200
 
     # Step 4. User logs in
     payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}

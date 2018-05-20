@@ -11,6 +11,9 @@ import {ROISelection2D} from '../../model/ROISelection2D';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 import {MatSnackBar} from '@angular/material';
+import {LabelTag} from "../../model/LabelTag";
+import {LabelListItem} from "../../model/LabelListItem";
+import {LabelExplorerComponent} from "../../components/label-explorer/label-explorer.component";
 
 
 @Component({
@@ -24,6 +27,13 @@ export class MarkerPageComponent implements OnInit {
     private static readonly SLICE_BATCH_SIZE = 10;
 
     @ViewChild(MarkerComponent) marker: MarkerComponent;
+
+    @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
+
+	// TODO: get labelling context from categry
+	tags: Array<LabelTag> = [
+		new LabelTag("All", "ALL", ["RECTANGLE"])
+	];
 
     scan: ScanMetadata;
     category: string;
@@ -39,6 +49,7 @@ export class MarkerPageComponent implements OnInit {
         console.log('MarkerPage init', this.marker);
 
         this.marker.setSelector(new RectROISelector(this.marker.getCanvas()));
+        this.marker.setLabelExplorer(this.labelExplorer);
 
         this.route.queryParamMap.subscribe(params => {
             this.category = params.get('category') || '';
@@ -134,6 +145,8 @@ export class MarkerPageComponent implements OnInit {
             });
         this.startMeasuringLabelingTime();
         this.indicateLabelHasBeenSend();
+
+        this.labelExplorer.reinitializeExplorer();
         return;
     }
 

@@ -1,8 +1,9 @@
 import {EventEmitter} from "@angular/core";
+import {SelectionStateMessage} from "../../model/SelectionStateMessage";
 
 export interface Selector<SliceSelection> {
 
-    drawPreviousSelections(): any;
+    drawSelections(): any;
 
     drawSelection(selection: SliceSelection, color: string): any;
 
@@ -16,7 +17,7 @@ export interface Selector<SliceSelection> {
 
     clearData(): any;
 
-    getStateChangeEmitter(): EventEmitter<void>;
+    getStateChangeEmitter(): EventEmitter<SelectionStateMessage>;
 
     addCurrentSelection(): any;
 
@@ -38,6 +39,21 @@ export interface Selector<SliceSelection> {
 
     removeCurrentSelection(): any;
 
+    removeSelection(selectionId: number): void;
+
     clearSelections(): any;
 
+    updateCanvasWidth(width: number): void;
+
+    updateCanvasHeight(height: number): void;
+
+    normalizeByView(paramX: number, paramY: number): {x: number, y: number};
+
+    scaleToView(paramX: number, paramY: number): {x: number, y: number};
+
+    // Show selection on all slice images
+    pinSelection(selectionId: number, newValue: boolean): void;
+
+    // Hides selection from user view without deleting from memory
+    hideSelection(selectionId: number, newValue: boolean): void;
 }

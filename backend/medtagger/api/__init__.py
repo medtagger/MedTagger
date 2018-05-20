@@ -8,7 +8,7 @@ from flask_restplus import Api
 from flask_socketio import SocketIO, emit
 
 from medtagger.api.exceptions import UnauthorizedException, InvalidArgumentsException, NotFoundException, \
-    BusinessLogicException, AccessForbiddenException
+    AccessForbiddenException
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ authorizations = {
 }
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 api = Api(blueprint, version='0.1', title='Backend API', description='Documentation for Backend API',
-          authorizations=authorizations, validate=True)
+          default='core', default_label='Core methods', authorizations=authorizations, validate=True)
 web_socket = SocketIO(logger=True, engineio_logger=True)
 
 
@@ -35,18 +35,6 @@ def rest_default_error_handler(exception: Exception) -> Tuple[Dict, int]:  # pyl
     """
     logger.error(traceback.format_exc())
     return {'message': 'An unhandled exception occurred.'}, 500
-
-
-@api.errorhandler(BusinessLogicException)
-def rest_business_logic_error_handler(exception: Exception) -> Tuple[Dict, int]:
-    """Handle business logic errors.
-
-    :param exception: Python Exception
-    :return: tuple with response and status code
-    """
-    logger.warning(traceback.format_exc())
-    details = str(exception)
-    return {'message': 'Business logic error.', 'details': details}, 500
 
 
 @api.errorhandler(UnauthorizedException)
