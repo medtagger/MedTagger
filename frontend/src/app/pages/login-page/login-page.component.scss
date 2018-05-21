@@ -18,9 +18,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    @include respond-to('medium') {
-        display: block;
-    }
 
     &:before {
         @include absolute(top -1em);
@@ -42,8 +39,7 @@
         justify-content: center;
         @include respond-to('medium') {
             @include absolute(top 20% right 20%);
-            display: block;
-            min-height: 20%;
+            min-height: 25em;
             min-width: 20em;
             margin: 0;
         }
@@ -56,10 +52,14 @@
 }
 
 mat-card-content {
+    @include size(100%);
+    flex: 1;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     form {
         max-width: 90%;
+        flex: 1;
         display: flex;
         flex-direction: column;
         padding: 0 .5em;
