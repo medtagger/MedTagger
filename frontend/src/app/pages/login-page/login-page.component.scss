@@ -15,11 +15,20 @@
 .login-side {
     position: relative;
     @include size(100%);
-    transition: all 1s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    @include respond-to('medium') {
+        display: block;
+    }
 
     &:before {
-        @include absolute(top 0);
-        @include size(100%);
+        @include absolute(top -1em);
+        @include size(100%, 110%);
+        @include respond-to('medium') {
+            @include absolute(top 0em);
+            @include size(100%);
+        }
         display: block;
         background-size: cover;
         background: white url("../../../assets/img/login_pic.jpg") no-repeat center;
@@ -27,10 +36,17 @@
     }
 
     mat-card {
-        @include absolute(top 20% right 20%);
-        min-height: 20%;
-        min-width: 20em;
-        margin: 0;
+        min-height: 60%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        @include respond-to('medium') {
+            @include absolute(top 20% right 20%);
+            display: block;
+            min-height: 20%;
+            min-width: 20em;
+            margin: 0;
+        }
         @include mat-elevation-transition;
         @include mat-elevation(2);
         &:hover {
@@ -43,10 +59,14 @@ mat-card-content {
     display: flex;
     flex-direction: column;
     form {
-        max-width: 80%;
+        max-width: 90%;
         display: flex;
         flex-direction: column;
-        padding: 1em 0;
+        padding: 0 .5em;
+        @include respond-to('medium') {
+            max-width: 80%;
+            padding: 1em 0;
+        }
     }
     mat-card-actions {
         padding: 0;
@@ -71,10 +91,9 @@ mat-card-content {
             }
         }
     }
-}
 
-.register-link {
-    padding-top: 15px;
-    border-top: 1px solid #bbb;
+    .register-link {
+        padding-top: 15px;
+        border-top: 1px solid #bbb;
+    }
 }
-
