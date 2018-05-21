@@ -25,6 +25,7 @@ export class LoginPageComponent implements OnInit {
 
     loggingInProgress: boolean;
     loggingInError: boolean;
+    registrationInProgress: boolean;
 
     constructor(private routerService: Router, private accountService: AccountService) {
     }
@@ -40,6 +41,11 @@ export class LoginPageComponent implements OnInit {
             password: new FormControl(null, [Validators.required, Validators.minLength(MIN_PASSWORD_LENGTH)]),
             confirmPassword: new FormControl(null, [Validators.required, passwordValidator()])
         });
+    }
+
+    resetLogin(): void{
+        this.loggingInProgress = false;
+        this.loggingInError = false;
     }
 
     public logIn(): void {
@@ -71,8 +77,10 @@ export class LoginPageComponent implements OnInit {
         this.userForm.reset();
         if (this.loginPageMode === LoginPageMode.LOG_IN) {
             this.loginPageMode = LoginPageMode.REGISTER;
+            this.resetLogin()
         } else if (this.loginPageMode === LoginPageMode.REGISTER) {
             this.loginPageMode = LoginPageMode.LOG_IN;
+            this.resetRegistration()
         } else {
             console.error('Unsupported login page mode!');
         }
@@ -104,9 +112,20 @@ export class LoginPageComponent implements OnInit {
                 '';
     }
 
+    resetRegistration(): void {
+        this.registrationInProgress = false
+    }
+
     public register(): void {
+        this.registrationInProgress = true;
         let formValue = this.userForm.value;
         this.accountService.register(formValue['email'], formValue['password'], formValue['firstName'], formValue['lastName'])
-            .then(() => this.changePageMode());
+            .then(() => {
+                this.registrationInProgress = false;
+                this.changePageMode()
+            }, (error) => {
+                this.resetRegistration()
+            })
     }
+
 }
