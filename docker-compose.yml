@@ -67,21 +67,11 @@ services:
   medtagger_backend_rest:
     image: medtagger_backend/rest
     restart: unless-stopped
-    environment:
-      - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_REST_PORT=51000
-      - MEDTAGGER__API_WEBSOCKET_PORT=51001
-      - MEDTAGGER__API_DEBUG=1
-      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
-      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__CASSANDRA_ADDRESSES=cassandra
-      - MEDTAGGER__CASSANDRA_PORT=9042
-      - MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
-      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    env_file:
+      - ./docker/backend.env
     build:
       context: backend
-      dockerfile: Dockerfile_rest
+      dockerfile: docker/Dockerfile_rest
       args:
         - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
         - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
@@ -99,21 +89,11 @@ services:
   medtagger_backend_websocket:
     image: medtagger_backend/websocket
     restart: unless-stopped
-    environment:
-      - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_REST_PORT=51000
-      - MEDTAGGER__API_WEBSOCKET_PORT=51001
-      - MEDTAGGER__API_DEBUG=1
-      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
-      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__CASSANDRA_ADDRESSES=cassandra
-      - MEDTAGGER__CASSANDRA_PORT=9042
-      - MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
-      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    env_file:
+      - ./docker/backend.env
     build:
       context: backend
-      dockerfile: Dockerfile_websocket
+      dockerfile: docker/Dockerfile_websocket
       args:
         - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
         - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
@@ -131,21 +111,11 @@ services:
   medtagger_backend_worker:
     image: medtagger_backend/worker
     restart: unless-stopped
-    environment:
-      - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_REST_PORT=51000
-      - MEDTAGGER__API_WEBSOCKET_PORT=51001
-      - MEDTAGGER__API_DEBUG=1
-      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
-      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__CASSANDRA_ADDRESSES=cassandra
-      - MEDTAGGER__CASSANDRA_PORT=9042
-      - MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
-      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    env_file:
+      - ./docker/backend.env
     build:
       context: backend
-      dockerfile: Dockerfile_worker
+      dockerfile: docker/Dockerfile_worker
       args:
         - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
         - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
@@ -159,21 +129,11 @@ services:
 
   medtagger_backend_database_migrations:
     image: medtagger_backend/database_migrations
-    environment:
-      - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_REST_PORT=51000
-      - MEDTAGGER__API_WEBSOCKET_PORT=51001
-      - MEDTAGGER__API_DEBUG=1
-      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
-      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__CASSANDRA_ADDRESSES=cassandra
-      - MEDTAGGER__CASSANDRA_PORT=9042
-      - MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT=30
-      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    env_file:
+      - ./docker/backend.env
     build:
       context: backend
-      dockerfile: Dockerfile_database_migrations
+      dockerfile: docker/Dockerfile_database_migrations
       args:
         - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
         - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
