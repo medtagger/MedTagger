@@ -68,7 +68,7 @@ services:
     image: medtagger_backend/rest
     restart: unless-stopped
     env_file:
-      - ./docker/backend.env
+      - ./backend/docker/backend.env
     build:
       context: backend
       dockerfile: docker/Dockerfile_rest
@@ -90,7 +90,7 @@ services:
     image: medtagger_backend/websocket
     restart: unless-stopped
     env_file:
-      - ./docker/backend.env
+      - ./backend/docker/backend.env
     build:
       context: backend
       dockerfile: docker/Dockerfile_websocket
@@ -112,7 +112,7 @@ services:
     image: medtagger_backend/worker
     restart: unless-stopped
     env_file:
-      - ./docker/backend.env
+      - ./backend/docker/backend.env
     build:
       context: backend
       dockerfile: docker/Dockerfile_worker
@@ -130,7 +130,7 @@ services:
   medtagger_backend_database_migrations:
     image: medtagger_backend/database_migrations
     env_file:
-      - ./docker/backend.env
+      - ./backend/docker/backend.env
     build:
       context: backend
       dockerfile: docker/Dockerfile_database_migrations
