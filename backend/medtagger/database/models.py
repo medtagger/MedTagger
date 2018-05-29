@@ -395,3 +395,33 @@ class RectangularLabelElement(LabelElement):
     def __repr__(self) -> str:
         """Return string representation for  Rectangular Label Element."""
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
+
+
+class BrushLabelElement(LabelElement):
+    """Definition of a Label Element made with Brush Tool."""
+
+    __tablename__ = 'BrushLabelElements'
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+
+    width: float = Column(Float, nullable=False)
+    height: float = Column(Float, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': LabelTool.BRUSH,
+    }
+
+    def __init__(self, slice_index: int, shape: LabelShape, tag: LabelTag) -> None:
+        """Initialize LabelElement made with Brush Tool.
+
+        :param slice_index: integer value representing index of a Slice in asc order
+        :param shape: shape (width, height) of the label
+        :param tag: tag of the label
+        """
+        super(BrushLabelElement, self).__init__(tag)
+        self.slice_index = slice_index
+        self.width = shape.width
+        self.height = shape.height
+
+    def __repr__(self) -> str:
+        """Return string representation for Brush Label Element."""
+        return '<{}: {}>'.format(self.__class__.__name__, self.id)

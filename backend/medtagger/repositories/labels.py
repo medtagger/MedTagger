@@ -1,11 +1,13 @@
 """Module responsible for definition of Labels' Repository."""
+from io import BytesIO
 from typing import List
 
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement
+from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement, BrushLabelElement
 from medtagger.definitions import LabelVerificationStatus
+from medtagger.storage.models import BrushLabelElement as BrushLabelElementStorage
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime
 
 
@@ -51,13 +53,30 @@ class LabelsRepository(object):
 
         :param label_id: Label's ID
         :param position: position (x, y, slice_index) of the Label
-        :param shape: shape (width, height, depth) of the Label
+        :param shape: shape (width, height) of the Label
         :param label_tag: Label Tag object
         :return: ID of a Element
         """
         with db_session() as session:
-            new_rectangular_label_element = RectangularLabelElement(position, shape, label_tag)
-            new_rectangular_label_element.label_id = label_id
-            session.add(new_rectangular_label_element)
+            rectangular_label_element = RectangularLabelElement(position, shape, label_tag)
+            rectangular_label_element.label_id = label_id
+            session.add(rectangular_label_element)
 
-        return new_rectangular_label_element.id
+        return rectangular_label_element.id
+
+    @staticmethod
+    def add_new_brush_label_element(label_id: LabelID, slice_index: int, shape: LabelShape, image: bytes, label_tag: LabelTag) -> LabelElementID:
+        """Add new Brush Element for given Label.
+
+        :param label_id: Label's ID
+        :param shape: shape (width, height) of the Label
+        :param image: bytes with image representation of a binary mask
+        :param label_tag: Label Tag object
+        :return: ID of a Element
+        """
+        with db_session() as session:
+            brush_label_element = BrushLabelElement(slice_index, shape, label_tag)
+            brush_label_element.label_id = label_id
+            session.add(brush_label_element)
+        BrushLabelElementStorage.create(id=brush_label_element.id, image=image)
+        return brush_label_element.id

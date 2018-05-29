@@ -15,6 +15,7 @@ elements_schema = {
         "type": "object",
         'oneOf': [
             {'$ref': '#/definitions/rectangular_label_element_schema'},
+            {'$ref': '#/definitions/brush_label_element_schema'},
         ],
     },
     'definitions': {
@@ -26,9 +27,22 @@ elements_schema = {
                 'height': {'type': 'number'},
                 'slice_index': {'type': 'integer'},
                 'tag': {'type': 'string'},
-                'tool': {'enum': [tool.name for tool in LabelTool]},
+                'tool': {'type': 'string', 'pattern': 'RECTANGLE'},
             },
             'required': ['x', 'y', 'width', 'height', 'slice_index', 'tag', 'tool'],
+            'additionalProperties': False,
+        },
+        'brush_label_element_schema': {
+            'properties': {
+                'width': {'type': 'number'},
+                'height': {'type': 'number'},
+                'image_key': {'type': 'string'},
+                'slice_index': {'type': 'integer'},
+                'tag': {'type': 'string'},
+                'tool': {'type': 'string', 'pattern': 'BRUSH'},
+            },
+            'required': ['width', 'height', 'image_key', 'slice_index', 'tag', 'tool'],
+            'additionalProperties': False,
         },
     },
 }
@@ -38,10 +52,13 @@ in__label_tag_element = api.model('Label Element model', {
     'name': fields.String(),
 })
 
-in__label = api.model('Label model', {
-    'elements': fields.List(fields.Raw),
-    'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
+in__label_model = api.model('Label model', {
+    'elements': fields.List(fields.Raw, required=True),
+    'labeling_time': fields.Float(description='Time in seconds that user spent on labeling', required=True),
 })
+
+in__label = api.parser()
+in__label.add_argument('label', type=in__label_model, help='Label model object', location='form', required=True)
 
 in__scan_category = api.model('New Scan Category model', {
     'key': fields.String(),

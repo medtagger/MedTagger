@@ -1,5 +1,7 @@
 """Module responsible for definition of Scans service available via HTTP REST API."""
+import json
 from typing import Any
+
 from flask import request
 from flask_restplus import Resource
 from jsonschema import validate, ValidationError, Draft4Validator
@@ -96,6 +98,7 @@ class Random(Resource):
 class Label(Resource):
     """Endpoint that stores label for given scan."""
 
+    # TODO: Fix these docs :(
     @staticmethod
     @login_required
     @scans_ns.expect(serializers.in__label)
@@ -105,8 +108,9 @@ class Label(Resource):
     @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan or tag'})
     def post(scan_id: ScanID) -> Any:
         """Save new label for given scan."""
-        payload = request.json
-        elements = payload['elements']
+        files = {name: files for name, files in request.files.items()}
+        label = json.loads(request.form['label'])
+        elements = label['elements']
         try:
             validate(elements, elements_schema)
         except ValidationError:
@@ -115,9 +119,8 @@ class Label(Resource):
             best_error = best_match(errors)
             raise InvalidArgumentsException(best_error.message)
 
-        labeling_time = payload['labeling_time']
-
-        label = business.add_label(scan_id, elements, labeling_time)
+        labeling_time = label['labeling_time']
+        label = business.add_label(scan_id, elements, files, labeling_time)
         return label, 201
 
 
