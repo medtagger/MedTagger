@@ -65,17 +65,18 @@ class LabelsRepository(object):
         return rectangular_label_element.id
 
     @staticmethod
-    def add_new_brush_label_element(label_id: LabelID, slice_index: int, shape: LabelShape, image: bytes, label_tag: LabelTag) -> LabelElementID:
+    def add_new_brush_label_element(label_id: LabelID, slice_index: int, width: int, height: int, image: bytes, label_tag: LabelTag) -> LabelElementID:
         """Add new Brush Element for given Label.
 
         :param label_id: Label's ID
-        :param shape: shape (width, height) of the Label
+        :param width: width of the Label's image
+        :param height: height of the Label's image
         :param image: bytes with image representation of a binary mask
         :param label_tag: Label Tag object
         :return: ID of a Element
         """
         with db_session() as session:
-            brush_label_element = BrushLabelElement(slice_index, shape, label_tag)
+            brush_label_element = BrushLabelElement(slice_index, width, height, label_tag)
             brush_label_element.label_id = label_id
             session.add(brush_label_element)
         BrushLabelElementStorage.create(id=brush_label_element.id, image=image)

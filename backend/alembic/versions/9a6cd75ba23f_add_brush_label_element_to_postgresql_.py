@@ -25,9 +25,6 @@ new_label_tool_enum = ENUM('RECTANGLE', 'BRUSH', name='label_tool', create_type=
 
 
 def upgrade():
-    # Remove legacy column
-    op.drop_column('LabelElements', 'has_binary_mask')
-
     # Do not use server default value on Tool column as it will have cause issues during Enum update
     # What's more, it shouldn't have any default value!
     op.alter_column('LabelElements', 'tool', server_default=None)
@@ -43,8 +40,8 @@ def upgrade():
     # Create table in PostgreSQL
     op.create_table('BrushLabelElements',
                     sa.Column('id', sa.String(), nullable=False),
-                    sa.Column('width', sa.Float(), nullable=False),
-                    sa.Column('height', sa.Float(), nullable=False),
+                    sa.Column('width', sa.Integer(), nullable=False),
+                    sa.Column('height', sa.Integer(), nullable=False),
                     sa.ForeignKeyConstraint(['id'], ['LabelElements.id'], name=op.f('fk_BrushLabelElements_id_LabelElements')),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_BrushLabelElements'))
                     )
@@ -60,8 +57,14 @@ def upgrade():
 
 
 def downgrade():
-    # Restore previous binary mask column but we won't restore previous data - these haven't been used anyways...
-    op.add_column('LabelElements', sa.Column('has_binary_mask', sa.BOOLEAN(), autoincrement=False, nullable=False))
+    # Remove all tables - both in PostgreSQL and Cassandra
+    op.drop_table('BrushLabelElements')
+    session.set_keyspace('medtagger')
+    session.execute('DROP TABLE brush_label_elements')
+
+    # Remove all elements that were labeled with Brush
+    label_elements_table = sa.sql.table('LabelElements', sa.Column('tool', new_label_tool_enum, nullable=False))
+    op.execute(label_elements_table.delete().where(label_elements_table.c.tool == 'BRUSH'))
 
     # Remove Brush as available Tool
     tmp_label_tool_enum.create(op.get_bind(), checkfirst=False)
@@ -73,8 +76,3 @@ def downgrade():
 
     # Revert server default value on Tool column
     op.alter_column('LabelElements', 'tool', server_default='RECTANGLE')
-
-    # Remove all tables - both in PostgreSQL and Cassandra
-    op.drop_table('BrushLabelElements')
-    session.set_keyspace('medtagger')
-    session.execute('DROP TABLE brush_label_elements')

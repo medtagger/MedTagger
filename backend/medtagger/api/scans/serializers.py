@@ -21,10 +21,10 @@ elements_schema = {
     'definitions': {
         'rectangular_label_element_schema': {
             'properties': {
-                'x': {'type': 'number'},
-                'y': {'type': 'number'},
-                'width': {'type': 'number'},
-                'height': {'type': 'number'},
+                'x': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                'y': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                'width': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                'height': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
                 'slice_index': {'type': 'integer'},
                 'tag': {'type': 'string'},
                 'tool': {'type': 'string', 'pattern': 'RECTANGLE'},
@@ -34,8 +34,8 @@ elements_schema = {
         },
         'brush_label_element_schema': {
             'properties': {
-                'width': {'type': 'number'},
-                'height': {'type': 'number'},
+                'width': {'type': 'integer', 'minimum': 0},
+                'height': {'type': 'integer', 'minimum': 0},
                 'image_key': {'type': 'string'},
                 'slice_index': {'type': 'integer'},
                 'tag': {'type': 'string'},

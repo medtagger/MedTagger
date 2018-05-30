@@ -14,12 +14,14 @@ configuration = AppConfiguration()
 addresses = configuration.get('cassandra', 'addresses', 'localhost').split(',')
 port = configuration.getint('cassandra', 'port', 9042)
 default_timeout = configuration.getint('cassandra', 'default_timeout', 20)
+connect_timeout = configuration.getint('cassandra', 'connect_timeout', 20)
 
 
 def create_session(use_gevent: bool = False) -> Session:
     """Create a Session object for above Cluster."""
     connection_class = GeventConnection if use_gevent else AsyncoreConnection
-    cluster = Cluster(addresses, port=port, load_balancing_policy=RoundRobinPolicy(), connection_class=connection_class)
+    cluster = Cluster(addresses, port=port, load_balancing_policy=RoundRobinPolicy(), connection_class=connection_class,
+                      connect_timeout=connect_timeout)
     session = cluster.connect()
     session.default_timeout = default_timeout
     return session
@@ -29,7 +31,7 @@ def create_connection(use_gevent: bool = False) -> None:
     """Create a Session object for above Cluster."""
     connection_class = GeventConnection if use_gevent else AsyncoreConnection
     connection.setup(addresses, MEDTAGGER_KEYSPACE, port=port, load_balancing_policy=RoundRobinPolicy(),
-                     connection_class=connection_class)
+                     connection_class=connection_class, connect_timeout=connect_timeout)
     session = connection.get_session()
     session.default_timeout = default_timeout
 

@@ -156,11 +156,12 @@ def _add_brush_element(element: Dict[str, Any], files: Dict[str, FileStorage], l
     :param files: mapping of uploaded files (name and content)
     :param label_id: ID of a given Label that the element should be added to
     """
-    shape = LabelShape(width=element['width'], height=element['height'])
+    width = element['width']
+    height = element['height']
     label_tag = _get_label_tag(element['tag'])
     slice_index = element['slice_index']
     image = files[element['image_key']].read()
-    LabelsRepository.add_new_brush_label_element(label_id, slice_index, shape, image, label_tag)
+    LabelsRepository.add_new_brush_label_element(label_id, slice_index, width, height, image, label_tag)
 
 
 def _get_label_tag(tag_key: str) -> LabelTag:
