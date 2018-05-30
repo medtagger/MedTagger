@@ -153,8 +153,8 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
         }],
         'labeling_time': 12.34,
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
-                               headers=get_headers(token=admin_user_token, json=True))
+    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
+                               headers=get_headers(token=admin_user_token, multipart=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     owner_id = json_response['owner_id']

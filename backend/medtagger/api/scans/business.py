@@ -1,6 +1,6 @@
 """Module responsible for business logic in all Scans endpoints."""
 import logging
-from typing import Iterable, Mapping, Dict, List, Tuple, Any
+from typing import Callable, Iterable, Dict, List, Tuple, Any
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
@@ -19,6 +19,8 @@ from medtagger.workers.storage import parse_dicom_and_update_slice
 from medtagger.api.utils import get_current_user
 
 logger = logging.getLogger(__name__)
+
+LabelElementHandler = Callable[[Dict[str, Any], LabelID, Dict[str, FileStorage]], None]
 
 
 def get_available_scan_categories() -> List[ScanCategory]:
@@ -98,7 +100,8 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
         yield _slice, image
 
 
-def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, FileStorage], labeling_time: LabelingTime) -> Label:
+def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, FileStorage],
+              labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
@@ -125,22 +128,21 @@ def add_label_element(element: Dict[str, Any], files: Dict[str, FileStorage], la
     :param label_id: ID of a given Label that the element should be added to
     """
     tool = element['tool']
-    handlers = {
+    handlers: Dict[str, LabelElementHandler] = {
         LabelTool.RECTANGLE.value: _add_rectangle_element,
         LabelTool.BRUSH.value: _add_brush_element,
     }
     try:
         handler = handlers[tool]
-        handler(element, files, label_id)
+        handler(element, label_id, files)
     except KeyError:
         raise InvalidArgumentsException('{} tool is not supported!'.format(tool))
 
 
-def _add_rectangle_element(element: Dict[str, Any], files: Dict[str, FileStorage], label_id: LabelID) -> None:
+def _add_rectangle_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> None:
     """Add new Rectangular Label Element for given Label.
 
     :param element: JSON describing single element
-    :param files: (not used) mapping of uploaded files (name and content)
     :param label_id: ID of a given Label that the element should be added to
     """
     position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
@@ -149,18 +151,22 @@ def _add_rectangle_element(element: Dict[str, Any], files: Dict[str, FileStorage
     LabelsRepository.add_new_rectangular_label_element(label_id, position, shape, label_tag)
 
 
-def _add_brush_element(element: Dict[str, Any], files: Dict[str, FileStorage], label_id: LabelID) -> None:
+def _add_brush_element(element: Dict[str, Any], label_id: LabelID, files: Dict[str, FileStorage]) -> None:
     """Add new Brush Label Element for given Label.
 
     :param element: JSON describing single element
-    :param files: mapping of uploaded files (name and content)
     :param label_id: ID of a given Label that the element should be added to
+    :param files: mapping of uploaded files (name and content)
     """
     width = element['width']
     height = element['height']
     label_tag = _get_label_tag(element['tag'])
     slice_index = element['slice_index']
-    image = files[element['image_key']].read()
+    try:
+        image = files[element['image_key']].read()
+    except KeyError:
+        message = 'Request does not have field named {} that could contain the image!'
+        raise InvalidArgumentsException(message.format(element['image_key']))
     LabelsRepository.add_new_brush_label_element(label_id, slice_index, width, height, image, label_tag)
 
 

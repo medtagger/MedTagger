@@ -12,6 +12,7 @@ in__label_status = api.model("Status for label", {
 })
 
 out__common_label_element = api.model('Common Label Element model', {
+    'label_element_id': fields.String(description='Label Element\'s ID', attribute='id'),
     'slice_index': fields.Integer(description='Slice\'s order index', min=0),
     'tag': fields.String(description='Element\'s tag', attribute='tag.key'),
     'tool': fields.String(description='Element\'s tool', attribute='tool.value',

@@ -2,7 +2,7 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
-from medtagger.definitions import ScanStatus, LabelVerificationStatus, LabelTool
+from medtagger.definitions import ScanStatus, LabelVerificationStatus
 
 in__new_scan = api.model('New Scan model', {
     'category': fields.String(description='Scan\'s category', required=True),

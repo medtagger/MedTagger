@@ -31,7 +31,7 @@ def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery
         with open(file, 'rb') as image:
             response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
                 'image': (image, 'slice_1.dcm'),
-            }, content_type='multipart/form-data', headers=get_headers(token=user_token))
+            }, headers=get_headers(token=user_token, multipart=True))
             assert response.status_code == 201
 
     # Step 3. Check Scan & Slices in the databases

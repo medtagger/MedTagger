@@ -84,8 +84,8 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
         }],
         'labeling_time': 12.34,
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=json.dumps(payload),
-                               headers=get_headers(token=user_token, json=True))
+    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
+                               headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -102,16 +102,15 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert json_response['labeling_time'] == 12.34
     assert json_response['status'] == LabelVerificationStatus.NOT_VERIFIED.value
     assert json_response['scan_id'] == scan_id
-    assert json_response['elements'] == [{
-        'x': 0.5,
-        'y': 0.5,
-        'slice_index': 0,
-        'width': 0.1,
-        'height': 0.1,
-        'tag': tag_key,
-        'tool': LabelTool.RECTANGLE.value,
-        'status': LabelElementStatus.NOT_VERIFIED.value,
-    }]
+    assert len(json_response['elements'][0]['label_element_id']) >= 1
+    assert json_response['elements'][0]['x'] == 0.5
+    assert json_response['elements'][0]['y'] == 0.5
+    assert json_response['elements'][0]['slice_index'] == 0
+    assert json_response['elements'][0]['width'] == 0.1
+    assert json_response['elements'][0]['height'] == 0.1
+    assert json_response['elements'][0]['tag'] == tag_key
+    assert json_response['elements'][0]['tool'] == LabelTool.RECTANGLE.value
+    assert json_response['elements'][0]['status'] == LabelElementStatus.NOT_VERIFIED.value
 
     # # Step 8. Verification of labels will be disabled until mechanism for validation of label elements is introduced
     # payload = {'status': LabelStatus.VALID.value}
