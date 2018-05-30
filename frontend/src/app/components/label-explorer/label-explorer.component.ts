@@ -9,7 +9,7 @@ import {LabelListItem} from "../../model/LabelListItem";
 })
 export class LabelExplorerComponent implements OnInit {
 
-	protected tags: Array<LabelTag> = [];
+	public tags: Array<LabelTag> = [];
 
 	protected labels: Array<LabelListItem> = [];
 

@@ -126,7 +126,7 @@ import {LabelExplorerComponent} from "../components/label-explorer/label-explore
 })
 export class AppModule {
     constructor(matIconRegistry: MatIconRegistry, domSanitizer: DomSanitizer) {
-    let MATERIAL_DESIGN_ICONS = '/assets/fonts/mdi.svg';
+    let MATERIAL_DESIGN_ICONS = 'assets/fonts/mdi.svg';
         matIconRegistry.addSvgIconSet(domSanitizer.bypassSecurityTrustResourceUrl(MATERIAL_DESIGN_ICONS));
     }
 }
