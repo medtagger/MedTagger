@@ -43,10 +43,13 @@ export class ScanService {
 
     public sendSelection(scanId: string, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {
         console.log('ScanService | send3dSelection | sending ROI:', selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
+
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
+        let form = new FormData();
+        form.append('label', JSON.stringify(payload));
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload).toPromise().then((response: Response) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/label`, form).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
                 resolve(response);
             }).catch((error: Response) => {
