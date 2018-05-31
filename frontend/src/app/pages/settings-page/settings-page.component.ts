@@ -20,7 +20,7 @@ export class SettingsPageComponent implements OnInit {
     userPasswordConfirmation = new FormControl('', [Validators.required]);
 
     public currentUser: UserInfo;
-    private allUsers: Array<UserInfo>;
+    protected allUsers: Array<UserInfo>;
 
     constructor(public snackBar: MatSnackBar, private usersService: UsersService) {
         this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));
@@ -39,12 +39,12 @@ export class SettingsPageComponent implements OnInit {
         this.usersService.setRole(user.id, 'doctor')
             .then(() => {
                 user.role = 'doctor';
-            })
+            });
     }
 
     updateUserDetails() {
-        if(!this.validateUserInput()) {
-          this.snackBar.open("User data has not been updated due to a validation failure.", "Dismiss", {
+        if (!this.validateUserInput()) {
+          this.snackBar.open('User data has not been updated due to a validation failure.', 'Dismiss', {
             duration: 3000,
           });
           return;
@@ -54,24 +54,21 @@ export class SettingsPageComponent implements OnInit {
               this.currentUser.firstName = this.userFirstName.value;
               this.currentUser.lastName = this.userLastName.value;
               sessionStorage.setItem('userInfo', JSON.stringify(this.currentUser));
-              this.snackBar.open("User data has been updated.", "Dismiss", {
+              this.snackBar.open('User data has been updated.', 'Dismiss', {
                 duration: 3000,
               });
             });
     }
 
     validateUserInput() {
-      if(this.userFirstName.value == "" ||
-         this.userLastName.value == "" ||
-         this.userEmail.value == "" ||
-         (this.userFirstName.value == this.currentUser.firstName && this.userLastName.value == this.currentUser.lastName)) {
-        return false;
-      }
-      return true;
+      return !(this.userFirstName.value === '' ||
+          this.userLastName.value === '' ||
+          this.userEmail.value === '' ||
+          (this.userFirstName.value === this.currentUser.firstName && this.userLastName.value === this.currentUser.lastName));
     }
 
     showInvalidFormMessage() {
-        this.snackBar.open("Incorrect form data!", "Dismiss", {
+        this.snackBar.open('Incorrect form data!', 'Dismiss', {
             duration: 5000,
         });
     }

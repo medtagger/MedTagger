@@ -1,14 +1,14 @@
 import {Component, ViewChild, OnInit} from '@angular/core';
 import {MatHorizontalStepper} from '@angular/material';
-import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {Router} from "@angular/router";
-import {UsersService} from "../../services/users.service";
-import {UserInfo} from "../../model/UserInfo";
-import {UserSettings} from "../../model/UserSettings";
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {Router} from '@angular/router';
+import {UsersService} from '../../services/users.service';
+import {UserInfo} from '../../model/UserInfo';
+import {UserSettings} from '../../model/UserSettings';
 
 
 @Component({
-    selector: 'marker-tutorial-page',
+    selector: 'app-marker-tutorial-page',
     templateUrl: './marker-tutorial-page.component.html',
     styleUrls: ['./marker-tutorial-page.component.scss'],
     providers: [UsersService]
@@ -25,7 +25,7 @@ export class MarkerTutorialPageComponent implements OnInit {
 
     doNotShowAgain = new FormControl(true);
 
-    private user: UserInfo;
+    private readonly user: UserInfo;
 
     constructor(private _formBuilder: FormBuilder, private router: Router, private usersService: UsersService) {
         this.user = JSON.parse(sessionStorage.getItem('userInfo'));
@@ -54,7 +54,7 @@ export class MarkerTutorialPageComponent implements OnInit {
                     break;
                 }
             }
-        })
+        });
     }
 
     playFirstStepVideo() {
@@ -87,16 +87,15 @@ export class MarkerTutorialPageComponent implements OnInit {
 
     public endTutorial(): void {
         if (this.doNotShowAgain.value) {
-            let settings = new UserSettings();
+            const settings = new UserSettings();
             settings.skipTutorial = true;
             this.usersService.setUserSettings(this.user.id, settings).then(() => {
                 this.user.settings.skipTutorial = true;
                 sessionStorage.setItem('userInfo', JSON.stringify(this.user));
-                this.router.navigateByUrl("/labelling/choose-category");
+                this.router.navigateByUrl('/labelling/choose-category');
             });
-        }
-        else {
-            this.router.navigateByUrl("/labelling/choose-category");
+        } else {
+            this.router.navigateByUrl('/labelling/choose-category');
         }
     }
 }
