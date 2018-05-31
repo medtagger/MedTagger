@@ -71,7 +71,7 @@ def test_add_label_non_supported_tool(prepare_environment: Any) -> None:
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 400
-    # [Related #...] Please fix this details message!
+    # [Related #288] Please fix this details message!
     # json_response = json.loads(response.data)
     # assert json_response['details'] == "'NON_EXISTING' is not one of ['RECTANGLE']"
 
@@ -104,7 +104,7 @@ def test_add_label_missing_tag(prepare_environment: Any) -> None:
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 400
-    # [Related #...] Please fix this details message!
+    # [Related #288] Please fix this details message!
     # json_response = json.loads(response.data)
     # assert json_response['details'] == "'tag' is a required property"
 
@@ -137,6 +137,6 @@ def test_add_label_missing_tool(prepare_environment: Any) -> None:
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 400
-    # [Related #...] Please fix this details message!
+    # [Related #288] Please fix this details message!
     # json_response = json.loads(response.data)
     # assert json_response['details'] == "'tool' is a required property"

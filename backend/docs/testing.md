@@ -47,3 +47,13 @@ _**TIP!**_ You can also specify which functional test should be executed by:
 (venv) $ make functional_tests FUNCTIONAL_TEST=tests/functional_tests/test_basic_flow.py 
 ```
 
+_**TIP!**_ To speed up the testing and debugging, above command can be split into three
+ separate commands:
+
+```bash
+(venv) $ functional_tests__prepare_environment
+(venv) $ functional_tests__run
+(venv) $ functional_tests__delete_environment
+```
+
+Feel free to run tests as many times you would like during debugging!
