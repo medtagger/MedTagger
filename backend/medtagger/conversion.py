@@ -35,7 +35,7 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[sitk.Image], output_
 
     # Read all Dicom images and retrieve pixel values for each slice
     pixel_array = np.array(np.stack(sitk.GetArrayFromImage(_slice)[0] for _slice in dicom_files))
-    _convert_to_hounsfield_units_if_needed(dicom_file[0], pixel_array)
+    pixel_array = _convert_to_hounsfield_units_if_needed(dicom_file[0], pixel_array)
 
     # Calculate scale factor that should be applied to the input 3D scan
     real_shape = np.array([thickness, spacing, spacing]) * pixel_array.shape  # Shape after applying voxel's size
