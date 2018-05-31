@@ -42,6 +42,8 @@ matrix:
       services:
         - docker
       env: FRONTEND=production_build
+      node_js:
+        - "8"
       script:
         - ./.travis/run_tests_if_subproject_changed.py frontend --command="
            docker-compose build medtagger_frontend"
