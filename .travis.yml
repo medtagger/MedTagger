@@ -26,6 +26,15 @@ matrix:
            docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run medtagger_backend_functional_tests &&
            docker-compose down"
 
+    # Frontend - linters
+    - language: node_js
+      env: FRONTEND=linters
+      script:
+        - ./.travis/run_tests_if_subproject_changed.py backend --command="
+           cd frontend/ &&
+           npm i &&
+           ng lint"
+
     # Frontend - build production Docker
     - language: node_js
       services:
