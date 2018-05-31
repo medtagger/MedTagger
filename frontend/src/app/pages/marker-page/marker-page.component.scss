@@ -18,6 +18,7 @@ button {
 
 .marker-toolbox {
     display: flex;
+    height: inherit;
     flex-direction: column;
     background-color: #fafafa;
     border-right: 1px solid $top-header-color;
@@ -44,7 +45,13 @@ button {
         }
     }
 
+    app-label-explorer {
+        overflow-y: auto;
+    }
+
     .actions {
+        margin-top: auto;
+
         .buttons {
             display: flex;
 
