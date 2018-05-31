@@ -14,7 +14,7 @@ import {CategoryPageComponent} from '../pages/category-page/category-page.compon
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
-import {HttpAuthenticationInterceptor} from "../services/http-authentication.interceptor";
+import {HttpAuthenticationInterceptor} from '../services/http-authentication.interceptor';
 
 import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
@@ -49,14 +49,14 @@ import {
     MatIconRegistry,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
-import {routing} from "./app.routes";
-import {AuthGuard} from "../guards/auth.guard";
-import {AccountService} from "../services/account.service";
-import {DialogService} from "../services/dialog.service";
-import {InfoDialog} from "../dialogs/info.dialog";
-import {MedTaggerWebSocket} from "../services/websocket.service";
+import {routing} from './app.routes';
+import {AuthGuard} from '../guards/auth.guard';
+import {AccountService} from '../services/account.service';
+import {DialogService} from '../services/dialog.service';
+import {InfoDialogComponent} from '../dialogs/info-dialog.component';
+import {MedTaggerWebSocket} from '../services/websocket.service';
 
-import {LabelExplorerComponent} from "../components/label-explorer/label-explorer.component";
+import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
 
 @NgModule({
     declarations: [
@@ -66,14 +66,14 @@ import {LabelExplorerComponent} from "../components/label-explorer/label-explore
         HomePageComponent,
         CategoryPageComponent,
         MarkerComponent,
-		LabelExplorerComponent,
+        LabelExplorerComponent,
         ScanViewerComponent,
         MarkerTutorialPageComponent,
         UploadScansSelectorComponent,
         UploadPageComponent,
         SettingsPageComponent,
         ValidationPageComponent,
-        InfoDialog
+        InfoDialogComponent
     ],
     imports: [
         routing,
@@ -108,7 +108,7 @@ import {LabelExplorerComponent} from "../components/label-explorer/label-explore
         MatCheckboxModule,
     ],
     entryComponents: [
-        InfoDialog
+        InfoDialogComponent
     ],
     providers: [
         {
@@ -126,7 +126,7 @@ import {LabelExplorerComponent} from "../components/label-explorer/label-explore
 })
 export class AppModule {
     constructor(matIconRegistry: MatIconRegistry, domSanitizer: DomSanitizer) {
-    let MATERIAL_DESIGN_ICONS = 'assets/fonts/mdi.svg';
+    const MATERIAL_DESIGN_ICONS = 'assets/fonts/mdi.svg';
         matIconRegistry.addSvgIconSet(domSanitizer.bypassSecurityTrustResourceUrl(MATERIAL_DESIGN_ICONS));
     }
 }

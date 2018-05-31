@@ -1,156 +1,157 @@
-import {EventEmitter} from "@angular/core";
-import {SliceSelection} from "../../model/SliceSelection";
-import {SelectionStateMessage} from "../../model/SelectionStateMessage";
+import {EventEmitter} from '@angular/core';
+import {SliceSelection} from '../../model/SliceSelection';
+import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 
 export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> {
-	selectedArea: CustomSliceSelection;
-	selections: Map<number, CustomSliceSelection>;
-	archivedSelections: Array<CustomSliceSelection>;
-	canvasCtx: CanvasRenderingContext2D;
-	protected currentSlice;
-	protected mouseDrag = false;
-	protected canvasPosition: ClientRect;
-	canvasSize: { width: number, height: number };
+    selectedArea: CustomSliceSelection;
+    selections: Map<number, CustomSliceSelection>;
+    archivedSelections: Array<CustomSliceSelection>;
+    canvasCtx: CanvasRenderingContext2D;
+    protected currentSlice;
+    protected mouseDrag = false;
+    protected canvasPosition: ClientRect;
+    canvasSize: { width: number, height: number };
 
-	public stateChange: EventEmitter<SelectionStateMessage>;
-	public getStateChangeEmitter(): EventEmitter<SelectionStateMessage> {
-		return this.stateChange;
-	}
+    public stateChange: EventEmitter<SelectionStateMessage>;
 
-	public getSelections(): CustomSliceSelection[] {
-		return Array.from(this.selections.values());
-	}
+    public getStateChangeEmitter(): EventEmitter<SelectionStateMessage> {
+        return this.stateChange;
+    }
 
-	public clearData(): void {
-		this.selectedArea = undefined;
-		this.selections = new Map<number, CustomSliceSelection>();
-		this.archivedSelections = [];
-		this.stateChange = new EventEmitter<SelectionStateMessage>();
-		this.clearCanvasSelection();
-	}
+    public getSelections(): CustomSliceSelection[] {
+        return Array.from(this.selections.values());
+    }
 
-	public clearCanvasSelection(): void {
-		console.log("RectROISelector | clearCanvasSelection");
-		this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
-	}
+    public clearData(): void {
+        this.selectedArea = undefined;
+        this.selections = new Map<number, CustomSliceSelection>();
+        this.archivedSelections = [];
+        this.stateChange = new EventEmitter<SelectionStateMessage>();
+        this.clearCanvasSelection();
+    }
 
-	public addCurrentSelection(): void {
-		if (this.selectedArea) {
-			console.log("RectROISelector | addCurrentSelection");
-			this.selections.set(this.currentSlice, this.selectedArea);
-			this.stateChange.emit(new SelectionStateMessage(this.currentSlice, false));
-			this.clearSelectedArea();
-		}
-	}
+    public clearCanvasSelection(): void {
+        console.log('RectROISelector | clearCanvasSelection');
+        this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+    }
 
-	protected clearSelectedArea() {
-		this.selectedArea = undefined;
-	}
+    public addCurrentSelection(): void {
+        if (this.selectedArea) {
+            console.log('RectROISelector | addCurrentSelection');
+            this.selections.set(this.currentSlice, this.selectedArea);
+            this.stateChange.emit(new SelectionStateMessage(this.currentSlice, false));
+            this.clearSelectedArea();
+        }
+    }
 
-	public updateCurrentSlice(currentSliceId: number): void {
-		this.currentSlice = currentSliceId;
-	}
+    protected clearSelectedArea() {
+        this.selectedArea = undefined;
+    }
 
-	public updateCanvasPosition(canvasRect: ClientRect) {
-		this.canvasPosition = canvasRect;
-	}
+    public updateCurrentSlice(currentSliceId: number): void {
+        this.currentSlice = currentSliceId;
+    }
 
-	public hasArchivedSelections(): boolean {
-		return this.archivedSelections.length > 0;
-	}
+    public updateCanvasPosition(canvasRect: ClientRect) {
+        this.canvasPosition = canvasRect;
+    }
 
-	public hasValidSelection(): boolean {
-		return this.selections.size >= 1;
-	}
+    public hasArchivedSelections(): boolean {
+        return this.archivedSelections.length > 0;
+    }
 
-	public hasSliceSelection(): boolean {
-		return !!this.selections.get(this.currentSlice) || !!this.selectedArea;
-	}
+    public hasValidSelection(): boolean {
+        return this.selections.size >= 1;
+    }
 
-	public archiveSelections(selectionMap?: Array<CustomSliceSelection>): void {
-		if (!selectionMap) {
-			selectionMap = Array.from(this.selections.values());
-		}
-		selectionMap.forEach((value: CustomSliceSelection) => {
-			this.archivedSelections.push(value);
-		});
-	}
+    public hasSliceSelection(): boolean {
+        return !!this.selections.get(this.currentSlice) || !!this.selectedArea;
+    }
 
-	public removeCurrentSelection(): void {
-		if (this.hasSliceSelection()) {
-			this.selections.delete(this.currentSlice);
+    public archiveSelections(selectionMap?: Array<CustomSliceSelection>): void {
+        if (!selectionMap) {
+            selectionMap = Array.from(this.selections.values());
+        }
+        selectionMap.forEach((value: CustomSliceSelection) => {
+            this.archivedSelections.push(value);
+        });
+    }
 
-			this.selectedArea = undefined;
-		}
-	}
+    public removeCurrentSelection(): void {
+        if (this.hasSliceSelection()) {
+            this.selections.delete(this.currentSlice);
 
-	public clearSelections() {
-		this.selections.clear();
-	}
+            this.selectedArea = undefined;
+        }
+    }
 
-	public updateCanvasHeight(height: number): void {
-		if (height && height > 0) {
-			this.canvasSize.height = height;
-		} else {
-			console.warn('RectROISelector | updateCanvasHeight - non numeric/positive height provided', height);
-		}
-	}
+    public clearSelections() {
+        this.selections.clear();
+    }
 
-	public updateCanvasWidth(width: number): void {
-		if (width && width > 0) {
-			this.canvasSize.width = width;
-		} else {
-			console.warn('RectROISelector | updateCanvasWidth - non numeric/positive width provided', width);
-		}
-	}
+    public updateCanvasHeight(height: number): void {
+        if (height && height > 0) {
+            this.canvasSize.height = height;
+        } else {
+            console.warn('RectROISelector | updateCanvasHeight - non numeric/positive height provided', height);
+        }
+    }
 
-	public removeSelection(selectionId: number): void {
-		if(selectionId == this.currentSlice) {
-			this.removeCurrentSelection();
-		} else {
-			this.selections.delete(selectionId);
-			this.clearCanvasSelection();
-		}
-		this.redrawSelections();
-	}
+    public updateCanvasWidth(width: number): void {
+        if (width && width > 0) {
+            this.canvasSize.width = width;
+        } else {
+            console.warn('RectROISelector | updateCanvasWidth - non numeric/positive width provided', width);
+        }
+    }
 
-	public pinSelection(selectionId: number, newValue: boolean): void {
-		let selection: CustomSliceSelection = this.selections.get(selectionId);
-		if(selection) {
-			if (selection.pinned != newValue) {
-				selection.pinned = newValue;
-				this.redrawSelections();
-			}
-		} else {
-			console.warn('RectROISelector | hideSelection | cannot pin non present selection!');
-		}
-	}
+    public removeSelection(selectionId: number): void {
+        if (selectionId === this.currentSlice) {
+            this.removeCurrentSelection();
+        } else {
+            this.selections.delete(selectionId);
+            this.clearCanvasSelection();
+        }
+        this.redrawSelections();
+    }
 
-	public hideSelection(selectionId: number, newValue: boolean): void {
-		let selection: SliceSelection = this.selections.get(selectionId);
-		if(selection) {
-			if (selection.hidden != newValue) {
-				selection.hidden = newValue;
-				this.redrawSelections();
-			}
-		} else {
-			console.warn('RectROISelector | hideSelection | cannot hide non present selection!');
-		}
-	}
+    public pinSelection(selectionId: number, newValue: boolean): void {
+        const selection: CustomSliceSelection = this.selections.get(selectionId);
+        if (selection) {
+            if (selection.pinned !== newValue) {
+                selection.pinned = newValue;
+                this.redrawSelections();
+            }
+        } else {
+            console.warn('RectROISelector | hideSelection | cannot pin non present selection!');
+        }
+    }
 
-	public normalizeByView(paramX: number, paramY: number): {x: number, y: number} {
-		return {
-			x: paramX / this.canvasSize.width,
-			y: paramY / this.canvasSize.height
-		}
-	}
+    public hideSelection(selectionId: number, newValue: boolean): void {
+        const selection: SliceSelection = this.selections.get(selectionId);
+        if (selection) {
+            if (selection.hidden !== newValue) {
+                selection.hidden = newValue;
+                this.redrawSelections();
+            }
+        } else {
+            console.warn('RectROISelector | hideSelection | cannot hide non present selection!');
+        }
+    }
 
-	public scaleToView(paramX: number, paramY: number): {x: number, y: number} {
-		return {
-			x: paramX * this.canvasSize.width,
-			y: paramY * this.canvasSize.height
-		}
-	}
+    public normalizeByView(paramX: number, paramY: number): { x: number, y: number } {
+        return {
+            x: paramX / this.canvasSize.width,
+            y: paramY / this.canvasSize.height
+        };
+    }
 
-	abstract redrawSelections(): void;
+    public scaleToView(paramX: number, paramY: number): { x: number, y: number } {
+        return {
+            x: paramX * this.canvasSize.width,
+            y: paramY * this.canvasSize.height
+        };
+    }
+
+    abstract redrawSelections(): void;
 }

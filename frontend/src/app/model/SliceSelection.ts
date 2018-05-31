@@ -1,5 +1,5 @@
 export interface SliceSelection {
     sliceIndex: number;
-	pinned: boolean;
-	hidden: boolean;
+    pinned: boolean;
+    hidden: boolean;
 }
