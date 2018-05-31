@@ -18,7 +18,7 @@ export class ROISelection3D implements ScanSelection<ROISelection2D> {
     }
 
     toJSON(): Object {
-        let jsonObject: { elements: SelectionData[] } = {elements: undefined};
+        const jsonObject: { elements: SelectionData[] } = {elements: undefined};
         jsonObject.elements = [];
         if (this._elements) {
             this._elements.forEach((element: ROISelection2D) => {

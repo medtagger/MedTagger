@@ -3,7 +3,7 @@ import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@an
 const FILE_SIZE_LIMIT = 5;  // MB
 
 export class SelectedScan {
-    directory: string = '';
+    directory = '';
     files: File[] = [];
 }
 
@@ -30,7 +30,7 @@ export class UserFiles {
 }
 
 @Component({
-    selector: 'upload-scans-selector',
+    selector: 'app-upload-scans-selector',
     templateUrl: './upload-scans-selector.component.html'
 })
 export class UploadScansSelectorComponent {
@@ -41,21 +41,21 @@ export class UploadScansSelectorComponent {
     private userSelectedFiles: File[] = [];
 
     public scans: SelectedScan[] = [];
-    public totalNumberOfSlices: number = 0;
+    public totalNumberOfSlices = 0;
     public incompatibleFiles: IncompatibleFile[] = [];
 
     private isCompatibleSliceFile(sliceFile: File): boolean {
         // Skip all files that are not DICOMs
-        if (sliceFile.type != "application/dicom") {
-            let reason = 'Incompatible MIME Type! Should be "application/dicom" but File has type "' + sliceFile.type + '".';
+        if (sliceFile.type !== 'application/dicom') {
+            const reason = 'Incompatible MIME Type! Should be "application/dicom" but File has type "' + sliceFile.type + '".';
             this.incompatibleFiles.push(new IncompatibleFile(sliceFile, reason));
             return false;
         }
 
         // Check for size limit (5 MB)
         if (sliceFile.size > FILE_SIZE_LIMIT * 1024 * 1024) {
-            let fileSize = Math.round(sliceFile.size / 1024 / 1024);
-            let reason = 'Too large File! This file has ' + fileSize + 'MB but the limit is ' + FILE_SIZE_LIMIT + 'MB.';
+            const fileSize = Math.round(sliceFile.size / 1024 / 1024);
+            const reason = 'Too large File! This file has ' + fileSize + 'MB but the limit is ' + FILE_SIZE_LIMIT + 'MB.';
             this.incompatibleFiles.push(new IncompatibleFile(sliceFile, reason));
             return false;
         }
@@ -69,14 +69,14 @@ export class UploadScansSelectorComponent {
         this.incompatibleFiles = [];
 
         // User didn't select any files
-        if (!this.userSelectedFiles || this.userSelectedFiles.length == 0) {
+        if (!this.userSelectedFiles || this.userSelectedFiles.length === 0) {
             return;
         }
 
         // User selected single scan upload
         if (!this.multipleScans) {
-            let singleScan = new SelectedScan();
-            for (let sliceFile of this.userSelectedFiles) {
+            const singleScan = new SelectedScan();
+            for (const sliceFile of this.userSelectedFiles) {
                 // Check file compatibility and add it to the list of incompatible files
                 if (!this.isCompatibleSliceFile(sliceFile)) {
                     continue;
@@ -95,16 +95,16 @@ export class UploadScansSelectorComponent {
         // User selected multiple scans for upload, so let's group them into the Scans
         let lastScanDirectory: String;
         let currentScan;
-        for (let sliceFile of this.userSelectedFiles) {
+        for (const sliceFile of this.userSelectedFiles) {
             // Check file compatibility and add it to the list of incompatible files
             if (!this.isCompatibleSliceFile(sliceFile)) {
                 continue;
             }
 
             // Slices that are in the same directory as others (previous ones) are considered as a single Scan
-            let slicePath = sliceFile.webkitRelativePath;
-            let currentScanDirectory = slicePath.split("/").slice(0, -1).join("/");
-            if (currentScanDirectory != lastScanDirectory) {
+            const slicePath = sliceFile.webkitRelativePath;
+            const currentScanDirectory = slicePath.split('/').slice(0, -1).join('/');
+            if (currentScanDirectory !== lastScanDirectory) {
                 // If this is not the first iteration of the whole loop over files -> save current Scan
                 if (!!lastScanDirectory) {
                     this.scans.push(currentScan);
