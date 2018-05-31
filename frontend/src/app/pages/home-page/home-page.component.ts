@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {UserInfo} from '../../model/UserInfo';
-import {MatSnackBar} from "@angular/material";
+import {MatSnackBar} from '@angular/material';
 
 @Component({
     selector: 'app-home-page',

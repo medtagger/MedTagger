@@ -3,12 +3,12 @@ import {LabelService} from '../../services/label.service';
 import {Label} from '../../model/Label';
 import {ScanService} from '../../services/scan.service';
 import {MarkerSlice} from '../../model/MarkerSlice';
-import {ScanMetadata} from "../../model/ScanMetadata";
+import {ScanMetadata} from '../../model/ScanMetadata';
 import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
-import {DialogService} from "../../services/dialog.service";
-import {Location} from "@angular/common";
+import {DialogService} from '../../services/dialog.service';
+import {Location} from '@angular/common';
 
 
 @Component({
@@ -86,7 +86,7 @@ export class ValidationPageComponent implements OnInit {
             });
         }).catch((error: Error) => {
             this.dialogService
-                .openInfoDialog("Nothing to do here!", "No more Labels need your attention!", "Go back")
+                .openInfoDialog('Nothing to do here!', 'No more Labels need your attention!', 'Go back')
                 .afterClosed()
                 .subscribe(() => {
                     this.location.back();

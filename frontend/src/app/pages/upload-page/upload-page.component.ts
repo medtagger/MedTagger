@@ -5,10 +5,15 @@ import {HttpErrorResponse} from '@angular/common/http';
 
 import {ScanService} from '../../services/scan.service';
 import {ScanMetadata} from '../../model/ScanMetadata';
-import {UploadScansSelectorComponent, SelectedScan, UserFiles, IncompatibleFile} from "../../components/upload-scans-selector/upload-scans-selector.component";
-import {Observable} from "rxjs/internal/Observable";
-import {interval} from "rxjs/internal/observable/interval";
-import {throwError} from "rxjs/internal/observable/throwError";
+import {
+    UploadScansSelectorComponent,
+    SelectedScan,
+    UserFiles,
+    IncompatibleFile
+} from '../../components/upload-scans-selector/upload-scans-selector.component';
+import {Observable} from 'rxjs/internal/Observable';
+import {interval} from 'rxjs/internal/observable/interval';
+import {throwError} from 'rxjs/internal/observable/throwError';
 
 
 enum UploadMode {
@@ -34,10 +39,10 @@ enum UploadStep {
 }
 
 class UploadingScan {
-    id: string = '';
+    id = '';
     status: UploadingScanStatus = UploadingScanStatus.QUEUED;
     scan: SelectedScan;
-    errorsDuringUpload: number = 0;
+    errorsDuringUpload = 0;
 
     constructor(scan: SelectedScan) {
         this.scan = scan;
@@ -87,11 +92,11 @@ export class UploadPageComponent implements OnInit {
     errorScans: Array<UploadingScan> = [];
 
     incompatibleFiles: IncompatibleFile[] = [];
-    
-    slicesSent: number = 0;
-    totalNumberOfSlices: number = 0;
-    progress: number = 0.0;
-    
+
+    slicesSent = 0;
+    totalNumberOfSlices = 0;
+    progress = 0.0;
+
     // Needed in template for comparison with Enum values
     UploadMode = UploadMode;
     UploadingScanStatus = UploadingScanStatus;
@@ -106,7 +111,8 @@ export class UploadPageComponent implements OnInit {
     uploadCompletedFormGroup: FormGroup;
     chooseCategoryFormGroup: FormGroup;
 
-    constructor(private scanService: ScanService, private formBuilder: FormBuilder) {}
+    constructor(private scanService: ScanService, private formBuilder: FormBuilder) {
+    }
 
     ngOnInit() {
         this.chooseModeFormGroup = this.formBuilder.group({});
@@ -133,11 +139,11 @@ export class UploadPageComponent implements OnInit {
     }
 
     private pollScanUploadStatus() {
-        let TIME_INTERVAL = 5000; // 5 seconds
-        var subscription = interval(TIME_INTERVAL).subscribe(_ => {
+        const TIME_INTERVAL = 5000; // 5 seconds
+        const subscription = interval(TIME_INTERVAL).subscribe(_ => {
             // Iteration in reverse order makes it safe to remove elements from this array
             for (let i = this.uploadingAndProcessingScans.length - 1; i >= 0; i--) {
-                let scanToMonitor = this.uploadingAndProcessingScans[i];
+                const scanToMonitor = this.uploadingAndProcessingScans[i];
 
                 // Skip all Scans that were not fully created yet
                 if (!scanToMonitor.id) {
@@ -149,7 +155,7 @@ export class UploadPageComponent implements OnInit {
                     scanToMonitor.updateStatus(metadata);
                 }, (error: HttpErrorResponse) => {
                     // Scan was removed from MedTagger due to all files corrupted
-                    if (error.status == 404) {
+                    if (error.status === 404) {
                         scanToMonitor.status = UploadingScanStatus.ERROR;
                     }
                 });
@@ -177,7 +183,7 @@ export class UploadPageComponent implements OnInit {
             }
         });
     }
-    
+
     public async uploadFiles(): Promise<void> {
         this.slicesSent = 0;
         this.progress = 0.0;
@@ -187,7 +193,7 @@ export class UploadPageComponent implements OnInit {
         this.uploadingAndProcessingScans = [];
         this.availableScans = [];
         this.errorScans = [];
-        for (let scan of this.scans) {
+        for (const scan of this.scans) {
             this.queuedScans.push(new UploadingScan(scan));
         }
 
@@ -196,7 +202,7 @@ export class UploadPageComponent implements OnInit {
 
         // Upload all queued Scans one by one
         while (this.queuedScans.length > 0) {
-            let queuedScan = this.queuedScans.pop();
+            const queuedScan = this.queuedScans.pop();
             queuedScan.status = UploadingScanStatus.UPLOADING;
             this.uploadingAndProcessingScans.push(queuedScan);
             try {
@@ -208,8 +214,8 @@ export class UploadPageComponent implements OnInit {
     }
 
     private asyncUploadSingleScan(uploadingScan: UploadingScan): Promise<void> {
-        let numberOfAllSlices = uploadingScan.scan.files.length;
-        var numberOfSlicesSent = 0;
+        const numberOfAllSlices = uploadingScan.scan.files.length;
+        let numberOfSlicesSent = 0;
         return new Promise<void>((resolve, reject) => {
             this.uploadSingleScan(uploadingScan).then((newScan) => {
                 console.log('Upload has started!');
@@ -232,25 +238,24 @@ export class UploadPageComponent implements OnInit {
     }
 
     private uploadSingleScan(uploadingScan: UploadingScan): Promise<Observable<any | never>> {
-        let category = this.chooseCategoryFormGroup.get('category').value;
-        let numberOfSlices = uploadingScan.scan.files.length;
-
+        const category = this.chooseCategoryFormGroup.get('category').value;
+        const numberOfSlices = uploadingScan.scan.files.length;
 
         return this.scanService.createNewScan(category, numberOfSlices).then((scanId: string) => {
-            console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
-            uploadingScan.id = scanId;
-            return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
-        },
+                console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
+                uploadingScan.id = scanId;
+                return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
+            },
             () => {
-            return throwError({error: 'Could not create Scan.'});
-        });
+                return throwError({error: 'Could not create Scan.'});
+            });
     }
 
     private resetFormGroup(formGroup: FormGroup): void {
         formGroup.reset();
         formGroup.markAsUntouched();
         Object.keys(formGroup.controls).forEach((name) => {
-            let control = formGroup.controls[name];
+            const control = formGroup.controls[name];
             control.setErrors(null);
         });
     }
@@ -293,7 +298,7 @@ export class UploadPageComponent implements OnInit {
         this.scans = [];
         this.incompatibleFiles = [];
         this.totalNumberOfSlices = 0;
-        for (let listElement of this.scansForRetry.selectedOptions.selected) {
+        for (const listElement of this.scansForRetry.selectedOptions.selected) {
             this.totalNumberOfSlices += listElement.value.scan.files.length;
             this.scans.push(listElement.value.scan);
         }
@@ -311,19 +316,19 @@ export class UploadPageComponent implements OnInit {
     public isGoogleChrome(): boolean {
         // TODO: It would be nice to check if there is some lib that does it for us
         // For now, this ugly method was taken (nearly) as-is from: https://stackoverflow.com/a/13348618
-        var isChromium = (window as any).chrome,
+        const isChromium = (window as any).chrome,
             winNav = window.navigator,
             vendorName = winNav.vendor,
-            isOpera = winNav.userAgent.indexOf("OPR") > -1,
-            isIEedge = winNav.userAgent.indexOf("Edge") > -1,
-            isIOSChrome = winNav.userAgent.match("CriOS");
+            isOpera = winNav.userAgent.indexOf('OPR') > -1,
+            isIEedge = winNav.userAgent.indexOf('Edge') > -1,
+            isIOSChrome = winNav.userAgent.match('CriOS');
 
         if (isIOSChrome) {
             return false; // We don't want to support mobile devices
         } else if (
             isChromium !== null &&
-            typeof isChromium !== "undefined" &&
-            vendorName === "Google Inc." &&
+            typeof isChromium !== 'undefined' &&
+            vendorName === 'Google Inc.' &&
             isOpera === false &&
             isIEedge === false
         ) {

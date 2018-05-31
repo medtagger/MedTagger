@@ -1,8 +1,7 @@
-import {Injectable} from "@angular/core";
-import {environment} from "../../environments/environment";
-import {UserInfo} from "../model/UserInfo";
+import {Injectable} from '@angular/core';
+import {environment} from '../../environments/environment';
+import {UserInfo} from '../model/UserInfo';
 import {HttpClient} from '@angular/common/http';
-import {UserSettings} from "../model/UserSettings";
 
 interface LogInResponse {
     token: string;
@@ -26,8 +25,8 @@ export class AccountService {
     constructor(private http: HttpClient) {}
 
     public register(email: string, password: string, firstName: string, lastName: string): Promise<void> {
-        let url = environment.API_URL + '/auth/register';
-        let payload = {
+        const url = environment.API_URL + '/auth/register';
+        const payload = {
             email: email,
             password: password,
             firstName: firstName,
@@ -36,52 +35,53 @@ export class AccountService {
         return new Promise<void>((resolve, reject) => {
             this.http.post(url, payload).toPromise()
                 .then(response => {
-                    console.log("AccountService | register | response: ", response);
+                    console.log('AccountService | register | response: ', response);
                     resolve();
                 })
                 .catch(error => {
-                    console.log("AccountService | register | error: ", error);
+                    console.log('AccountService | register | error: ', error);
                     reject(error);
                 });
-        })
+        });
     }
 
     public logIn(email: string, password: string): Promise<string> {
-        let url = environment.API_URL + '/auth/sign-in';
-        let payload = {
+        const url = environment.API_URL + '/auth/sign-in';
+        const payload = {
             'email': email,
             'password': password
         };
         return new Promise((resolve, reject) => {
             this.http.post<LogInResponse>(url, payload).toPromise()
                 .then(response => {
-                    console.log("AccountService | logIn | response: ", response);
+                    console.log('AccountService | logIn | response: ', response);
                     resolve(response.token);
                 })
                 .catch(error => {
-                    console.log("AccountService | logIn | error: ", error);
+                    console.log('AccountService | logIn | error: ', error);
                     reject(error);
                 });
-        })
+        });
     }
 
     public getCurrentUserInfo(): Promise<UserInfo> {
-        let url = environment.API_URL + '/users/info';
+        const url = environment.API_URL + '/users/info';
         return new Promise((resolve, reject) => {
             this.http.get<UserInfoResponse>(url).toPromise()
                 .then(response => {
-                    console.log("AccountService | getCurrentUserInfo | response: ", response);
-                    let userInfo = new UserInfo(response.id, response.email, response.firstName, response.lastName, response.role, response.settings);
+                    console.log('AccountService | getCurrentUserInfo | response: ', response);
+                    const userInfo = new UserInfo(response.id, response.email, response.firstName, response.lastName,
+                        response.role, response.settings);
                     resolve(userInfo);
                 })
                 .catch(error => {
-                    console.log("AccountService | getCurrentUserInfo | error: ", error);
+                    console.log('AccountService | getCurrentUserInfo | error: ', error);
                     reject(error);
                 });
-        })
+        });
     }
 
     public isLoggedIn(): boolean {
-        return !!(sessionStorage.getItem('userInfo') && sessionStorage.getItem('authorizationToken'))
+        return !!(sessionStorage.getItem('userInfo') && sessionStorage.getItem('authorizationToken'));
     }
 }
