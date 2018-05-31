@@ -29,6 +29,8 @@ matrix:
     # Frontend - linters
     - language: node_js
       env: FRONTEND=linters
+      node_js:
+        - "8"
       script:
         - ./.travis/run_tests_if_subproject_changed.py frontend --command="
            cd frontend/ &&
