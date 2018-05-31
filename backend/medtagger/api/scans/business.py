@@ -1,9 +1,11 @@
 """Module responsible for business logic in all Scans endpoints."""
+import io
 import logging
 from typing import Callable, Iterable, Dict, List, Tuple, Any
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
+from PIL import Image
 
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.repositories.label_tag import LabelTagRepository
@@ -99,6 +101,39 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
         yield _slice, image
 
 
+def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> None:
+    """Validate and raise an Exception for sent payload.
+
+    :param elements: List of JSONs describing elements for a single label
+    :param files: mapping of uploaded files (name and content)
+    """
+    _validate_files(files)
+    _validate_label_elements(elements, files)
+
+
+def _validate_files(files: Dict[str, bytes]) -> None:
+    """Validate files and make sure that images are PNGs."""
+    for file_name, file_data in files.items():
+        try:
+            image = Image.open(io.BytesIO(file_data))
+            image.verify()
+            assert image.format == 'PNG'
+        except Exception:
+            raise InvalidArgumentsException('Type of file "{}" is not supported!'.format(file_name))
+
+
+def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> None:
+    """Validate Label Elements and make suer that all Brush Elements have images."""
+    for label_element in elements:
+        # Each Brush Label Element should have its own image attatched
+        if label_element['tool'] == LabelTool.BRUSH.value:
+            try:
+                files[label_element['image_key']]
+            except KeyError:
+                message = 'Request does not have field named {} that could contain the image!'
+                raise InvalidArgumentsException(message.format(label_element['image_key']))
+
+
 def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, bytes],
               labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
@@ -131,11 +166,8 @@ def add_label_element(element: Dict[str, Any], label_id: LabelID, files: Dict[st
         LabelTool.RECTANGLE.value: _add_rectangle_element,
         LabelTool.BRUSH.value: _add_brush_element,
     }
-    try:
-        handler = handlers[tool]
-        handler(element, label_id, files)
-    except KeyError:
-        raise InvalidArgumentsException('{} tool is not supported!'.format(tool))
+    handler = handlers[tool]
+    handler(element, label_id, files)
 
 
 def _add_rectangle_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> None:
@@ -161,11 +193,7 @@ def _add_brush_element(element: Dict[str, Any], label_id: LabelID, files: Dict[s
     height = element['height']
     label_tag = _get_label_tag(element['tag'])
     slice_index = element['slice_index']
-    try:
-        image = files[element['image_key']]
-    except KeyError:
-        message = 'Request does not have field named {} that could contain the image!'
-        raise InvalidArgumentsException(message.format(element['image_key']))
+    image = files[element['image_key']]
     LabelsRepository.add_new_brush_label_element(label_id, slice_index, width, height, image, label_tag)
 
 

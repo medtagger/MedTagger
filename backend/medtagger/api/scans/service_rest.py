@@ -1,5 +1,4 @@
 """Module responsible for definition of Scans service available via HTTP REST API."""
-import io
 import json
 from typing import Any
 
@@ -7,7 +6,6 @@ from flask import request
 from flask_restplus import Resource
 from jsonschema import validate, ValidationError, Draft4Validator
 from jsonschema.exceptions import best_match
-from PIL import Image
 
 from medtagger.types import ScanID
 from medtagger.api import api
@@ -100,7 +98,6 @@ class Random(Resource):
 class Label(Resource):
     """Endpoint that stores label for given scan."""
 
-    # TODO: Fix these docs :(
     @staticmethod
     @login_required
     @scans_ns.expect(serializers.in__label)
@@ -109,7 +106,23 @@ class Label(Resource):
     @scans_ns.doc(description='Stores label and assigns it to given scan.')
     @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan or tag'})
     def post(scan_id: ScanID) -> Any:
-        """Save new label for given scan."""
+        """Add new Label for given scan.
+
+        This endpoint needs a multipart/form-data content where there is one mandatory section called "label".
+        Such section will contain a JSON payload with representation of a Label. If such Label needs additional
+        information like images (binary mask), please attach them as a separate part.
+
+        Here is an example CURL command that sends Label with Brush Element:
+
+            $> curl -v
+                    -H "Content-Type:multipart/form-data"
+                    -H "Authorization: Bearer MEDTAGGER_API_TOKEN"
+                    -F "SLICE_1=@"/Users/jakubpowierza/Desktop/test.png""
+                    -F "label={"elements": [{"width": 1, "height": 1, "image_key": "SLICE_1",
+                               "slice_index": 1, "tag": "LEFT_KIDNEY", "tool": "BRUSH"}],
+                               "labeling_time": 0.1};type=application/json"
+                     http://localhost:51000/api/v1/scans/c5102707-cb36-4869-8041-f00421c03fa1/label
+        """
         files = {name: file_data.read() for name, file_data in request.files.items()}
         label = json.loads(request.form['label'])
         elements = label['elements']
@@ -121,14 +134,7 @@ class Label(Resource):
             best_error = best_match(errors)
             raise InvalidArgumentsException(best_error.message)
 
-        # Make sure that we have all images/files as PNG
-        for file_name, file_data in files.items():
-            try:
-                image = Image.open(io.BytesIO(file_data))
-                image.verify()
-                assert image.format == 'PNG'
-            except Exception:
-                raise InvalidArgumentsException('Type of file "{}" is not supported!'.format(file_name))
+        business.validate_label_payload(elements, files)
 
         labeling_time = label['labeling_time']
         label = business.add_label(scan_id, elements, files, labeling_time)
