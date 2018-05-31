@@ -6,7 +6,7 @@ import SimpleITK as sitk
 from scipy import ndimage
 
 from medtagger.definitions import DicomTag
-from medtagger.dicoms import read_float, read_list
+from medtagger.dicoms import read_float, read_list, read_string
 
 
 def convert_slice_to_normalized_8bit_array(dicom_file: sitk.Image) -> np.ndarray:
@@ -35,6 +35,7 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[sitk.Image], output_
 
     # Read all Dicom images and retrieve pixel values for each slice
     pixel_array = np.array(np.stack(sitk.GetArrayFromImage(_slice)[0] for _slice in dicom_files))
+    _convert_to_hounsfield_units_if_needed(dicom_file[0], pixel_array)
 
     # Calculate scale factor that should be applied to the input 3D scan
     real_shape = np.array([thickness, spacing, spacing]) * pixel_array.shape  # Shape after applying voxel's size
@@ -46,6 +47,20 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[sitk.Image], output_
 
     pixel_array_normalized = (pixel_array - np.min(pixel_array)) / (np.max(pixel_array) - np.min(pixel_array))
     pixel_array = np.uint8(pixel_array_normalized * 255)
+    return pixel_array
+
+
+def _convert_to_hounsfield_units_if_needed(example_dicom_file: sitk.Image, pixel_array: np.ndarray) -> np.ndarray:
+    """Convert to Hounsfield Units based on example DICOM metadata.
+
+    :param example_dicom_file: example DICOM file related with currently processing Scan
+    :param pixel_array: 3D numpy array with Scan
+    """
+    modality = read_string(example_dicom_file, DicomTag.MODALITY, default=None)
+    intercept = read_float(example_dicom_file, DicomTag.RESCALE_INTERCEPT, default=None)
+    slope = read_float(example_dicom_file, DicomTag.RESCALE_SLOPE, default=None)
+    if modality == 'CT' and intercept is not None and slope is not None:
+        pixel_array = pixel_array * slope + intercept
     return pixel_array
 
 
