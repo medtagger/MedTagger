@@ -189,6 +189,6 @@ export class ScanService {
                 );
             }),
             mergeAll(CONCURRENT_API_CALLS)
-        )
+        );
     }
 }
