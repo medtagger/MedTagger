@@ -37,7 +37,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert len(scan_id) >= 1
 
     # Step 3. Send slices
-    with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
+    with open('tests/assets/example_scan/slice_1.dcm', 'rb') as image:
         response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
             'image': (image, 'slice_1.dcm'),
         }, content_type='multipart/form-data', headers=get_headers(token=user_token))

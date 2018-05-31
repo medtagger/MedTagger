@@ -4,7 +4,6 @@ from typing import Callable, Iterable, Dict, List, Tuple, Any
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.datastructures import FileStorage
 
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.repositories.label_tag import LabelTagRepository
@@ -20,7 +19,7 @@ from medtagger.api.utils import get_current_user
 
 logger = logging.getLogger(__name__)
 
-LabelElementHandler = Callable[[Dict[str, Any], LabelID, Dict[str, FileStorage]], None]
+LabelElementHandler = Callable[[Dict[str, Any], LabelID, Dict[str, bytes]], None]
 
 
 def get_available_scan_categories() -> List[ScanCategory]:
@@ -100,7 +99,7 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
         yield _slice, image
 
 
-def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, FileStorage],
+def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, bytes],
               labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
 
@@ -116,16 +115,16 @@ def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, FileStorag
     except IntegrityError:
         raise NotFoundException('Could not find Scan for that id!')
     for element in elements:
-        add_label_element(element, files, label.id)
+        add_label_element(element, label.id, files)
     return label
 
 
-def add_label_element(element: Dict[str, Any], files: Dict[str, FileStorage], label_id: LabelID) -> None:
+def add_label_element(element: Dict[str, Any], label_id: LabelID, files: Dict[str, bytes]) -> None:
     """Add new Label Element for given Label.
 
     :param element: JSON describing single element
-    :param files: mapping of uploaded files (name and content)
     :param label_id: ID of a given Label that the element should be added to
+    :param files: mapping of uploaded files (name and content)
     """
     tool = element['tool']
     handlers: Dict[str, LabelElementHandler] = {
@@ -151,7 +150,7 @@ def _add_rectangle_element(element: Dict[str, Any], label_id: LabelID, *_: Any) 
     LabelsRepository.add_new_rectangular_label_element(label_id, position, shape, label_tag)
 
 
-def _add_brush_element(element: Dict[str, Any], label_id: LabelID, files: Dict[str, FileStorage]) -> None:
+def _add_brush_element(element: Dict[str, Any], label_id: LabelID, files: Dict[str, bytes]) -> None:
     """Add new Brush Label Element for given Label.
 
     :param element: JSON describing single element
@@ -163,7 +162,7 @@ def _add_brush_element(element: Dict[str, Any], label_id: LabelID, files: Dict[s
     label_tag = _get_label_tag(element['tag'])
     slice_index = element['slice_index']
     try:
-        image = files[element['image_key']].read()
+        image = files[element['image_key']]
     except KeyError:
         message = 'Request does not have field named {} that could contain the image!'
         raise InvalidArgumentsException(message.format(element['image_key']))

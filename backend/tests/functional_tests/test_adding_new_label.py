@@ -35,8 +35,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
         }],
         'labeling_time': 12.34,
     }
-    # TODO: In real life - this should be a PNG image...
-    with open('example_data/example_scan/slice_1.dcm', 'rb') as image:
+    with open('tests/assets/example_labels/binary_mask.png', 'rb') as image:
         data = {
             'label': json.dumps(payload),
             'SLICE_1': (image, 'slice_1'),
