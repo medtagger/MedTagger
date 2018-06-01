@@ -11,9 +11,8 @@ import {ROISelection2D} from '../../model/ROISelection2D';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 import {MatSnackBar} from '@angular/material';
-import {LabelTag} from "../../model/LabelTag";
-import {LabelListItem} from "../../model/LabelListItem";
-import {LabelExplorerComponent} from "../../components/label-explorer/label-explorer.component";
+import {LabelTag} from '../../model/LabelTag';
+import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
 
 
 @Component({
@@ -30,10 +29,10 @@ export class MarkerPageComponent implements OnInit {
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
 
-	// TODO: get labelling context from categry
-	tags: Array<LabelTag> = [
-		new LabelTag("All", "ALL", ["RECTANGLE"])
-	];
+    // TODO: get labelling context from categry
+    tags: Array<LabelTag> = [
+        new LabelTag('All', 'ALL', ['RECTANGLE'])
+    ];
 
     scan: ScanMetadata;
     category: string;
@@ -91,7 +90,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private requestScan(): void {
-      this.marker.setDownloadScanInProgress(true);
+        this.marker.setDownloadScanInProgress(true);
         this.scanService.getRandomScan(this.category).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -151,19 +150,19 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private startMeasuringLabelingTime(): void {
-      this.startTime = new Date();
+        this.startTime = new Date();
     }
 
     private getLabelingTimeInSeconds(startTime: Date): number {
-      const endTime = new Date();
-      return (endTime.getTime() - startTime.getTime()) / 1000.0;
+        const endTime = new Date();
+        return (endTime.getTime() - startTime.getTime()) / 1000.0;
     }
 
     private indicateLabelHasBeenSend(): void {
-      this.snackBar.open('Label has been sent!', '', {duration: 2000, });
+        this.snackBar.open('Label has been sent!', '', {duration: 2000});
     }
 
     private indicateNewScanAppeared(): void {
-      this.snackBar.open('New scan has been loaded!', '', {duration: 2000, });
+        this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
     }
 }

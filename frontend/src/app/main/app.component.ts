@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {Router, NavigationEnd, ActivatedRoute} from '@angular/router';
 import {UserInfo} from '../model/UserInfo';
-import {MatSnackBar} from "@angular/material";
-import {filter, map, mergeMap} from "rxjs/operators";
+import {MatSnackBar} from '@angular/material';
+import {filter, map, mergeMap} from 'rxjs/operators';
 
 @Component({
     selector: 'app-root',
@@ -11,24 +11,25 @@ import {filter, map, mergeMap} from "rxjs/operators";
 })
 export class AppComponent implements OnInit {
 
-    public pageTitle: string = '';
-    public shouldShowFooter: boolean = true;
+    public pageTitle = '';
+    public shouldShowFooter = true;
     public currentUser: UserInfo;
 
     constructor(private router: Router, private activatedRoute: ActivatedRoute, private snackBar: MatSnackBar) {
         router.events.subscribe(() => {
             this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));
             console.log(this.currentUser);
-        })
-
-    };
+        });
+    }
 
     ngOnInit() {
         this.router.events.pipe(
             filter((event) => event instanceof NavigationEnd),
             map(() => this.activatedRoute),
             map((route: ActivatedRoute) => {
-                while (route.firstChild) route = route.firstChild;
+                while (route.firstChild) {
+                    route = route.firstChild;
+                }
                 return route;
             }),
             filter((route: ActivatedRoute) => route.outlet === 'primary'),

@@ -37,11 +37,11 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
         reader.SetFileName(temp_file.name)
         reader.ReadImageInformation()
 
-        location = SliceLocation(read_float(reader, DicomTag.SLICE_LOCATION, default=0.0))
-        position = SlicePosition(*list(map(float, read_list(reader, DicomTag.IMAGE_POSITION_PATIENT,
-                                                            default=[0.0, 0.0, 0.0]))))
-        height = read_int(reader, DicomTag.ROWS)
-        width = read_int(reader, DicomTag.COLUMNS)
+        location = SliceLocation(read_float(reader, DicomTag.SLICE_LOCATION) or 0.0)
+        raw_position = read_list(reader, DicomTag.IMAGE_POSITION_PATIENT) or [0.0, 0.0, 0.0]
+        position = SlicePosition(*list(map(float, raw_position)))
+        height = read_int(reader, DicomTag.ROWS) or 0
+        width = read_int(reader, DicomTag.COLUMNS) or 0
 
     except RuntimeError:
         logger.error('User sent a file that is not a DICOM.')

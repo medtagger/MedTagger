@@ -101,8 +101,8 @@
                             </section>
                         </mat-card-content>
                         <mat-card-actions>
-                            <upload-scans-selector #uploadSingleScanSelector (onFileSelect)="chooseFiles($event)"
-                                                   [multipleScans]="false" style="float: left;"></upload-scans-selector>
+                            <app-upload-scans-selector #uploadSingleScanSelector (onFileSelect)="chooseFiles($event)"
+                                                   [multipleScans]="false" style="float: left;"></app-upload-scans-selector>
                             <button mat-raised-button color="primary" (click)="uploadFiles()"
                                     *ngIf="totalNumberOfSlices != 0" style="float: right;" matStepperNext>
                                 <mat-icon>file_upload</mat-icon>
@@ -149,8 +149,8 @@
                             </section>
                         </mat-card-content>
                         <mat-card-actions>
-                            <upload-scans-selector #uploadMultipleScansSelector (onFileSelect)="chooseFiles($event)"
-                                                   [multipleScans]="true" style="float: left;"></upload-scans-selector>
+                            <app-upload-scans-selector #uploadMultipleScansSelector (onFileSelect)="chooseFiles($event)"
+                                                   [multipleScans]="true" style="float: left;"></app-upload-scans-selector>
                             <button mat-raised-button color="primary" (click)="uploadFiles()"
                                     *ngIf="totalNumberOfSlices != 0" style="float: right;" matStepperNext>
                                 <mat-icon>file_upload</mat-icon>

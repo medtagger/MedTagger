@@ -16,6 +16,7 @@ def convert_slice_to_normalized_8bit_array(dicom_file: sitk.Image) -> np.ndarray
     :return numpy array of pixels
     """
     pixel_array = sitk.GetArrayFromImage(dicom_file)[0]
+    pixel_array[pixel_array < -1000] = -1000  # Set all smaller values to Air
     pixel_array_normalized = (pixel_array - np.min(pixel_array)) / (np.max(pixel_array) - np.min(pixel_array))
     pixel_array = np.uint8(pixel_array_normalized * 255)
     return pixel_array
@@ -31,10 +32,11 @@ def convert_scan_to_normalized_8bit_array(dicom_files: List[sitk.Image], output_
     """
     dicom_files = sorted(dicom_files, key=lambda _slice: read_float(_slice, DicomTag.SLICE_LOCATION), reverse=True)
     thickness = _get_scan_slice_thickness(dicom_files)
-    spacing = float(read_list(dicom_files[0], DicomTag.PIXEL_SPACING)[0])
+    spacing = float((read_list(dicom_files[0], DicomTag.PIXEL_SPACING) or [])[0])
 
     # Read all Dicom images and retrieve pixel values for each slice
     pixel_array = np.array(np.stack(sitk.GetArrayFromImage(_slice)[0] for _slice in dicom_files))
+    pixel_array[pixel_array < -1000] = -1000  # Set all smaller values to Air
 
     # Calculate scale factor that should be applied to the input 3D scan
     real_shape = np.array([thickness, spacing, spacing]) * pixel_array.shape  # Shape after applying voxel's size
@@ -56,8 +58,8 @@ def _get_scan_slice_thickness(dicom_files: List[Any]) -> float:
     :return: float value with Scan's Slice thickness
     """
     try:
-        first_location = read_float(dicom_files[0], DicomTag.SLICE_LOCATION, default=0.0)
-        second_location = read_float(dicom_files[1], DicomTag.SLICE_LOCATION, default=0.0)
+        first_location = read_float(dicom_files[0], DicomTag.SLICE_LOCATION) or 0.0
+        second_location = read_float(dicom_files[1], DicomTag.SLICE_LOCATION) or 0.0
         return abs(second_location - first_location)
     except IndexError:
         return 1.0  # It seems that there is only one Slice. Thickness >=1.0 will be fine for all of the computations.

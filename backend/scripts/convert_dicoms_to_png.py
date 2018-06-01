@@ -33,13 +33,13 @@ converted_dicoms_folder_path = args.output
 
 dicoms = [sitk.ReadImage(dicoms_folder_path + d) for d in os.listdir(dicoms_folder_path) if
           os.path.isfile(dicoms_folder_path + d)]
-min_position = abs(min(float(read_list(dicom, DicomTag.IMAGE_POSITION_PATIENT)[2]) for dicom in dicoms))
+min_position = abs(min(float((read_list(dicom, DicomTag.IMAGE_POSITION_PATIENT) or [])[2]) for dicom in dicoms))
 
 if not os.path.exists(converted_dicoms_folder_path):
     os.mkdir(converted_dicoms_folder_path)
 
 for single_dicom in dicoms:
     image_bytes = convert_slice_to_normalized_8bit_array(single_dicom)
-    slice_position = float(read_list(single_dicom, DicomTag.IMAGE_POSITION_PATIENT)[2])
+    slice_position = float((read_list(single_dicom, DicomTag.IMAGE_POSITION_PATIENT) or [])[2])
     converted_dicom_name = '{0:.2f}'.format(slice_position + min_position)
     Image.fromarray(image_bytes, 'L').save(converted_dicoms_folder_path + converted_dicom_name + '.png')
