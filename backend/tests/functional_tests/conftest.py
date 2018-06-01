@@ -3,18 +3,15 @@ import logging
 from typing import Any
 
 import pytest
-
 from cassandra.cqlengine.models import ModelMetaClass
 
+from medtagger import storage
 from medtagger.api import InvalidArgumentsException
+from medtagger.api.auth.business import create_user, sign_in_user
+from medtagger.api.users.business import set_user_role
 from medtagger.api.rest import app
 from medtagger.database import Base, session, db_session
 from medtagger.database.fixtures import apply_all_fixtures
-from medtagger.api.auth.business import create_user, sign_in_user
-from medtagger.api.users.business import set_user_role
-from medtagger.database import Base, session
-from medtagger.database.fixtures import apply_all_fixtures
-from medtagger import storage
 from medtagger.storage import models
 from medtagger.repositories.roles import RolesRepository
 

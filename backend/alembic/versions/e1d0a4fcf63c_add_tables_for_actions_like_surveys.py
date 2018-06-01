@@ -1,7 +1,7 @@
 """Add tables for Actions like Surveys
 
 Revision ID: e1d0a4fcf63c
-Revises: f49f6dc9b600
+Revises: 39c660178412
 Create Date: 2018-04-28 20:09:39.238496
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'e1d0a4fcf63c'
-down_revision = 'f49f6dc9b600'
+down_revision = '39c660178412'
 branch_labels = None
 depends_on = None
 

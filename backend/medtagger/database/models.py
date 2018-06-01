@@ -7,10 +7,10 @@ from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
-from medtagger.database import Base, db_session, db
+from medtagger.database import Base, db_session
 from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
     LabelElementStatus, LabelTool
-from medtagger.types import ScanID, SliceID, LabelID, LabelSelectionID, SliceLocation, SlicePosition, \
+from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime, LabelTagID, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
     ActionResponseID, SurveyResponseID
 

@@ -5,7 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.types import LabelID, ActionID
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
-from medtagger.database.models import Label, LabelStatus, Action, ActionResponse
+from medtagger.database.models import Label, Action, ActionResponse
 from medtagger.definitions import LabelVerificationStatus
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.actions import ActionsRepository, InvalidResponseException, \
