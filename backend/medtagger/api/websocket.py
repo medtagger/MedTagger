@@ -8,6 +8,9 @@ It is also a great entry point for running WebSocket's endpoints. To do so, you 
 # pylint: disable=unused-import;  It's used by Flask
 # pylint: disable=wrong-import-position;  Python logging should be configured ASAP
 import logging.config
+from typing import Any
+from gevent import monkey
+monkey.patch_all()
 
 # Setup logging as fast as possible, so imported libraries __init__.py will
 # be able to log using our configuration of logging
@@ -17,9 +20,9 @@ from flask_cors import CORS  # noqa
 
 from medtagger.api import blueprint, web_socket  # noqa
 from medtagger.config import AppConfiguration  # noqa
-from medtagger.clients.hbase_client import create_hbase_connection_pool  # noqa
-from medtagger.database import db  # noqa
+from medtagger.database import session  # noqa
 from medtagger.database.models import User, Role  # noqa
+from medtagger.storage import create_connection  # noqa
 
 # Import all WebSocket services
 from medtagger.api.scans.service_web_socket import Slices as slices_websocket_ns  # noqa
@@ -29,6 +32,9 @@ logger = logging.getLogger(__name__)
 # Load configuration
 logger.info('Loading configuration file...')
 configuration = AppConfiguration()
+host = configuration.get('api', 'host', fallback='localhost')
+port = configuration.getint('api', 'websocket_port', fallback=51001)
+debug = configuration.getboolean('api', 'debug', fallback=True)
 
 # Definition of application
 app = Flask(__name__)
@@ -36,17 +42,14 @@ CORS(app)
 app.secret_key = configuration.get('api', 'secret_key', fallback='')
 web_socket.init_app(app)
 
-# Application config
-app.config['SQLALCHEMY_DATABASE_URI'] = configuration.get('db', 'database_uri')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+create_connection(use_gevent=True)
 
-with app.app_context():
-    create_hbase_connection_pool()
-    db.init_app(app)
+
+@app.teardown_appcontext
+def shutdown_session(exception: Any = None) -> None:  # pylint: disable=unused-argument
+    """Remove Session on each Request end."""
+    session.remove()
+
 
 if __name__ == '__main__':
-    # Run the application
-    host = configuration.get('api', 'host', fallback='localhost')
-    port = configuration.getint('api', 'websocket_port', fallback=51001)
-    debug = configuration.getboolean('api', 'debug', fallback=True)
     web_socket.run(app, host=host, port=port, debug=debug)

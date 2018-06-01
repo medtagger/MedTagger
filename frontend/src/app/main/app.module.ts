@@ -1,7 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HttpModule} from '@angular/http';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import {SocketIoModule} from 'ng-socket-io';
 
@@ -15,11 +14,12 @@ import {CategoryPageComponent} from '../pages/category-page/category-page.compon
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
-import {HttpAuthenticationInterceptor} from "../services/http-authentication.interceptor";
+import {HttpAuthenticationInterceptor} from '../services/http-authentication.interceptor';
 
 import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
 
+import {DomSanitizer} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {
@@ -30,6 +30,7 @@ import {
     MatRadioModule,
     MatSliderModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
@@ -44,13 +45,18 @@ import {
     MatDialog,
     MatDialogModule,
     MatChipsModule,
+    MatCheckboxModule,
+    MatIconRegistry,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
-import {routing} from "./app.routes";
-import {AuthGuard} from "../guards/auth.guard";
-import {AccountService} from "../services/account.service";
-import {DialogService} from "../services/dialog.service";
-import {InfoDialog} from "../dialogs/info.dialog";
+import {routing} from './app.routes';
+import {AuthGuard} from '../guards/auth.guard';
+import {AccountService} from '../services/account.service';
+import {DialogService} from '../services/dialog.service';
+import {InfoDialogComponent} from '../dialogs/info-dialog.component';
+import {MedTaggerWebSocket} from '../services/websocket.service';
+
+import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
 
 @NgModule({
     declarations: [
@@ -60,13 +66,14 @@ import {InfoDialog} from "../dialogs/info.dialog";
         HomePageComponent,
         CategoryPageComponent,
         MarkerComponent,
+        LabelExplorerComponent,
         ScanViewerComponent,
         MarkerTutorialPageComponent,
         UploadScansSelectorComponent,
         UploadPageComponent,
         SettingsPageComponent,
         ValidationPageComponent,
-        InfoDialog
+        InfoDialogComponent
     ],
     imports: [
         routing,
@@ -81,6 +88,7 @@ import {InfoDialog} from "../dialogs/info.dialog";
         MatInputModule,
         MatSliderModule,
         MatButtonModule,
+        MatButtonToggleModule,
         MatIconModule,
         MatSidenavModule,
         MatListModule,
@@ -95,12 +103,12 @@ import {InfoDialog} from "../dialogs/info.dialog";
         MatExpansionModule,
         MatSnackBarModule,
         MatSelectModule,
-        HttpModule,
         HttpClientModule,
-        MatChipsModule
+        MatChipsModule,
+        MatCheckboxModule,
     ],
     entryComponents: [
-        InfoDialog
+        InfoDialogComponent
     ],
     providers: [
         {
@@ -111,8 +119,14 @@ import {InfoDialog} from "../dialogs/info.dialog";
         AuthGuard,
         AccountService,
         DialogService,
-        MatDialog
+        MatDialog,
+        MedTaggerWebSocket,
     ],
     bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+    constructor(matIconRegistry: MatIconRegistry, domSanitizer: DomSanitizer) {
+    const MATERIAL_DESIGN_ICONS = 'assets/fonts/mdi.svg';
+        matIconRegistry.addSvgIconSet(domSanitizer.bypassSecurityTrustResourceUrl(MATERIAL_DESIGN_ICONS));
+    }
+}

@@ -10,6 +10,7 @@ const MEDTAGGER_PASSWORD = process.argv[6];
 const SCAN_CATEGORY = process.argv[7];
 const SCAN_BEGIN = parseInt(process.argv[8]);
 const SCAN_COUNT = parseInt(process.argv[9]);
+const STICKY_SESSION = parseInt(process.argv[10]);
 
 // Global state of this Client
 var socket = null;
@@ -91,9 +92,8 @@ logIn(() => {
     getCookieForWebSocketStickness((cookie) => {
 
         // Open WebSocket connection to the server with Cookie (important!)
-        socket = io(MEDTAGGER_INSTANCE_WEBSOCKET_URL + '/slices', {
-            extraHeaders: { 'Cookie': cookie }
-        });
+        options = {extraHeaders: { 'Cookie': cookie }} ? STICKY_SESSION : {};
+        socket = io(MEDTAGGER_INSTANCE_WEBSOCKET_URL + '/slices', options);
 
         socket.on('connect', function() {
             // Once we will connect to the server, let's ask backend for random Scan and request first batch of Slices

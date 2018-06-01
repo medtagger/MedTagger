@@ -1,14 +1,14 @@
-<div id="markerWrapper">
-    <img #image id="markerBackgroundImage" width="600" height="600"/>
-    <canvas #canvas id="markerCanvas" width="600" height="600"></canvas>
+<div #canvasWorkspace id="markerWrapper">
+    <img #image id="markerBackgroundImage"/>
+    <canvas #canvas id="markerCanvas"></canvas>
     <mat-slider #slider id="markerSlider"
                 (blur)="this.sliderFocus()"
                 [disabled]="false"
                 [max]="10"
                 [min]="0"
                 [step]="1"
-                [thumb-label]="true"
-                [tick-interval]="1"
+                [thumbLabel]="true"
+                [tickInterval]="1"
                 [value]="this.currentSlice"
                 [vertical]="true">
     </mat-slider>

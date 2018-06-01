@@ -11,6 +11,9 @@ then
     apt install -y python3-pip
 fi
 
+# Fix https://github.com/pypa/pip/issues/5367
+apt-get install -y python3-distutils
+
 echo "Applying environment variables..."
 cd /vagrant/backend
 . ./devenv.sh
@@ -23,7 +26,7 @@ then
 fi
 
 echo "Running all Docker dependencies..."
-docker-compose -f /vagrant/docker-compose.yml up -d hbase postgres rabbitmq
+docker-compose -f /vagrant/docker-compose.yml up -d cassandra postgres rabbitmq
 
 echo "Installing all Python packages..."
 make install_packages

@@ -1,6 +1,6 @@
-import {Component, HostListener, OnInit, ViewChild, ElementRef} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
@@ -11,7 +11,7 @@ import {SliceSelection} from '../../model/SliceSelection';
     templateUrl: './scan-viewer.component.html',
     styleUrls: ['./scan-viewer.component.scss']
 })
-export class ScanViewerComponent implements OnInit {
+export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     currentImage: HTMLImageElement;
 
@@ -29,6 +29,14 @@ export class ScanViewerComponent implements OnInit {
 
     @ViewChild('slider') slider: MatSlider;
 
+
+    canvasWorkspace: HTMLDivElement;
+
+    @ViewChild('canvasWorkspace')
+    set viewWorkspace(viewElement: ElementRef) {
+        this.canvasWorkspace = viewElement.nativeElement;
+    }
+
     public scanMetadata: ScanMetadata;
     public slices: Map<number, MarkerSlice>;
     protected _currentSlice;
@@ -38,7 +46,19 @@ export class ScanViewerComponent implements OnInit {
 
     protected selector: Selector<SliceSelection>;
 
-    constructor() {
+    constructor() {}
+
+    @HostListener('window:resize', ['$event'])
+    onResize() {
+        this.resizeImageToCurrentWorkspace();
+        this.updateCanvasSize();
+    }
+
+    protected updateCanvasSize(): void {
+        console.log('ScanViewer | updateCanvasSize');
+        this.setCanvasWidth(this.currentImage.width);
+        this.setCanvasHeight(this.currentImage.height);
+        this.selector.drawSelections();
     }
 
     ngAfterViewInit() {
@@ -62,6 +82,16 @@ export class ScanViewerComponent implements OnInit {
 
     public getCanvas(): HTMLCanvasElement {
         return this.canvas;
+    }
+
+    public setCanvasWidth(newWidth: number): void {
+        this.canvas.width = newWidth;
+        this.selector.updateCanvasWidth(this.canvas.width);
+    }
+
+    public setCanvasHeight(newHeight: number): void {
+        this.canvas.height = newHeight;
+        this.selector.updateCanvasHeight(this.canvas.height);
     }
 
     get currentSlice() {
@@ -113,8 +143,6 @@ export class ScanViewerComponent implements OnInit {
         });
     }
 
-    ngAfterViewChecked() {}
-
     ngOnInit() {
         console.log('ScanViewer | ngOnInit');
         console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
@@ -122,6 +150,10 @@ export class ScanViewerComponent implements OnInit {
         this.slices = new Map<number, MarkerSlice>();
 
         this.initializeCanvas();
+
+        this.initializeImage(() => {
+            this.selector.drawSelections();
+        });
 
         this.setCanvasImage();
 
@@ -132,7 +164,8 @@ export class ScanViewerComponent implements OnInit {
             this.requestSlicesIfNeeded(sliderValue);
 
             this.changeMarkerImage(sliderValue);
-            this.selector.drawPreviousSelections();
+
+            this.selector.drawSelections();
         });
     }
 
@@ -155,9 +188,13 @@ export class ScanViewerComponent implements OnInit {
         this.selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
     }
 
-    @HostListener('window:resize', [])
-    protected updateCanvasPositionOnWindowResize(): void {
-        this.selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
+    protected initializeImage(afterImageLoad?: () => void): void {
+        this.currentImage.onload = (event: Event) => {
+            if (afterImageLoad) {
+                afterImageLoad();
+            }
+            this.updateCanvasSize();
+        };
     }
 
     protected changeMarkerImage(sliceID: number): void {
@@ -173,6 +210,44 @@ export class ScanViewerComponent implements OnInit {
     protected setCanvasImage(): void {
         if (this.slices.has(this._currentSlice)) {
             this.currentImage.src = this.slices.get(this._currentSlice).source;
+            this.resizeImageToCurrentWorkspace();
         }
+    }
+
+    protected resizeImageToCurrentWorkspace(): void {
+        console.log('ScanViewer | resizeImageToCurrentWorkspace | scanMetadata (width, height): ',
+            this.scanMetadata.width, this.scanMetadata.height);
+        console.log('ScanViewer | resizeImageToCurrentWorkspace | canvasWorkspace (client rect): ',
+            this.canvasWorkspace.getClientRects());
+
+        const maxImageSize = Math.max(this.scanMetadata.width, this.scanMetadata.height);
+        const minCanvasSize = Math.min(this.canvasWorkspace.clientWidth, this.canvasWorkspace.clientHeight);
+        const ratioScalar = (minCanvasSize / maxImageSize);
+
+        console.log('ScanViewer | resizeImageToCurrentWorkspace | ratioScalar: ', ratioScalar);
+
+        this.currentImage.style.maxWidth = (this.scanMetadata.width * ratioScalar) + 'px';
+        this.currentImage.style.maxHeight = (this.scanMetadata.height * ratioScalar) + 'px';
+
+        this.currentImage.width = this.scanMetadata.width * ratioScalar;
+        this.currentImage.height = this.scanMetadata.height * ratioScalar;
+
+        this.centerImageAndCanvas();
+    }
+
+    protected centerImageAndCanvas(): void {
+        console.log('ScanViewer | centerImageAndCanvas');
+        const centerX = (this.canvasWorkspace.clientWidth / 2) - (this.currentImage.width / 2);
+        const centerY = (this.canvasWorkspace.clientHeight / 2) - (this.currentImage.height / 2);
+
+        console.log('ScanViewer | centerImageAndCanvas | centerX - centerY: ', centerX, centerY);
+
+        this.currentImage.style.left = centerX + 'px';
+        this.currentImage.style.top = centerY + 'px';
+
+        this.canvas.style.left = centerX + 'px';
+        this.canvas.style.top = centerY + 'px';
+
+        this.selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
     }
 }

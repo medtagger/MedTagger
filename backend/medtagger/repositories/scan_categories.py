@@ -2,7 +2,7 @@
 from typing import List
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory
+from medtagger.database.models import ScanCategory, LabelTag
 
 
 class ScanCategoriesRepository(object):
@@ -39,3 +39,25 @@ class ScanCategoriesRepository(object):
             category = ScanCategory(key, name, image_path)
             session.add(category)
         return category
+
+    @staticmethod
+    def assign_label_tag(tag: LabelTag, scan_category_key: str) -> None:
+        """Assign existing Label Tag to Scan Category.
+
+        :param tag: tag that should be assigned to Scan Category
+        :param scan_category_key: key that will identify such Scan Category
+        """
+        scan_category = ScanCategory.query.filter(ScanCategory.key == scan_category_key).one()
+        scan_category.available_tags.append(tag)
+        scan_category.save()
+
+    @staticmethod
+    def unassign_label_tag(tag: LabelTag, scan_category_key: str) -> None:
+        """Unassign Label Tag from Scan Category.
+
+        :param tag: tag that should be unassigned from Scan Category
+        :param scan_category_key: key that will identify such Scan Category
+        """
+        scan_category = ScanCategory.query.filter(ScanCategory.key == scan_category_key).one()
+        scan_category.available_tags.remove(tag)
+        scan_category.save()

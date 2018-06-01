@@ -2,11 +2,13 @@
 import json
 from typing import Any
 
-from medtagger.database.models import LabelStatus
+from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
 from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
+from tests.functional_tests.helpers import create_tag_and_assign_to_category
 
 
+# pylint: disable=too-many-locals
 def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test application with basic flow."""
     api_client = get_api_client()
@@ -54,6 +56,8 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert isinstance(json_response, dict)
     assert json_response['scan_id'] == scan_id
     assert json_response['number_of_slices'] == 1
+    assert json_response['width'] == 512
+    assert json_response['height'] == 512
 
     # Step 5. Get slices from the server
     web_socket_client.emit('request_slices', {'scan_id': scan_id, 'begin': 0, 'count': 1}, namespace='/slices')
@@ -66,13 +70,17 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert isinstance(response['args'][0]['image'], bytes)
 
     # Step 6. Label it
+    tag_key = 'EXAMPLE_TAG'
+    create_tag_and_assign_to_category(tag_key, 'Example tag', category_key)
     payload = {
-        'selections': [{
+        'elements': [{
             'x': 0.5,
             'y': 0.5,
             'slice_index': 0,
             'width': 0.1,
             'height': 0.1,
+            'tag': tag_key,
+            'tool': LabelTool.RECTANGLE.value,
         }],
         'labeling_time': 12.34,
     }
@@ -92,27 +100,29 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert isinstance(json_response, dict)
     assert json_response['label_id'] == label_id
     assert json_response['labeling_time'] == 12.34
-    assert json_response['status'] == LabelStatus.NOT_VERIFIED.value
+    assert json_response['status'] == LabelVerificationStatus.NOT_VERIFIED.value
     assert json_response['scan_id'] == scan_id
-    assert json_response['selections'] == [{
+    assert json_response['elements'] == [{
         'x': 0.5,
         'y': 0.5,
         'slice_index': 0,
         'width': 0.1,
         'height': 0.1,
-        'binary_mask': None,
+        'tag': tag_key,
+        'tool': LabelTool.RECTANGLE.value,
+        'status': LabelElementStatus.NOT_VERIFIED.value,
     }]
 
-    # Step 8. Verify such label
-    payload = {'status': LabelStatus.VALID.value}
-    response = api_client.put('/api/v1/labels/{}/status'.format(label_id), data=json.dumps(payload),
-                              headers=get_headers(token=user_token, json=True))
-    assert response.status_code == 200
-    json_response = json.loads(response.data)
-    assert isinstance(json_response, dict)
-    assert json_response['label_id'] == label_id
-    assert json_response['status'] == LabelStatus.VALID.value
-
-    # Step 9. Try to get another label for validation
-    response = api_client.get('/api/v1/labels/random', headers=get_headers(token=user_token))
-    assert response.status_code == 404
+    # # Step 8. Verification of labels will be disabled until mechanism for validation of label elements is introduced
+    # payload = {'status': LabelStatus.VALID.value}
+    # response = api_client.put('/api/v1/labels/{}/status'.format(label_id), data=json.dumps(payload),
+    #                           headers=get_headers(token=user_token, json=True))
+    # assert response.status_code == 200
+    # json_response = json.loads(response.data)
+    # assert isinstance(json_response, dict)
+    # assert json_response['label_id'] == label_id
+    # assert json_response['status'] == LabelStatus.VALID.value
+    #
+    # # Step 9. Try to get another label for validation
+    # response = api_client.get('/api/v1/labels/random', headers=get_headers(token=user_token))
+    # assert response.status_code == 404

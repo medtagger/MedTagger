@@ -1,17 +1,22 @@
-import {UploadPageComponent} from "../pages/upload-page/upload-page.component";
-import {MarkerTutorialPageComponent} from "../pages/marker-tutorial-page/marker-tutorial-page.component";
-import {HomePageComponent} from "../pages/home-page/home-page.component";
-import {CategoryPageComponent} from "../pages/category-page/category-page.component";
-import {ValidationPageComponent} from "../pages/validation-page/validation-page.component";
-import {SettingsPageComponent} from "../pages/settings-page/settings-page.component";
-import {RouterModule, Routes} from "@angular/router";
-import {MarkerPageComponent} from "../pages/marker-page/marker-page.component";
-import {LoginPageComponent} from "../pages/login-page/login-page.component";
-import {ModuleWithProviders} from "@angular/core";
-import {AuthGuard} from "../guards/auth.guard";
+import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
+import {MarkerTutorialPageComponent} from '../pages/marker-tutorial-page/marker-tutorial-page.component';
+import {HomePageComponent} from '../pages/home-page/home-page.component';
+import {CategoryPageComponent} from '../pages/category-page/category-page.component';
+import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
+import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
+import {RouterModule, Routes} from '@angular/router';
+import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
+import {LoginPageComponent} from '../pages/login-page/login-page.component';
+import {ModuleWithProviders} from '@angular/core';
+import {AuthGuard} from '../guards/auth.guard';
 
 export const labellingRoutes: Routes = [
-    {path: 'labelling', component: MarkerPageComponent, data: {title: 'Labelling'}, canActivate: [AuthGuard]},
+    {
+        path: 'labelling',
+        component: MarkerPageComponent,
+        data: {title: 'Labelling', disableFooter: true},
+        canActivate: [AuthGuard]
+    },
     {
         path: 'labelling/choose-category',
         component: CategoryPageComponent,

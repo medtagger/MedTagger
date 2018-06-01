@@ -12,6 +12,7 @@ from celery.utils.log import get_task_logger
 from medtagger.types import ScanID
 from medtagger.workers import celery_app
 from medtagger.conversion import convert_slice_to_normalized_8bit_array, convert_scan_to_normalized_8bit_array
+from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.database.models import SliceOrientation, Slice, Scan
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.slices import SlicesRepository
@@ -24,7 +25,7 @@ MAX_PREVIEW_X_SIZE = 256
 
 @celery_app.task
 def convert_scan_to_png(scan_id: ScanID) -> None:
-    """Store Scan in HBase database.
+    """Convert DICOM Scan to PNG and save it into Storage.
 
     :param scan_id: ID of a Scan
     """
@@ -36,6 +37,9 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
         logger.error('This Scan is empty! Removing from database...')
         ScansRepository.delete_scan_by_id(scan_id)
         return
+
+    logger.info('Marking Scan as processing.')
+    scan.update_status(ScanStatus.PROCESSING)
 
     # At first, collect all Dicom images for given Scan
     logger.info('Reading all Slices for this Scan... This may take a while...')
@@ -56,8 +60,8 @@ def convert_scan_to_png(scan_id: ScanID) -> None:
     # Correlate Dicom files with Slices and convert all Slices
     _convert_scan_in_all_axes(dicom_images, slices, scan)
 
-    logger.info('Marking whole Scan as converted.')
-    scan.mark_as_converted()
+    logger.info('Marking Scan as available to use.')
+    scan.update_status(ScanStatus.AVAILABLE)
 
     # Remove all temporarily created files for applying workaround
     for file_name in temp_files_to_remove:
@@ -101,6 +105,7 @@ def _prepare_slices_in_y_orientation(normalized_scan: np.ndarray, scan: Scan) ->
         slice_pixels = normalized_scan[:, y, :]
         _slice = scan.add_slice(SliceOrientation.Y)
         _slice.update_location(location)
+        _slice.update_size(*slice_pixels.shape)
         _convert_to_png_and_store(_slice, slice_pixels)
 
 
@@ -115,6 +120,7 @@ def _prepare_slices_in_x_orientation(normalized_scan: np.ndarray, scan: Scan) ->
         slice_pixels = normalized_scan[:, :, x]
         _slice = scan.add_slice(SliceOrientation.X)
         _slice.update_location(location)
+        _slice.update_size(*slice_pixels.shape)
         _convert_to_png_and_store(_slice, slice_pixels)
 
 
@@ -126,7 +132,7 @@ def _convert_to_png_and_store(_slice: Slice, slice_pixels: np.ndarray) -> None:
     """
     converted_image = _convert_slice_pixels_to_png(slice_pixels)
     SlicesRepository.store_converted_image(_slice.id, converted_image)
-    _slice.mark_as_converted()
+    _slice.update_status(SliceStatus.PROCESSED)
     logger.info('%s converted and stored.', _slice)
 
 

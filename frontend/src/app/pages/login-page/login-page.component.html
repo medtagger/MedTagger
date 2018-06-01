@@ -74,7 +74,7 @@
                             <mat-form-field>
                                 <input matInput type="text" id="lastName" placeholder="Last name"
                                        formControlName="lastName" required>
-                                <mat-error *ngIf="userForm.get('firstName').invalid">{{getLastNameErrorMessage()}}
+                                <mat-error *ngIf="userForm.get('lastName').invalid">{{getLastNameErrorMessage()}}
                                 </mat-error>
                             </mat-form-field>
                         </td>
@@ -124,7 +124,17 @@
                         </td>
                         <td>
                             <mat-card-actions>
-                                <button mat-raised-button color="primary" (click)="register()">Register</button>
+                                <button mat-raised-button color="primary"
+                                        *ngIf="!registrationInProgress"
+                                        [disabled]="userForm.invalid"
+                                        (click)="register()">
+                                    Register
+                                </button>
+                                <mat-progress-spinner class="register-spinner"
+                                                      mode="indeterminate"
+                                                      [diameter]="36"
+                                                      strokeWidth="2"
+                                                      *ngIf="registrationInProgress"></mat-progress-spinner>
                             </mat-card-actions>
                         </td>
                     </tr>

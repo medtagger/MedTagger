@@ -3,12 +3,14 @@ import os
 import json
 from typing import Dict, List  # pylint: disable=unused-import
 
+from medtagger.definitions import LabelTool
 from medtagger.repositories.roles import RolesRepository
 from medtagger.repositories.users import UsersRepository
 from medtagger.repositories.scans import ScansRepository
-from medtagger.repositories.scan_categories import ScanCategoriesRepository
 from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.labels import LabelsRepository
+from medtagger.repositories.label_tag import LabelTagRepository
+from medtagger.repositories.scan_categories import ScanCategoriesRepository
 
 BACKUP_DIRECTORY = 'medtagger_backup/'
 SCANS_DIRECTORY = BACKUP_DIRECTORY + 'dicoms/'
@@ -58,6 +60,7 @@ with open(ROLES_AND_USERS_FILE, 'w') as json_file:
 # Backup all Scans and its Labels with DICOM files
 _scans = {
     'scan_categories': [],
+    'label_tags': [],
     'scans': [],
 }  # type: Dict[str, List[Dict]]
 
@@ -69,6 +72,17 @@ for scan_category in ScanCategoriesRepository.get_all_categories():
         'key': scan_category.key,
         'name': scan_category.name,
         'image_path': scan_category.image_path,
+        'available_tags': [{
+            'key': label_tag.key,
+        } for label_tag in scan_category.available_tags],
+    })
+print('\nFetching Label Tags...')
+for label_tag in LabelTagRepository.get_all_tags():
+    print('Saving Label Tag: {}'.format(label_tag.key))
+    _scans['label_tags'].append({
+        'id': label_tag.id,
+        'key': label_tag.key,
+        'name': label_tag.name,
     })
 print('\nSaving all DICOMs to directory...')
 for scan in ScansRepository.get_all_scans():
@@ -118,15 +132,23 @@ for label in LabelsRepository.get_all_labels():
         'labeling_time': label.labeling_time,
         'status': label.status.value,
         'owner_id': label.owner_id,
-        'selections': [{
-            'id': selection.id,
-            'position_x': selection.position_x,
-            'position_y': selection.position_y,
-            'slice_index': selection.slice_index,
-            'shape_width': selection.shape_width,
-            'shape_height': selection.shape_height,
-        } for selection in label.selections],
     })
+    for element in label.elements:
+        if element.tool.value == LabelTool.RECTANGLE:
+            print('Saving Rectangle Label Elements')
+            _labels['labels'].append({
+                'elements': {
+                    'id': element.id,
+                    'x': element.x,
+                    'y': element.y,
+                    'slice_index': element.slice_index,
+                    'width': element.width,
+                    'height': element.height,
+                    'status': element.status.value,
+                    'tag_id': element.tag_id,
+                    'tool': element.tool,
+                }
+            })
 print('\nSaving all Labels to file: {}'.format(LABELS_FILE))
 with open(LABELS_FILE, 'w') as json_file:
     json.dump(_labels, json_file)

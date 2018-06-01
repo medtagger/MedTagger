@@ -22,6 +22,9 @@ PYLINT_UNIT_TESTS_CONFIG_FILE = .test.pylintrc
 #
 
 venv:
+	# Disable Cassandra Driver tweaks - not needed in development setup
+	export CASS_DRIVER_NO_CYTHON=1
+	export CASS_DRIVER_NO_EXTENSIONS=1
 	virtualenv -p $(PYTHON) venv
 	venv/bin/pip install -r requirements.txt
 	venv/bin/pip install -r requirements.dev.txt
@@ -51,16 +54,22 @@ run_websocket_production:
 run_workers:
 	PYTHONPATH=`pwd` celery -A medtagger.workers worker --loglevel=info
 
+run_database_migrations:
+	PYTHONPATH=`pwd` alembic upgrade head
+
 #
 # Dependencies
 #
 
 start_dependencies:
-	cd .. && docker-compose up -d hbase postgres rabbitmq
+	cd .. && docker-compose up -d cassandra postgres rabbitmq
 	make update_dependencies
 
 stop_dependencies:
 	cd .. && docker-compose down
+
+clear_dependencies: stop_dependencies
+	docker volume rm medtagger_postgres-data medtagger_hbase-data medtagger_rabbitmq-data
 
 update_dependencies:
 	./scripts/dev__prepare_backend.sh
@@ -85,10 +94,9 @@ unit_tests:
 	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) --durations=$(PYTEST_SLOWEST_TESTS) $(RUN_UNIT_TEST)
 
 functional_tests:
-	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d hbase postgres rabbitmq
+	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d cassandra postgres rabbitmq
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic upgrade head
-	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && $(PYTHON) ./$(SCRIPTS_DIRECTORY)/migrate_hbase.py -y
 	@if . $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ! pytest --durations=$(PYTEST_SLOWEST_TESTS) $(RUN_FUNCTIONAL_TEST) ; then\
 		docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down;\
 		echo "Functional tests failed!";\
@@ -101,7 +109,6 @@ functional_tests:
 functional_tests_docker:
 	./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
 	alembic upgrade head
-	$(PYTHON) ./$(SCRIPTS_DIRECTORY)/migrate_hbase.py -y
 	pytest --durations=$(PYTEST_SLOWEST_TESTS) $(FUNCTIONAL_TESTS_MODULE)
 
 #

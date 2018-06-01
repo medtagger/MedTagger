@@ -7,25 +7,20 @@ services:
     command: --configFile=/var/traefik/traefik.toml
     ports:
       - 80:80
-      - 7128:8080
+      - 52000:8080
     volumes:
       - $PWD/traefik.toml:/var/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "traefik.enable=false"
 
-  hbase:
-    image: dajobe/hbase
+  cassandra:
+    image: cassandra
     restart: unless-stopped
     volumes:
-      - hbase-data:/data
+      - cassandra-data:/var/lib/cassandra
     ports:
-      - 8080:8080
-      - 8085:8085
-      - 9090:9090
-      - 9095:9095
-      - 2181:2181
-      - 16010:16010
+      - 9042:9042
     labels:
       - "traefik.enable=false"
 
@@ -35,12 +30,8 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq/mnesia
     ports:
-      - 4369:4369
-      - 5671:5671
       - 5672:5672
-      - 15671:15671
       - 15672:15672
-      - 25672:25672
     labels:
       - "traefik.enable=false"
 
@@ -76,29 +67,21 @@ services:
   medtagger_backend_rest:
     image: medtagger_backend/rest
     restart: unless-stopped
-    environment:
-      - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_REST_PORT=51000
-      - MEDTAGGER__API_WEBSOCKET_PORT=51001
-      - MEDTAGGER__API_DEBUG=1
-      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
-      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__HBASE_HOST=hbase
-      - MEDTAGGER__HBASE_PORT=9090
-      - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=4
-      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    env_file:
+      - ./backend/docker/backend.env
     build:
       context: backend
-      dockerfile: Dockerfile_rest
+      dockerfile: docker/Dockerfile_rest
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
     depends_on:
-      - hbase
+      - cassandra
       - rabbitmq
       - postgres
       - medtagger_backend_websocket
       - medtagger_backend_worker
-    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_rest_production"
+    command: bash -c "./scripts/wait_for_dependencies.sh && make run_rest_production"
     labels:
       - "traefik.backend=medtagger_backend_rest"
       - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}api/v1/,${MEDTAGGER__HOST_ON_SUBDIRECTORY}swaggerui/; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) /$$1"
@@ -106,27 +89,19 @@ services:
   medtagger_backend_websocket:
     image: medtagger_backend/websocket
     restart: unless-stopped
-    environment:
-      - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_REST_PORT=51000
-      - MEDTAGGER__API_WEBSOCKET_PORT=51001
-      - MEDTAGGER__API_DEBUG=1
-      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
-      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__HBASE_HOST=hbase
-      - MEDTAGGER__HBASE_PORT=9090
-      - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=4
-      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    env_file:
+      - ./backend/docker/backend.env
     build:
       context: backend
-      dockerfile: Dockerfile_websocket
+      dockerfile: docker/Dockerfile_websocket
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
     depends_on:
-      - hbase
+      - cassandra
       - rabbitmq
       - postgres
-    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_websocket_production"
+    command: bash -c "./scripts/wait_for_dependencies.sh && make run_websocket_production"
     labels:
       - "traefik.backend=medtagger_backend_websocket"
       - "traefik.backend.loadbalancer.stickiness=true"
@@ -136,31 +111,41 @@ services:
   medtagger_backend_worker:
     image: medtagger_backend/worker
     restart: unless-stopped
-    environment:
-      - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_REST_PORT=51000
-      - MEDTAGGER__API_WEBSOCKET_PORT=51001
-      - MEDTAGGER__API_DEBUG=1
-      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres:5432/medtagger
-      - MEDTAGGER__DB_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__HBASE_HOST=hbase
-      - MEDTAGGER__HBASE_PORT=9090
-      - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=4
-      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    env_file:
+      - ./backend/docker/backend.env
     build:
       context: backend
-      dockerfile: Dockerfile_worker
+      dockerfile: docker/Dockerfile_worker
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
     depends_on:
-      - hbase
+      - cassandra
       - rabbitmq
       - postgres
-    command: bash -c "./scripts/wait_for_dependencies.sh && ./scripts/dev__prepare_backend.sh && make run_workers"
+    command: bash -c "./scripts/wait_for_dependencies.sh && make run_workers"
+    labels:
+      - "traefik.enable=false"
+
+  medtagger_backend_database_migrations:
+    image: medtagger_backend/database_migrations
+    env_file:
+      - ./backend/docker/backend.env
+    build:
+      context: backend
+      dockerfile: docker/Dockerfile_database_migrations
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+    depends_on:
+      - cassandra
+      - rabbitmq
+      - postgres
+    command: bash -c "./scripts/dev__prepare_backend.sh"
     labels:
       - "traefik.enable=false"
 
 volumes:
-  hbase-data:
+  cassandra-data:
   rabbitmq-data:
   postgres-data:

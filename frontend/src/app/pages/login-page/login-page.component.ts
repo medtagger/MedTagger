@@ -9,6 +9,8 @@ enum LoginPageMode {
     REGISTER
 }
 
+const MIN_PASSWORD_LENGTH = 8;
+
 @Component({
     selector: 'app-login-page',
     templateUrl: './login-page.component.html',
@@ -23,6 +25,7 @@ export class LoginPageComponent implements OnInit {
 
     loggingInProgress: boolean;
     loggingInError: boolean;
+    registrationInProgress: boolean;
 
     constructor(private routerService: Router, private accountService: AccountService) {
     }
@@ -35,9 +38,14 @@ export class LoginPageComponent implements OnInit {
             firstName: new FormControl(null, [Validators.required]),
             lastName: new FormControl(null, [Validators.required]),
             email: new FormControl(null, [Validators.required, Validators.email]),
-            password: new FormControl(null, [Validators.required]),
+            password: new FormControl(null, [Validators.required, Validators.minLength(MIN_PASSWORD_LENGTH)]),
             confirmPassword: new FormControl(null, [Validators.required, passwordValidator()])
         });
+    }
+
+    resetLogin(): void {
+        this.loggingInProgress = false;
+        this.loggingInError = false;
     }
 
     public logIn(): void {
@@ -59,7 +67,7 @@ export class LoginPageComponent implements OnInit {
                 } else {
                     this.loggingInError = true;
                 }
-            }, (error) => {
+            }, () => {
                 this.loggingInProgress = false;
                 this.loggingInError = true;
             });
@@ -69,46 +77,54 @@ export class LoginPageComponent implements OnInit {
         this.userForm.reset();
         if (this.loginPageMode === LoginPageMode.LOG_IN) {
             this.loginPageMode = LoginPageMode.REGISTER;
+            this.resetLogin();
         } else if (this.loginPageMode === LoginPageMode.REGISTER) {
             this.loginPageMode = LoginPageMode.LOG_IN;
+            this.resetRegistration();
         } else {
             console.error('Unsupported login page mode!');
         }
     }
 
-    getFirstNameErrorMessage() {
-        if (this.userForm.get('firstName').hasError('required')) {
-            return 'Field required.';
-        }
+    getFirstNameErrorMessage(): string {
+        return this.userForm.get('firstName').hasError('required') ? 'Field required' : '';
     }
 
-    getLastNameErrorMessage() {
-        if (this.userForm.get('lastName').hasError('required')) {
-            return 'Field required.';
-        }
+    getLastNameErrorMessage(): string {
+        return this.userForm.get('lastName').hasError('required') ? 'Field required' : '';
     }
 
-    getEmailErrorMessage() {
-        return this.userForm.get('email').hasError('required') ? 'Field required.' :
+    getEmailErrorMessage(): string {
+        return this.userForm.get('email').hasError('required') ? 'Field required' :
             this.userForm.get('email').hasError('email') ? 'Invalid email.' :
                 '';
     }
 
-    getPasswordErrorMessage() {
-        if (this.userForm.get('password').hasError('required')) {
-            return 'Field required.';
-        }
+    getPasswordErrorMessage(): string {
+        return this.userForm.get('password').hasError('required') ? 'Field required' :
+            this.userForm.get('password').hasError('minlength') ? 'Password should be longer than ' + MIN_PASSWORD_LENGTH + ' characters.' :
+                '';
     }
 
-    getConfirmPasswordErrorMessage() {
-        return this.userForm.get('confirmPassword').hasError('required') ? 'Field required.' :
+    getConfirmPasswordErrorMessage(): string {
+        return this.userForm.get('confirmPassword').hasError('required') ? 'Field required' :
             this.userForm.get('confirmPassword').hasError('passwordValidator') ? 'Passwords does not match.' :
                 '';
     }
 
+    resetRegistration(): void {
+        this.registrationInProgress = false;
+    }
+
     public register(): void {
-        let formValue = this.userForm.value;
+        this.registrationInProgress = true;
+        const formValue = this.userForm.value;
         this.accountService.register(formValue['email'], formValue['password'], formValue['firstName'], formValue['lastName'])
-            .then(() => this.changePageMode());
+            .then(() => {
+                this.registrationInProgress = false;
+                this.changePageMode();
+            }, () => {
+                this.resetRegistration();
+            });
     }
 }

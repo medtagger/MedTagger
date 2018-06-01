@@ -6,12 +6,13 @@ import {MarkerComponent} from '../../components/marker/marker.component';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
-import {Response} from '@angular/http';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 import {MatSnackBar} from '@angular/material';
+import {LabelTag} from '../../model/LabelTag';
+import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
 
 
 @Component({
@@ -25,6 +26,13 @@ export class MarkerPageComponent implements OnInit {
     private static readonly SLICE_BATCH_SIZE = 10;
 
     @ViewChild(MarkerComponent) marker: MarkerComponent;
+
+    @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
+
+    // TODO: get labelling context from categry
+    tags: Array<LabelTag> = [
+        new LabelTag('All', 'ALL', ['RECTANGLE'])
+    ];
 
     scan: ScanMetadata;
     category: string;
@@ -40,6 +48,7 @@ export class MarkerPageComponent implements OnInit {
         console.log('MarkerPage init', this.marker);
 
         this.marker.setSelector(new RectROISelector(this.marker.getCanvas()));
+        this.marker.setLabelExplorer(this.labelExplorer);
 
         this.route.queryParamMap.subscribe(params => {
             this.category = params.get('category') || '';
@@ -81,7 +90,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private requestScan(): void {
-      this.marker.setDownloadScanInProgress(true);
+        this.marker.setDownloadScanInProgress(true);
         this.scanService.getRandomScan(this.category).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -135,6 +144,8 @@ export class MarkerPageComponent implements OnInit {
             });
         this.startMeasuringLabelingTime();
         this.indicateLabelHasBeenSend();
+
+        this.labelExplorer.reinitializeExplorer();
         return;
     }
 
@@ -143,19 +154,19 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private startMeasuringLabelingTime(): void {
-      this.startTime = new Date();
+        this.startTime = new Date();
     }
 
     private getLabelingTimeInSeconds(startTime: Date): number {
-      const endTime = new Date();
-      return (endTime.getTime() - startTime.getTime()) / 1000.0;
+        const endTime = new Date();
+        return (endTime.getTime() - startTime.getTime()) / 1000.0;
     }
 
     private indicateLabelHasBeenSend(): void {
-      this.snackBar.open('Label has been send', '', {duration: 2000, });
+        this.snackBar.open('Label has been send', '', {duration: 2000});
     }
 
     private indicateNewScanAppeared(): void {
-      this.snackBar.open('New scan has been loaded', '', {duration: 2000, });
+        this.snackBar.open('New scan has been loaded', '', {duration: 2000});
     }
 }

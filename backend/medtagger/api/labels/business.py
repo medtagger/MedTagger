@@ -6,17 +6,17 @@ from sqlalchemy.orm.exc import NoResultFound
 from medtagger.types import LabelID, ActionID
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.database.models import Label, LabelStatus, Action, ActionResponse
+from medtagger.definitions import LabelVerificationStatus
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.actions import ActionsRepository, InvalidResponseException, \
     UnsupportedActionException
 
 
-def change_label_status(label_id: LabelID, status: LabelStatus) -> Label:
-    """Change status of the Label.
+def change_label_status(label_id: LabelID, status: LabelVerificationStatus) -> Label:
+    """Change status of the label.
 
-    :param label_id: ID of a Label for which the status should be changed
-    :param status: new Label Status that should be set
-    :return: Label that was changed
+    :param label_id: ID of a label for which the status should be changed
+    :param status: new Label Verification Status that should be set
     """
     try:
         label = LabelsRepository.get_label_by_id(label_id)
@@ -33,7 +33,7 @@ def get_random_label() -> Label:
     :return: random Label object from database
     """
     try:
-        return LabelsRepository.get_random_label(LabelStatus.NOT_VERIFIED, fetch_binary_masks=True)
+        return LabelsRepository.get_random_label(LabelVerificationStatus.NOT_VERIFIED)
     except NoResultFound:
         raise NotFoundException('No Labels found.')
 

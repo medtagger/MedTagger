@@ -3,8 +3,10 @@ import json
 from typing import Dict, Any
 
 from tests.functional_tests import get_api_client, get_headers
+from tests.functional_tests.helpers import create_tag_and_assign_to_category
 from medtagger.api.users.business import set_user_role
 from medtagger.api.auth.business import create_user
+from medtagger.definitions import LabelTool
 
 EXAMPLE_USER_EMAIL = 'test@mail.com'
 EXAMPLE_USER_PASSWORD = 'medtagger1'
@@ -39,7 +41,7 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert isinstance(json_response, dict)
     user_token = json_response['token']
     assert isinstance(user_token, str)
-    assert len(user_token) == 122
+    assert len(user_token) > 100
 
     # Step 3. Get user account information
     response = api_client.get('/api/v1/users/info', headers=get_headers(token=user_token))
@@ -72,7 +74,7 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     assert isinstance(json_response, dict)
     admin_user_token = json_response['token']
     assert isinstance(admin_user_token, str)
-    assert len(admin_user_token) == 122
+    assert len(admin_user_token) > 100
 
     # Step 2. Admin gets all users
     response = api_client.get('/api/v1/users/', headers=get_headers(token=admin_user_token))
@@ -86,7 +88,7 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     payload = {'role': 'doctor'}
     response = api_client.put('/api/v1/users/{}/role'.format(volunteer_id), data=json.dumps(payload),
                               headers=get_headers(token=admin_user_token, json=True))
-    assert response.status_code == 204
+    assert response.status_code == 200
 
     # Step 4. User logs in
     payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}
@@ -104,12 +106,14 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     assert json_response['role'] == 'doctor'
 
 
-def test_ownership(prepare_environment: Any) -> None:
+def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test for checking scan and label ownership."""
     api_client = get_api_client()
 
     admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
     set_user_role(admin_id, 'admin')
+    tag_key = 'EXAMPLE_TAG'
+    create_tag_and_assign_to_category(tag_key, 'Example tag', 'LUNGS')
 
     # Step 1. Admin user logs in
     payload: Dict[str, Any] = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
@@ -138,12 +142,14 @@ def test_ownership(prepare_environment: Any) -> None:
 
     # Step 4. Label
     payload = {
-        'selections': [{
+        'elements': [{
             'x': 0.5,
             'y': 0.5,
             'slice_index': 0,
             'width': 0.1,
             'height': 0.1,
+            'tag': tag_key,
+            'tool': LabelTool.RECTANGLE.value,
         }],
         'labeling_time': 12.34,
     }

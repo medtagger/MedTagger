@@ -20,7 +20,9 @@ COPY requirements.txt ./requirements.txt
 
 ENV PYTHONPATH /medtagger_backend
 
+ARG CASS_DRIVER_NO_CYTHON
+ARG CASS_DRIVER_NO_EXTENSIONS
 RUN pip install -r requirements.txt
 
-ENV C_FORCE_ROOT true
-CMD ["celery", "-A", "medtagger.workers", "worker", "--loglevel=info"]
+CMD ["make", "run_database_migration"]
+

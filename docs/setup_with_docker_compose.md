@@ -2,8 +2,8 @@ Setup with Docker Compose
 -------------------------
 
 Docker Compose is great to set up all environment with one command. It is also great
- for setting up all depended services. Docker Compose can setup things like Hadoop,
- HBase and RabbitMQ easily!
+ for setting up all depended services. Docker Compose can setup things like Cassandra,
+ PostgreSQL and RabbitMQ easily!
 
 **But...** it's not a good idea to develop the project inside of it. Changes in the
  code will require rebuilding whole Docker images. Instead, consider using Vagrant
@@ -65,7 +65,7 @@ $ docker-compose up -d --no-deps --build medtagger_frontend medtagger_backend_re
 It's really easy to start all needed external dependencies with:
 
 ```bash
-$ docker-compose up -d hbase postgres rabbitmq
+$ docker-compose up -d cassandra postgres rabbitmq
 ```
 
 For more information about usage please read the [documentation](https://docs.docker.com/compose/).
@@ -80,7 +80,30 @@ To run MedTagger on a subdirectory export `MEDTAGGER__HOST_ON_SUBDIRECTORY` envi
 Here is an example how to do this:
 
 ```bash
+# Frontend & Backend will be hosted under below subdirectory
 $ export MEDTAGGER__HOST_ON_SUBDIRECTORY=/medtagger/
-$ docker-compose up
+
+# Now, you will be able to build & run your containers
+$ docker-compose up ...
 ```
 
+### How to speed up Cassandra Driver?
+
+By default MedTagger will use only Python implementation for Cassandra Driver. But authors of this
+ library provided us with couple of switches that can be used to compile its library for your
+ server and add some extentions that can speed up the driver significantly. These flags are
+ described [here](https://github.com/datastax/python-driver/blob/master/docs/installation.rst#optional-non-python-dependencies).
+
+To use them with MedTagger, we've provided two environment variables that can be enabled/disabled
+ before you will build Docker images:
+
+```bash
+# This will enable Cython (by default set to 1)
+$ export CASSANDRA_DRIVER__DISABLE_CYTHON=0
+
+# This will enable extentions (by default set to 1)
+$ export CASSANDRA_DRIVER__DISABLE_EXTENTIONS=0
+
+# Now, you will be able to build & run your containers
+$ docker-compose up ...
+```

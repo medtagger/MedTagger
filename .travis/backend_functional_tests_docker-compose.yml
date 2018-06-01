@@ -1,10 +1,9 @@
 version: '3'
 services:
-  hbase:
-    image: dajobe/hbase
+  cassandra:
+    image: cassandra
     ports:
-      - 52001:8080
-      - 52002:9090
+      - 52001:9042
 
   rabbitmq:
     image: rabbitmq:management
@@ -16,24 +15,17 @@ services:
       POSTGRES_USER: medtagger_user
       POSTGRES_PASSWORD: MedTa99er!
     ports:
-      - 52003:5432
+      - 52002:5432
 
   medtagger_backend_functional_tests:
     image: medtagger_backend/functional_tests
-    environment:
-      - MEDTAGGER__API_HOST=0.0.0.0
-      - MEDTAGGER__API_REST_PORT=51000
-      - MEDTAGGER__API_WEBSOCKET_PORT=51001
-      - MEDTAGGER__API_DEBUG=1
-      - MEDTAGGER__API_SECRET_KEY=SECRET_KEY
-      - MEDTAGGER__DB_DATABASE_URI=postgresql://medtagger_user:MedTa99er!@postgres/medtagger
-      - MEDTAGGER__HBASE_HOST=hbase
-      - MEDTAGGER__HBASE_PORT=9090
-      - MEDTAGGER__HBASE_REST_PORT=8080
-      - MEDTAGGER__HBASE_CONNECTION_POOL_SIZE=10
-      - MEDTAGGER__CELERY_BROKER=pyamqp://guest:guest@rabbitmq//
+    env_file:
+      - ../backend/docker/backend.env
     build:
       context: ../backend
-      dockerfile: Dockerfile_rest
+      dockerfile: docker/Dockerfile_rest
+      args:
+        - CASS_DRIVER_NO_CYTHON=1
+        - CASS_DRIVER_NO_EXTENSIONS=1
     command: /bin/bash -c "make install_dev_packages && make functional_tests_docker"
 

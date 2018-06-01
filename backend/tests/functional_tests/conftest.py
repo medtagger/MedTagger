@@ -4,13 +4,18 @@ from typing import Any
 
 import pytest
 
+from cassandra.cqlengine.models import ModelMetaClass
+
 from medtagger.api import InvalidArgumentsException
 from medtagger.api.rest import app
 from medtagger.database import Base, session, db_session
 from medtagger.database.fixtures import apply_all_fixtures
-from medtagger.clients.hbase_client import HBaseClient
 from medtagger.api.auth.business import create_user, sign_in_user
 from medtagger.api.users.business import set_user_role
+from medtagger.database import Base, session
+from medtagger.database.fixtures import apply_all_fixtures
+from medtagger import storage
+from medtagger.storage import models
 from medtagger.repositories.roles import RolesRepository
 
 logger = logging.getLogger(__name__)
@@ -72,7 +77,10 @@ def _clear_databases() -> None:
             sess.execute('TRUNCATE TABLE "{}" RESTART IDENTITY CASCADE;'.format(table.name))
     session.close_all()
 
-    logger.info('Removing all data from HBase.')
-    for table_name in HBaseClient.HBASE_SCHEMA:
-        for key in HBaseClient().get_all_keys(table_name):
-            HBaseClient().delete(table_name, key)
+    logger.info('Removing all data from Cassandra.')
+    storage_session = storage.create_session()
+    storage_session.set_keyspace(storage.MEDTAGGER_KEYSPACE)
+    for model_name in dir(models):
+        model = getattr(models, model_name)
+        if issubclass(model.__class__, ModelMetaClass) and model.__table_name__:
+            storage_session.execute('TRUNCATE {}'.format(model.__table_name__))

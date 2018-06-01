@@ -3,26 +3,26 @@ import {SelectionData} from './SelectionData';
 import {ScanSelection} from './ScanSelection';
 
 export class ROISelection3D implements ScanSelection<ROISelection2D> {
-    _selections: ROISelection2D[];
+    _elements: ROISelection2D[];
 
-    constructor(selections?: ROISelection2D[]) {
-        this._selections = selections;
+    constructor(elements?: ROISelection2D[]) {
+        this._elements = elements;
     }
 
     public get coordinates(): Object[] {
         const coordinatesArray: Object[] = [];
-        this._selections.forEach((selection: ROISelection2D) => {
-            coordinatesArray.push(selection.coordinates);
+        this._elements.forEach((element: ROISelection2D) => {
+            coordinatesArray.push(element.coordinates);
         });
         return coordinatesArray;
     }
 
     toJSON(): Object {
-        let jsonObject: { selections: SelectionData[] } = {selections: undefined};
-        jsonObject.selections = [];
-        if (this._selections) {
-            this._selections.forEach((selection: ROISelection2D) => {
-                jsonObject.selections.push(selection.toJSON());
+        const jsonObject: { elements: SelectionData[] } = {elements: undefined};
+        jsonObject.elements = [];
+        if (this._elements) {
+            this._elements.forEach((element: ROISelection2D) => {
+                jsonObject.elements.push(element.toJSON());
             });
         }
 

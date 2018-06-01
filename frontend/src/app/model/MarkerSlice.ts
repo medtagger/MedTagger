@@ -1,7 +1,7 @@
 export class MarkerSlice {
-    private _id: number;
-    private _index: number;
-    private _source: string;
+    private readonly _id: number;
+    private readonly _index: number;
+    private readonly _source: string;
 
     constructor(id: string, index: number, source: ArrayBuffer | string) {
         this._id = +id;
