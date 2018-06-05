@@ -3,7 +3,7 @@ alembic==0.9.9
 SQLAlchemy==1.2.8
 werkzeug==0.14.1
 flask==1.0.2
-flask-socketio==3.0.0
+flask-socketio==3.0.1
 flask-restplus==0.11.0
 flask-cors==3.0.4
 flask-login==0.4.1
