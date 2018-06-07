@@ -1,14 +1,16 @@
 """Module responsible for business logic in all Scans endpoints."""
+import io
 import logging
-from typing import Iterable, Dict, List, Tuple, Any
+from typing import Callable, Iterable, Dict, List, Tuple, Any
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
+from PIL import Image
 
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.repositories.label_tag import LabelTagRepository
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID
-from medtagger.database.models import ScanCategory, Scan, Slice, Label, SliceOrientation
+from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
@@ -18,6 +20,8 @@ from medtagger.workers.storage import parse_dicom_and_update_slice
 from medtagger.api.utils import get_current_user
 
 logger = logging.getLogger(__name__)
+
+LabelElementHandler = Callable[[Dict[str, Any], LabelID, Dict[str, bytes]], None]
 
 
 def get_available_scan_categories() -> List[ScanCategory]:
@@ -97,11 +101,46 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
         yield _slice, image
 
 
-def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime) -> Label:
+def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> None:
+    """Validate and raise an Exception for sent payload.
+
+    :param elements: List of JSONs describing elements for a single label
+    :param files: mapping of uploaded files (name and content)
+    """
+    _validate_files(files)
+    _validate_label_elements(elements, files)
+
+
+def _validate_files(files: Dict[str, bytes]) -> None:
+    """Validate files and make sure that images are PNGs."""
+    for file_name, file_data in files.items():
+        try:
+            image = Image.open(io.BytesIO(file_data))
+            image.verify()
+            assert image.format == 'PNG'
+        except Exception:
+            raise InvalidArgumentsException('Type of file "{}" is not supported!'.format(file_name))
+
+
+def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> None:
+    """Validate Label Elements and make sure that all Brush Elements have images."""
+    for label_element in elements:
+        # Each Brush Label Element should have its own image attatched
+        if label_element['tool'] == LabelTool.BRUSH.value:
+            try:
+                files[label_element['image_key']]
+            except KeyError:
+                message = 'Request does not have field named {} that could contain the image!'
+                raise InvalidArgumentsException(message.format(label_element['image_key']))
+
+
+def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, bytes],
+              labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
     :param elements: List of JSONs describing elements for a single label
+    :param files: mapping of uploaded files (name and content)
     :param labeling_time: time in seconds that user spent on labeling
     :return: Label object
     """
@@ -111,27 +150,59 @@ def add_label(scan_id: ScanID, elements: List[Dict], labeling_time: LabelingTime
     except IntegrityError:
         raise NotFoundException('Could not find Scan for that id!')
     for element in elements:
-        add_label_element(element, label.id)
+        add_label_element(element, label.id, files)
     return label
 
 
-def add_label_element(element: Dict[str, Any], label_id: LabelID) -> None:
+def add_label_element(element: Dict[str, Any], label_id: LabelID, files: Dict[str, bytes]) -> None:
     """Add new Label Element for given Label.
 
     :param element: JSON describing single element
     :param label_id: ID of a given Label that the element should be added to
+    :param files: mapping of uploaded files (name and content)
     """
     tool = element['tool']
-    if tool == LabelTool.RECTANGLE.value:
-        position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
-        shape = LabelShape(width=element['width'], height=element['height'])
-        try:
-            label_tag = LabelTagRepository.get_label_tag_by_key(element['tag'])
-        except NoResultFound:
-            raise NotFoundException('Could not find any Label Tag for that key!')
-        LabelsRepository.add_new_rectangular_label_element(label_id, position, shape, label_tag)
-    else:
-        raise InvalidArgumentsException('{} tool is not supported!'.format(tool))
+    handlers: Dict[str, LabelElementHandler] = {
+        LabelTool.RECTANGLE.value: _add_rectangle_element,
+        LabelTool.BRUSH.value: _add_brush_element,
+    }
+    handler = handlers[tool]
+    handler(element, label_id, files)
+
+
+def _add_rectangle_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> None:
+    """Add new Rectangular Label Element for given Label.
+
+    :param element: JSON describing single element
+    :param label_id: ID of a given Label that the element should be added to
+    """
+    position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
+    shape = LabelShape(width=element['width'], height=element['height'])
+    label_tag = _get_label_tag(element['tag'])
+    LabelsRepository.add_new_rectangular_label_element(label_id, position, shape, label_tag)
+
+
+def _add_brush_element(element: Dict[str, Any], label_id: LabelID, files: Dict[str, bytes]) -> None:
+    """Add new Brush Label Element for given Label.
+
+    :param element: JSON describing single element
+    :param label_id: ID of a given Label that the element should be added to
+    :param files: mapping of uploaded files (name and content)
+    """
+    width = element['width']
+    height = element['height']
+    label_tag = _get_label_tag(element['tag'])
+    slice_index = element['slice_index']
+    image = files[element['image_key']]
+    LabelsRepository.add_new_brush_label_element(label_id, slice_index, width, height, image, label_tag)
+
+
+def _get_label_tag(tag_key: str) -> LabelTag:
+    """Return Label Tag based on Tag's key or raise an exception in case if not found."""
+    try:
+        return LabelTagRepository.get_label_tag_by_key(tag_key)
+    except NoResultFound:
+        raise NotFoundException('Could not find any Label Tag for that key!')
 
 
 def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:

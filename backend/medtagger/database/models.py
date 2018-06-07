@@ -418,6 +418,37 @@ class RectangularLabelElement(LabelElement):
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
 
 
+class BrushLabelElement(LabelElement):
+    """Definition of a Label Element made with Brush Tool."""
+
+    __tablename__ = 'BrushLabelElements'
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+
+    width: int = Column(Integer, nullable=False)
+    height: int = Column(Integer, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': LabelTool.BRUSH,
+    }
+
+    def __init__(self, slice_index: int, width: int, height: int, tag: LabelTag) -> None:
+        """Initialize LabelElement made with Brush Tool.
+
+        :param slice_index: integer value representing index of a Slice in asc order
+        :param width: width of the label's image
+        :param height: height of the label's image
+        :param tag: tag of the label
+        """
+        super(BrushLabelElement, self).__init__(tag)
+        self.slice_index = slice_index
+        self.width = width
+        self.height = height
+
+    def __repr__(self) -> str:
+        """Return string representation for Brush Label Element."""
+        return '<{}: {}>'.format(self.__class__.__name__, self.id)
+
+
 ###########################
 #
 #  Actions related models

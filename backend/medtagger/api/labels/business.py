@@ -12,6 +12,17 @@ from medtagger.repositories.actions import ActionsRepository, InvalidResponseExc
     UnsupportedActionException
 
 
+def get_label(label_id: LabelID) -> Label:
+    """Fetch Label from database for given Label ID.
+
+    :param label_id: ID of a Label which should be returned
+    """
+    try:
+        return LabelsRepository.get_label_by_id(label_id)
+    except NoResultFound:
+        raise NotFoundException('Label "{}" not found.'.format(label_id))
+
+
 def change_label_status(label_id: LabelID, status: LabelVerificationStatus) -> Label:
     """Change status of the label.
 

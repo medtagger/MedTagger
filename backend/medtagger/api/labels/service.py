@@ -14,8 +14,25 @@ from medtagger.api.security import login_required, role_required
 labels_ns = api.namespace('labels', 'Methods related with labels')
 
 
+@labels_ns.route('/<string:label_id>')
+@labels_ns.param('label_id', 'Label identifier')
+class Label(Resource):
+    """Endpoint that returns Label for the given Label ID."""
+
+    @staticmethod
+    @login_required
+    @role_required('doctor', 'admin')
+    @labels_ns.marshal_with(serializers.out__label)
+    @labels_ns.doc(security='token')
+    @labels_ns.doc(description='Returns Label with given Label ID.')
+    @labels_ns.doc(responses={200: 'Success', 404: 'Could not find Label'})
+    def get(label_id: LabelID) -> Any:
+        """Return Label for the given Label ID."""
+        return business.get_label(label_id)
+
+
 @labels_ns.route('/random')
-class Random(Resource):
+class RandomLabel(Resource):
     """Endpoint that returns random label with status NOT_VERIFIED."""
 
     @staticmethod
