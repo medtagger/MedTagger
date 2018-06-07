@@ -93,32 +93,22 @@ unit_tests:
 	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) $(UNIT_TEST)
 
 functional_tests:
-	make functional_tests__prepare_environment
-	@if ! make functional_tests__run; then\
+	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d cassandra postgres rabbitmq
+	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
+	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic upgrade head
+	@if . $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ! pytest $(FUNCTIONAL_TEST) ; then\
 		docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down;\
 		echo "Functional tests failed!";\
 		exit 1;\
 	fi
-	echo "Functional tests passed!"
-	make functional_tests__delete_environment
-
-functional_tests__prepare_environment:
-	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) up -d cassandra postgres rabbitmq
-	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && ./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
-	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic upgrade head
-
-functional_tests__run:
-	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && pytest $(FUNCTIONAL_TEST)
-	
-functional_tests__delete_environment:
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic downgrade base
 	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down
+	echo "Functional tests passed!"
 
 functional_tests_docker:
 	./$(SCRIPTS_DIRECTORY)/wait_for_dependencies.sh
 	alembic upgrade head
 	pytest $(FUNCTIONAL_TESTS_MODULE)
-	alembic downgrade base
 
 #
 # Utilities

@@ -123,7 +123,7 @@ def _validate_files(files: Dict[str, bytes]) -> None:
 
 
 def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> None:
-    """Validate Label Elements and make suer that all Brush Elements have images."""
+    """Validate Label Elements and make sure that all Brush Elements have images."""
     for label_element in elements:
         # Each Brush Label Element should have its own image attatched
         if label_element['tool'] == LabelTool.BRUSH.value:
