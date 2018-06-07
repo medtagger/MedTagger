@@ -322,14 +322,18 @@ class LabelTag(Base):
     scan_category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
     scan_category: ScanCategory = relationship('ScanCategory', back_populates="available_tags")
 
-    def __init__(self, key: str, name: str) -> None:
+    actions: List['Action'] = relationship('Action', back_populates='label_tag')
+
+    def __init__(self, key: str, name: str, actions: List['Action'] = None) -> None:
         """Initialize Label Tag.
 
         :param key: unique key representing Label Tag
         :param name: name which describes this Label Tag
+        :param actions: (optional) list of required actions for this Label Tag
         """
         self.key = key
         self.name = name
+        self.actions = actions or []
 
     def __repr__(self) -> str:
         """Return string representation for Label Tag."""
@@ -463,7 +467,8 @@ class Action(Base):
     name: str = Column(String(255), nullable=False)
     action_type: str = Column(String(50), nullable=False)
 
-    # TODO: Add LabelTag, which is necessary to assign action for given Tag!
+    label_tag_id: int = Column(Integer, ForeignKey('LabelTags.id'))
+    label_tag: LabelTag = relationship('LabelTag', back_populates='actions')
 
     responses: List['ActionResponse'] = relationship('ActionResponse', back_populates='action')
 
@@ -625,7 +630,8 @@ class SurveyResponse(ActionResponse):
 
     survey: Survey = relationship('Survey', back_populates='responses', foreign_keys=ActionResponse.action_id)
 
-    # TODO: Add LabelElement with which it will be connected
+    label_element_id: LabelElementID = Column(String, ForeignKey('LabelElements.id'))
+    label_element: LabelElement = relationship('LabelElement')
 
     __mapper_args__ = {
         'polymorphic_identity': 'SurveyResponse',

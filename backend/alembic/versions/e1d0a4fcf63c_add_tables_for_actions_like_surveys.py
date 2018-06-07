@@ -1,7 +1,7 @@
 """Add tables for Actions like Surveys
 
 Revision ID: e1d0a4fcf63c
-Revises: 39c660178412
+Revises: 9a6cd75ba23f
 Create Date: 2018-04-28 20:09:39.238496
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'e1d0a4fcf63c'
-down_revision = '39c660178412'
+down_revision = '9a6cd75ba23f'
 branch_labels = None
 depends_on = None
 
@@ -23,6 +23,8 @@ def upgrade():
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('name', sa.String(length=255), nullable=False),
                     sa.Column('action_type', sa.String(length=50), nullable=False),
+                    sa.Column('label_tag_id', sa.Integer(), nullable=True),
+                    sa.ForeignKeyConstraint(['label_tag_id'], ['LabelTags.id'], name=op.f('fk_Actions_label_tag_id_LabelTags')),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_Actions')),
                     )
     op.create_table('ActionResponses',
@@ -54,7 +56,9 @@ def upgrade():
     op.create_table('SurveyResponses',
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('data', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+                    sa.Column('label_element_id', sa.String(), nullable=True),
                     sa.ForeignKeyConstraint(['id'], ['ActionResponses.id'], name=op.f('fk_SurveyResponses_id_ActionResponses')),
+                    sa.ForeignKeyConstraint(['label_element_id'], ['LabelElements.id'], name=op.f('fk_SurveyResponses_label_element_id_LabelElements')),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_SurveyResponses')),
                     )
     op.create_table('SurveySingleChoiceQuestions',
@@ -64,7 +68,6 @@ def upgrade():
                     sa.ForeignKeyConstraint(['id'], ['SurveyElements.id'], name=op.f('fk_SurveySingleChoiceQuestions_id_SurveyElements')),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk_SurveySingleChoiceQuestions')),
                     )
-
 
 def downgrade():
     op.drop_table('SurveySingleChoiceQuestions')
