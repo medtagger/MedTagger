@@ -68,3 +68,4 @@ class LabelTool(Enum):
     """Defines available Label Tools."""
 
     RECTANGLE = 'RECTANGLE'
+    BRUSH = 'BRUSH'

@@ -23,6 +23,8 @@ def get_headers(**kwargs: Any) -> Mapping:
     headers = {}
     if kwargs.get('json'):
         headers['Content-Type'] = 'application/json'
+    if kwargs.get('multipart'):
+        headers['Content-Type'] = 'multipart/form-data'
     if kwargs.get('token'):
         headers['Authorization'] = 'Bearer ' + kwargs.get('token', '')
     return headers

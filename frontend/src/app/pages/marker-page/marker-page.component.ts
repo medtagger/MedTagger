@@ -134,19 +134,15 @@ export class MarkerPageComponent implements OnInit {
 
         this.scanService.sendSelection(this.scan.scanId, roiSelection, labelingTime)
             .then((response: Response) => {
-                if (response.status === 200) {
-                    console.log('MarkerPage | sendSelection | success!');
-                }
+                console.log('MarkerPage | sendSelection | success!');
+                this.indicateLabelHasBeenSend();
+                this.labelExplorer.reinitializeExplorer();
+                this.skipScan();
+                this.startMeasuringLabelingTime();
             })
             .catch((errorResponse: Error) => {
-                this.dialogService
-                    .openInfoDialog('Error', 'Cannot send selection', 'Ok');
+                this.dialogService.openInfoDialog('Error', 'Cannot send selection', 'Ok');
             });
-        this.startMeasuringLabelingTime();
-        this.indicateLabelHasBeenSend();
-
-        this.labelExplorer.reinitializeExplorer();
-        return;
     }
 
     public remove2dSelection(): void {
@@ -163,10 +159,10 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private indicateLabelHasBeenSend(): void {
-        this.snackBar.open('Label has been send', '', {duration: 2000});
+        this.snackBar.open('Label has been sent!', '', {duration: 2000});
     }
 
     private indicateNewScanAppeared(): void {
-        this.snackBar.open('New scan has been loaded', '', {duration: 2000});
+        this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
     }
 }
