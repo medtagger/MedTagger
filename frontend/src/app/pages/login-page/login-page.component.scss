@@ -1,18 +1,5 @@
-.decoration-side {
-    position: relative;
-    margin: -0.5em 0; // Workaround for top navigation bar shadow
-    float: left;
-    width: 100%;
-    height: 110%;
-    background: white url("../../../assets/img/login_pic.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-body {
-    background: black;
-}
+@import "../../utils/mixins";
+@import '~@angular/material/theming';
 
 .mat-card-title {
     font-size: 1.5em;
@@ -26,46 +13,87 @@ body {
 }
 
 .login-side {
-    position: absolute;
-    margin: 0;
-    top: 25%;
-    right: 20%;
-    width: 20%;
-    min-width: 340px;
+    position: relative;
+    @include size(100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
-    .login-card {
-        position: relative;
-        height: 60%;
-        margin: 0 auto;
+    &:before {
+        @include absolute(top -1em);
+        @include size(100%, 110%);
+        @include respond-to('medium') {
+            @include absolute(top 0em);
+            @include size(100%);
+        }
+        display: block;
+        background-size: cover;
+        background: white url("../../../assets/img/login_pic.jpg") no-repeat center;
+        content: " ";
+    }
+
+    mat-card {
+        min-height: 60%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        @include respond-to('medium') {
+            @include absolute(top 20% right 20%);
+            min-height: 25em;
+            min-width: 20em;
+            margin: 0;
+        }
+        @include mat-elevation-transition;
+        @include mat-elevation(2);
+        &:hover {
+            @include mat-elevation(3);
+        }
     }
 }
 
-.login-button {
-    float: left;
-}
+mat-card-content {
+    @include size(100%);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    form {
+        max-width: 90%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 0 .5em;
+        @include respond-to('medium') {
+            max-width: 80%;
+            padding: 1em 0;
+        }
+    }
+    mat-card-actions {
+        padding: 0;
+        display: flex;
+        align-items: center;
 
-.login-spinner {
-    left: 10px;
-    float: left;
-}
+        :not(:last-child) {
+            margin-right: 0.5em;
+        }
 
-.login-spinner-label {
-    margin-left: 15px;
-    line-height: 36px;
-}
+        .error {
+            color: red;
+        }
+    }
 
-.incorrect-login-or-password {
-    color: red;
-    padding-left: 10px;
-    line-height: 36px;
-}
+    button {
+        &:not(:disabled) {
+            @include mat-elevation-transition;
+            @include mat-elevation(3);
+            &:hover {
+                @include mat-elevation(5);
+            }
+        }
+    }
 
-.login-button-row {
-    padding-bottom: 15px;
+    .register-link {
+        padding-top: 15px;
+        border-top: 1px solid #bbb;
+    }
 }
-
-.register-link-row {
-    padding-top: 15px;
-    border-top: 1px solid #bbb;
-}
-
