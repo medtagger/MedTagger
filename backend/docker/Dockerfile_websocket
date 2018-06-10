@@ -4,7 +4,6 @@ WORKDIR /medtagger_backend/
 
 COPY Makefile ./Makefile
 COPY alembic ./alembic
-COPY example_data/example_scan ./example_data/example_scan/
 COPY medtagger ./medtagger
 COPY scripts ./scripts
 COPY tests ./tests
@@ -24,5 +23,6 @@ ARG CASS_DRIVER_NO_CYTHON
 ARG CASS_DRIVER_NO_EXTENSIONS
 RUN pip install -r requirements.txt
 
-ENV C_FORCE_ROOT true
-CMD ["celery", "-A", "medtagger.workers", "worker", "--loglevel=info"]
+EXPOSE 51001
+CMD ["make", "run_websocket_production"]
+

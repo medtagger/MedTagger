@@ -9,7 +9,7 @@ enum LoginPageMode {
     REGISTER
 }
 
-const MIN_PASSWORD_LENGTH: number = 8;
+const MIN_PASSWORD_LENGTH = 8;
 
 @Component({
     selector: 'app-login-page',
@@ -43,7 +43,7 @@ export class LoginPageComponent implements OnInit {
         });
     }
 
-    resetLogin(): void{
+    resetLogin(): void {
         this.loggingInProgress = false;
         this.loggingInError = false;
     }
@@ -67,7 +67,7 @@ export class LoginPageComponent implements OnInit {
                 } else {
                     this.loggingInError = true;
                 }
-            }, (error) => {
+            }, () => {
                 this.loggingInProgress = false;
                 this.loggingInError = true;
             });
@@ -77,10 +77,10 @@ export class LoginPageComponent implements OnInit {
         this.userForm.reset();
         if (this.loginPageMode === LoginPageMode.LOG_IN) {
             this.loginPageMode = LoginPageMode.REGISTER;
-            this.resetLogin()
+            this.resetLogin();
         } else if (this.loginPageMode === LoginPageMode.REGISTER) {
             this.loginPageMode = LoginPageMode.LOG_IN;
-            this.resetRegistration()
+            this.resetRegistration();
         } else {
             console.error('Unsupported login page mode!');
         }
@@ -113,19 +113,18 @@ export class LoginPageComponent implements OnInit {
     }
 
     resetRegistration(): void {
-        this.registrationInProgress = false
+        this.registrationInProgress = false;
     }
 
     public register(): void {
         this.registrationInProgress = true;
-        let formValue = this.userForm.value;
+        const formValue = this.userForm.value;
         this.accountService.register(formValue['email'], formValue['password'], formValue['firstName'], formValue['lastName'])
             .then(() => {
                 this.registrationInProgress = false;
-                this.changePageMode()
-            }, (error) => {
-                this.resetRegistration()
-            })
+                this.changePageMode();
+            }, () => {
+                this.resetRegistration();
+            });
     }
-
 }

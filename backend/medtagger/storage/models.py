@@ -23,3 +23,13 @@ class ProcessedSlice(Model):
 
     id = Text(primary_key=True)
     image = Blob()
+
+
+class BrushLabelElement(Model):
+    """Model representing Label Element made with Brush Tool."""
+
+    __table_name__ = 'brush_label_elements'
+    __keyspace__ = MEDTAGGER_KEYSPACE
+
+    id = Text(primary_key=True)
+    image = Blob()

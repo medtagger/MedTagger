@@ -6,13 +6,13 @@ import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
-import {ScanSelection} from "../model/ScanSelection";
-import {SliceSelection} from "../model/SliceSelection";
-import {MedTaggerWebSocket} from "./websocket.service";
-import {concat, delay, flatMap, map, mergeAll, retryWhen, take} from "rxjs/operators";
-import {of} from "rxjs/internal/observable/of";
-import {from} from "rxjs/internal/observable/from";
-import {defer} from "rxjs/internal/observable/defer";
+import {ScanSelection} from '../model/ScanSelection';
+import {SliceSelection} from '../model/SliceSelection';
+import {MedTaggerWebSocket} from './websocket.service';
+import {concat, delay, flatMap, map, mergeAll, retryWhen, take} from 'rxjs/operators';
+import {of} from 'rxjs/internal/observable/of';
+import {from} from 'rxjs/internal/observable/from';
+import {defer} from 'rxjs/internal/observable/defer';
 
 interface ScanResponse {
     scan_id: string;
@@ -42,11 +42,15 @@ export class ScanService {
     }
 
     public sendSelection(scanId: string, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {
-        console.log('ScanService | send3dSelection | sending ROI:', selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
+        console.log('ScanService | send3dSelection | sending ROI:',
+            selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
+
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
+        const form = new FormData();
+        form.append('label', JSON.stringify(payload));
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/label`, payload).toPromise().then((response: Response) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/label`, form).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
                 resolve(response);
             }).catch((error: Response) => {
@@ -58,13 +62,14 @@ export class ScanService {
 
     public getRandomScan(category: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
-			let params = new HttpParams();
-			params = params.set('category', category);
+            let params = new HttpParams();
+            params = params.set('category', category);
             this.http.get<ScanResponse>(environment.API_URL + '/scans/random', {params: params})
                 .subscribe(
                     (response: ScanResponse) => {
                         console.log('ScanService | getRandomScan | response: ', response);
-                        resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices, response.width, response.height));
+                        resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices,
+                            response.width, response.height));
                     },
                     (error: Error) => {
                         console.log('ScanService | getRandomScan | error: ', error);
@@ -79,11 +84,12 @@ export class ScanService {
     getScanForScanId(scanId: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
             this.http.get<ScanResponse>(environment.API_URL + '/scans/' + scanId).toPromise().then(
-				(response: ScanResponse) => {
+                (response: ScanResponse) => {
                     console.log('ScanService | getScanForScanId | response: ', response);
-                    resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices, response.width, response.height));
+                    resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices,
+                        response.width, response.height));
                 },
-				(error: Error) => {
+                (error: Error) => {
                     console.log('ScanService | getScanForScanId | error: ', error);
                     reject(error);
                 }
@@ -97,8 +103,8 @@ export class ScanService {
                 response => {
                     console.log('ScanService | getAvailableCategories | response: ', response);
                     const categories = [];
-                    for (let category of response) {
-                        categories.push(new ScanCategory(category.key, category.name, category.image_path))
+                    for (const category of response) {
+                        categories.push(new ScanCategory(category.key, category.name, category.image_path));
                     }
                     resolve(categories);
                 },
@@ -134,15 +140,15 @@ export class ScanService {
                 .pipe(
                     retryWhen((error: Observable<HttpErrorResponse>) => {
                         return error.pipe(
-                            flatMap((error: HttpErrorResponse) => {
+                            flatMap((scanRequestError: HttpErrorResponse) => {
                                 console.warn('Retrying request for creating new Scan (attempt: ' + (++retryAttempt) + ').');
-                                return of(error.status).pipe(
+                                return of(scanRequestError.status).pipe(
                                     delay(5000), // Let's give it a try after 5 seconds
-                                    take(5), // Let's give it 5 retrys (each after 5 seconds)
+                                    take(5), // Let's give it 5 retries (each after 5 seconds)
                                     concat(observableThrowError({error: 'Cannot create new Scan.'}))
                                 );
                             }),
-                        )
+                        );
                     })
                 ).toPromise().then(
                 (response: NewScanResponse) => {
@@ -156,25 +162,27 @@ export class ScanService {
     }
 
     uploadSlices(scanId: string, files: File[]) {
-        let CONCURRENT_API_CALLS = 5;
+        const CONCURRENT_API_CALLS = 5;
 
         return from(files).pipe(
             map((file: File) => {
                 console.log('uploading...', file);
-                var retryAttempt = 0;
-                let form = new FormData();
+                let retryAttempt = 0;
+                const form = new FormData();
                 form.append('image', file, file.name);
                 return defer(
                     () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
                         .pipe(
                             retryWhen((error: Observable<HttpErrorResponse>) => {
                                 return error.pipe(
-                                    flatMap((error: HttpErrorResponse) => {
-                                        console.warn('Retrying request for uploading a single Slice (' + file.name + ', attempt: ' + (++retryAttempt) + ').');
-                                        return of(error.status).pipe(
+                                    flatMap((uploadRequestError: HttpErrorResponse) => {
+                                        console.warn('Retrying request for uploading a single Slice ('
+                                            + file.name + ', attempt: ' + (++retryAttempt) + ').');
+                                        return of(uploadRequestError.status).pipe(
                                             delay(5000),  // Let's give it a try after 5 seconds
-                                            take(5),  // Let's give it 5 retrys (each after 5 seconds)
-                                            concat(observableThrowError({error: 'Cannot upload Slice ' + file.name })) //TODO: use some new way of dealing with
+                                            take(5),  // Let's give it 5 retries (each after 5 seconds)
+                                            concat(observableThrowError({error: 'Cannot upload Slice ' + file.name}))
+                                            // TODO: use some new way of dealing with
                                         );
                                     })
                                 );
@@ -183,6 +191,6 @@ export class ScanService {
                 );
             }),
             mergeAll(CONCURRENT_API_CALLS)
-        )
+        );
     }
 }

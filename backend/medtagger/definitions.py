@@ -13,6 +13,7 @@ class DicomTag(Enum):
     PIXEL_SPACING = '0028|0030'
     ROWS = '0028|0010'
     COLUMNS = '0028|0011'
+    MODALITY = '0008|0060'
 
 
 class SliceOrientation(Enum):
@@ -67,3 +68,4 @@ class LabelTool(Enum):
     """Defines available Label Tools."""
 
     RECTANGLE = 'RECTANGLE'
+    BRUSH = 'BRUSH'

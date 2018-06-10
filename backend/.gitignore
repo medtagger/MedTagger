@@ -105,6 +105,7 @@ ENV/
 backend_api.conf
 
 # MedTagger
+data
 medtagger_backup
 
 # Tools

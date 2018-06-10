@@ -8,7 +8,6 @@ LabelID = NewType('LabelID', str)
 LabelElementID = NewType('LabelElementID', str)
 LabelTagID = NewType('LabelTagID', int)
 
-
 SliceLocation = NewType('SliceLocation', float)
 SlicePosition = NamedTuple('SlicePosition', [('x', float), ('y', float), ('z', float)])
 

@@ -1,12 +1,12 @@
-import {Component, ElementRef, OnInit, ViewChild, HostListener} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
-import {LabelExplorerComponent} from "../label-explorer/label-explorer.component";
-import {LabelListItem} from "../../model/LabelListItem";
-import {SelectionStateMessage} from "../../model/SelectionStateMessage";
+import {LabelExplorerComponent} from '../label-explorer/label-explorer.component';
+import {LabelListItem} from '../../model/LabelListItem';
+import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 
 @Component({
     selector: 'app-marker-component',
@@ -33,15 +33,19 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     @ViewChild('slider') slider: MatSlider;
 
-    public selectionState: {isValid: boolean, is2d: boolean, hasArchive: boolean} = { isValid: false, is2d: false, hasArchive: false};
+    public selectionState: { isValid: boolean, is2d: boolean, hasArchive: boolean } = {
+        isValid: false,
+        is2d: false,
+        hasArchive: false
+    };
 
     public observableSliceRequest: Subject<number>;
 
     private labelExplorer: LabelExplorerComponent;
 
-    //TODO: dynamic context and tool changes
-    private currentTaggingContext: string = "ALL";
-    private currentTool: string = "RECTANGLE";
+    // TODO: dynamic context and tool changes
+    private currentTaggingContext = 'ALL';
+    private currentTool = 'RECTANGLE';
 
     constructor() {
         super();
@@ -90,32 +94,32 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             console.log('Marker | getStateChange event from selector!');
             this.updateSelectionState();
             if (this.labelExplorer) {
-            	if(selectionStateMessage.toDelete) {
-					console.log('Marker | getStateChange remove slice from label explorer, sliceId: ', selectionStateMessage.sliceId);
-					this.labelExplorer.removeLabel(selectionStateMessage.sliceId, this.currentTaggingContext, this.currentTool);
-				} else {
-					console.log('Marker | getStateChange adding new slice to label explorer, sliceId: ', selectionStateMessage.sliceId);
-					this.labelExplorer.addLabel(selectionStateMessage.sliceId, this.currentTaggingContext, this.currentTool);
-				}
-			}
+                if (selectionStateMessage.toDelete) {
+                    console.log('Marker | getStateChange remove slice from label explorer, sliceId: ', selectionStateMessage.sliceId);
+                    this.labelExplorer.removeLabel(selectionStateMessage.sliceId, this.currentTaggingContext, this.currentTool);
+                } else {
+                    console.log('Marker | getStateChange adding new slice to label explorer, sliceId: ', selectionStateMessage.sliceId);
+                    this.labelExplorer.addLabel(selectionStateMessage.sliceId, this.currentTaggingContext, this.currentTool);
+                }
+            }
         });
     }
 
     private hookUpExplorerLabelChangeSubscription(): void {
-    	if(this.labelExplorer) {
-    		this.labelExplorer.getLabelChangeEmitter().subscribe( (labelChanged: LabelListItem)=> {
-				console.log('Marker | getLabelChange event from label-explorer!');
-				if(labelChanged.toDelete) {
-					this.selector.removeSelection(labelChanged.sliceIndex);
-				} else {
-					this.selector.pinSelection(labelChanged.sliceIndex, labelChanged.pinned);
-					this.selector.hideSelection(labelChanged.sliceIndex, labelChanged.hidden);
-				}
-			});
-		} else {
-			console.warn(`Marker | hookUpExplorerLabelChangeSubscription cannot hook up observer when labelExplorer isn't present!`);
-		}
-	}
+        if (this.labelExplorer) {
+            this.labelExplorer.getLabelChangeEmitter().subscribe((labelChanged: LabelListItem) => {
+                console.log('Marker | getLabelChange event from label-explorer!');
+                if (labelChanged.toDelete) {
+                    this.selector.removeSelection(labelChanged.sliceIndex);
+                } else {
+                    this.selector.pinSelection(labelChanged.sliceIndex, labelChanged.pinned);
+                    this.selector.hideSelection(labelChanged.sliceIndex, labelChanged.hidden);
+                }
+            });
+        } else {
+            console.warn(`Marker | hookUpExplorerLabelChangeSubscription cannot hook up observer when labelExplorer isn't present!`);
+        }
+    }
 
     public prepareForNewScan(): void {
         this.clearData();
@@ -136,8 +140,8 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.initializeCanvas();
 
         this.initializeImage(() => {
-        	this.afterImageLoad();
-		});
+            this.afterImageLoad();
+        });
 
         this.setCanvasImage();
 
@@ -155,11 +159,11 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     private afterImageLoad(): void {
-		this.selector.clearCanvasSelection();
+        this.selector.clearCanvasSelection();
 
-		this.selector.drawSelections();
-		this.updateSelectionState();
-	}
+        this.selector.drawSelections();
+        this.updateSelectionState();
+    }
 
     private initCanvasSelectionTool(): void {
         console.log('Marker | initCanvasSelectionTool');
@@ -170,7 +174,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         };
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
-			console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
+            console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
             this.selector.onMouseUp(mouseEvent);
         };
 
@@ -180,7 +184,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     public setLabelExplorer(labelExplorerRef: LabelExplorerComponent): void {
-    	this.labelExplorer = labelExplorerRef;
-    	this.hookUpExplorerLabelChangeSubscription();
-	}
+        this.labelExplorer = labelExplorerRef;
+        this.hookUpExplorerLabelChangeSubscription();
+    }
 }
