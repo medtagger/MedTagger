@@ -104,4 +104,3 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     assert len(json_response['elements']) == 1
     assert json_response['elements'][0]['x'] == 0.25
     assert json_response['elements'][0]['y'] == 0.5
-
