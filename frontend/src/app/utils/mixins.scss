@@ -1,0 +1,72 @@
+@mixin size($width, $height: $width) {
+    width: $width;
+    height: $height;
+}
+
+@mixin keyframes($name) {
+    @-webkit-keyframes #{$name}{
+        @content
+    }
+    @-moz-keyframes #{$name}{
+        @content
+    }
+    @-ms-keyframes #{$name}{
+        @content
+    }
+    @keyframes #{$name}{
+        @content
+    }
+}
+
+@mixin position($position, $args) {
+    position: $position;
+    @each $o in top, right, bottom, left {
+        $i: index($args, $o);
+        @if $i and $i + 1 <= length($args) and type-of(nth($args, $i + 1)) == number {
+            #{$o}: nth($args, $i + 1)
+        }
+    }
+}
+
+@mixin absolute($args) {
+    @include position(absolute, $args);
+}
+
+@mixin fixed($args) {
+    @include position(fixed, $args);
+}
+
+@mixin relative($args) {
+    @include position(relative, $args);
+}
+
+$breakpoints: ('small': (min-width: 320px), 'medium': (min-width: 768px), 'large': (min-width: 1440px));
+
+@mixin respond-to($breakpoint) {
+    $raw-query: map-get($breakpoints, $breakpoint);
+    @if $raw-query {
+        $query: if(type-of($raw-query) == 'string', unquote($raw-query), inspect($raw-query)) ;
+        @media #{$query}{
+            @content
+        }
+    } @else {
+        @error 'No value found for `#{$breakpoint}`. ';
+    }
+}
+
+@mixin prefix($property, $value, $vendors: webkit moz ms o) {
+    @if $vendors {
+        @each $vendor in $vendors {
+            #{"-" + $vendor + "-" + $property}: #{$value};
+            #{$property}: #{$value};
+        }
+    }
+}
+
+@mixin transform($value) {
+    @include prefix(transform, $value);
+}
+
+@mixin animation($value) {
+    @include prefix(animation, $value);
+}
