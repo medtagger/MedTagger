@@ -2,7 +2,7 @@
 from flask_restplus import fields
 
 from medtagger.api import api
-from medtagger.database.models import RectangularLabelElement, BrushLabelElement
+from medtagger.database.models import RectangularLabelElement, BrushLabelElement, PointLabelElement
 from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
 
 in__label_status = api.model("Status for label", {
@@ -33,6 +33,11 @@ out__brush_label_element = api.inherit('Brush Label Element model', out__common_
     'height': fields.Integer(description='Image\'s height', min=0),
 })
 
+out__point_label_element = api.inherit('Point Label Element model', out__common_label_element, {
+    'x': fields.Float(description='Element\'s X position', min=0.0, max=1.0),
+    'y': fields.Float(description='Element\'s Y position', min=0.0, max=1.0),
+})
+
 out__label_status = api.model('Label status and ID', {
     'label_id': fields.String(description='Label\'s ID', attribute='id'),
     'status': fields.String(description='Status of the label', attribute='status.name'),
@@ -43,6 +48,7 @@ out__label = api.inherit('Label model', out__label_status, {
     'elements': fields.List(fields.Polymorph({
         RectangularLabelElement: out__rectangular_label_element,
         BrushLabelElement: out__brush_label_element,
+        PointLabelElement: out__point_label_element,
     })),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
     'status': fields.String(description='Label\'s status', enum=[status.name for status in LabelVerificationStatus]),

@@ -426,3 +426,32 @@ class BrushLabelElement(LabelElement):
     def __repr__(self) -> str:
         """Return string representation for Brush Label Element."""
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
+
+
+class PointLabelElement(LabelElement):
+    """Definition of a Label Element made with Point Tool."""
+
+    __tablename__ = 'PointLabelElements'
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+
+    x: float = Column(Integer, nullable=False)
+    y: float = Column(Integer, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': LabelTool.POINT,
+    }
+
+    def __init__(self, position: LabelPosition, tag: LabelTag) -> None:
+        """Initialize LabelElement made with Point Tool.
+
+        :param position: position (x, y, slice_index) of the label
+        :param tag: tag of the label
+        """
+        super().__init__(tag)
+        self.slice_index = position.slice_index
+        self.x = position.x
+        self.y = position.y
+
+    def __repr__(self) -> str:
+        """Return string representation for Point Label Element."""
+        return '<{}: {}>'.format(self.__class__.__name__, self.id)
