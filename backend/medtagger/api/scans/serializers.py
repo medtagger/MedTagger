@@ -47,9 +47,10 @@ elements_schema = {
     },
 }
 
-in__label_tag_element = api.model('Label Element model', {
+inout__label_tag_element = api.model('Label Element model', {
     'key': fields.String(),
     'name': fields.String(),
+    'actions_ids': fields.List(fields.Integer(), attribute=lambda category: [action.id for action in category.actions]),
 })
 
 in__label_model = api.model('Label model', {
@@ -70,7 +71,7 @@ out__scan_category = api.model('Scan Category model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
-    'tags': fields.List(fields.Nested(in__label_tag_element), attribute='available_tags'),
+    'tags': fields.List(fields.Nested(inout__label_tag_element), attribute='available_tags'),
 })
 
 out__scan = api.model('Scan model', {
