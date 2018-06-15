@@ -41,7 +41,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public slices: Map<number, MarkerSlice>;
     protected _currentSlice;
 
-    public observableSliceRequest: Subject<number>;
+    public observableSliceRequest: Subject<object>;
     protected sliceBatchSize: number;
 
     protected selector: Selector<SliceSelection>;
@@ -138,7 +138,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public hookUpSliceObserver(sliceBatchSize: number): Promise<boolean> {
         this.sliceBatchSize = sliceBatchSize;
         return new Promise((resolve) => {
-            this.observableSliceRequest = new Subject<number>();
+            this.observableSliceRequest = new Subject<object>();
             resolve(true);
         });
     }
@@ -175,12 +175,12 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         if (this.slider.max === sliderValue) {
             requestSliceIndex = sliderValue + 1;
             console.log('ScanViewer | requestSlicesIfNeeded more (higher indexes): ', requestSliceIndex);
-            this.observableSliceRequest.next(requestSliceIndex);
+            this.observableSliceRequest.next({slice: requestSliceIndex});
         }
         if (this.slider.min === sliderValue) {
-            requestSliceIndex = sliderValue - this.sliceBatchSize;
+            requestSliceIndex = sliderValue - 1;
             console.log('ScanViewer | requestSlicesIfNeeded more (lower indexes): ', requestSliceIndex);
-            this.observableSliceRequest.next(requestSliceIndex);
+            this.observableSliceRequest.next({slice: requestSliceIndex, reversed: true});
         }
     }
 

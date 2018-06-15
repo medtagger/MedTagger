@@ -40,7 +40,10 @@ export class ValidationPageComponent implements OnInit {
 
             this.scanViewer.hookUpSliceObserver(ValidationPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
                 if (isObserverHooked) {
-                    this.scanViewer.observableSliceRequest.subscribe((sliceRequest: number) => {
+                    this.scanViewer.observableSliceRequest.subscribe((request: object) => {
+                        // TODO: Why is it copied & pasted here? We shoul unify this ASAP!
+                        let sliceRequest = request['slice'];
+                        let reversed = request['reversed'] || false;
                         console.log('ValidationPage | observable sliceRequest: ', sliceRequest);
                         let count = ValidationPageComponent.SLICE_BATCH_SIZE;
                         if (sliceRequest + count > this.scan.numberOfSlices) {
@@ -50,7 +53,7 @@ export class ValidationPageComponent implements OnInit {
                             count = count + sliceRequest;
                             sliceRequest = 0;
                         }
-                        this.scanService.requestSlices(this.label.scanId, sliceRequest, count);
+                        this.scanService.requestSlices(this.label.scanId, sliceRequest, count, reversed);
                     });
                 }
             });
@@ -82,7 +85,7 @@ export class ValidationPageComponent implements OnInit {
                 if (begin + ValidationPageComponent.SLICE_BATCH_SIZE > this.scan.numberOfSlices) {
                     count = this.scan.numberOfSlices - begin;
                 }
-                this.scanService.requestSlices(this.label.scanId, begin, count);
+                this.scanService.requestSlices(this.label.scanId, begin, count, false);
             });
         }).catch((error: Error) => {
             this.dialogService

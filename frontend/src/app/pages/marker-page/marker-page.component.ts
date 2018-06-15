@@ -64,26 +64,36 @@ export class MarkerPageComponent implements OnInit {
             if (this.marker.downloadingScanInProgress === true) {
                 this.indicateNewScanAppeared();
             }
-            this.marker.setDownloadSlicesInProgress(false);
+            if (slice.isLastInBatch()) {
+                this.marker.setDownloadSlicesInProgress(false);
+            }
             this.marker.setDownloadScanInProgress(false);
         });
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
             if (isObserverHooked) {
-                this.marker.observableSliceRequest.subscribe((sliceRequest: number) => {
-                    console.log('MarkerPage | observable sliceRequest: ', sliceRequest);
-                    this.marker.setDownloadSlicesInProgress(true);
+                this.marker.observableSliceRequest.subscribe((request: object) => {
+                    let sliceRequest = request['slice'];
+                    let reversed = request['reversed'] || false;
+                    console.log('MarkerPage | observable sliceRequest: ', sliceRequest, ' reversed: ', reversed);
                     let count = MarkerPageComponent.SLICE_BATCH_SIZE;
-                    if (sliceRequest + count > this.scan.numberOfSlices) {
+                    if (reversed === false && sliceRequest + count > this.scan.numberOfSlices) {
                         count = this.scan.numberOfSlices - sliceRequest;
-                        this.marker.setDownloadSlicesInProgress(false);
                     }
-                    if (sliceRequest < 0) {
-                        count = count + sliceRequest;
-                        sliceRequest = 0;
-                        this.marker.setDownloadSlicesInProgress(false);
+                    if (reversed === true) {
+                        sliceRequest -= count;
+                        if (sliceRequest < 0) {
+                            count += sliceRequest;
+                            sliceRequest = 0;
+                        }
                     }
-                    this.scanService.requestSlices(this.scan.scanId, sliceRequest, count);
+                    if (count <= 0) {
+                        return;
+                    }
+                    if (this.marker.downloadingSlicesInProgress === false) {
+                        this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
+                        this.marker.setDownloadSlicesInProgress(true);
+                    }
                 });
             }
         });
@@ -99,7 +109,7 @@ export class MarkerPageComponent implements OnInit {
                 const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
                 this.startMeasuringLabelingTime();
-                this.scanService.requestSlices(scan.scanId, begin, count);
+                this.scanService.requestSlices(scan.scanId, begin, count, false);
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);

@@ -39,7 +39,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         hasArchive: false
     };
 
-    public observableSliceRequest: Subject<number>;
+    public observableSliceRequest: Subject<object>;
 
     private labelExplorer: LabelExplorerComponent;
 

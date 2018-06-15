@@ -68,7 +68,7 @@ stop_dependencies:
 	cd .. && docker-compose down
 
 clear_dependencies: stop_dependencies
-	docker volume rm medtagger_postgres-data medtagger_hbase-data medtagger_rabbitmq-data
+	docker volume rm medtagger_postgres-data medtagger_cassandra-data medtagger_rabbitmq-data
 
 update_dependencies:
 	./scripts/dev__prepare_backend.sh
