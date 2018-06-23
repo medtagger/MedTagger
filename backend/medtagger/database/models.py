@@ -434,8 +434,8 @@ class PointLabelElement(LabelElement):
     __tablename__ = 'PointLabelElements'
     id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
 
-    x: float = Column(Integer, nullable=False)
-    y: float = Column(Integer, nullable=False)
+    x: float = Column(Float, nullable=False)
+    y: float = Column(Float, nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': LabelTool.POINT,
