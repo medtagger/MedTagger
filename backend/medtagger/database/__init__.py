@@ -17,6 +17,10 @@ class MedTaggerBase(object):  # pylint: disable=too-few-public-methods
     _modified = Column(DateTime, nullable=False, server_default=func.now(), default=datetime.utcnow,
                        onupdate=datetime.utcnow)
 
+    def __repr__(self) -> str:
+        """Return string representation."""
+        return '<{}: {}>'.format(self.__class__.__name__, getattr(self, 'id', '-'))
+
     def save(self) -> None:
         """Save the model into the database after changes."""
         with db_session() as _session:

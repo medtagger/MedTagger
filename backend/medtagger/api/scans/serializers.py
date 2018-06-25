@@ -59,11 +59,6 @@ elements_schema = {
     },
 }
 
-in__label_tag_element = api.model('Label Element model', {
-    'key': fields.String(),
-    'name': fields.String(),
-})
-
 in__label_model = api.model('Label model', {
     'elements': fields.List(fields.Raw, required=True),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling', required=True),
@@ -78,11 +73,17 @@ in__scan_category = api.model('New Scan Category model', {
     'image_path': fields.String(),
 })
 
+out__label_tag = api.model('Label Tag model', {
+    'key': fields.String(),
+    'name': fields.String(),
+    'actions_ids': fields.List(fields.Integer(), attribute=lambda category: [action.id for action in category.actions]),
+})
+
 out__scan_category = api.model('Scan Category model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
-    'tags': fields.List(fields.Nested(in__label_tag_element), attribute='available_tags'),
+    'tags': fields.List(fields.Nested(out__label_tag), attribute='available_tags'),
 })
 
 out__scan = api.model('Scan model', {

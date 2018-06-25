@@ -5,6 +5,9 @@ from medtagger.api import api
 from medtagger.database.models import RectangularLabelElement, BrushLabelElement, PointLabelElement
 from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
 
+
+in__action_response = api.model("Response for Action", {})
+
 in__label_status = api.model("Status for label", {
     'status': fields.String(description='New status for label',
                             enum=[status.name for status in LabelVerificationStatus],
@@ -52,4 +55,17 @@ out__label = api.inherit('Label model', out__label_status, {
     })),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
     'status': fields.String(description='Label\'s status', enum=[status.name for status in LabelVerificationStatus]),
+})
+
+out__action = api.model('Action model', {
+    'action_id': fields.Integer(description='Action\'s ID', attribute='id'),
+    'action_type': fields.String(description='Action\'s Type'),
+    'details': fields.Raw(attribute=lambda action: action.get_details()),
+})
+
+out__action_response = api.model('Action Response model', {
+    'response_id': fields.Integer(description='Action Response\'s ID', attribute='id'),
+    'action_id': fields.Integer(description='Action\'s ID', attribute='action.id'),
+    'action_type': fields.String(description='Action\'s Type', attribute='action.action_type'),
+    'details': fields.Raw(attribute=lambda action_response: action_response.get_details()),
 })
