@@ -16,6 +16,7 @@ elements_schema = {
         'oneOf': [
             {'$ref': '#/definitions/rectangular_label_element_schema'},
             {'$ref': '#/definitions/brush_label_element_schema'},
+            {'$ref': '#/definitions/point_label_element_schema'},
         ],
     },
     'definitions': {
@@ -42,6 +43,17 @@ elements_schema = {
                 'tool': {'type': 'string', 'pattern': 'BRUSH'},
             },
             'required': ['width', 'height', 'image_key', 'slice_index', 'tag', 'tool'],
+            'additionalProperties': False,
+        },
+        'point_label_element_schema': {
+            'properties': {
+                'x': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                'y': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                'slice_index': {'type': 'integer'},
+                'tag': {'type': 'string'},
+                'tool': {'type': 'string', 'pattern': 'POINT'},
+            },
+            'required': ['x', 'y', 'slice_index', 'tag', 'tool'],
             'additionalProperties': False,
         },
     },

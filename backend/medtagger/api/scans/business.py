@@ -165,6 +165,7 @@ def add_label_element(element: Dict[str, Any], label_id: LabelID, files: Dict[st
     handlers: Dict[str, LabelElementHandler] = {
         LabelTool.RECTANGLE.value: _add_rectangle_element,
         LabelTool.BRUSH.value: _add_brush_element,
+        LabelTool.POINT.value: _add_point_element,
     }
     handler = handlers[tool]
     handler(element, label_id, files)
@@ -195,6 +196,17 @@ def _add_brush_element(element: Dict[str, Any], label_id: LabelID, files: Dict[s
     slice_index = element['slice_index']
     image = files[element['image_key']]
     LabelsRepository.add_new_brush_label_element(label_id, slice_index, width, height, image, label_tag)
+
+
+def _add_point_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> None:
+    """Add new Point Label Element for given Label.
+
+    :param element: JSON describing single element
+    :param label_id: ID of a given Label that the element should be added to
+    """
+    position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
+    label_tag = _get_label_tag(element['tag'])
+    LabelsRepository.add_new_point_label_element(label_id, position, label_tag)
 
 
 def _get_label_tag(tag_key: str) -> LabelTag:
