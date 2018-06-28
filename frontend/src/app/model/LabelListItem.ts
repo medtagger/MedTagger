@@ -2,6 +2,7 @@ import {LabelTag} from './LabelTag';
 
 export class LabelListItem {
     tag: LabelTag;
+    selectionId: number
     sliceIndex: number;
     pinned: boolean;
     hidden: boolean;
@@ -9,7 +10,8 @@ export class LabelListItem {
 
     hovered: boolean;  // TODO: Can I do this in any better way?
 
-    constructor(sliceIndex: number, tag: LabelTag) {
+    constructor(selectionId: number, sliceIndex: number, tag: LabelTag) {
+        this.selectionId = selectionId;
         this.sliceIndex = sliceIndex;
         this.tag = tag;
         this.hidden = false;

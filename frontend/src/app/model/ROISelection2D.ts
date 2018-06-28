@@ -1,7 +1,6 @@
-import {SelectionData} from './SelectionData';
 import {SliceSelection} from './SliceSelection';
 
-export class ROISelection2D implements SliceSelection {
+export class ROISelection2D extends SliceSelection {
 
     // Normalized parameters of selection (<0;1>)
     _positionX: number;
@@ -9,16 +8,8 @@ export class ROISelection2D implements SliceSelection {
     _width: number;
     _height: number;
 
-    sliceIndex: number;
-
-    label_tool: string;
-    label_tag: string;
-
-    // Rendering flags
-    public pinned = false;
-    public hidden = false;
-
     constructor(x: number, y: number, depth: number, width?: number, height?: number) {
+        super();
         this._positionX = x;
         this._positionY = y;
         this._width = width ? width : 0;
@@ -44,7 +35,7 @@ export class ROISelection2D implements SliceSelection {
         return this._height;
     }
 
-    public get coordinates() {
+    public getCoordinates() {
         return {x: this._positionX, y: this._positionY, z: this.sliceIndex};
     }
 
@@ -56,7 +47,7 @@ export class ROISelection2D implements SliceSelection {
         this._height = newHeight;
     }
 
-    public toJSON(): SelectionData {
+    public toJSON() {
         let correctPositionX = this._positionX;
         let correctPositionY = this._positionY;
         let correctWidth = this._width;
@@ -70,14 +61,14 @@ export class ROISelection2D implements SliceSelection {
             correctPositionY += this._height;
             correctHeight = Math.abs(this._height);
         }
-        return new SelectionData(
-            this.sliceIndex,
-            correctPositionX,
-            correctPositionY,
-            correctWidth,
-            correctHeight,
-            this.label_tag,
-            this.label_tool
-        );
+        return {
+            'slice_index': this.sliceIndex,
+            'x': correctPositionX,
+            'y': correctPositionY,
+            'width': correctWidth,
+            'height': correctHeight,
+            'tag': this.label_tag,
+            'tool': this.label_tool
+        };
     }
 }

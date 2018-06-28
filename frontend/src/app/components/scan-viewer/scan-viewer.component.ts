@@ -1,6 +1,7 @@
 import {Component, HostListener, OnInit, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
-import {Subject} from 'rxjs';
+import {Subject, from} from 'rxjs';
+import {groupBy, toArray} from 'rxjs/operators'
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
@@ -44,7 +45,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public observableSliceRequest: Subject<number>;
     protected sliceBatchSize: number;
 
-    protected selector: Selector<SliceSelection>;
+    protected selectors: Array<Selector<SliceSelection>>;
 
     constructor() {}
 
@@ -58,7 +59,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         console.log('ScanViewer | updateCanvasSize');
         this.setCanvasWidth(this.currentImage.width);
         this.setCanvasHeight(this.currentImage.height);
-        this.selector.drawSelections();
+        this.drawSelections();
     }
 
     ngAfterViewInit() {
@@ -70,14 +71,29 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         this.slider._elementRef.nativeElement.focus();
     }
 
-    public setSelector(newSelector: Selector<SliceSelection>) {
-        this.selector = newSelector;
+    public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {
+        this.clearCanvasSelections();
+        this.selectors = newSelectors.slice();
+        this.selectors.forEach((selector) => {
+            selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
+            selector.updateCurrentSlice(this._currentSlice);
+            selector.updateCanvasWidth(this.canvas.width);
+            selector.updateCanvasHeight(this.canvas.height);
+            selector.drawSelections();
+        });
     }
 
     public setArchivedSelections(selections: Array<SliceSelection>): void {
         console.log('ScanViewer | setArchivedSelections: ', selections);
-        const normalizedSelections: Array<SliceSelection> = this.selector.formArchivedSelections(selections);
-        this.selector.archiveSelections(normalizedSelections);
+        from(selections).pipe(groupBy((selection) => selection.label_tool)).subscribe(selectionGroup => {
+            let selector = this.selectors.find((selector) => selector.getSelectorName() == selectionGroup.key);
+            if (selector !== undefined) {
+                selectionGroup.pipe(toArray()).subscribe((s) => selector.archiveSelections(selector.formArchivedSelections(s)));
+            } else {
+                console.warn(`ScanViewer | setArchivedSelections | '${selectionGroup.key}' tool doesn't exist`);
+            }
+        });
+
     }
 
     public getCanvas(): HTMLCanvasElement {
@@ -86,12 +102,12 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     public setCanvasWidth(newWidth: number): void {
         this.canvas.width = newWidth;
-        this.selector.updateCanvasWidth(this.canvas.width);
+        this.selectors.forEach((selector) => selector.updateCanvasWidth(this.canvas.width));
     }
 
     public setCanvasHeight(newHeight: number): void {
         this.canvas.height = newHeight;
-        this.selector.updateCanvasHeight(this.canvas.height);
+        this.selectors.forEach((selector) => selector.updateCanvasHeight(this.canvas.height));
     }
 
     get currentSlice() {
@@ -101,14 +117,14 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public clearData(): void {
         this.slices = new Map<number, MarkerSlice>();
         this._currentSlice = undefined;
-        this.selector.clearData();
+        this.selectors.forEach((selector) => selector.clearData());
     }
 
     public feedData(newSlice: MarkerSlice): void {
         console.log('ScanViewer | feedData: ', newSlice);
         if (!this._currentSlice) {
             this._currentSlice = newSlice.index;
-            this.selector.updateCurrentSlice(this._currentSlice);
+            this.selectors.forEach((selector) => selector.updateCurrentSlice(this._currentSlice));
         }
         this.addSlice(newSlice);
         this.updateSliderRange();
@@ -151,21 +167,19 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
         this.initializeCanvas();
 
-        this.initializeImage(() => {
-            this.selector.drawSelections();
-        });
+        this.initializeImage(this.drawSelections);
 
         this.setCanvasImage();
 
         this.slider.registerOnChange((sliderValue: number) => {
             console.log('ScanViewer init | slider change: ', sliderValue);
 
-            this.selector.updateCurrentSlice(sliderValue);
+            this.selectors.forEach((selector) => selector.updateCurrentSlice(sliderValue));
             this.requestSlicesIfNeeded(sliderValue);
 
             this.changeMarkerImage(sliderValue);
 
-            this.selector.drawSelections();
+            this.drawSelections();
         });
     }
 
@@ -185,7 +199,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     protected initializeCanvas(): void {
-        this.selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
+        this.selectors.forEach((selector) => selector.updateCanvasPosition(this.canvas.getBoundingClientRect()));
     }
 
     protected initializeImage(afterImageLoad?: () => void): void {
@@ -198,12 +212,10 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     protected changeMarkerImage(sliceID: number): void {
-        this.selector.addCurrentSelection();
-
         this._currentSlice = sliceID;
-        this.selector.updateCurrentSlice(this._currentSlice);
+        this.selectors.forEach((selector) => selector.updateCurrentSlice(this._currentSlice));
 
-        this.selector.clearCanvasSelection();
+        this.clearCanvasSelections();
         this.setCanvasImage();
     }
 
@@ -248,6 +260,19 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         this.canvas.style.left = centerX + 'px';
         this.canvas.style.top = centerY + 'px';
 
-        this.selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
+        this.selectors.forEach((selector) => selector.updateCanvasPosition(this.canvas.getBoundingClientRect()));
+    }
+
+    protected drawSelections(): void {
+        this.selectors.forEach((selector) => selector.drawSelections());
+    }
+
+    protected clearCanvasSelections(): void {
+        this.canvas.getContext('2d').clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    protected redrawSelections(): void {
+        this.clearCanvasSelections();
+        this.drawSelections();
     }
 }

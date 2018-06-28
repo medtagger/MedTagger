@@ -20,4 +20,8 @@ export class CircleROISelector extends RectROISelector implements Selector<ROISe
         this.canvasCtx.fillStyle = color;
         this.canvasCtx.fillText(selection.sliceIndex.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
     }
+
+    public getSelectorName(): string {
+        return "CIRCLE";
+    }
 }

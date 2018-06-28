@@ -14,10 +14,10 @@
         <div class="tools">
             <h3>Available Tools</h3>
             <div class="buttons">
-                <button mat-mini-fab><mat-icon>crop</mat-icon></button>
+                <button mat-mini-fab (click)="setSelector('RECT')"><mat-icon>crop</mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon>brush</mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon svgIcon="eraser"></mat-icon></button>
-                <button mat-mini-fab disabled><mat-icon svgIcon="gesture-tap"></mat-icon></button>
+                <button mat-mini-fab (click)="setSelector('POINT')"><mat-icon svgIcon="gesture-tap"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon>timeline</mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon>zoom_in</mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon>zoom_out</mat-icon></button>
