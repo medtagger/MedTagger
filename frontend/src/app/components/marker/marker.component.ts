@@ -7,8 +7,8 @@ import {SliceSelection} from '../../model/SliceSelection';
 import {LabelExplorerComponent} from '../label-explorer/label-explorer.component';
 import {LabelListItem} from '../../model/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {Selector} from "../selectors/Selector";
-import {Subscription} from "rxjs/Subscription";
+import {Selector} from '../selectors/Selector';
+import {Subscription} from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-marker-component',
@@ -108,23 +108,26 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     private hookUpStateChangeSubscription(): void {
         this.selectorSubscriptions.forEach((subscription) => subscription.unsubscribe());
-        this.selectorSubscriptions = this.selectors.map((selector) => selector.getStateChangeEmitter().subscribe((selectionStateMessage: SelectionStateMessage) => {
-            console.log('Marker | getStateChange event from selector!');
-            this.updateSelectionState();
-            if (this.labelExplorer) {
-                if (selectionStateMessage.toDelete) {
-                    console.log('Marker | getStateChange remove slice from label explorer, selectionId: ', selectionStateMessage.selectionId);
-                    this.labelExplorer.removeLabel(selectionStateMessage.selectionId);
-                } else {
-                    console.log('Marker | getStateChange adding new slice to label explorer, selectionId: ', selectionStateMessage.selectionId);
-                    this.labelExplorer.addLabel(selectionStateMessage.selectionId, selectionStateMessage.sliceId, this.currentTaggingContext, this.currentTool);
+        this.selectorSubscriptions = this.selectors
+            .map((selector) => selector.getStateChangeEmitter().subscribe((selection: SelectionStateMessage) => {
+                console.log('Marker | getStateChange event from selector!');
+                this.updateSelectionState();
+                if (this.labelExplorer) {
+                    if (selection.toDelete) {
+                        console.log('Marker | getStateChange remove selection from label explorer, selectionId: ', selection.selectionId);
+                        this.labelExplorer.removeLabel(selection.selectionId);
+                    } else {
+                        console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
+                            selection.selectionId);
+                        this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTaggingContext,
+                            this.currentTool);
+                    }
                 }
-            }
         }));
     }
 
     private iterateSelectorsUntilTrue(callbackfn: (selector: Selector<SliceSelection>) => boolean): void {
-        for (let selector of this.selectors) {
+        for (const selector of this.selectors) {
             if (callbackfn(selector)) {
                 break;
             }

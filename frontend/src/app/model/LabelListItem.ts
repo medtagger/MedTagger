@@ -2,7 +2,7 @@ import {LabelTag} from './LabelTag';
 
 export class LabelListItem {
     tag: LabelTag;
-    selectionId: number
+    selectionId: number;
     sliceIndex: number;
     pinned: boolean;
     hidden: boolean;

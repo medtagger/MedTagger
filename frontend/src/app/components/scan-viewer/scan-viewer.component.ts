@@ -1,7 +1,7 @@
 import {Component, HostListener, OnInit, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {Subject, from} from 'rxjs';
-import {groupBy, toArray} from 'rxjs/operators'
+import {groupBy, toArray} from 'rxjs/operators';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
@@ -86,7 +86,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public setArchivedSelections(selections: Array<SliceSelection>): void {
         console.log('ScanViewer | setArchivedSelections: ', selections);
         from(selections).pipe(groupBy((selection) => selection.label_tool)).subscribe(selectionGroup => {
-            let selector = this.selectors.find((selector) => selector.getSelectorName() == selectionGroup.key);
+            const selector = this.selectors.find((s) => s.getSelectorName() === selectionGroup.key);
             if (selector !== undefined) {
                 selectionGroup.pipe(toArray()).subscribe((s) => selector.archiveSelections(selector.formArchivedSelections(s)));
             } else {

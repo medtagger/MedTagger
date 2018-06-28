@@ -22,6 +22,6 @@ export class CircleROISelector extends RectROISelector implements Selector<ROISe
     }
 
     public getSelectorName(): string {
-        return "CIRCLE";
+        return 'CIRCLE';
     }
 }

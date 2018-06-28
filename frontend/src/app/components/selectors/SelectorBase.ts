@@ -38,8 +38,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
             console.log('RectROISelector | addCurrentSelection');
             if (this.isOnlyOneSelectionPerSlice()) {
                 this.selections.set(this.currentSlice, [this.selectedArea]);
-            }
-            else {
+            } else {
                 const currentSliceSelections = this.selections.get(this.currentSlice);
                 if (currentSliceSelections) {
                     currentSliceSelections.push(this.selectedArea);
@@ -142,8 +141,8 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     }
 
     private findAndModifySelection(selectionId: number, modifyFunc: (selections: [CustomSliceSelection], index: number) => void): boolean {
-        for (let selectionsBySlice of Array.from(this.selections.values())) {
-            let index = selectionsBySlice.findIndex((selection) => selection.getId() == selectionId);
+        for (const selectionsBySlice of Array.from(this.selections.values())) {
+            const index = selectionsBySlice.findIndex((selection) => selection.getId() === selectionId);
             if (index !== -1) {
                 modifyFunc(selectionsBySlice, index);
                 return true;

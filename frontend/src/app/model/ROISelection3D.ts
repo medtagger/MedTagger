@@ -1,5 +1,5 @@
 import {ScanSelection} from './ScanSelection';
-import {SliceSelection} from "./SliceSelection";
+import {SliceSelection} from './SliceSelection';
 
 export class ROISelection3D implements ScanSelection<SliceSelection> {
     _elements: SliceSelection[];

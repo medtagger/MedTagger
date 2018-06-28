@@ -47,7 +47,7 @@ export class LabelExplorerComponent implements OnInit {
     }
 
     public removeLabel(selectionId: number): void {
-        const index = this.labels.findIndex((item) => item.selectionId == selectionId);
+        const index = this.labels.findIndex((item) => item.selectionId === selectionId);
         if (index !== -1) {
             this.labels.splice(index, 1);
         } else {

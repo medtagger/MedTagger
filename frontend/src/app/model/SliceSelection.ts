@@ -1,5 +1,7 @@
 export abstract class SliceSelection {
 
+    private static nextId = 0;
+
     public sliceIndex: number;
     public pinned: boolean;
     public hidden: boolean;
@@ -7,7 +9,6 @@ export abstract class SliceSelection {
     public label_tag: string;
 
     private id: number = SliceSelection.nextId++;
-    private static nextId = 0;
 
     public getId(): number {
         return this.id;

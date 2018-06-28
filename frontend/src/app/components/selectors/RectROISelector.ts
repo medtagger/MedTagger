@@ -2,7 +2,7 @@ import {ROISelection2D} from '../../model/ROISelection2D';
 import {EventEmitter} from '@angular/core';
 import {SelectorBase} from './SelectorBase';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {Selector} from "./Selector";
+import {Selector} from './Selector';
 
 export class RectROISelector extends SelectorBase<ROISelection2D> implements Selector<ROISelection2D> {
     readonly STYLE = {
@@ -132,6 +132,6 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
     }
 
     public getSelectorName(): string {
-        return "RECTANGLE";
+        return 'RECTANGLE';
     }
 }

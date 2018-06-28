@@ -1,4 +1,4 @@
-import {SliceSelection} from "./SliceSelection";
+import {SliceSelection} from './SliceSelection';
 
 export class PointSelection extends SliceSelection {
 

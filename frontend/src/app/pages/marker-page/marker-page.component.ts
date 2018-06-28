@@ -13,8 +13,8 @@ import {Location} from '@angular/common';
 import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
-import {Selector} from "../../components/selectors/Selector";
-import {PointSelector} from "../../components/selectors/PointSelector";
+import {Selector} from '../../components/selectors/Selector';
+import {PointSelector} from '../../components/selectors/PointSelector';
 
 
 @Component({
@@ -55,7 +55,7 @@ export class MarkerPageComponent implements OnInit {
             ['POINT', new PointSelector(this.marker.getCanvas())]
         ]);
         this.marker.setSelectors(Array.from(this.selectors.values()));
-        this.setSelector("RECT");
+        this.setSelector('RECT');
 
         this.marker.setLabelExplorer(this.labelExplorer);
 
