@@ -8,6 +8,7 @@ import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
+import {SliceRequest} from '../../model/SliceRequest';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 import {MatSnackBar} from '@angular/material';
@@ -72,9 +73,9 @@ export class MarkerPageComponent implements OnInit {
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
             if (isObserverHooked) {
-                this.marker.observableSliceRequest.subscribe((request: object) => {
-                    let sliceRequest = request['slice'];
-                    let reversed = request['reversed'] || false;
+                this.marker.observableSliceRequest.subscribe((request: SliceRequest) => {
+                    let sliceRequest = request.slice;
+                    let reversed = request.reversed;
                     console.log('MarkerPage | observable sliceRequest: ', sliceRequest, ' reversed: ', reversed);
                     let count = MarkerPageComponent.SLICE_BATCH_SIZE;
                     if (reversed === false && sliceRequest + count > this.scan.numberOfSlices) {

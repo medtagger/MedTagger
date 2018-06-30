@@ -5,6 +5,7 @@ import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
 import {SliceSelection} from '../../model/SliceSelection';
+import {SliceRequest} from '../../model/SliceRequest';
 
 @Component({
     selector: 'app-scan-viewer',
@@ -41,7 +42,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public slices: Map<number, MarkerSlice>;
     protected _currentSlice;
 
-    public observableSliceRequest: Subject<object>;
+    public observableSliceRequest: Subject<SliceRequest>;
     protected sliceBatchSize: number;
 
     protected selector: Selector<SliceSelection>;
@@ -138,7 +139,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public hookUpSliceObserver(sliceBatchSize: number): Promise<boolean> {
         this.sliceBatchSize = sliceBatchSize;
         return new Promise((resolve) => {
-            this.observableSliceRequest = new Subject<object>();
+            this.observableSliceRequest = new Subject<SliceRequest>();
             resolve(true);
         });
     }
@@ -175,12 +176,12 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         if (this.slider.max === sliderValue) {
             requestSliceIndex = sliderValue + 1;
             console.log('ScanViewer | requestSlicesIfNeeded more (higher indexes): ', requestSliceIndex);
-            this.observableSliceRequest.next({slice: requestSliceIndex});
+            this.observableSliceRequest.next(new SliceRequest(requestSliceIndex));
         }
         if (this.slider.min === sliderValue) {
             requestSliceIndex = sliderValue - 1;
             console.log('ScanViewer | requestSlicesIfNeeded more (lower indexes): ', requestSliceIndex);
-            this.observableSliceRequest.next({slice: requestSliceIndex, reversed: true});
+            this.observableSliceRequest.next(new SliceRequest(requestSliceIndex, true));
         }
     }
 

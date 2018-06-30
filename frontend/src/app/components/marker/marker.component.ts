@@ -4,6 +4,7 @@ import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
 import {SliceSelection} from '../../model/SliceSelection';
+import {SliceRequest} from '../../model/SliceRequest';
 import {LabelExplorerComponent} from '../label-explorer/label-explorer.component';
 import {LabelListItem} from '../../model/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
@@ -39,7 +40,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         hasArchive: false
     };
 
-    public observableSliceRequest: Subject<object>;
+    public observableSliceRequest: Subject<SliceRequest>;
 
     private labelExplorer: LabelExplorerComponent;
 
