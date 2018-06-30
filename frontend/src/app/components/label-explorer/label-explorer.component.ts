@@ -9,6 +9,17 @@ import {LabelListItem} from '../../model/LabelListItem';
 })
 
 export class LabelExplorerComponent implements OnInit {
+
+    static readonly toolIconNames: Map<string, string> = new Map([
+        ['RECTANGLE', 'crop'],
+        ['BRUSH', 'brush'],
+        ['POINT', 'gesture-tap'],
+        ['CHAIN', 'vector-polyline'],
+        ['ERASER', 'eraser'],
+        ['ZOOM_IN', 'magnify-plus-outline'],
+        ['ZOOM_OUT', 'magnify-minus-outline']
+    ]);
+
     public tags: Array<LabelTag> = [];
     protected labels: Array<LabelListItem> = [];
     public labelChange: EventEmitter<LabelListItem> = new EventEmitter<LabelListItem>();
@@ -59,7 +70,7 @@ export class LabelExplorerComponent implements OnInit {
     // TODO: tools should be part of dict stored in backend (available tools)
     public addLabel(selectionId: number, labelSlice: number, tagKey: string, tool: string): void {
         const tag: LabelTag = this.getLabelTag(tagKey, tool);
-        const newItem: LabelListItem = new LabelListItem(selectionId, labelSlice, tag);
+        const newItem: LabelListItem = new LabelListItem(selectionId, labelSlice, tag, tool);
         this.labels.push(newItem);
     }
 
@@ -88,5 +99,9 @@ export class LabelExplorerComponent implements OnInit {
 
     private emitLabelChange(label: LabelListItem): void {
         this.labelChange.emit(label);
+    }
+
+    public getToolIconName(iconName: string): string {
+        return LabelExplorerComponent.toolIconNames.get(iconName);
     }
 }

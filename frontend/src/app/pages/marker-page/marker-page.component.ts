@@ -31,7 +31,7 @@ export class MarkerPageComponent implements OnInit {
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
 
-    // TODO: get labelling context from categry
+    // TODO: get labelling context from category
     tags: Array<LabelTag> = [
         new LabelTag('All', 'ALL', ['RECTANGLE'])
     ];
@@ -51,11 +51,11 @@ export class MarkerPageComponent implements OnInit {
         console.log('MarkerPage init', this.marker);
 
         this.selectors = new Map<string, Selector<any>>([
-            ['RECT', new RectROISelector(this.marker.getCanvas())],
+            ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
             ['POINT', new PointSelector(this.marker.getCanvas())]
         ]);
         this.marker.setSelectors(Array.from(this.selectors.values()));
-        this.setSelector('RECT');
+        this.setSelector('RECTANGLE');
 
         this.marker.setLabelExplorer(this.labelExplorer);
 
@@ -182,5 +182,9 @@ export class MarkerPageComponent implements OnInit {
         } else {
             console.warn(`MarkerPage | setSelector | Selector "${selectorName}" doesn't exist`);
         }
+    }
+
+    public getToolIconName(iconName: string): string {
+        return LabelExplorerComponent.toolIconNames.get(iconName);
     }
 }

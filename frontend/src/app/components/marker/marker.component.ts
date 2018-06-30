@@ -49,7 +49,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     // TODO: dynamic context and tool changes
     private currentTaggingContext = 'ALL';
-    private currentTool = 'RECTANGLE';
 
     private selectorSubscriptions: Array<Subscription> = [];
 
@@ -120,7 +119,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                         console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
                             selection.selectionId);
                         this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTaggingContext,
-                            this.currentTool);
+                            this.currentSelector.getSelectorName());
                     }
                 }
         }));
