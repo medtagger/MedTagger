@@ -74,8 +74,8 @@ export class MarkerPageComponent implements OnInit {
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
             if (isObserverHooked) {
                 this.marker.observableSliceRequest.subscribe((request: SliceRequest) => {
+                    const reversed = request.reversed;
                     let sliceRequest = request.slice;
-                    let reversed = request.reversed;
                     console.log('MarkerPage | observable sliceRequest: ', sliceRequest, ' reversed: ', reversed);
                     let count = MarkerPageComponent.SLICE_BATCH_SIZE;
                     if (reversed === false && sliceRequest + count > this.scan.numberOfSlices) {

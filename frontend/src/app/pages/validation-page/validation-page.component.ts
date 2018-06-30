@@ -43,8 +43,8 @@ export class ValidationPageComponent implements OnInit {
                 if (isObserverHooked) {
                     this.scanViewer.observableSliceRequest.subscribe((request: SliceRequest) => {
                         // TODO: Why is it copied & pasted here? We shoul unify this ASAP!
+                        const reversed = request.reversed;
                         let sliceRequest = request.slice;
-                        let reversed = request.reversed;
                         console.log('ValiadionPage | observable sliceRequest: ', sliceRequest, ' reversed: ', reversed);
                         let count = ValidationPageComponent.SLICE_BATCH_SIZE;
                         if (reversed === false && sliceRequest + count > this.scan.numberOfSlices) {
@@ -62,10 +62,10 @@ export class ValidationPageComponent implements OnInit {
                         }
                         this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
                         // TODO: Downloading Slices indicator is not available on Validation Page...
-                        //if (this.scanViewer.downloadingSlicesInProgress === false) {
-                        //    this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
-                        //    this.scanViewer.setDownloadSlicesInProgress(true);
-                        //}
+                        // if (this.scanViewer.downloadingSlicesInProgress === false) {
+                        //     this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
+                        //     this.scanViewer.setDownloadSlicesInProgress(true);
+                        // }
                     });
                 }
             });

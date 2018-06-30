@@ -29,10 +29,6 @@ export class MarkerSlice {
         return this._source;
     }
 
-    public isLastInBatch() : Boolean {
-        return this._index == this._lastInBatch;
-    }
-
     private static byteToBase64(byteImage: ArrayBuffer): string {
         const bytes = new Uint8Array(byteImage);
         let binary = '';
@@ -40,5 +36,9 @@ export class MarkerSlice {
             binary += String.fromCharCode(bytes[i]);
         }
         return 'data:image/png;base64,' + btoa(binary);
+    }
+
+    public isLastInBatch(): boolean {
+        return this._index === this._lastInBatch;
     }
 }
