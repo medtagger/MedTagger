@@ -69,3 +69,4 @@ class LabelTool(Enum):
 
     RECTANGLE = 'RECTANGLE'
     BRUSH = 'BRUSH'
+    POINT = 'POINT'

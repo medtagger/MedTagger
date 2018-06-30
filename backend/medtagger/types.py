@@ -15,3 +15,10 @@ LabelPosition = NamedTuple('LabelPosition', [('x', float), ('y', float), ('slice
 LabelShape = NamedTuple('LabelShape', [('width', float), ('height', float)])
 
 LabelingTime = NewType('LabelingTime', float)
+
+ActionID = NewType('ActionID', int)
+SurveyID = NewType('SurveyID', ActionID)
+SurveyElementID = NewType('SurveyElementID', int)
+SurveyElementKey = NewType('SurveyElementKey', str)
+ActionResponseID = NewType('ActionResponseID', int)
+SurveyResponseID = NewType('SurveyResponseID', ActionResponseID)

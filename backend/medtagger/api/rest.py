@@ -51,6 +51,7 @@ app.register_blueprint(blueprint)
 app.config['RESTPLUS_MASK_SWAGGER'] = False
 app.config['SWAGGER_UI_DOC_EXPANSION'] = 'list'
 app.config['RESTPLUS_VALIDATE'] = True
+app.config['ERROR_404_HELP'] = False
 
 
 try:

@@ -16,6 +16,7 @@ elements_schema = {
         'oneOf': [
             {'$ref': '#/definitions/rectangular_label_element_schema'},
             {'$ref': '#/definitions/brush_label_element_schema'},
+            {'$ref': '#/definitions/point_label_element_schema'},
         ],
     },
     'definitions': {
@@ -44,13 +45,19 @@ elements_schema = {
             'required': ['width', 'height', 'image_key', 'slice_index', 'tag', 'tool'],
             'additionalProperties': False,
         },
+        'point_label_element_schema': {
+            'properties': {
+                'x': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                'y': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                'slice_index': {'type': 'integer'},
+                'tag': {'type': 'string'},
+                'tool': {'type': 'string', 'pattern': 'POINT'},
+            },
+            'required': ['x', 'y', 'slice_index', 'tag', 'tool'],
+            'additionalProperties': False,
+        },
     },
 }
-
-in__label_tag_element = api.model('Label Element model', {
-    'key': fields.String(),
-    'name': fields.String(),
-})
 
 in__label_model = api.model('Label model', {
     'elements': fields.List(fields.Raw, required=True),
@@ -66,11 +73,17 @@ in__scan_category = api.model('New Scan Category model', {
     'image_path': fields.String(),
 })
 
+out__label_tag = api.model('Label Tag model', {
+    'key': fields.String(),
+    'name': fields.String(),
+    'actions_ids': fields.List(fields.Integer(), attribute=lambda category: [action.id for action in category.actions]),
+})
+
 out__scan_category = api.model('Scan Category model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
-    'tags': fields.List(fields.Nested(in__label_tag_element), attribute='available_tags'),
+    'tags': fields.List(fields.Nested(out__label_tag), attribute='available_tags'),
 })
 
 out__scan = api.model('Scan model', {

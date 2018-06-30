@@ -4,7 +4,8 @@ from typing import List
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement, BrushLabelElement
+from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement, BrushLabelElement, \
+    PointLabelElement
 from medtagger.definitions import LabelVerificationStatus
 from medtagger.storage.models import BrushLabelElement as BrushLabelElementStorage
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime
@@ -81,3 +82,19 @@ class LabelsRepository(object):
             session.add(brush_label_element)
         BrushLabelElementStorage.create(id=brush_label_element.id, image=image)
         return brush_label_element.id
+
+    @staticmethod
+    def add_new_point_label_element(label_id: LabelID, position: LabelPosition, label_tag: LabelTag) -> LabelElementID:
+        """Add new Point Element for given Label.
+
+        :param label_id: Label's ID
+        :param position: position (x, y, slice_index) of the Label
+        :param label_tag: Label Tag object
+        :return: ID of a Element
+        """
+        with db_session() as session:
+            point_label_element = PointLabelElement(position, label_tag)
+            point_label_element.label_id = label_id
+            session.add(point_label_element)
+
+        return point_label_element.id
