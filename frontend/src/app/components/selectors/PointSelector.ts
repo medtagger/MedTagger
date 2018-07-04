@@ -8,6 +8,8 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
 
     readonly STYLE = {
         RADIUS: 10,
+        SELECTION_FONT_SIZE: 14,
+        SELECTION_FONT_COLOR: '#ffffff',
         CURRENT_SELECTION_COLOR: '#ff0000',
         OTHER_SELECTION_COLOR: '#256fde',
         ARCHIVED_SELECTION_COLOR: '#5f27e5'
@@ -59,6 +61,13 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         this.canvasCtx.beginPath();
         this.canvasCtx.arc(scaledPointPosition.x , scaledPointPosition.y, this.STYLE.RADIUS, 0, 2 * Math.PI);
         this.canvasCtx.fill();
+
+        const fontSize = this.STYLE.SELECTION_FONT_SIZE;
+        this.canvasCtx.font = `${fontSize}px Arial`;
+        this.canvasCtx.fillStyle = this.STYLE.SELECTION_FONT_COLOR;
+        this.canvasCtx.textAlign = 'center';
+        this.canvasCtx.fillText(selection.getId().toString(), scaledPointPosition.x,
+            scaledPointPosition.y + this.STYLE.SELECTION_FONT_SIZE * 0.25);
     }
 
     private checkDistance(point: PointSelection, x: number, y: number) {

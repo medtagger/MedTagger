@@ -3,6 +3,7 @@ import {EventEmitter} from '@angular/core';
 import {SelectorBase} from './SelectorBase';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from './Selector';
+import {SliceSelection} from '../../model/SliceSelection';
 
 export class RectROISelector extends SelectorBase<ROISelection2D> implements Selector<ROISelection2D> {
     readonly STYLE = {
@@ -68,7 +69,8 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
         const fontSize = this.STYLE.SELECTION_FONT_SIZE;
         this.canvasCtx.font = `${fontSize}px Arial`;
         this.canvasCtx.fillStyle = color;
-        this.canvasCtx.fillText(selection.sliceIndex.toString(), scaledStartPoint.x + (fontSize / 4), scaledStartPoint.y + fontSize);
+        this.canvasCtx.textAlign = 'start';
+        this.canvasCtx.fillText(selection.getId().toString(), scaledStartPoint.x + (fontSize / 4), scaledStartPoint.y + fontSize);
     }
 
     public onMouseDown(event: MouseEvent): boolean {
@@ -80,7 +82,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
 
         this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice);
         if (this.isOnlyOneSelectionPerSlice() && this.selections.get(this.currentSlice)) {
-            this.selections.get(this.currentSlice).forEach((selection) => this.stateChange.emit(
+            this.selections.get(this.currentSlice).forEach((selection: SliceSelection) => this.stateChange.emit(
                 new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
             this.selections.delete(this.currentSlice);
         }

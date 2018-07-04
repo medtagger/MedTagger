@@ -118,6 +118,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         this.slices = new Map<number, MarkerSlice>();
         this._currentSlice = undefined;
         this.selectors.forEach((selector) => selector.clearData());
+        SliceSelection.resetIdCounter();
     }
 
     public feedData(newSlice: MarkerSlice): void {

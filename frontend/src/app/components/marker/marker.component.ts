@@ -52,6 +52,8 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     private selectorSubscriptions: Array<Subscription> = [];
 
+    private selectorsByName: Map<string, Selector<SliceSelection>> = new Map();
+
     constructor() {
         super();
     }
@@ -62,6 +64,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {
         super.setSelectors(newSelectors);
+        this.selectorsByName.clear();
+        this.selectors.forEach((selector: Selector<SliceSelection>) => {
+            this.selectorsByName.set(selector.getSelectorName(), selector);
+        });
         this.hookUpStateChangeSubscription();
     }
 
@@ -125,23 +131,15 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         }));
     }
 
-    private iterateSelectorsUntilTrue(callbackfn: (selector: Selector<SliceSelection>) => boolean): void {
-        for (const selector of this.selectors) {
-            if (callbackfn(selector)) {
-                break;
-            }
-        }
-    }
-
     private hookUpExplorerLabelChangeSubscription(): void {
         if (this.labelExplorer) {
             this.labelExplorer.getLabelChangeEmitter().subscribe((labelChanged: LabelListItem) => {
                 console.log('Marker | getLabelChange event from label-explorer!');
                 if (labelChanged.toDelete) {
-                    this.iterateSelectorsUntilTrue((selector) => selector.removeSelection(labelChanged.selectionId));
+                    this.selectorsByName.get(labelChanged.selectorName).removeSelection(labelChanged.selectionId);
                 } else {
-                    this.iterateSelectorsUntilTrue((selector) => selector.pinSelection(labelChanged.selectionId, labelChanged.pinned));
-                    this.iterateSelectorsUntilTrue((selector) => selector.hideSelection(labelChanged.selectionId, labelChanged.hidden));
+                    this.selectorsByName.get(labelChanged.selectorName).pinSelection(labelChanged.selectionId, labelChanged.pinned);
+                    this.selectorsByName.get(labelChanged.selectorName).hideSelection(labelChanged.selectionId, labelChanged.hidden);
                 }
                 this.redrawSelections();
             });

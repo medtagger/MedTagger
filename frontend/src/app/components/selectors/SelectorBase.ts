@@ -85,8 +85,9 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     }
 
     public removeSelectionsOnCurrentSlice(): void {
-        if (this.selections.get(this.currentSlice)) {
-            this.selections.get(this.currentSlice).forEach((selection) => this.stateChange.emit(
+        const selectionsOnCurrentSlice = this.selections.get(this.currentSlice);
+        if (selectionsOnCurrentSlice) {
+            selectionsOnCurrentSlice.forEach((selection) => this.stateChange.emit(
                 new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
             this.selections.delete(this.currentSlice);
         }
@@ -95,8 +96,9 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     }
 
     public removeSelectionsOnSlice(sliceId: number): void {
-        if (this.selections.get(sliceId)) {
-            this.selections.get(sliceId).forEach((selection) => this.stateChange.emit(
+        const selectionsOnSlice = this.selections.get(sliceId);
+        if (selectionsOnSlice) {
+            selectionsOnSlice.forEach((selection) => this.stateChange.emit(
                 new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
             this.selections.delete(sliceId);
         }
