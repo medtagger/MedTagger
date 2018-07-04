@@ -1,27 +1,26 @@
-import {ROISelection2D} from './ROISelection2D';
-import {SelectionData} from './SelectionData';
 import {ScanSelection} from './ScanSelection';
+import {SliceSelection} from './SliceSelection';
 
-export class ROISelection3D implements ScanSelection<ROISelection2D> {
-    _elements: ROISelection2D[];
+export class ROISelection3D implements ScanSelection<SliceSelection> {
+    _elements: SliceSelection[];
 
-    constructor(elements?: ROISelection2D[]) {
+    constructor(elements?: SliceSelection[]) {
         this._elements = elements;
     }
 
     public get coordinates(): Object[] {
         const coordinatesArray: Object[] = [];
-        this._elements.forEach((element: ROISelection2D) => {
-            coordinatesArray.push(element.coordinates);
+        this._elements.forEach((element: SliceSelection) => {
+            coordinatesArray.push(element.getCoordinates());
         });
         return coordinatesArray;
     }
 
     toJSON(): Object {
-        const jsonObject: { elements: SelectionData[] } = {elements: undefined};
-        jsonObject.elements = [];
+        const jsonObject: { elements: Object[] } = {elements: []};
+
         if (this._elements) {
-            this._elements.forEach((element: ROISelection2D) => {
+            this._elements.forEach((element: SliceSelection) => {
                 jsonObject.elements.push(element.toJSON());
             });
         }

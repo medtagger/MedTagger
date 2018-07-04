@@ -2,8 +2,10 @@ import {ROISelection2D} from '../../model/ROISelection2D';
 import {EventEmitter} from '@angular/core';
 import {SelectorBase} from './SelectorBase';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
+import {Selector} from './Selector';
+import {SliceSelection} from '../../model/SliceSelection';
 
-export class RectROISelector extends SelectorBase<ROISelection2D> {
+export class RectROISelector extends SelectorBase<ROISelection2D> implements Selector<ROISelection2D> {
     readonly STYLE = {
         SELECTION_FONT_SIZE: 14,
         SELECTION_LINE_DENSITY: [6],
@@ -19,7 +21,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
             width: canvas.width,
             height: canvas.height
         };
-        this.selections = new Map<number, ROISelection2D>();
+        this.selections = new Map<number, [ROISelection2D]>();
         this.selectedArea = undefined;
         this.currentSlice = undefined;
         this.stateChange = new EventEmitter<SelectionStateMessage>();
@@ -35,7 +37,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
 
     public drawSelections(): void {
         console.log('RectROISelector | drawSelections | selection: ', this.selections);
-        this.selections.forEach((selection: ROISelection2D) => {
+        this.getSelections().forEach((selection: ROISelection2D) => {
             let color: string;
             const isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
             if (isCurrent) {
@@ -47,6 +49,9 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
                 this.drawSelection(selection, color);
             }
         });
+        if (this.selectedArea) {
+            this.drawSelection(this.selectedArea, this.STYLE.CURRENT_SELECTION_COLOR);
+        }
     }
 
     public drawSelection(selection: ROISelection2D, color: string): void {
@@ -64,10 +69,11 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
         const fontSize = this.STYLE.SELECTION_FONT_SIZE;
         this.canvasCtx.font = `${fontSize}px Arial`;
         this.canvasCtx.fillStyle = color;
-        this.canvasCtx.fillText(selection.sliceIndex.toString(), scaledStartPoint.x + (fontSize / 4), scaledStartPoint.y + fontSize);
+        this.canvasCtx.textAlign = 'start';
+        this.canvasCtx.fillText(selection.getId().toString(), scaledStartPoint.x + (fontSize / 4), scaledStartPoint.y + fontSize);
     }
 
-    public onMouseDown(event: MouseEvent): void {
+    public onMouseDown(event: MouseEvent): boolean {
         console.log('RectROISelector | startMouseSelection | event: ', event);
         const selectionStartX = (event.clientX) - this.canvasPosition.left;
         const selectionStartY = (event.clientY) - this.canvasPosition.top;
@@ -75,19 +81,22 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
         const normalizedPoint: { x: number, y: number } = this.normalizeByView(selectionStartX, selectionStartY);
 
         this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice);
-        this.selections.delete(this.currentSlice);
+        if (this.isOnlyOneSelectionPerSlice() && this.selections.get(this.currentSlice)) {
+            this.selections.get(this.currentSlice).forEach((selection: SliceSelection) => this.stateChange.emit(
+                new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
+            this.selections.delete(this.currentSlice);
+        }
         this.mouseDrag = true;
+        return true;
     }
 
-    public onMouseMove(mouseEvent: MouseEvent): void {
+    public onMouseMove(mouseEvent: MouseEvent): boolean {
         if (this.mouseDrag && this.selectedArea) {
             console.log('RectROISelector | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
             this.updateSelection(mouseEvent);
-
-            this.redrawSelections();
-
-            this.drawSelection(this.selectedArea, this.STYLE.CURRENT_SELECTION_COLOR);
+            return true;
         }
+        return false;
     }
 
     public updateSelection(event: MouseEvent): void {
@@ -111,23 +120,20 @@ export class RectROISelector extends SelectorBase<ROISelection2D> {
         return !!this.selectedArea && this.selectedArea.height !== 0 && this.selectedArea.width !== 0;
     }
 
-    public onMouseUp(event: MouseEvent): void {
+    public onMouseUp(event: MouseEvent): boolean {
         if (this.mouseDrag) {
             this.mouseDrag = false;
             if (this.checkSquareSelection()) {
                 this.addCurrentSelection();
             } else {
-                this.stateChange.emit(new SelectionStateMessage(this.currentSlice, true));
                 this.clearSelectedArea();
-                this.clearCanvasSelection();
-                this.redrawSelections();
             }
+            return true;
         }
+        return false;
     }
 
-    public redrawSelections(): void {
-        this.clearCanvasSelection();
-
-        this.drawSelections();
+    public getSelectorName(): string {
+        return 'RECTANGLE';
     }
 }

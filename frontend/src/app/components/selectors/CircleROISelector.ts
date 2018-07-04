@@ -18,6 +18,11 @@ export class CircleROISelector extends RectROISelector implements Selector<ROISe
         const fontSize = this.STYLE.SELECTION_FONT_SIZE;
         this.canvasCtx.font = `${fontSize}px Arial`;
         this.canvasCtx.fillStyle = color;
-        this.canvasCtx.fillText(selection.sliceIndex.toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
+        this.canvasCtx.textAlign = 'start';
+        this.canvasCtx.fillText(selection.getId().toString(), selection.positionX + (fontSize / 4), selection.positionY + fontSize);
+    }
+
+    public getSelectorName(): string {
+        return 'CIRCLE';
     }
 }

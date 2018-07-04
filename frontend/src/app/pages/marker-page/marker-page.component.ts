@@ -13,6 +13,8 @@ import {Location} from '@angular/common';
 import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
+import {Selector} from '../../components/selectors/Selector';
+import {PointSelector} from '../../components/selectors/PointSelector';
 
 
 @Component({
@@ -29,7 +31,7 @@ export class MarkerPageComponent implements OnInit {
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
 
-    // TODO: get labelling context from categry
+    // TODO: get labelling context from category
     tags: Array<LabelTag> = [
         new LabelTag('All', 'ALL', ['RECTANGLE'])
     ];
@@ -38,6 +40,7 @@ export class MarkerPageComponent implements OnInit {
     category: string;
     lastSliceID = 0;
     startTime: Date;
+    selectors: Map<string, Selector<any>>;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar) {
@@ -47,7 +50,13 @@ export class MarkerPageComponent implements OnInit {
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
 
-        this.marker.setSelector(new RectROISelector(this.marker.getCanvas()));
+        this.selectors = new Map<string, Selector<any>>([
+            ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
+            ['POINT', new PointSelector(this.marker.getCanvas())]
+        ]);
+        this.marker.setSelectors(Array.from(this.selectors.values()));
+        this.setSelector('RECTANGLE');
+
         this.marker.setLabelExplorer(this.labelExplorer);
 
         this.route.queryParamMap.subscribe(params => {
@@ -146,7 +155,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public remove2dSelection(): void {
-        this.marker.removeCurrentSelection();
+        this.marker.removeAllSelectionsOnCurrentSlice();
     }
 
     private startMeasuringLabelingTime(): void {
@@ -164,5 +173,18 @@ export class MarkerPageComponent implements OnInit {
 
     private indicateNewScanAppeared(): void {
         this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
+    }
+
+    public setSelector(selectorName: string) {
+        const selector = this.selectors.get(selectorName);
+        if (selector) {
+            this.marker.setCurrentSelector(selector);
+        } else {
+            console.warn(`MarkerPage | setSelector | Selector "${selectorName}" doesn't exist`);
+        }
+    }
+
+    public getToolIconName(iconName: string): string {
+        return LabelExplorerComponent.toolIconNames.get(iconName);
     }
 }
