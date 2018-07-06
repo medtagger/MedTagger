@@ -249,8 +249,5 @@ def skip_scan(scan_id: ScanID) -> Scan:
     :param scan_id: ID of a Scan which should be returned
     :return: None
     """
-    try:
-        scan = get_scan(scan_id)
-        return scan.skip()
-    except NotFoundException:
-        raise NotFoundException('Scan "{}" not found.'.format(scan_id))
+    scan = get_scan(scan_id)
+    return scan.skip()
