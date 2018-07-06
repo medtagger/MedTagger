@@ -241,3 +241,16 @@ def get_scan(scan_id: ScanID) -> Scan:
         return ScansRepository.get_scan_by_id(scan_id)
     except NoResultFound:
         raise NotFoundException('Scan "{}" not found.'.format(scan_id))
+
+
+def skip_scan(scan_id: ScanID) -> Scan:
+    """Increases skip count of Scan with given scan_id.
+
+    :param scan_id: ID of a Scan which should be returned
+    :return: None
+    """
+    try:
+        scan = get_scan(scan_id)
+        return scan.skip()
+    except NotFoundException:
+        raise NotFoundException('Scan "{}" not found.'.format(scan_id))

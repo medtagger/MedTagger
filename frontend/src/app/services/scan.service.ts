@@ -193,4 +193,16 @@ export class ScanService {
             mergeAll(CONCURRENT_API_CALLS)
         );
     }
+
+    skipScan(scanId: string): Promise<Response> {
+        return new Promise((resolve, reject) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}`, {}).toPromise().then((response: Response) => {
+                console.log('ScanService | skipScan | response: ', response);
+                resolve(response);
+            }).catch((error: Response) => {
+                console.log('ScanService | skipScan | error: ', error);
+                reject(error);
+            });
+        });
+    }
 }

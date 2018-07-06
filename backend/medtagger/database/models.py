@@ -125,6 +125,7 @@ class Scan(Base):
     id: ScanID = Column(String, primary_key=True)
     status: ScanStatus = Column(Enum(ScanStatus), nullable=False, default=ScanStatus.NEW)
     declared_number_of_slices: int = Column(Integer, nullable=False)
+    skip_count: int = Column(Integer, nullable=False)
 
     category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
     category: ScanCategory = relationship('ScanCategory')
@@ -145,6 +146,7 @@ class Scan(Base):
         self.id = ScanID(str(uuid.uuid4()))
         self.category = category
         self.declared_number_of_slices = declared_number_of_slices
+        self.skip_count = 0
         self.owner_id = user.id if user else None
 
     def __repr__(self) -> str:
@@ -187,6 +189,15 @@ class Scan(Base):
         :return: Scan object
         """
         self.status = status
+        self.save()
+        return self
+
+    def skip(self) -> 'Scan':
+        """Increase Scan's skip count.
+
+        :return: None
+        """
+        self.skip_count = self.skip_count + 1
         self.save()
         return self
 

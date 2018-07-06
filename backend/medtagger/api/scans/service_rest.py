@@ -156,6 +156,16 @@ class Scan(Resource):
         """Return scan for the given scan_id."""
         return business.get_scan(scan_id)
 
+    @staticmethod
+    @login_required
+    @scans_ns.marshal_with(serializers.out__scan)
+    @scans_ns.doc(security='token')
+    @scans_ns.doc(description='Increases skip count of a scan with given scan_id.')
+    @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
+    def post(scan_id: ScanID) -> Any:
+        """Increases skip count of a scan with given scan_id."""
+        return business.skip_scan(scan_id)
+
 
 @scans_ns.route('/<string:scan_id>/slices')
 @scans_ns.param('scan_id', 'Scan identifier')
