@@ -195,7 +195,7 @@ class Scan(Base):
     def skip(self) -> 'Scan':
         """Increase Scan's skip count.
 
-        :return: None
+        :return: Scan object
         """
         self.skip_count = self.skip_count + 1
         self.save()
