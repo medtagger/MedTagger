@@ -118,15 +118,15 @@ export class ScanService {
 
     slicesObservable(): Observable<MarkerSlice> {
         return this.websocket.fromEvent<any>('slice').pipe(
-            map((slice: { scan_id: string, index: number, image: ArrayBuffer }) => {
-                return new MarkerSlice(slice.scan_id, slice.index, slice.image);
+            map((slice: { scan_id: string, index: number, last_in_batch: number, image: ArrayBuffer }) => {
+                return new MarkerSlice(slice.scan_id, slice.index, slice.last_in_batch, slice.image);
             })
         );
     }
 
-    requestSlices(scanId: string, begin: number, count: number) {
+    requestSlices(scanId: string, begin: number, count: number, reversed: boolean) {
         console.log('ScanService | requestSlices | begin:', begin);
-        this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count});
+        this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count, reversed: reversed});
     }
 
     createNewScan(category: string, numberOfSlices: number) {
