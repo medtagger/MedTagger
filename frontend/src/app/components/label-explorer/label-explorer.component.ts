@@ -9,6 +9,17 @@ import {LabelListItem} from '../../model/LabelListItem';
 })
 
 export class LabelExplorerComponent implements OnInit {
+
+    static readonly toolIconNames: Map<string, string> = new Map([
+        ['RECTANGLE', 'crop'],
+        ['BRUSH', 'brush'],
+        ['POINT', 'gesture-tap'],
+        ['CHAIN', 'vector-polyline'],
+        ['ERASER', 'eraser'],
+        ['ZOOM_IN', 'magnify-plus-outline'],
+        ['ZOOM_OUT', 'magnify-minus-outline']
+    ]);
+
     public tags: Array<LabelTag> = [];
     protected labels: Array<LabelListItem> = [];
     public labelChange: EventEmitter<LabelListItem> = new EventEmitter<LabelListItem>();
@@ -46,33 +57,21 @@ export class LabelExplorerComponent implements OnInit {
         this.emitLabelChange(label);
     }
 
-    public removeLabel(sliceId: number, tagKey: string, tool: string): void {
-        const tag: LabelTag = this.tags.find((item: LabelTag) => item.key === tagKey && item.tools.includes(tool));
-
-        if (tag) {
-            const index = this.labels.findIndex(
-                (item: LabelListItem) =>
-                    (item.sliceIndex === sliceId) &&
-                    (item.tag === tag)
-            );
-            if (index > -1) {
-                this.labels.splice(index, 1);
-            } else {
-                console.warn(`LabelExplorerComponent | removeLabel: cannot find label for sliceId: ${sliceId} and tag: ${tag}`);
-            }
+    public removeLabel(selectionId: number): void {
+        const index = this.labels.findIndex((item) => item.selectionId === selectionId);
+        if (index !== -1) {
+            this.labels.splice(index, 1);
         } else {
-            console.warn(`LabelExplorerComponent | removeLabel: cannot find tag for key: ${tagKey} and tool: ${tool}`);
+            console.warn(`LabelExplorerComponent | removeLabel: cannot find label for selectionId ${selectionId}`);
         }
     }
 
     // TODO: tagKey should be part of dict stored in backend (labelling context)
     // TODO: tools should be part of dict stored in backend (available tools)
-    public addLabel(labelSlice: number, tagKey: string, tool: string): void {
+    public addLabel(selectionId: number, labelSlice: number, tagKey: string, tool: string): void {
         const tag: LabelTag = this.getLabelTag(tagKey, tool);
-        const newItem: LabelListItem = new LabelListItem(labelSlice, tag);
-        if (!this.labels.find(label => label.sliceIndex === newItem.sliceIndex)) {
-            this.labels.push(new LabelListItem(labelSlice, tag));
-        }
+        const newItem: LabelListItem = new LabelListItem(selectionId, labelSlice, tag, tool);
+        this.labels.push(newItem);
     }
 
     private getLabelTag(tagKey: string, tool: string): LabelTag {
@@ -100,5 +99,9 @@ export class LabelExplorerComponent implements OnInit {
 
     private emitLabelChange(label: LabelListItem): void {
         this.labelChange.emit(label);
+    }
+
+    public getToolIconName(iconName: string): string {
+        return LabelExplorerComponent.toolIconNames.get(iconName);
     }
 }

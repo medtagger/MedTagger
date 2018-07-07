@@ -7,13 +7,11 @@ export interface Selector<SliceSelection> {
 
     drawSelection(selection: SliceSelection, color: string): any;
 
-    onMouseDown(event: MouseEvent): any;
+    onMouseDown(event: MouseEvent): boolean;
 
-    onMouseMove(event: MouseEvent): any;
+    onMouseMove(event: MouseEvent): boolean;
 
-    onMouseUp(event: MouseEvent): any;
-
-    clearCanvasSelection(): any;
+    onMouseUp(event: MouseEvent): boolean;
 
     clearData(): any;
 
@@ -37,9 +35,11 @@ export interface Selector<SliceSelection> {
 
     archiveSelections(selectionMap?: Array<SliceSelection>): any;
 
-    removeCurrentSelection(): any;
+    removeSelectionsOnCurrentSlice(): any;
 
-    removeSelection(selectionId: number): void;
+    removeSelectionsOnSlice(sliceId: number): void;
+
+    removeSelection(selectionId: number): boolean;
 
     clearSelections(): any;
 
@@ -51,9 +51,11 @@ export interface Selector<SliceSelection> {
 
     scaleToView(paramX: number, paramY: number): {x: number, y: number};
 
-    // Show selection on all slice images
-    pinSelection(selectionId: number, newValue: boolean): void;
+    // Show selection on all slice images, return true if selection with selectionId exists
+    pinSelection(selectionId: number, newValue: boolean): boolean;
 
-    // Hides selection from user view without deleting from memory
-    hideSelection(selectionId: number, newValue: boolean): void;
+    // Hides selection from user view without deleting from memory, return true if selection with selectionId exists
+    hideSelection(selectionId: number, newValue: boolean): boolean;
+
+    getSelectorName(): string;
 }

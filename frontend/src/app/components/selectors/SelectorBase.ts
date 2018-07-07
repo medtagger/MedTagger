@@ -4,8 +4,8 @@ import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 
 export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> {
     selectedArea: CustomSliceSelection;
-    selections: Map<number, CustomSliceSelection>;
-    archivedSelections: Array<CustomSliceSelection>;
+    selections: Map<number, [CustomSliceSelection]>;
+    archivedSelections: Array<CustomSliceSelection> = [];
     canvasCtx: CanvasRenderingContext2D;
     protected currentSlice;
     protected mouseDrag = false;
@@ -14,32 +14,39 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
 
     public stateChange: EventEmitter<SelectionStateMessage>;
 
+    public isOnlyOneSelectionPerSlice(): boolean {
+        return false;
+    }
+
     public getStateChangeEmitter(): EventEmitter<SelectionStateMessage> {
         return this.stateChange;
     }
 
     public getSelections(): CustomSliceSelection[] {
-        return Array.from(this.selections.values());
+        return Array.from(this.selections.values()).reduce((x, y) => x.concat(y), []);
     }
 
     public clearData(): void {
         this.selectedArea = undefined;
-        this.selections = new Map<number, CustomSliceSelection>();
+        this.selections = new Map<number, [CustomSliceSelection]>();
         this.archivedSelections = [];
         this.stateChange = new EventEmitter<SelectionStateMessage>();
-        this.clearCanvasSelection();
-    }
-
-    public clearCanvasSelection(): void {
-        console.log('RectROISelector | clearCanvasSelection');
-        this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
     }
 
     public addCurrentSelection(): void {
         if (this.selectedArea) {
             console.log('RectROISelector | addCurrentSelection');
-            this.selections.set(this.currentSlice, this.selectedArea);
-            this.stateChange.emit(new SelectionStateMessage(this.currentSlice, false));
+            if (this.isOnlyOneSelectionPerSlice()) {
+                this.selections.set(this.currentSlice, [this.selectedArea]);
+            } else {
+                const currentSliceSelections = this.selections.get(this.currentSlice);
+                if (currentSliceSelections) {
+                    currentSliceSelections.push(this.selectedArea);
+                } else {
+                    this.selections.set(this.currentSlice, [this.selectedArea]);
+                }
+            }
+            this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
             this.clearSelectedArea();
         }
     }
@@ -70,22 +77,40 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
 
     public archiveSelections(selectionMap?: Array<CustomSliceSelection>): void {
         if (!selectionMap) {
-            selectionMap = Array.from(this.selections.values());
+            selectionMap = this.getSelections();
         }
         selectionMap.forEach((value: CustomSliceSelection) => {
             this.archivedSelections.push(value);
         });
     }
 
-    public removeCurrentSelection(): void {
-        if (this.hasSliceSelection()) {
+    public removeSelectionsOnCurrentSlice(): void {
+        const selectionsOnCurrentSlice = this.selections.get(this.currentSlice);
+        if (selectionsOnCurrentSlice) {
+            selectionsOnCurrentSlice.forEach((selection) => this.stateChange.emit(
+                new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
             this.selections.delete(this.currentSlice);
+        }
 
+        this.selectedArea = undefined;
+    }
+
+    public removeSelectionsOnSlice(sliceId: number): void {
+        const selectionsOnSlice = this.selections.get(sliceId);
+        if (selectionsOnSlice) {
+            selectionsOnSlice.forEach((selection) => this.stateChange.emit(
+                new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
+            this.selections.delete(sliceId);
+        }
+
+        if (sliceId === this.currentSlice) {
             this.selectedArea = undefined;
         }
     }
 
     public clearSelections() {
+        this.getSelections().forEach((selection) => this.stateChange.emit(
+            new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
         this.selections.clear();
     }
 
@@ -105,38 +130,27 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         }
     }
 
-    public removeSelection(selectionId: number): void {
-        if (selectionId === this.currentSlice) {
-            this.removeCurrentSelection();
-        } else {
-            this.selections.delete(selectionId);
-            this.clearCanvasSelection();
-        }
-        this.redrawSelections();
+    public removeSelection(selectionId: number): boolean {
+        return this.findAndModifySelection(selectionId, (selections, index) => selections.splice(index, 1));
     }
 
-    public pinSelection(selectionId: number, newValue: boolean): void {
-        const selection: CustomSliceSelection = this.selections.get(selectionId);
-        if (selection) {
-            if (selection.pinned !== newValue) {
-                selection.pinned = newValue;
-                this.redrawSelections();
-            }
-        } else {
-            console.warn('RectROISelector | hideSelection | cannot pin non present selection!');
-        }
+    public pinSelection(selectionId: number, newValue: boolean): boolean {
+        return this.findAndModifySelection(selectionId, (selections, index) => selections[index].pinned = newValue);
     }
 
-    public hideSelection(selectionId: number, newValue: boolean): void {
-        const selection: SliceSelection = this.selections.get(selectionId);
-        if (selection) {
-            if (selection.hidden !== newValue) {
-                selection.hidden = newValue;
-                this.redrawSelections();
+    public hideSelection(selectionId: number, newValue: boolean): boolean {
+         return this.findAndModifySelection(selectionId, (selections, index) => selections[index].hidden = newValue);
+    }
+
+    private findAndModifySelection(selectionId: number, modifyFunc: (selections: [CustomSliceSelection], index: number) => void): boolean {
+        for (const selectionsBySlice of Array.from(this.selections.values())) {
+            const index = selectionsBySlice.findIndex((selection) => selection.getId() === selectionId);
+            if (index !== -1) {
+                modifyFunc(selectionsBySlice, index);
+                return true;
             }
-        } else {
-            console.warn('RectROISelector | hideSelection | cannot hide non present selection!');
         }
+        return false;
     }
 
     public normalizeByView(paramX: number, paramY: number): { x: number, y: number } {
@@ -152,6 +166,4 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
             y: paramY * this.canvasSize.height
         };
     }
-
-    abstract redrawSelections(): void;
 }

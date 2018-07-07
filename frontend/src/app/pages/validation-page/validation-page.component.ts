@@ -33,7 +33,7 @@ export class ValidationPageComponent implements OnInit {
     ngOnInit() {
         console.log('ValidationPage init', this.scanViewer);
 
-        this.scanViewer.setSelector(new RectROISelector(this.scanViewer.getCanvas()));
+        this.scanViewer.setSelectors([new RectROISelector(this.scanViewer.getCanvas())]);
 
         this.requestSlicesWithLabel();
         this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {

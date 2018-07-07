@@ -8,6 +8,8 @@ import {SliceRequest} from '../../model/SliceRequest';
 import {LabelExplorerComponent} from '../label-explorer/label-explorer.component';
 import {LabelListItem} from '../../model/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
+import {Selector} from '../selectors/Selector';
+import {Subscription} from 'rxjs/Subscription';
 
 @Component({
     selector: 'app-marker-component',
@@ -26,6 +28,8 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     canvas: HTMLCanvasElement;
+
+    private currentSelector: Selector<SliceSelection>;
 
     @ViewChild('canvas')
     set viewCanvas(viewElement: ElementRef) {
@@ -46,7 +50,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     // TODO: dynamic context and tool changes
     private currentTaggingContext = 'ALL';
-    private currentTool = 'RECTANGLE';
+
+    private selectorSubscriptions: Array<Subscription> = [];
+
+    private selectorsByName: Map<string, Selector<SliceSelection>> = new Map();
 
     constructor() {
         super();
@@ -54,6 +61,19 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     get currentSlice() {
         return this._currentSlice;
+    }
+
+    public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {
+        super.setSelectors(newSelectors);
+        this.selectorsByName.clear();
+        this.selectors.forEach((selector: Selector<SliceSelection>) => {
+            this.selectorsByName.set(selector.getSelectorName(), selector);
+        });
+        this.hookUpStateChangeSubscription();
+    }
+
+    public setCurrentSelector(selector: Selector<any>) {
+        this.currentSelector = selector;
     }
 
     public setDownloadScanInProgress(isInProgress: boolean) {
@@ -64,46 +84,52 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.downloadingSlicesInProgress = isInProgress;
     }
 
-    public removeCurrentSelection(): void {
-        this.selector.removeCurrentSelection();
+    public removeAllSelectionsOnCurrentSlice(): void {
+        this.selectors.forEach((selector) => selector.removeSelectionsOnCurrentSlice());
         this.updateSelectionState();
     }
 
     private updateSelectionState(): void {
-        this.selectionState.hasArchive = this.selector.hasArchivedSelections();
-        this.selectionState.is2d = this.selector.hasSliceSelection();
-        this.selectionState.isValid = this.selector.hasValidSelection();
+        this.selectionState.hasArchive = this.selectors.some((selector) => selector.hasArchivedSelections());
+        this.selectionState.is2d = this.selectors.some((selector) => selector.hasSliceSelection());
+        this.selectionState.isValid = this.selectors.every((selector) => selector.hasValidSelection());
     }
 
     public get3dSelection(): SliceSelection[] {
-        this.selector.archiveSelections();
+        this.selectors.forEach((selector) => selector.archiveSelections());
         this.updateSelectionState();
 
-        this.selector.clearCanvasSelection();
+        this.clearCanvasSelections();
 
-        const coordinates: SliceSelection[] = this.selector.getSelections();
-        this.selector.clearSelections();
+        const coordinates: SliceSelection[] = this.selectors
+            .map((selector) => selector.getSelections())
+            .reduce((x, y) => x.concat(y), []);
+        this.selectors.forEach((selector) => selector.clearSelections());
         this.updateSelectionState();
 
-        this.selector.drawSelections();
+        this.drawSelections();
 
         return coordinates;
     }
 
     private hookUpStateChangeSubscription(): void {
-        this.selector.getStateChangeEmitter().subscribe((selectionStateMessage: SelectionStateMessage) => {
-            console.log('Marker | getStateChange event from selector!');
-            this.updateSelectionState();
-            if (this.labelExplorer) {
-                if (selectionStateMessage.toDelete) {
-                    console.log('Marker | getStateChange remove slice from label explorer, sliceId: ', selectionStateMessage.sliceId);
-                    this.labelExplorer.removeLabel(selectionStateMessage.sliceId, this.currentTaggingContext, this.currentTool);
-                } else {
-                    console.log('Marker | getStateChange adding new slice to label explorer, sliceId: ', selectionStateMessage.sliceId);
-                    this.labelExplorer.addLabel(selectionStateMessage.sliceId, this.currentTaggingContext, this.currentTool);
+        this.selectorSubscriptions.forEach((subscription) => subscription.unsubscribe());
+        this.selectorSubscriptions = this.selectors
+            .map((selector) => selector.getStateChangeEmitter().subscribe((selection: SelectionStateMessage) => {
+                console.log('Marker | getStateChange event from selector!');
+                this.updateSelectionState();
+                if (this.labelExplorer) {
+                    if (selection.toDelete) {
+                        console.log('Marker | getStateChange remove selection from label explorer, selectionId: ', selection.selectionId);
+                        this.labelExplorer.removeLabel(selection.selectionId);
+                    } else {
+                        console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
+                            selection.selectionId);
+                        this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTaggingContext,
+                            this.currentSelector.getSelectorName());
+                    }
                 }
-            }
-        });
+        }));
     }
 
     private hookUpExplorerLabelChangeSubscription(): void {
@@ -111,11 +137,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             this.labelExplorer.getLabelChangeEmitter().subscribe((labelChanged: LabelListItem) => {
                 console.log('Marker | getLabelChange event from label-explorer!');
                 if (labelChanged.toDelete) {
-                    this.selector.removeSelection(labelChanged.sliceIndex);
+                    this.selectorsByName.get(labelChanged.selectorName).removeSelection(labelChanged.selectionId);
                 } else {
-                    this.selector.pinSelection(labelChanged.sliceIndex, labelChanged.pinned);
-                    this.selector.hideSelection(labelChanged.sliceIndex, labelChanged.hidden);
+                    this.selectorsByName.get(labelChanged.selectorName).pinSelection(labelChanged.selectionId, labelChanged.pinned);
+                    this.selectorsByName.get(labelChanged.selectorName).hideSelection(labelChanged.selectionId, labelChanged.hidden);
                 }
+                this.redrawSelections();
             });
         } else {
             console.warn(`Marker | hookUpExplorerLabelChangeSubscription cannot hook up observer when labelExplorer isn't present!`);
@@ -134,10 +161,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.slices = new Map<number, MarkerSlice>();
 
-        this.selector.clearData();
-
-        this.hookUpStateChangeSubscription();
-
         this.initializeCanvas();
 
         this.initializeImage(() => {
@@ -152,7 +175,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             this.requestSlicesIfNeeded(sliderValue);
             this.changeMarkerImage(sliderValue);
 
-            this.selector.drawSelections();
+            this.drawSelections();
         });
 
         this.initCanvasSelectionTool();
@@ -160,9 +183,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     private afterImageLoad(): void {
-        this.selector.clearCanvasSelection();
+        this.clearCanvasSelections();
 
-        this.selector.drawSelections();
+        this.drawSelections();
         this.updateSelectionState();
     }
 
@@ -171,16 +194,22 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.canvas.onmousedown = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmousedown clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            this.selector.onMouseDown(mouseEvent);
+            if (this.currentSelector.onMouseDown(mouseEvent)) {
+                this.redrawSelections();
+            }
         };
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            this.selector.onMouseUp(mouseEvent);
+            if (this.currentSelector.onMouseUp(mouseEvent)) {
+                this.redrawSelections();
+            }
         };
 
         this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
-            this.selector.onMouseMove(mouseEvent);
+            if (this.currentSelector.onMouseMove(mouseEvent)) {
+                this.redrawSelections();
+            }
         };
     }
 
