@@ -7,15 +7,6 @@ export class Selection3D implements ScanSelection<SliceSelection> {
     constructor(elements?: SliceSelection[]) {
         this._elements = elements;
     }
-
-    public get coordinates(): Object[] {
-        const coordinatesArray: Object[] = [];
-        this._elements.forEach((element: SliceSelection) => {
-            coordinatesArray.push(element.getCoordinates());
-        });
-        return coordinatesArray;
-    }
-
     toJSON(): Object {
         const jsonObject: { elements: Object[] } = {elements: []};
 
