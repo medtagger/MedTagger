@@ -5,7 +5,7 @@ import {ScanService} from '../../services/scan.service';
 import {MarkerComponent} from '../../components/marker/marker.component';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
-import {ROISelection3D} from '../../model/selections/ROISelection3D';
+import {Selection3D} from '../../model/selections/Selection3D';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {SliceRequest} from '../../model/SliceRequest';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
@@ -16,6 +16,7 @@ import {LabelTag} from '../../model/labels/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
+import {SliceSelection} from '../../model/selections/SliceSelection';
 
 
 @Component({
@@ -146,18 +147,18 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
-        this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()));
+        this.sendSelection(new Selection3D(<SliceSelection[]>this.marker.get3dSelection()));
     }
 
     public sendEmptyLabel(): void {
-        this.sendSelection(new ROISelection3D());
+        this.sendSelection(new Selection3D());
         this.nextScan();
     }
 
-    private sendSelection(roiSelection: ROISelection3D) {
+    private sendSelection(selection3D: Selection3D) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
 
-        this.scanService.sendSelection(this.scan.scanId, roiSelection, labelingTime)
+        this.scanService.sendSelection(this.scan.scanId, selection3D, labelingTime)
             .then((response: Response) => {
                 console.log('MarkerPage | sendSelection | success!');
                 this.indicateLabelHasBeenSend();

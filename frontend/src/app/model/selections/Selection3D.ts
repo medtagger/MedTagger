@@ -1,7 +1,7 @@
 import {ScanSelection} from './ScanSelection';
 import {SliceSelection} from './SliceSelection';
 
-export class ROISelection3D implements ScanSelection<SliceSelection> {
+export class Selection3D implements ScanSelection<SliceSelection> {
     _elements: SliceSelection[];
 
     constructor(elements?: SliceSelection[]) {
