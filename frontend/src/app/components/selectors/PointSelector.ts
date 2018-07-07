@@ -1,7 +1,7 @@
 import {EventEmitter} from '@angular/core';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {SelectorBase} from './SelectorBase';
-import {PointSelection} from '../../model/PointSelection';
+import {PointSelection} from '../../model/selections/PointSelection';
 import {Selector} from './Selector';
 
 export class PointSelector extends SelectorBase<PointSelection> implements Selector<PointSelection> {

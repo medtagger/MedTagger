@@ -5,7 +5,7 @@
 
 export const environment = {
     production: false,
-    API_URL: 'http://localhost:51000/api/v1',
-    WEBSOCKET_URL: 'http://localhost:51001',
-    WEBSOCKET_PATH: '/socket.io'
+    API_URL: 'https://kask.eti.pg.gda.pl/medtagger/api/v1',
+    WEBSOCKET_URL: 'https://kask.eti.pg.gda.pl',
+    WEBSOCKET_PATH: '/medtagger/socket.io'
 };

@@ -1,4 +1,4 @@
-import {SliceSelection} from './SliceSelection';
+import {SliceSelection} from '../selections/SliceSelection';
 
 export class Label {
     labelId: string;

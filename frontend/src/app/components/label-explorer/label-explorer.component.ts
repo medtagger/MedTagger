@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit} from '@angular/core';
-import {LabelTag} from '../../model/LabelTag';
-import {LabelListItem} from '../../model/LabelListItem';
+import {LabelTag} from '../../model/labels/LabelTag';
+import {LabelListItem} from '../../model/labels/LabelListItem';
 
 @Component({
     selector: 'app-label-explorer',
