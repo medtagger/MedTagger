@@ -63,6 +63,10 @@ $breakpoints: ('small': (min-width: 320px), 'medium': (min-width: 768px), 'large
     }
 }
 
+@mixin transition($values...){
+    @include  prefix(transition, $values)
+}
+
 @mixin transform($value) {
     @include prefix(transform, $value);
 }

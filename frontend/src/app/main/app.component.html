@@ -1,5 +1,9 @@
+<div class="container-fluid">
+<router-outlet></router-outlet>
+</div>
+<!--
 <mat-drawer-container>
-    <!-- Right navigation bar -->
+    &lt;!&ndash; Right navigation bar &ndash;&gt;
     <mat-drawer #sidenav mode="over" position="end" class="right-sidebar mat-typography">
         <div *ngIf="!!currentUser">
             <section class="user-profile">
@@ -44,9 +48,9 @@
         </div>
     </mat-drawer>
 
-    <!-- Whole page content -->
+    &lt;!&ndash; Whole page content &ndash;&gt;
     <mat-drawer-content class="mat-typography">
-        <!-- Top header -->
+        &lt;!&ndash; Top header &ndash;&gt;
         <mat-toolbar class="mat-elevation-z5 header" color="primary">
             <a routerLink="/home">
                 <mat-icon class="header-icon">local_hospital</mat-icon>
@@ -58,14 +62,15 @@
             </button>
         </mat-toolbar>
 
-        <!-- Main content -->
+        &lt;!&ndash; Main content &ndash;&gt;
         <div class="dynamicContent">
             <router-outlet></router-outlet>
         </div>
 
-        <!-- Bottom footer -->
+        &lt;!&ndash; Bottom footer &ndash;&gt;
         <mat-toolbar class="mat-elevation-z5 footer" color="primary" *ngIf="shouldShowFooter">
             <img src="assets/img/logo_politechnika_gdanska.png">
         </mat-toolbar>
     </mat-drawer-content>
 </mat-drawer-container>
+-->
