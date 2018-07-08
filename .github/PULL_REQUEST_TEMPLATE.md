@@ -2,9 +2,9 @@ Fixes #[Fill ID of the Issue]
 
 ## Proposed Changes
 
-  - [What did you changed?]
-  - [What did you changed?]
-  - [What did you changed?]
+  - [What did you change?]
+  - [What did you change?]
+  - [What did you change?]
 
 ## UI changes (optional)
 
