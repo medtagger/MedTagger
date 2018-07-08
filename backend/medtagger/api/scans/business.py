@@ -248,7 +248,7 @@ def skip_scan(scan_id: ScanID) -> bool:
 
     :param scan_id: ID of a Scan which should be returned
     :return: boolean information whether the Scan was skipped or not
-    # """
+    """
     if not ScansRepository.increase_skip_count_of_a_scan(scan_id):
         raise NotFoundException('Scan "{}" not found.'.format(scan_id))
     return True
