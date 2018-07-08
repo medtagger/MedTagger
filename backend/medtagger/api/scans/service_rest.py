@@ -169,8 +169,9 @@ class SkipScan(Resource):
     @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
     def post(scan_id: ScanID) -> Any:
         """Increases skip count of a scan with given scan_id."""
-        if business.skip_scan(scan_id):
-            return '', 200
+        if not business.skip_scan(scan_id):
+            return '', 404
+        return '', 200
 
 
 @scans_ns.route('/<string:scan_id>/slices')
