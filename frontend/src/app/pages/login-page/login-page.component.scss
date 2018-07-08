@@ -105,7 +105,6 @@ header {
 }
 
 main {
-    overflow-x: hidden;
     @include media-breakpoint-up(lg) {
         max-width: 80%;
     }
@@ -142,7 +141,7 @@ main {
     align-items: center;
     font-size: 1.5em;
     text-align: center;
-    margin: 0 0 .5em .5em;
+    margin: 0 .5em .5em .5em;
     button {
         font-size: 1em;
         text-transform: uppercase;
