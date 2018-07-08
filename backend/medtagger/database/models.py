@@ -125,6 +125,7 @@ class Scan(Base):
     id: ScanID = Column(String, primary_key=True)
     status: ScanStatus = Column(Enum(ScanStatus), nullable=False, default=ScanStatus.NEW)
     declared_number_of_slices: int = Column(Integer, nullable=False)
+    skip_count: int = Column(Integer, nullable=False, default=0)
 
     category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
     category: ScanCategory = relationship('ScanCategory')

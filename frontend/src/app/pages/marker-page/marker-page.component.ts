@@ -135,6 +135,11 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
+        this.scanService.skipScan(this.scan.scanId);
+        this.nextScan();
+    }
+
+    public nextScan(): void {
         this.marker.setDownloadScanInProgress(true);
         this.marker.prepareForNewScan();
         this.requestScan();
@@ -146,7 +151,7 @@ export class MarkerPageComponent implements OnInit {
 
     public sendEmptyLabel(): void {
         this.sendSelection(new ROISelection3D());
-        this.skipScan();
+        this.nextScan();
     }
 
     private sendSelection(roiSelection: ROISelection3D) {
@@ -157,7 +162,7 @@ export class MarkerPageComponent implements OnInit {
                 console.log('MarkerPage | sendSelection | success!');
                 this.indicateLabelHasBeenSend();
                 this.labelExplorer.reinitializeExplorer();
-                this.skipScan();
+                this.nextScan();
                 this.startMeasuringLabelingTime();
             })
             .catch((errorResponse: Error) => {
