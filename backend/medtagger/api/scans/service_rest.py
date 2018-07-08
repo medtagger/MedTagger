@@ -157,10 +157,27 @@ class Scan(Resource):
         return business.get_scan(scan_id)
 
 
+@scans_ns.route('/<string:scan_id>/skip')
+@scans_ns.param('scan_id', 'Scan identifier')
+class SkipScan(Resource):
+    """Endpoint that allows for skipping given Scan."""
+
+    @staticmethod
+    @login_required
+    @scans_ns.doc(security='token')
+    @scans_ns.doc(description='Increases skip count of a scan with given scan_id.')
+    @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
+    def post(scan_id: ScanID) -> Any:
+        """Increases skip count of a scan with given scan_id."""
+        if not business.skip_scan(scan_id):
+            return '', 404
+        return '', 200
+
+
 @scans_ns.route('/<string:scan_id>/slices')
 @scans_ns.param('scan_id', 'Scan identifier')
 class ScanSlices(Resource):
-    """Endpoint that allow for uploading Slices to given Scan."""
+    """Endpoint that allows for uploading Slices to given Scan."""
 
     @staticmethod
     @login_required

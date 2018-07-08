@@ -85,3 +85,16 @@ def try_to_mark_scan_as_stored(scan_id: ScanID) -> bool:
         query = query.filter(Scan.declared_number_of_slices == stored_slices_subquery.c.count)
         updated = query.update({"status": (ScanStatus.STORED)}, synchronize_session=False)
         return bool(updated)
+
+
+def increase_skip_count_of_a_scan(scan_id: ScanID) -> bool:
+    """Increase skip_count of a Scan with given scan_id.
+
+    :param scan_id: ID of a Scan which skip_count should be increased
+    :return: boolean information whether the Scan was skipped or not
+    """
+    with db_session() as session:
+        query = session.query(Scan)
+        query = query.filter(Scan.id == scan_id)
+        updated = query.update({"skip_count": (Scan.skip_count + 1)})
+        return bool(updated)
