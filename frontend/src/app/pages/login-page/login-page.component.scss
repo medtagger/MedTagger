@@ -32,8 +32,8 @@ header {
         margin-top: 3em;
         font-weight: lighter;
         max-width: 15em;
-        @include media-breakpoint-up(lg) {
-            max-width: 12em;
+        @include media-breakpoint-only(lg) {
+            max-width: 10em;
         }
     }
 }
@@ -45,14 +45,15 @@ header {
     flex-wrap: wrap;
     img {
         display: inline-block;
-        margin: 0 1.2em 1.2em 0;
-        max-height: 70px;
+        margin: 0 .5em 0 0;
+        height: 2em;
+        @include fluid-type(576px, 1200px, 33.184px, 50.512px);
     }
     h1 {
         display: inline-block;
         color: $white-high-emphasis;
-        font-size: 3.5em;
         font-weight: bold;
+        margin: .5em 0 0 0;
     }
 }
 
@@ -71,18 +72,13 @@ header {
     margin: 0 0 5em 0;
     display: flex;
     align-items: center;
-    a {
+    h4 {
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 1.5em;
-        width: 5em;
-        @include media-breakpoint-up(md) {
-            width: 8em;
-        }
+        height: 2em;
+        width: 7em;
         background: $black-8-opacity;
-        color: $black-disabled;
-        font-size: 1.8em;
         text-transform: uppercase;
         cursor: pointer;
         &:first-child {
@@ -91,18 +87,22 @@ header {
         &:last-child {
             border-radius: 0 50px 50px 0;
         }
-        @include transition(color .2s ease-out);
-        &:hover, &:active, &:focus {
-            color: $black-medium-emphasis;
-            text-decoration: none;
+        a {
+            color: $black-disabled;
+            @include transition(color .2s ease-out);
+            &:hover, &:active, &:focus {
+                color: $black-medium-emphasis;
+                text-decoration: none;
+            }
         }
         &.active {
             background: mat-color($accent);
-            color: $white-high-emphasis;
             @include transition(background .2s ease-out);
+            a {
+                color: $white-high-emphasis;
+            }
             &:hover, &:active, &:focus {
                 background: mat-color($accent, 600);
-                text-decoration: none;
             }
         }
     }
@@ -111,21 +111,15 @@ header {
 main {
     overflow-x: hidden;
     @include media-breakpoint-up(lg) {
-        max-width: 85%;
+        max-width: 80%;
     }
     @include media-breakpoint-up(md) {
         overflow-y: auto;
     }
     h3 {
         font-weight: bold;
-        @include media-breakpoint-up(lg) {
-            font-size: 2.5em;
-        }
     }
-    h5 {
-        @include media-breakpoint-up(lg) {
-            font-size: 1.8em;
-        }
+    h4 {
         color: $black-medium-emphasis;
         font-weight: lighter;
     }
@@ -136,6 +130,7 @@ main {
         }
         display: flex;
         flex-direction: column;
+        @include remove-autofill;
         mat-form-field {
             margin-bottom: 1.2em;
             mat-icon {
@@ -151,7 +146,7 @@ main {
     align-items: center;
     font-size: 1.5em;
     text-align: center;
-    margin-bottom: 0.5em;
+    margin: 0 0 .5em .5em;
     button {
         font-size: 1em;
         text-transform: uppercase;
@@ -160,9 +155,10 @@ main {
         @include media-breakpoint-up(md) {
             width: 10em;
         }
-        @include mat-elevation(3);
+        @include mat-elevation(2);
+        @include mat-elevation-transition;
         &:hover {
-            @include mat-elevation(6);
+            @include mat-elevation(5);
         }
     }
     mat-icon {

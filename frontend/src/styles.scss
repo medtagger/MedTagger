@@ -6,18 +6,29 @@
 body {
     //background: rgba(0, 0, 0, 0.1);
     //background-size: 30%;
-    margin: 0;
     font-family: 'Roboto', sans-serif;
 }
 
-html, body {
-    width: 100%;
-    height: 100%;
+// Fluid font-types
+
+h1 {
+    @include fluid-type(576px, 1200px, 33.184px, 50.512px);
 }
 
-app-root {
-    display: block;
-    height: 100%;
+h2 {
+    @include fluid-type(576px, 1200px, 27.648px, 37.904px);
+}
+
+h3 {
+    @include fluid-type(576px, 1200px, 23.04px, 28.432px);
+}
+
+h4 {
+    @include fluid-type(576px, 1200px, 19.2px, 21.328px);
+}
+
+h5 {
+    @include fluid-type(576px, 1200px, 16px, 16px);
 }
 
 .primary-color {

@@ -11,17 +11,17 @@
     </header>
     <div class="col-sm-12 col-lg-8 login">
         <div class="buttons-pill">
-            <a [ngClass]="{active: loginPageMode == LoginPageMode.REGISTER}" routerLink="/login"
-               (click)="changePageMode()">Sign
-                up</a>
-            <a [ngClass]="{active: loginPageMode == LoginPageMode.LOG_IN}" routerLink="/login"
-               (click)="changePageMode()">Sign
-                in</a>
+            <h4 [ngClass]="{active: loginPageMode == LoginPageMode.REGISTER}" (click)="changePageMode()">
+                <a routerLink="/login">Sign up</a>
+            </h4>
+            <h4 [ngClass]="{active: loginPageMode == LoginPageMode.LOG_IN}" (click)="changePageMode()">
+                <a routerLink="/login">Sign in</a>
+            </h4>
         </div>
         <main *ngIf="loginPageMode == LoginPageMode.LOG_IN">
             <h3>Hello!</h3>
-            <h5>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at leo vitae est fermentum suscipit quis
-                vestibulum leo.</h5>
+            <h4>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at leo vitae est fermentum suscipit quis
+                vestibulum leo.</h4>
             <form [formGroup]="userForm" (keyup.enter)="logIn()">
                 <mat-form-field appearance="fill">
                     <mat-label>Email</mat-label>
@@ -31,7 +31,8 @@
                 </mat-form-field>
                 <mat-form-field appearance="fill">
                     <mat-label>Password</mat-label>
-                    <input matInput type="{{loginPasswordVisible && 'text' || 'password'}}" placeholder="Insert your password."
+                    <input matInput type="{{loginPasswordVisible && 'text' || 'password'}}"
+                           placeholder="Insert your password."
                            id="password" formControlName="password" required>
                     <mat-error *ngIf="userForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
                     <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
@@ -50,23 +51,23 @@
 
         <main *ngIf="loginPageMode == LoginPageMode.REGISTER">
             <h3>Hello!</h3>
-            <h5>Start labeling with MedTagger today. It is easy! Just take your time and fill this registration form and
+            <h4>Start labeling with MedTagger today. It is easy! Just take your time and fill this registration form and
                 you
-                are ready to go. </h5>
+                are ready to go. </h4>
             <form [formGroup]="userForm" (keyup.enter)="register()">
                 <div class="row">
-                <mat-form-field appearance="fill" class="col-12 col-lg-6">
-                    <mat-label>First name</mat-label>
-                    <input matInput type="text" placeholder="Insert your name."
-                           id="firstName" formControlName="firstName" required>
-                    <mat-error *ngIf="userForm.get('firstName').invalid">{{getFirstNameErrorMessage()}}</mat-error>
-                </mat-form-field>
-                <mat-form-field appearance="fill" class="col-12 col-lg-6">
-                    <mat-label>Last name</mat-label>
-                    <input matInput type="text" placeholder="Insert your surname."
-                           id="lastName" formControlName="lastName" required>
-                    <mat-error *ngIf="userForm.get('lastName').invalid">{{getLastNameErrorMessage()}}</mat-error>
-                </mat-form-field>
+                    <mat-form-field appearance="fill" class="col-12 col-lg-6">
+                        <mat-label>First name</mat-label>
+                        <input matInput type="text" placeholder="Insert your name."
+                               id="firstName" formControlName="firstName" required>
+                        <mat-error *ngIf="userForm.get('firstName').invalid">{{getFirstNameErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="fill" class="col-12 col-lg-6">
+                        <mat-label>Last name</mat-label>
+                        <input matInput type="text" placeholder="Insert your surname."
+                               id="lastName" formControlName="lastName" required>
+                        <mat-error *ngIf="userForm.get('lastName').invalid">{{getLastNameErrorMessage()}}</mat-error>
+                    </mat-form-field>
                 </div>
                 <mat-form-field appearance="fill">
                     <mat-label>Email</mat-label>
@@ -76,14 +77,16 @@
                 </mat-form-field>
                 <mat-form-field appearance="fill">
                     <mat-label>Password</mat-label>
-                    <input matInput type="{{registerPasswordVisible && 'text' || 'password'}}" placeholder="Enter your password."
+                    <input matInput type="{{registerPasswordVisible && 'text' || 'password'}}"
+                           placeholder="Enter your password."
                            id="password" formControlName="password" required>
                     <mat-error *ngIf="userForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
                     <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                 </mat-form-field>
                 <mat-form-field appearance="fill">
                     <mat-label>Confirm password</mat-label>
-                    <input matInput type="{{registerPasswordVisible && 'text' || 'password'}}" placeholder="Re-enter your password."
+                    <input matInput type="{{registerPasswordVisible && 'text' || 'password'}}"
+                           placeholder="Re-enter your password."
                            id="confirmPassword" formControlName="confirmPassword" required>
                     <mat-error *ngIf="userForm.get('password').invalid">{{getConfirmPasswordErrorMessage()}}</mat-error>
                     <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
