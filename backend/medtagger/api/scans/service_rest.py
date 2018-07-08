@@ -164,13 +164,13 @@ class SkipScan(Resource):
 
     @staticmethod
     @login_required
-    @scans_ns.marshal_with(serializers.out__scan)
     @scans_ns.doc(security='token')
     @scans_ns.doc(description='Increases skip count of a scan with given scan_id.')
     @scans_ns.doc(responses={200: 'Success', 404: 'Could not find scan'})
     def post(scan_id: ScanID) -> Any:
         """Increases skip count of a scan with given scan_id."""
-        return business.skip_scan(scan_id)
+        if business.skip_scan(scan_id):
+            return '', 200
 
 
 @scans_ns.route('/<string:scan_id>/slices')

@@ -243,11 +243,12 @@ def get_scan(scan_id: ScanID) -> Scan:
         raise NotFoundException('Scan "{}" not found.'.format(scan_id))
 
 
-def skip_scan(scan_id: ScanID) -> Scan:
+def skip_scan(scan_id: ScanID) -> bool:
     """Increases skip count of Scan with given scan_id.
 
     :param scan_id: ID of a Scan which should be returned
-    :return: Scan object
-    """
-    ScansRepository.increase_skip_count_of_a_scan(scan_id)
-    return get_scan(scan_id)
+    :return: boolean information whether the Scan was skipped or not
+    # """
+    if not ScansRepository.increase_skip_count_of_a_scan(scan_id):
+        raise NotFoundException('Scan "{}" not found.'.format(scan_id))
+    return True

@@ -22,9 +22,6 @@ def test_skipping_a_scan(prepare_environment: Any, synchronous_celery: Any) -> N
     # Step 2. Skip Scan
     response = api_client.post('/api/v1/scans/' + scan_id + '/skip', headers=get_headers(token=user_token))
     assert response.status_code == 200
-    json_response = json.loads(response.data)
-    assert isinstance(json_response, dict)
-    assert json_response['skip_count'] == 1
 
 
 def test_skipping_a_scan_that_doesnt_exist(prepare_environment: Any, synchronous_celery: Any) -> None:

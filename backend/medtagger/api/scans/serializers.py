@@ -94,7 +94,6 @@ out__scan = api.model('Scan model', {
                             attribute='status.name'),
     'number_of_slices': fields.Integer(description='Total number of Slices in given scan',
                                        attribute='declared_number_of_slices'),
-    'skip_count': fields.Integer(description='Total number of times Scan was skipped'),
 })
 
 out__label = api.model('Newly created Label model', {
