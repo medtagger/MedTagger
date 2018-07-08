@@ -26,8 +26,8 @@ export class LoginPageComponent implements OnInit {
     loggingInProgress: boolean;
     loggingInError: boolean;
     registrationInProgress: boolean;
-    loginPasswordVisible: boolean = false;
-    registerPasswordVisible: boolean = false;
+    loginPasswordVisible = false;
+    registerPasswordVisible = false;
 
     constructor(private routerService: Router, private accountService: AccountService) {
     }
