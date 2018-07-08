@@ -7,7 +7,7 @@ from typing import Any
 from PIL import Image
 
 from medtagger.database.models import SliceOrientation
-from medtagger.repositories.slices import SlicesRepository
+from medtagger.repositories import slices as SlicesRepository
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
