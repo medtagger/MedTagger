@@ -124,9 +124,8 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
-        this.scanService.skipScan(this.scan.scanId).then(() => {
-            this.nextScan();
-        });
+        this.scanService.skipScan(this.scan.scanId);
+        this.nextScan();
     }
 
     public nextScan(): void {

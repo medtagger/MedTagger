@@ -249,5 +249,5 @@ def skip_scan(scan_id: ScanID) -> Scan:
     :param scan_id: ID of a Scan which should be returned
     :return: Scan object
     """
-    scan = get_scan(scan_id)
-    return scan.skip()
+    ScansRepository.increase_skip_count_of_a_scan(scan_id)
+    return get_scan(scan_id)

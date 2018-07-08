@@ -156,6 +156,12 @@ class Scan(Resource):
         """Return scan for the given scan_id."""
         return business.get_scan(scan_id)
 
+
+@scans_ns.route('/<string:scan_id>/skip')
+@scans_ns.param('scan_id', 'Scan identifier')
+class SkipScan(Resource):
+    """Endpoint that allows for skipping given Scan."""
+
     @staticmethod
     @login_required
     @scans_ns.marshal_with(serializers.out__scan)
@@ -170,7 +176,7 @@ class Scan(Resource):
 @scans_ns.route('/<string:scan_id>/slices')
 @scans_ns.param('scan_id', 'Scan identifier')
 class ScanSlices(Resource):
-    """Endpoint that allow for uploading Slices to given Scan."""
+    """Endpoint that allows for uploading Slices to given Scan."""
 
     @staticmethod
     @login_required
