@@ -274,6 +274,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     protected redrawSelections(): void {
+        console.log('ScanViewer | Redrawing selections (clean and draw)');
         this.clearCanvasSelections();
         this.drawSelections();
     }

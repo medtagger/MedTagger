@@ -17,6 +17,7 @@ import {LabelExplorerComponent} from '../../components/label-explorer/label-expl
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
 import {SliceSelection} from '../../model/selections/SliceSelection';
+import {BrushSelector} from '../../components/selectors/BrushSelector';
 
 
 @Component({
@@ -54,7 +55,8 @@ export class MarkerPageComponent implements OnInit {
 
         this.selectors = new Map<string, Selector<any>>([
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
-            ['POINT', new PointSelector(this.marker.getCanvas())]
+            ['POINT', new PointSelector(this.marker.getCanvas())],
+            ['BRUSH', new BrushSelector(this.marker.getCanvas())]
         ]);
         this.marker.setSelectors(Array.from(this.selectors.values()));
         this.setSelector('RECTANGLE');

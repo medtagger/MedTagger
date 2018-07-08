@@ -7,6 +7,7 @@ export interface Selector<SliceSelection> {
 
     drawSelection(selection: SliceSelection, color: string): any;
 
+    // mouse events return boolean value to decide whether we must redraw selections (true) or not (false)
     onMouseDown(event: MouseEvent): boolean;
 
     onMouseMove(event: MouseEvent): boolean;

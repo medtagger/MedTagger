@@ -166,4 +166,11 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
             y: paramY * this.canvasSize.height
         };
     }
+
+    public getViewScaleDifference(paramWidth: number, paramHeight: number): { scaleWidth: number, scaleHeight: number } {
+        return {
+            scaleWidth: this.canvasSize.width / paramWidth,
+            scaleHeight: this.canvasSize.height / paramHeight
+        };
+    }
 }
