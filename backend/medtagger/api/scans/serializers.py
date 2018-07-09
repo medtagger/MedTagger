@@ -73,9 +73,9 @@ elements_schema = {
                         'required': ['x', 'y'],
                         'additionalProperties': False,
                     },
-                    'minItems': 2
+                    'minItems': 2,
                 },
-                'loop': {'type': 'boolean'}
+                'loop': {'type': 'boolean'},
             },
             'required': ['points', 'slice_index', 'tag', 'tool', 'loop'],
             'additionalProperties': False,
