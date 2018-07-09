@@ -38,10 +38,10 @@ class LabelsRepository(object):
         return query.first()
 
     @staticmethod
-    def add_new_label(scan_id: ScanID, user: User, labeling_time: LabelingTime) -> Label:
+    def add_new_label(scan_id: ScanID, user: User, labeling_time: LabelingTime, comment: str) -> Label:
         """Add new Label for given Scan."""
         with db_session() as session:
-            label = Label(user, labeling_time)
+            label = Label(user, labeling_time, comment)
             label.scan_id = scan_id
             session.add(label)
         return label

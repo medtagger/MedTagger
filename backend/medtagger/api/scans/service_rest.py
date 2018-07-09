@@ -120,7 +120,7 @@ class Label(Resource):
                     -F "SLICE_1=@"/Users/jakubpowierza/Desktop/test.png""
                     -F "label={"elements": [{"width": 1, "height": 1, "image_key": "SLICE_1",
                                "slice_index": 1, "tag": "LEFT_KIDNEY", "tool": "BRUSH"}],
-                               "labeling_time": 0.1};type=application/json"
+                               "labeling_time": 0.1, "comment": "example comment"};type=application/json"
                      http://localhost:51000/api/v1/scans/c5102707-cb36-4869-8041-f00421c03fa1/label
         """
         files = {name: file_data.read() for name, file_data in request.files.items()}
@@ -137,7 +137,8 @@ class Label(Resource):
         business.validate_label_payload(elements, files)
 
         labeling_time = label['labeling_time']
-        label = business.add_label(scan_id, elements, files, labeling_time)
+        comment = label['comment']
+        label = business.add_label(scan_id, elements, files, labeling_time, comment)
         return label, 201
 
 
