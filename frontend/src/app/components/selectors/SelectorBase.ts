@@ -35,7 +35,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
 
     public addCurrentSelection(): void {
         if (this.selectedArea) {
-            console.log('RectROISelector | addCurrentSelection');
+            console.log('SelectorBase | addCurrentSelection');
             if (this.isOnlyOneSelectionPerSlice()) {
                 this.selections.set(this.currentSlice, [this.selectedArea]);
             } else {
@@ -164,13 +164,6 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         return {
             x: paramX * this.canvasSize.width,
             y: paramY * this.canvasSize.height
-        };
-    }
-
-    public getViewScaleDifference(paramWidth: number, paramHeight: number): { scaleWidth: number, scaleHeight: number } {
-        return {
-            scaleWidth: this.canvasSize.width / paramWidth,
-            scaleHeight: this.canvasSize.height / paramHeight
         };
     }
 }

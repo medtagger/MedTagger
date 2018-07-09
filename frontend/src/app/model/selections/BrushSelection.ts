@@ -2,16 +2,29 @@ import {SliceSelection} from './SliceSelection';
 
 export class BrushSelection extends SliceSelection {
     _selectionLayer: HTMLImageElement;
+    isReady: Promise<void>;
 
     constructor(selectionLayer: string, depth: number) {
         super();
         this._selectionLayer = new Image();
-        this._selectionLayer.src = selectionLayer;
+
+        this.isReady = new Promise((resolve, reject) => {
+            this._selectionLayer.onload = () => resolve();
+            this._selectionLayer.onerror = () => reject();
+
+            this._selectionLayer.src = selectionLayer;
+        });
+
+
         this.sliceIndex = depth;
     }
 
-    get selectionLayer(): HTMLImageElement {
-        return this._selectionLayer;
+    public getSelectionLayer(): Promise<HTMLImageElement | Error> {
+        return this.isReady.then( ()=> {
+            return this._selectionLayer;
+        }).catch( ()=> {
+            return new Error('Cannot load image (BrushSelection)');
+        });
     }
 
     toJSON(): Object {

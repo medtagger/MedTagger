@@ -68,6 +68,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         this.canvasCtx.textAlign = 'center';
         this.canvasCtx.fillText(selection.getId().toString(), scaledPointPosition.x,
             scaledPointPosition.y + this.STYLE.SELECTION_FONT_SIZE * 0.25);
+        this.canvasCtx.closePath();
     }
 
     private checkDistance(point: PointSelection, x: number, y: number) {
