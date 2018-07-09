@@ -14,7 +14,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 
 revision = '617bf951f6a2'
-down_revision = 'e1d0a4fcf63c'
+down_revision = '01dc85c25335'
 branch_labels = None
 depends_on = None
 
