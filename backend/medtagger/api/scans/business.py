@@ -9,7 +9,7 @@ from PIL import Image
 
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.repositories.label_tag import LabelTagRepository
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
 from medtagger.repositories.labels import LabelsRepository
@@ -166,6 +166,7 @@ def add_label_element(element: Dict[str, Any], label_id: LabelID, files: Dict[st
         LabelTool.RECTANGLE.value: _add_rectangle_element,
         LabelTool.BRUSH.value: _add_brush_element,
         LabelTool.POINT.value: _add_point_element,
+        LabelTool.CHAIN.value: _add_chain_element,
     }
     handler = handlers[tool]
     handler(element, label_id, files)
@@ -207,6 +208,19 @@ def _add_point_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> N
     position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
     label_tag = _get_label_tag(element['tag'])
     LabelsRepository.add_new_point_label_element(label_id, position, label_tag)
+
+
+def _add_chain_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> None:
+    """Add new Chain Label Element for given Label.
+
+    :param element: JSON describing single element
+    :param label_id: ID of a given Label that the element should be added to
+    """
+    label_tag = _get_label_tag(element['tag'])
+    points = map(lambda p: Point(p['x'], p['y']), element['points'])
+    slice_index = element['slice_index']
+    loop = element['loop']
+    LabelsRepository.add_new_chain_label_element(label_id, slice_index, label_tag, points, loop)
 
 
 def _get_label_tag(tag_key: str) -> LabelTag:

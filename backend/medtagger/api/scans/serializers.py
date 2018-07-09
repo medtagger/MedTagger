@@ -17,6 +17,7 @@ elements_schema = {
             {'$ref': '#/definitions/rectangular_label_element_schema'},
             {'$ref': '#/definitions/brush_label_element_schema'},
             {'$ref': '#/definitions/point_label_element_schema'},
+            {'$ref': '#/definitions/chain_label_element_schema'},
         ],
     },
     'definitions': {
@@ -54,6 +55,29 @@ elements_schema = {
                 'tool': {'type': 'string', 'pattern': 'POINT'},
             },
             'required': ['x', 'y', 'slice_index', 'tag', 'tool'],
+            'additionalProperties': False,
+        },
+        'chain_label_element_schema': {
+            'properties': {
+                'slice_index': {'type': 'integer'},
+                'tag': {'type': 'string'},
+                'tool': {'type': 'string', 'pattern': 'CHAIN'},
+                'points': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'properties': {
+                            'x': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                            'y': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                        },
+                        'required': ['x', 'y'],
+                        'additionalProperties': False,
+                    },
+                    'minItems': 2
+                },
+                'loop': {'type': 'boolean'}
+            },
+            'required': ['points', 'slice_index', 'tag', 'tool', 'loop'],
             'additionalProperties': False,
         },
     },
