@@ -514,7 +514,7 @@ class ChainLabelElement(LabelElement):
 
 
 class ChainLabelElementPoint(Base):
-    """Definition of one point in a chain created by Chain Tool"""
+    """Definition of one point in a chain created by Chain Tool."""
 
     __tablename__ = 'ChainLabelElementPoints'
     id: PointID = Column(String, primary_key=True)
