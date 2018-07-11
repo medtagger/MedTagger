@@ -299,6 +299,7 @@ class Label(Base):
         self.status = LabelVerificationStatus.NOT_VERIFIED
         self.comment = comment
 
+
     def __repr__(self) -> str:
         """Return string representation for Label."""
         return '<{}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id,
