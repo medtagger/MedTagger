@@ -34,6 +34,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     @ViewChild('canvas')
     set viewCanvas(viewElement: ElementRef) {
         this.canvas = viewElement.nativeElement;
+        this.canvas.oncontextmenu = function (e) {
+            e.preventDefault();
+        };
     }
 
     @ViewChild('slider') slider: MatSlider;

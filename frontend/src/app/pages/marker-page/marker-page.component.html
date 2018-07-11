@@ -18,7 +18,7 @@
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('BRUSH')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('ERASER')"></mat-icon></button>
                 <button mat-mini-fab (click)="setSelector('POINT')"><mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon></button>
-                <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon></button>
+                <button mat-mini-fab (click)="setSelector('CHAIN')"><mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon></button>
             </div>

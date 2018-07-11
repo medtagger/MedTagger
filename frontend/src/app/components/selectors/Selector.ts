@@ -17,8 +17,6 @@ export interface Selector<SliceSelection> {
 
     getStateChangeEmitter(): EventEmitter<SelectionStateMessage>;
 
-    addCurrentSelection(): any;
-
     updateCurrentSlice(currentSliceId: number): any;
 
     updateCanvasPosition(canvasRect: ClientRect): any;
@@ -46,10 +44,6 @@ export interface Selector<SliceSelection> {
     updateCanvasWidth(width: number): void;
 
     updateCanvasHeight(height: number): void;
-
-    normalizeByView(paramX: number, paramY: number): {x: number, y: number};
-
-    scaleToView(paramX: number, paramY: number): {x: number, y: number};
 
     // Show selection on all slice images, return true if selection with selectionId exists
     pinSelection(selectionId: number, newValue: boolean): boolean;
