@@ -1,13 +1,13 @@
-import { AfterViewChecked, Component, Inject } from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {AfterViewChecked, Component, Inject, OnInit} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {FormBuilder, FormGroup} from '@angular/forms';
 
 @Component({
     selector: 'app-input-dialog',
     templateUrl: 'input-dialog.component.html',
     styleUrls: ['./all.dialog.scss']
 })
-export class InputDialogComponent implements AfterViewChecked {
+export class InputDialogComponent implements OnInit, AfterViewChecked {
 
     form: FormGroup;
 
