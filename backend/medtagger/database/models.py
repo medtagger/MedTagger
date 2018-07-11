@@ -510,7 +510,7 @@ class ChainLabelElement(LabelElement):
 
     def __repr__(self) -> str:
         """Return string representation for Chain Label Element."""
-        return '<{}: {}>'.format(self.__class__.__name__, self.id)
+        return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, len(self.points), self.loop)
 
 
 class ChainLabelElementPoint(Base):
@@ -542,7 +542,7 @@ class ChainLabelElementPoint(Base):
 
     def __repr__(self) -> str:
         """Return string representation for Chain Label Element Point."""
-        return '<{}: {}>'.format(self.__class__.__name__, self.id)
+        return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, self.x, self.y)
 
 
 ###########################

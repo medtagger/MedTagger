@@ -217,7 +217,7 @@ def _add_chain_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> N
     :param label_id: ID of a given Label that the element should be added to
     """
     label_tag = _get_label_tag(element['tag'])
-    points = list(map(lambda p: Point(p['x'], p['y']), element['points']))
+    points = [Point(p['x'], p['y']) for p in element['points']]
     slice_index = element['slice_index']
     loop = element['loop']
     LabelsRepository.add_new_chain_label_element(label_id, slice_index, label_tag, points, loop)
