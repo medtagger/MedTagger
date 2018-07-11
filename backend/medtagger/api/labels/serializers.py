@@ -54,6 +54,7 @@ out__label = api.inherit('Label model', out__label_status, {
         PointLabelElement: out__point_label_element,
     })),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
+    'comment': fields.String(description='Comment describing a label'),
     'status': fields.String(description='Label\'s status', enum=[status.name for status in LabelVerificationStatus]),
 })
 

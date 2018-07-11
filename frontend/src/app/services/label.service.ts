@@ -11,6 +11,7 @@ interface RandomLabelResponse {
     status: string;
     selections: Array<SliceSelection>;
     labeling_time: number;
+    comment: string;
 }
 
 @Injectable()
@@ -24,7 +25,7 @@ export class LabelService {
                 response => {
                     console.log('LabelsService | getRandomLabel | response: ', response);
                     resolve(new Label(response.label_id, response.scan_id, response.status,
-                                      selectionConverter(response.selections), response.labeling_time));
+                                      selectionConverter(response.selections), response.labeling_time, response.comment));
                 },
                 error => {
                     console.log('LabelsService | getRandomLabel | error: ', error);

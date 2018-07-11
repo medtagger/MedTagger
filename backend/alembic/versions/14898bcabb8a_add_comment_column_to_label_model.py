@@ -1,8 +1,8 @@
-"""Add comment column to label model
+"""Add comment column to Label model
 
-Revision ID: 85bad1834e93
+Revision ID: 14898bcabb8a
 Revises: 01dc85c25335
-Create Date: 2018-07-09 09:02:37.404910
+Create Date: 2018-07-11 08:38:47.487875
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '85bad1834e93'
+revision = '14898bcabb8a'
 down_revision = '01dc85c25335'
 branch_labels = None
 depends_on = None

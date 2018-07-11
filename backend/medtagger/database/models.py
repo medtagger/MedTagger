@@ -286,9 +286,9 @@ class Label(Base):
     status: LabelVerificationStatus = Column(Enum(LabelVerificationStatus), nullable=False,
                                              server_default=LabelVerificationStatus.NOT_VERIFIED.value)
 
-    comment: Optional[String] = Column(String)
+    comment: String = Column(String, nullable=True)
 
-    def __init__(self, user: User, labeling_time: LabelingTime, comment: Optional[String] = None) -> None:
+    def __init__(self, user: User, labeling_time: LabelingTime, comment: String) -> None:
         """Initialize Label.
 
         By default all of the labels are not verified
