@@ -72,7 +72,7 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Label it with Brush
+    # Step 2. Label it with Point Tool
     create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS')
     payload = {
         'elements': [{
@@ -119,7 +119,7 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Label it with Brush
+    # Step 2. Label it with Chain Tool
     create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS')
     payload = {
         'elements': [{
@@ -178,7 +178,7 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Label it with Brush
+    # Step 2. Label it with Chain Tool
     create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS')
     payload = {
         'elements': [{
