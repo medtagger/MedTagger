@@ -10,6 +10,7 @@ import {LabelListItem} from '../../model/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from '../selectors/Selector';
 import {Subscription} from 'rxjs/Subscription';
+import {LabelTag} from '../../model/LabelTag';
 
 @Component({
     selector: 'app-marker-component',
@@ -30,6 +31,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     canvas: HTMLCanvasElement;
 
     private currentSelector: Selector<SliceSelection>;
+    private currentTag: LabelTag;
 
     @ViewChild('canvas')
     set viewCanvas(viewElement: ElementRef) {
@@ -74,6 +76,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setCurrentSelector(selector: Selector<any>) {
         this.currentSelector = selector;
+    }
+
+    public setCurrentTag(tag: LabelTag) {
+        this.currentTag = tag;
     }
 
     public setDownloadScanInProgress(isInProgress: boolean) {

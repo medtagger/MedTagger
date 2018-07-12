@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 
 import {ScanService} from '../../services/scan.service';
 import {MarkerComponent} from '../../components/marker/marker.component';
-import {ScanMetadata} from '../../model/ScanMetadata';
+import {ScanCategory, ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
@@ -16,6 +16,8 @@ import {LabelTag} from '../../model/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
+import {CategoryService} from '../../services/category.service';
+import {FormControl, Validators} from '@angular/forms';
 
 
 @Component({
@@ -32,24 +34,25 @@ export class MarkerPageComponent implements OnInit {
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
 
-    // TODO: get labelling context from category
-    tags: Array<LabelTag> = [
-        new LabelTag('All', 'ALL', ['RECTANGLE'])
-    ];
-
     scan: ScanMetadata;
-    category: string;
+    category: ScanCategory;
     lastSliceID = 0;
     startTime: Date;
     selectors: Map<string, Selector<any>>;
+    tagsControl: FormControl;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private location: Location, private snackBar: MatSnackBar) {
+                private categoryService: CategoryService, private location: Location, private snackBar: MatSnackBar) {
         console.log('MarkerPage constructor', this.marker);
     }
 
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
+
+        this.tagsControl = new FormControl('', [Validators.required]);
+        this.tagsControl.markAsTouched();
+
+        this.category = this.categoryService.getCurrentCategory();
 
         this.selectors = new Map<string, Selector<any>>([
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
@@ -60,10 +63,7 @@ export class MarkerPageComponent implements OnInit {
 
         this.marker.setLabelExplorer(this.labelExplorer);
 
-        this.route.queryParamMap.subscribe(params => {
-            this.category = params.get('category') || '';
-            this.requestScan();
-        });
+        this.requestScan();
 
         this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
             console.log('MarkerPage | ngOnInit | slicesObservable: ', slice);
@@ -111,7 +111,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.scanService.getRandomScan(this.category).then(
+        this.scanService.getRandomScan(this.category.key).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
@@ -198,6 +198,10 @@ export class MarkerPageComponent implements OnInit {
         } else {
             console.warn(`MarkerPage | setSelector | Selector "${selectorName}" doesn't exist`);
         }
+    }
+
+    public setTag(tag: LabelTag) {
+        this.marker.setCurrentTag(tag);
     }
 
     public getToolIconName(iconName: string): string {

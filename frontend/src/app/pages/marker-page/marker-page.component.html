@@ -3,11 +3,12 @@
         <div class="tags">
             <h3>Available Tags</h3>
             <mat-form-field>
-                <mat-select placeholder="Current Tag" required>
-                    <mat-option *ngFor="let tag of tags" [value]="tag.key">
+                <mat-select placeholder="Current Tag" [formControl]="tagsControl" required>
+                    <mat-option *ngFor="let tag of category.tags" [value]="tag.key">
                         {{ tag.name }}
                     </mat-option>
                 </mat-select>
+                <mat-error *ngIf="tagsControl.hasError('required')">Please select Label Tag!</mat-error>
             </mat-form-field>
         </div>
 
