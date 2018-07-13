@@ -50,9 +50,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     private labelExplorer: LabelExplorerComponent;
 
-    // TODO: dynamic context and tool changes
-    private currentTaggingContext = 'ALL';
-
     private selectorSubscriptions: Array<Subscription> = [];
 
     private selectorsByName: Map<string, Selector<SliceSelection>> = new Map();
@@ -131,7 +128,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                     } else {
                         console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
                             selection.selectionId);
-                        this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTaggingContext,
+                        this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTag,
                             this.currentSelector.getSelectorName());
                     }
                 }

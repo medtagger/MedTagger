@@ -39,7 +39,7 @@ export class MarkerPageComponent implements OnInit {
     lastSliceID = 0;
     startTime: Date;
     selectors: Map<string, Selector<any>>;
-    tagsControl: FormControl;
+    categoryTags: FormControl;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private categoryService: CategoryService, private location: Location, private snackBar: MatSnackBar) {
@@ -49,16 +49,33 @@ export class MarkerPageComponent implements OnInit {
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
 
-        this.tagsControl = new FormControl('', [Validators.required]);
-        this.tagsControl.markAsTouched();
-
         this.category = this.categoryService.getCurrentCategory();
+
+        if (!this.category) {
+            this.dialogService
+                .openInfoDialog('You did not choose category properly!', 'Please choose it again!', 'Go back')
+                .afterClosed()
+                .subscribe(() => {
+                    this.location.back();
+                });
+        } else if (this.category.tags.length === 0) {
+            this.dialogService
+                .openInfoDialog('There are no tags assigned to this category!', 'Please try another category!', 'Go back')
+                .afterClosed()
+                .subscribe(() => {
+                    this.location.back();
+                });
+        }
+
+        this.categoryTags = new FormControl('', [Validators.required]);
 
         this.selectors = new Map<string, Selector<any>>([
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
             ['POINT', new PointSelector(this.marker.getCanvas())]
         ]);
+
         this.marker.setSelectors(Array.from(this.selectors.values()));
+        this.categoryTags.setValue(this.category.tags[0]);
         this.setSelector('RECTANGLE');
 
         this.marker.setLabelExplorer(this.labelExplorer);
