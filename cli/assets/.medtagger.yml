@@ -1,0 +1,45 @@
+tasks:
+  - name: Kidneys segmentation
+    key: KIDNEYS_SEGMENTATION
+    tags:
+        - name: Left Kidney
+          key: LEFT_KIDNEY
+          tools:
+              - RECTANGLE
+        - name: Right Kidney
+          key: RIGHT_KIDNEY
+          tools:
+              - RECTANGLE
+  - name: Find nodules
+    key: FIND_NODULES
+    tags:
+        - name: Nodule
+          key: NODULE
+          tools:
+              - RECTANGLE
+  - name: Find narrowings in vains
+    key: FIND_NARROWINGS
+    tags:
+        - name: Narrowing
+          key: NARROWING
+          tools:
+              - RECTANGLE
+
+datasets:
+  - name: Kidneys
+    key: KIDNEYS
+    image_path: assets/icon/kidneys_category_icon.svg
+    tasks:
+      - KIDNEYS_SEGMENTATION
+
+  - name: Lungs
+    key: LUNGS
+    image_path: assets/icon/lungs_category_icon.svg
+    tasks:
+      - FIND_NODULES
+
+  - name: Heart
+    key: HEART
+    image_path: assets/icon/heart_category_icon.svg
+    tasks:
+      - FIND_NARROWINGS

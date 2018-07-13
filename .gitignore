@@ -118,6 +118,12 @@ Temporary Items
 
 # Tools
 .vagrant/
+venv/
+
+# Build CLI
+build/
+dist/
+medtagger.egg-info/
 
 # Others
 *.log

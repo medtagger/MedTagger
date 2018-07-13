@@ -52,29 +52,17 @@ services:
   medtagger_frontend:
     image: medtagger_frontend/web
     restart: unless-stopped
-    build:
-      context: frontend
-      dockerfile: Dockerfile
-      args:
-        - PRODUCTION=${MEDTAGGER__FRONTEND_PRODUCTION}
-        - SUBDIRECTORY=${MEDTAGGER__HOST_ON_SUBDIRECTORY}
     depends_on:
       - medtagger_backend_rest
     labels:
       - "traefik.backend=medtagger_frontend"
-      - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) /$$1"
+      - "traefik.frontend.rule=PathPrefix: /; ReplacePathRegex: /(.*) /$$1"
 
   medtagger_backend_rest:
     image: medtagger_backend/rest
     restart: unless-stopped
     env_file:
-      - ./backend/docker/backend.env
-    build:
-      context: backend
-      dockerfile: docker/Dockerfile_rest
-      args:
-        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
-        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+      - ./medtagger.env
     depends_on:
       - cassandra
       - rabbitmq
@@ -86,19 +74,13 @@ services:
       - ${PWD}/.medtagger.yml:/medtagger_backend/.medtagger.yml
     labels:
       - "traefik.backend=medtagger_backend_rest"
-      - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}api/v1/,${MEDTAGGER__HOST_ON_SUBDIRECTORY}swaggerui/; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) /$$1"
+      - "traefik.frontend.rule=PathPrefix: /api/v1/,/swaggerui/; ReplacePathRegex: /(.*) /$$1"
 
   medtagger_backend_websocket:
     image: medtagger_backend/websocket
     restart: unless-stopped
     env_file:
-      - ./backend/docker/backend.env
-    build:
-      context: backend
-      dockerfile: docker/Dockerfile_websocket
-      args:
-        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
-        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+      - ./medtagger.env
     depends_on:
       - cassandra
       - rabbitmq
@@ -110,19 +92,13 @@ services:
       - "traefik.backend=medtagger_backend_websocket"
       - "traefik.backend.loadbalancer.stickiness=true"
       - "traefik.backend.loadbalancer.stickiness.cookieName=MEDTAGER_WEBSOCKET_NODE"
-      - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}socket.io; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) /$$1"
+      - "traefik.frontend.rule=PathPrefix: /socket.io; ReplacePathRegex: /(.*) /$$1"
 
   medtagger_backend_worker:
     image: medtagger_backend/worker
     restart: unless-stopped
     env_file:
-      - ./backend/docker/backend.env
-    build:
-      context: backend
-      dockerfile: docker/Dockerfile_worker
-      args:
-        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
-        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+      - ./medtagger.env
     depends_on:
       - cassandra
       - rabbitmq
@@ -136,13 +112,7 @@ services:
   medtagger_backend_database_migrations:
     image: medtagger_backend/database_migrations
     env_file:
-      - ./backend/docker/backend.env
-    build:
-      context: backend
-      dockerfile: docker/Dockerfile_database_migrations
-      args:
-        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
-        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+      - ./medtagger.env
     depends_on:
       - cassandra
       - rabbitmq
