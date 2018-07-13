@@ -218,6 +218,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public setTag(tag: LabelTag) {
+        console.log("TAG",tag);
         this.marker.setCurrentTag(tag);
     }
 
