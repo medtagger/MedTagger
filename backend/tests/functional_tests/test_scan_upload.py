@@ -4,6 +4,8 @@ import glob
 import json
 from typing import Any
 
+import pytest
+from cassandra import WriteTimeout
 from PIL import Image
 
 from medtagger.database.models import SliceOrientation
@@ -56,3 +58,46 @@ def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery
     # x_slice = SlicesRepository.get_slice_converted_image(x_slices[128].id)
     # x_slice_image = Image.open(io.BytesIO(x_slice))
     # assert x_slice_image.size == (256, 186)
+
+
+@pytest.fixture
+def fixture_problems_with_storage(mocker: Any) -> Any:
+    """Fixture that mocks method related to storing original image in Cassandra."""
+    return mocker.patch.object(SlicesRepository, 'store_original_image')
+
+
+def test_scan_upload_with_retrying(fixture_problems_with_storage: Any, prepare_environment: Any,
+                                   synchronous_celery: Any) -> None:
+    """Test application for Scan upload with retrying."""
+    api_client = get_api_client()
+    user_token = get_token_for_logged_in_user('admin')
+
+    # Step 1. Add Scan to the system
+    payload = {'category': 'LUNGS', 'number_of_slices': 3}
+    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+                               headers=get_headers(token=user_token, json=True))
+    json_response = json.loads(response.data)
+    scan_id = json_response['scan_id']
+
+    # Step 2. Send Slices
+    for file in glob.glob('tests/assets/example_scan/*.dcm'):
+        with open(file, 'rb') as image:
+            # First request to the API will fail with unknown error due to Storage issues
+            fixture_problems_with_storage.side_effect = WriteTimeout('Internal Storage Error', write_type=0)
+            response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
+                'image': (image, 'slice_1.dcm'),
+            }, headers=get_headers(token=user_token, multipart=True))
+            assert response.status_code == 500
+
+            # After such error, UI will retry the request (this time it will be fine...)
+            # As request will close the image file, we've got to open it again
+            with open(file, 'rb') as image:
+                fixture_problems_with_storage.side_effect = None
+                response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
+                    'image': (image, 'slice_1.dcm'),
+                }, headers=get_headers(token=user_token, multipart=True))
+                assert response.status_code == 201
+
+    # Step 3. Check number of Slices in the databases
+    z_slices = SlicesRepository.get_slices_by_scan_id(scan_id)
+    assert len(z_slices) == 3

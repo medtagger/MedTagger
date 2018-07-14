@@ -3,11 +3,12 @@ import io
 import logging
 from typing import Callable, Iterable, Dict, List, Tuple, Any
 
+from cassandra import WriteTimeout
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
-from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
+from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException, InternalErrorException
 from medtagger.repositories.label_tag import LabelTagRepository
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
@@ -240,7 +241,11 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     """
     scan = ScansRepository.get_scan_by_id(scan_id)
     _slice = scan.add_slice()
-    SlicesRepository.store_original_image(_slice.id, image)
+    try:
+        SlicesRepository.store_original_image(_slice.id, image)
+    except WriteTimeout:
+        SlicesRepository.delete_slice_by_id(_slice.id)
+        raise InternalErrorException('Timeout during saving original image to the Storage.')
     parse_dicom_and_update_slice.delay(_slice.id)
     return _slice
 
