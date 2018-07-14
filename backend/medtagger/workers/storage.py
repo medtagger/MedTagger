@@ -10,8 +10,7 @@ from medtagger.dicoms import read_int, read_float, read_list
 from medtagger.types import ScanID, SliceID, SlicePosition, SliceLocation
 from medtagger.workers import celery_app
 from medtagger.workers.conversion import convert_scan_to_png
-from medtagger.repositories.scans import ScansRepository
-from medtagger.repositories.slices import SlicesRepository
+from medtagger.repositories import scans as ScansRepository, slices as SlicesRepository
 
 logger = get_task_logger(__name__)
 

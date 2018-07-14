@@ -140,14 +140,13 @@ export class ScanService {
                 .pipe(
                     retryWhen((error: Observable<HttpErrorResponse>) => {
                         return error.pipe(
-                            flatMap((scanRequestError: HttpErrorResponse) => {
+                            map((scanRequestError: HttpErrorResponse) => {
                                 console.warn('Retrying request for creating new Scan (attempt: ' + (++retryAttempt) + ').');
-                                return of(scanRequestError.status).pipe(
-                                    delay(5000), // Let's give it a try after 5 seconds
-                                    take(5), // Let's give it 5 retries (each after 5 seconds)
-                                    concat(observableThrowError({error: 'Cannot create new Scan.'}))
-                                );
+                                return of(scanRequestError.status);
                             }),
+                            delay(5000), // Let's give it a try after 5 seconds
+                            take(5), // Let's give it 5 retries (each after 5 seconds)
+                            concat(observableThrowError({error: 'Cannot create new Scan.'}))
                         );
                     })
                 ).toPromise().then(
@@ -166,7 +165,7 @@ export class ScanService {
 
         return from(files).pipe(
             map((file: File) => {
-                console.log('uploading...', file);
+                console.log('Uploading file...', file);
                 let retryAttempt = 0;
                 const form = new FormData();
                 form.append('image', file, file.name);
@@ -175,16 +174,14 @@ export class ScanService {
                         .pipe(
                             retryWhen((error: Observable<HttpErrorResponse>) => {
                                 return error.pipe(
-                                    flatMap((uploadRequestError: HttpErrorResponse) => {
+                                    map((uploadRequestError: HttpErrorResponse) => {
                                         console.warn('Retrying request for uploading a single Slice ('
                                             + file.name + ', attempt: ' + (++retryAttempt) + ').');
-                                        return of(uploadRequestError.status).pipe(
-                                            delay(5000),  // Let's give it a try after 5 seconds
-                                            take(5),  // Let's give it 5 retries (each after 5 seconds)
-                                            concat(observableThrowError({error: 'Cannot upload Slice ' + file.name}))
-                                            // TODO: use some new way of dealing with
-                                        );
-                                    })
+                                        return of(uploadRequestError.status);
+                                    }),
+                                    delay(5000),  // Let's give it a try after 5 seconds
+                                    take(5),  // Let's give it 5 retries (each after 5 seconds)
+                                    concat(observableThrowError({error: 'Cannot upload Slice ' + file.name}))
                                 );
                             })
                         )
