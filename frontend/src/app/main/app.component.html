@@ -15,7 +15,7 @@
                     <mat-icon matListIcon>apps</mat-icon>
                     <h3 matLine>Home</h3>
                 </a>
-                <a mat-list-item routerLink="{{ currentUser.settings.skipTutorial ? '/labelling/choose-category' : '/labelling/tutorial' }}" (click)="sidenav.close()">
+                <a mat-list-item routerLink="{{ currentUser.settings.skipTutorial ? '/labelling/choose-task' : '/labelling/tutorial' }}" (click)="sidenav.close()">
                     <mat-icon matListIcon>label_outline</mat-icon>
                     <h3 matLine>Labelling</h3>
                 </a>

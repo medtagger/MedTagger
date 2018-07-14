@@ -73,24 +73,56 @@ class ScanCategories(Resource):
         return business.create_scan_category(key, name, image_path), 201
 
 
+@scans_ns.route('/tasks')
+class Tasks(Resource):
+    """Endpoint that manages tasks."""
+
+    @staticmethod
+    @login_required
+    @scans_ns.marshal_with(serializers.out__task)
+    @scans_ns.doc(security='token')
+    @scans_ns.doc(description='Return all available tasks.')
+    @scans_ns.doc(responses={200: 'Success'})
+    def get() -> Any:
+        """Return all available tasks."""
+        return business.get_tasks()
+
+    @staticmethod
+    @login_required
+    @role_required('doctor', 'admin')
+    @scans_ns.expect(serializers.in__task)
+    @scans_ns.marshal_with(serializers.in__scan_category)
+    @scans_ns.doc(security='token')
+    @scans_ns.doc(description='Create new Scan Category.')
+    @scans_ns.doc(responses={201: 'Success'})
+    def post() -> Any:
+        """Create Scan Category."""
+        payload = request.json
+        key = payload['key']
+        name = payload['name']
+        image_path = payload['image_path']
+
+        return business.create_tast(key, name, image_path), 201
+
+
 @scans_ns.route('/random')
 class Random(Resource):
-    """Endpoint that returns random scan for labeling."""
+    """Endpoint that returns random scan for labeling from specified task."""
 
     @staticmethod
     @login_required
     @scans_ns.expect(serializers.args__random_scan)
     @scans_ns.marshal_with(serializers.out__scan)
     @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Returns random scan.')
+    @scans_ns.doc(description='Returns random scan from task.')
     @scans_ns.doc(responses={200: 'Success', 400: 'Invalid arguments', 404: 'No Scans available'})
     def get() -> Any:
         """Return random Scan."""
         args = serializers.args__random_scan.parse_args(request)
-        category_key = args.category
-        if not business.scan_category_is_valid(category_key):
-            raise InvalidArgumentsException('Category "{}" is not available.'.format(category_key))
-        return business.get_random_scan(category_key)
+        task_key = args.task
+        if not business.task_key_is_valid(task_key):
+            raise InvalidArgumentsException('Task "{}" is not available.'.format(task_key))
+        return business.get_random_scan(task_key)
 
 
 @scans_ns.route('/<string:scan_id>/label')

@@ -103,11 +103,26 @@ out__label_tag = api.model('Label Tag model', {
     'actions_ids': fields.List(fields.Integer(), attribute=lambda category: [action.id for action in category.actions]),
 })
 
-out__scan_category = api.model('Scan Category model', {
+out__task = api.model('Task model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
     'tags': fields.List(fields.Nested(out__label_tag), attribute='available_tags'),
+})
+
+out__scan_category = api.model('Scan Category model', {
+    'key': fields.String(),
+    'name': fields.String(),
+    'image_path': fields.String(),
+    'tasks': fields.List(fields.Nested(out__task))
+})
+
+in__task = api.model('New Task model', {
+    'key': fields.String(),
+    'name': fields.String(),
+    'image_path': fields.String(),
+    'tags': fields.List(fields.Nested(out__label_tag)),
+    'categories': fields.List(fields.String())
 })
 
 out__scan = api.model('Scan model', {
@@ -137,4 +152,4 @@ out__new_slice = api.model('Newly created Slice model', {
 })
 
 args__random_scan = reqparse.RequestParser()
-args__random_scan.add_argument('category', type=str, required=True, help='Scan\'s category')
+args__random_scan.add_argument('task', type=str, required=True, help='Task\'s key')

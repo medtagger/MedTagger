@@ -1,12 +1,16 @@
+import {Task} from "./Task";
+
 export class ScanCategory {
     key: string;
     name: string;
     imagePath: string;
+    tasks: Array<Task>;
 
-    constructor(key: string, name: string, imagePath: string) {
+    constructor(key: string, name: string, imagePath: string, tasks: Array<Task>) {
         this.key = key;
         this.name = name;
         this.imagePath = imagePath;
+        this.tasks = tasks;
     }
 }
 

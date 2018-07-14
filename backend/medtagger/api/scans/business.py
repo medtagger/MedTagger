@@ -10,12 +10,13 @@ from PIL import Image
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.repositories.label_tag import LabelTagRepository
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
-from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
+from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation, Task
 from medtagger.definitions import LabelTool
 from medtagger.repositories.labels import LabelsRepository
 from medtagger.repositories.slices import SlicesRepository
 from medtagger.repositories.scans import ScansRepository
 from medtagger.repositories.scan_categories import ScanCategoriesRepository
+from medtagger.repositories import tasks as TasksRepository
 from medtagger.workers.storage import parse_dicom_and_update_slice
 from medtagger.api.utils import get_current_user
 
@@ -45,6 +46,19 @@ def scan_category_is_valid(category_key: str) -> bool:
         return False
 
 
+def task_key_is_valid(task_key: str) -> bool:
+    """Check if Task for such key exists.
+
+    :param task_key: key representing Task
+    :return: boolean information if Task key is valid
+    """
+    try:
+        TasksRepository.get_task_by_key(task_key)
+        return True
+    except NoResultFound:
+        return False
+
+
 def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
     """Create new Scan ScanCategory.
 
@@ -68,21 +82,33 @@ def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan
     return ScansRepository.add_new_scan(category, declared_number_of_slices, user)
 
 
-def get_random_scan(category_key: str) -> Scan:
-    """Fetch random scan for labeling.
+def get_random_scan(task_key: str) -> Scan:
+    """Fetch random scan from specified Task for labeling.
 
-    :param category_key: unique key identifying category
+    :param task_key: unique key identifying task
     :return: Scan Metadata object
     """
     user = get_current_user()
-    category = ScanCategoriesRepository.get_category_by_key(category_key)
+    task = TasksRepository.get_task_by_key(task_key)
     try:
-        scan = ScansRepository.get_random_scan(category, user)
+        scan = ScansRepository.get_random_scan(task, user)
         if not scan:
-            raise NotFoundException('Could not find any Scan for this category!')
+            raise NotFoundException('Could not find any Scan for this task!')
         return scan
     except NoResultFound:
-        raise NotFoundException('Could not find any Scan for this category!')
+        raise NotFoundException('Could not find any Scan for this task!')
+
+
+def get_tasks() -> List[Task]:
+    """Fetch all tasks.
+
+    :return: list of tasks
+    """
+    return TasksRepository.get_all_tasks()
+
+
+def create_tast(key: str, name: str, image_path: str) -> Task:
+    return TasksRepository.add_task(key, name, image_path)
 
 
 def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,

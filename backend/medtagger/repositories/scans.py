@@ -4,7 +4,7 @@ from typing import Optional, List
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, Scan, Slice, User, Label
+from medtagger.database.models import ScanCategory, Scan, Slice, User, Label, Task
 from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.types import ScanID
 
@@ -23,17 +23,18 @@ class ScansRepository(object):
         return Scan.query.filter(Scan.id == scan_id).one()
 
     @staticmethod
-    def get_random_scan(category: ScanCategory = None, user: User = None) -> Scan:
-        """Fetch random Scan from database.
+    def get_random_scan(task: Task = None, user: User = None) -> Scan:
+        """Fetch random Scan from all database or from specified task.
+        If user provided,fetch only scan that isn't labeled by this user.
 
-        :param category: (optional) Scan's Category object
+        :param task: (optional) Task from which scan should be fetched
         :param user: (optional) User for which Scan should be randomized
         :return: Label object
         """
         query = Scan.query
-        if category:
-            query = query.join(ScanCategory)
-            query = query.filter(ScanCategory.key == category.key)
+        if task:
+            query = query.join(Scan).join(Task)
+            query = query.filter(Task.key == task.key)
         if user:
             labelled_scans = Label.query.filter(Label.owner == user).all()
             labelled_scans_ids = [label.scan_id for label in labelled_scans]

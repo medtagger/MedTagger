@@ -38,7 +38,7 @@ export class MarkerPageComponent implements OnInit {
     ];
 
     scan: ScanMetadata;
-    category: string;
+    task: string;
     lastSliceID = 0;
     startTime: Date;
     selectors: Map<string, Selector<any>>;
@@ -61,7 +61,7 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setLabelExplorer(this.labelExplorer);
 
         this.route.queryParamMap.subscribe(params => {
-            this.category = params.get('category') || '';
+            this.task = params.get('task') || '';
             this.requestScan();
         });
 
@@ -111,7 +111,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.scanService.getRandomScan(this.category).then(
+        this.scanService.getRandomScan(this.task).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
