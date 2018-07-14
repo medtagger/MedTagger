@@ -95,6 +95,7 @@ def add_new_point_label_element(label_id: LabelID, position: LabelPosition, labe
 
     return point_label_element.id
 
+
 def add_new_chain_label_element(label_id: LabelID, slice_index: int, label_tag: LabelTag, points: List[Point],
                                 loop: bool) -> LabelElementID:
     """Add new Chain Element for given Label.
