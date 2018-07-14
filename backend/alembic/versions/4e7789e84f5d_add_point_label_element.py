@@ -9,8 +9,6 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ENUM
 
-from medtagger.storage import create_session
-
 
 # revision identifiers, used by Alembic.
 revision = '4e7789e84f5d'
@@ -19,7 +17,6 @@ branch_labels = None
 depends_on = None
 
 
-session = create_session()
 old_label_tool_enum = ENUM('RECTANGLE', 'BRUSH',  name='label_tool', create_type=False)
 tmp_label_tool_enum = ENUM('RECTANGLE', 'BRUSH', 'POINT', name='label_tool_', create_type=False)
 new_label_tool_enum = ENUM('RECTANGLE', 'BRUSH', 'POINT', name='label_tool', create_type=False)
@@ -52,7 +49,7 @@ def downgrade():
     label_elements_table = sa.sql.table('LabelElements', sa.Column('tool', new_label_tool_enum, nullable=False))
     op.execute(label_elements_table.delete().where(label_elements_table.c.tool == 'POINT'))
 
-    # Remove Brush as available Tool
+    # Remove Point as available Tool
     tmp_label_tool_enum.create(op.get_bind(), checkfirst=False)
     op.execute('ALTER TABLE "LabelElements" ALTER COLUMN tool TYPE label_tool_ USING tool::text::label_tool_')
     new_label_tool_enum.drop(op.get_bind(), checkfirst=False)
