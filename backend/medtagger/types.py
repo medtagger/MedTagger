@@ -7,12 +7,15 @@ SliceID = NewType('SliceID', str)
 LabelID = NewType('LabelID', str)
 LabelElementID = NewType('LabelElementID', str)
 LabelTagID = NewType('LabelTagID', int)
+PointID = NewType('PointID', str)
 
 SliceLocation = NewType('SliceLocation', float)
 SlicePosition = NamedTuple('SlicePosition', [('x', float), ('y', float), ('z', float)])
 
 LabelPosition = NamedTuple('LabelPosition', [('x', float), ('y', float), ('slice_index', int)])
 LabelShape = NamedTuple('LabelShape', [('width', float), ('height', float)])
+
+Point = NamedTuple('Point', [('x', float), ('y', float)])
 
 LabelingTime = NewType('LabelingTime', float)
 

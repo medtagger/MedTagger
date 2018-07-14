@@ -10,3 +10,6 @@ requirements:
 
 # set a global prefix for PRs
 pr_prefix: "[Backend Dependencies Update]"
+
+# add a label to pull requests, default is not set
+label_prs: Under%20Review%20%EF%B8%8F
