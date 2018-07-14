@@ -5,10 +5,10 @@ from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
 from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement, BrushLabelElement, \
-    PointLabelElement
+    PointLabelElement, ChainLabelElement, ChainLabelElementPoint
 from medtagger.definitions import LabelVerificationStatus
 from medtagger.storage.models import BrushLabelElement as BrushLabelElementStorage
-from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime
+from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime, Point
 
 
 def get_all_labels() -> List[Label]:
@@ -94,3 +94,25 @@ def add_new_point_label_element(label_id: LabelID, position: LabelPosition, labe
         session.add(point_label_element)
 
     return point_label_element.id
+
+def add_new_chain_label_element(label_id: LabelID, slice_index: int, label_tag: LabelTag, points: List[Point],
+                                loop: bool) -> LabelElementID:
+    """Add new Chain Element for given Label.
+
+    :param label_id: Label's ID
+    :param slice_index: Slice's index
+    :param label_tag: Label Tag object
+    :param points: array of points where points with consecutive indices are connected
+    :param loop: true if first and last points are connected
+    :return: ID of a Element
+    """
+    with db_session() as session:
+        chain_label_element = ChainLabelElement(slice_index, label_tag, loop)
+        chain_label_element.label_id = label_id
+        session.add(chain_label_element)
+
+        for order, point in enumerate(points):
+            chain_label_element_point = ChainLabelElementPoint(point.x, point.y, chain_label_element.id, order)
+            session.add(chain_label_element_point)
+
+    return chain_label_element.id
