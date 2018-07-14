@@ -4,13 +4,15 @@ import json
 from typing import Dict, List  # pylint: disable=unused-import
 
 from medtagger.definitions import LabelTool
-from medtagger.repositories.roles import RolesRepository
-from medtagger.repositories.users import UsersRepository
-from medtagger.repositories.scans import ScansRepository
-from medtagger.repositories.slices import SlicesRepository
-from medtagger.repositories.labels import LabelsRepository
-from medtagger.repositories.label_tag import LabelTagRepository
-from medtagger.repositories.scan_categories import ScanCategoriesRepository
+from medtagger.repositories import (
+    roles as RolesRepository,
+    users as UsersRepository,
+    scans as ScansRepository,
+    slices as SlicesRepository,
+    labels as LabelsRepository,
+    label_tags as LabelTagsRepository,
+    scan_categories as ScanCategoriesRepository,
+)
 
 BACKUP_DIRECTORY = 'medtagger_backup/'
 SCANS_DIRECTORY = BACKUP_DIRECTORY + 'dicoms/'
@@ -77,7 +79,7 @@ for scan_category in ScanCategoriesRepository.get_all_categories():
         } for label_tag in scan_category.available_tags],
     })
 print('\nFetching Label Tags...')
-for label_tag in LabelTagRepository.get_all_tags():
+for label_tag in LabelTagsRepository.get_all_tags():
     print('Saving Label Tag: {}'.format(label_tag.key))
     _scans['label_tags'].append({
         'id': label_tag.id,

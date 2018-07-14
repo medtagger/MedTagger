@@ -4,12 +4,11 @@ from typing import Dict
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.types import LabelID, ActionID
+from medtagger.exceptions import InvalidResponseException, UnsupportedActionException
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.database.models import Label, Action, ActionResponse
 from medtagger.definitions import LabelVerificationStatus
-from medtagger.repositories.labels import LabelsRepository
-from medtagger.repositories.actions import ActionsRepository, InvalidResponseException, \
-    UnsupportedActionException
+from medtagger.repositories import labels as LabelsRepository, actions as ActionsRepository
 
 
 def get_label(label_id: LabelID) -> Label:

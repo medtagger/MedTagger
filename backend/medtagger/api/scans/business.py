@@ -9,14 +9,16 @@ from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException, InternalErrorException
-from medtagger.repositories.label_tag import LabelTagRepository
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
-from medtagger.repositories.labels import LabelsRepository
-from medtagger.repositories.slices import SlicesRepository
-from medtagger.repositories.scans import ScansRepository
-from medtagger.repositories.scan_categories import ScanCategoriesRepository
+from medtagger.repositories import (
+    labels as LabelsRepository,
+    label_tags as LabelTagsRepository,
+    slices as SlicesRepository,
+    scans as ScansRepository,
+    scan_categories as ScanCategoriesRepository,
+)
 from medtagger.workers.storage import parse_dicom_and_update_slice
 from medtagger.api.utils import get_current_user
 
@@ -227,7 +229,7 @@ def _add_chain_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> N
 def _get_label_tag(tag_key: str) -> LabelTag:
     """Return Label Tag based on Tag's key or raise an exception in case if not found."""
     try:
-        return LabelTagRepository.get_label_tag_by_key(tag_key)
+        return LabelTagsRepository.get_label_tag_by_key(tag_key)
     except NoResultFound:
         raise NotFoundException('Could not find any Label Tag for that key!')
 
