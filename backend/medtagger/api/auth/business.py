@@ -2,8 +2,7 @@
 from medtagger.api import InvalidArgumentsException
 from medtagger.api.security import hash_password, verify_user_password, generate_auth_token
 from medtagger.database.models import User
-from medtagger.repositories.roles import RolesRepository
-from medtagger.repositories.users import UsersRepository
+from medtagger.repositories import roles as RolesRepository, users as UsersRepository
 
 
 def create_user(email: str, password: str, first_name: str, last_name: str) -> int:

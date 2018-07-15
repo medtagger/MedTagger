@@ -13,7 +13,7 @@ from medtagger.api.rest import app
 from medtagger.database import Base, session, db_session
 from medtagger.database.fixtures import apply_all_fixtures
 from medtagger.storage import models
-from medtagger.repositories.roles import RolesRepository
+from medtagger.repositories import roles as RolesRepository
 
 logger = logging.getLogger(__name__)
 

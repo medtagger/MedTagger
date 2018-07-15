@@ -192,6 +192,7 @@ class Scan(Base):
         random_slice = Slice.query.filter(and_(
             Slice.scan_id == self.id,
             Slice.orientation == SliceOrientation.Z,
+            Slice.width.isnot(None),  # type: ignore  # "int" has no attribute "isnot"
         )).first()
         return random_slice.width if random_slice else None
 
@@ -201,6 +202,7 @@ class Scan(Base):
         random_slice = Slice.query.filter(and_(
             Slice.scan_id == self.id,
             Slice.orientation == SliceOrientation.Z,
+            Slice.height.isnot(None),  # type: ignore  # "int" has no attribute "isnot"
         )).first()
         return random_slice.height if random_slice else None
 

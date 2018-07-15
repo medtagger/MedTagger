@@ -14,8 +14,7 @@ from medtagger.workers import celery_app
 from medtagger.conversion import convert_slice_to_normalized_8bit_array, convert_scan_to_normalized_8bit_array
 from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.database.models import SliceOrientation, Slice, Scan
-from medtagger.repositories.scans import ScansRepository
-from medtagger.repositories.slices import SlicesRepository
+from medtagger.repositories import scans as ScansRepository, slices as SlicesRepository
 
 logger = get_task_logger(__name__)
 
