@@ -1,36 +1,22 @@
-import {AfterViewChecked, Component, Inject, OnInit} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 
 @Component({
     selector: 'app-input-dialog',
     templateUrl: 'input-dialog.component.html',
     styleUrls: ['./all.dialog.scss']
 })
-export class InputDialogComponent implements OnInit, AfterViewChecked {
+export class InputDialogComponent {
 
-    form: FormGroup;
+    userInput = new FormControl('', []);
 
-    constructor(private formBuilder: FormBuilder,
-                private dialogRef: MatDialogRef<InputDialogComponent>,
+    constructor(private dialogRef: MatDialogRef<InputDialogComponent>,
                 @Inject(MAT_DIALOG_DATA) public data: { title: string, content: string, buttonText: string }) {
     }
 
-    ngOnInit() {
-        this.form = this.formBuilder.group({
-            userInput: ''
-        });
-    }
-
-    ngAfterViewChecked() {
-        setTimeout(() => {
-            document.getElementById('userInput').focus();
-        }, 500);
-    }
-
-    closeDialog(form): void {
-        let input = form.value.userInput ? form.value.userInput : '';
-        input = input.trim();
+    closeDialog(): void {
+        let input = this.userInput.value ? this.userInput.value.trim() : '';
         this.dialogRef.close(`${input}`);
     }
 }

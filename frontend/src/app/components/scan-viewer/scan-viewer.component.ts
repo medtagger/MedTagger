@@ -48,7 +48,11 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     protected selectors: Array<Selector<SliceSelection>>;
 
-    constructor() {}
+    focusable: boolean;
+
+    constructor() {
+        this.focusable = true;
+    }
 
     @HostListener('window:resize', ['$event'])
     onResize() {
@@ -69,7 +73,18 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public sliderFocus() {
-        this.slider._elementRef.nativeElement.focus();
+        if(this.focusable) {
+            this.slider._elementRef.nativeElement.focus();
+        }
+    }
+
+    public setFocusable(focusable: boolean) {
+        this.focusable = focusable;
+        if(!this.focusable) {
+            this.slider._elementRef.nativeElement.focus();
+        } else {
+            this.slider._elementRef.nativeElement.blur();
+        }
     }
 
     public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {

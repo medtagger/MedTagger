@@ -146,10 +146,11 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
+        this.marker.setFocusable(false);
         this.dialogService.openInputDialog('Send label', 'If you\'d like, you can add a comment to the label below:',
             'Send label').afterClosed().subscribe(comment => {
-            console.log(comment);
             this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()), comment);
+            this.marker.setFocusable(true);
         });
     }
 
