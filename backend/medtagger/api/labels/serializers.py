@@ -2,7 +2,7 @@
 from flask_restplus import fields
 
 from medtagger.api import api
-from medtagger.database.models import RectangularLabelElement, BrushLabelElement, PointLabelElement
+from medtagger.database.models import RectangularLabelElement, BrushLabelElement, PointLabelElement, ChainLabelElement
 from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
 
 
@@ -41,6 +41,14 @@ out__point_label_element = api.inherit('Point Label Element model', out__common_
     'y': fields.Float(description='Element\'s Y position', min=0.0, max=1.0),
 })
 
+out__chain_label_element = api.inherit('Chain Label Element model', out__common_label_element, {
+    'loop': fields.Boolean(description='True if first and last points are connected'),
+    'points': fields.List(fields.Nested({
+        'x': fields.Float(description='X position', min=0.0, max=1.0),
+        'y': fields.Float(description='Y position', min=0.0, max=1.0),
+    }), description='Points of chain'),
+})
+
 out__label_status = api.model('Label status and ID', {
     'label_id': fields.String(description='Label\'s ID', attribute='id'),
     'status': fields.String(description='Status of the label', attribute='status.name'),
@@ -52,6 +60,7 @@ out__label = api.inherit('Label model', out__label_status, {
         RectangularLabelElement: out__rectangular_label_element,
         BrushLabelElement: out__brush_label_element,
         PointLabelElement: out__point_label_element,
+        ChainLabelElement: out__chain_label_element,
     })),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
     'comment': fields.String(description='Comment describing a label'),

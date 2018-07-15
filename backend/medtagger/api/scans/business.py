@@ -3,19 +3,22 @@ import io
 import logging
 from typing import Callable, Iterable, Dict, List, Tuple, Any
 
+from cassandra import WriteTimeout
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
-from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
-from medtagger.repositories.label_tag import LabelTagRepository
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID
+from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException, InternalErrorException
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
-from medtagger.repositories.labels import LabelsRepository
-from medtagger.repositories.slices import SlicesRepository
-from medtagger.repositories.scans import ScansRepository
-from medtagger.repositories.scan_categories import ScanCategoriesRepository
+from medtagger.repositories import (
+    labels as LabelsRepository,
+    label_tags as LabelTagsRepository,
+    slices as SlicesRepository,
+    scans as ScansRepository,
+    scan_categories as ScanCategoriesRepository,
+)
 from medtagger.workers.storage import parse_dicom_and_update_slice
 from medtagger.api.utils import get_current_user
 
@@ -167,6 +170,7 @@ def add_label_element(element: Dict[str, Any], label_id: LabelID, files: Dict[st
         LabelTool.RECTANGLE.value: _add_rectangle_element,
         LabelTool.BRUSH.value: _add_brush_element,
         LabelTool.POINT.value: _add_point_element,
+        LabelTool.CHAIN.value: _add_chain_element,
     }
     handler = handlers[tool]
     handler(element, label_id, files)
@@ -210,10 +214,23 @@ def _add_point_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> N
     LabelsRepository.add_new_point_label_element(label_id, position, label_tag)
 
 
+def _add_chain_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> None:
+    """Add new Chain Label Element for given Label.
+
+    :param element: JSON describing single element
+    :param label_id: ID of a given Label that the element should be added to
+    """
+    label_tag = _get_label_tag(element['tag'])
+    points = [Point(p['x'], p['y']) for p in element['points']]
+    slice_index = element['slice_index']
+    loop = element['loop']
+    LabelsRepository.add_new_chain_label_element(label_id, slice_index, label_tag, points, loop)
+
+
 def _get_label_tag(tag_key: str) -> LabelTag:
     """Return Label Tag based on Tag's key or raise an exception in case if not found."""
     try:
-        return LabelTagRepository.get_label_tag_by_key(tag_key)
+        return LabelTagsRepository.get_label_tag_by_key(tag_key)
     except NoResultFound:
         raise NotFoundException('Could not find any Label Tag for that key!')
 
@@ -227,7 +244,11 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     """
     scan = ScansRepository.get_scan_by_id(scan_id)
     _slice = scan.add_slice()
-    SlicesRepository.store_original_image(_slice.id, image)
+    try:
+        SlicesRepository.store_original_image(_slice.id, image)
+    except WriteTimeout:
+        SlicesRepository.delete_slice_by_id(_slice.id)
+        raise InternalErrorException('Timeout during saving original image to the Storage.')
     parse_dicom_and_update_slice.delay(_slice.id)
     return _slice
 
