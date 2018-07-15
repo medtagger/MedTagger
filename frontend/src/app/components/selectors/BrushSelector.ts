@@ -37,7 +37,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     drawSelection(selection: BrushSelection, color: string): any {
         console.log('BrushSelector | drawSelection | selection: ', selection);
 
-        selection.getSelectionLayer().then( (selectionLayerImage: HTMLImageElement)=> {
+        selection.getSelectionLayer().then( (selectionLayerImage: HTMLImageElement) => {
             this.canvasCtx.drawImage(selectionLayerImage, 0, 0, this.canvasSize.width, this.canvasSize.height);
         }, (error: Error) => {
             console.error('Error while drawing brush selections!: ', error);

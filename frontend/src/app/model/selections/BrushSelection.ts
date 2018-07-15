@@ -20,9 +20,9 @@ export class BrushSelection extends SliceSelection {
     }
 
     public getSelectionLayer(): Promise<HTMLImageElement | Error> {
-        return this.isReady.then( ()=> {
+        return this.isReady.then( () => {
             return this._selectionLayer;
-        }).catch( ()=> {
+        }).catch( () => {
             return new Error('Cannot load image (BrushSelection)');
         });
     }
