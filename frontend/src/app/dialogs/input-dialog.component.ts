@@ -1,6 +1,6 @@
-import {Component, Inject} from '@angular/core';
+import {AfterViewChecked, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {FormControl} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
 
 @Component({
     selector: 'app-input-dialog',
@@ -16,7 +16,7 @@ export class InputDialogComponent {
     }
 
     closeDialog(): void {
-        const input = this.userInput.value ? this.userInput.value.trim() : '';
+        let input = this.userInput.value ? this.userInput.value.trim() : '';
         this.dialogRef.close(`${input}`);
     }
 }

@@ -11,7 +11,7 @@ from medtagger.storage.models import BrushLabelElement as BrushLabelElementStora
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime
 
 
-class LabelsRepository:
+class LabelsRepository(object):
     """Repository for Labels."""
 
     @staticmethod

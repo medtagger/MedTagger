@@ -5,7 +5,7 @@ from medtagger.database import db_session
 from medtagger.database.models import User
 
 
-class UsersRepository:
+class UsersRepository(object):
     """Repository for Users."""
 
     @staticmethod
