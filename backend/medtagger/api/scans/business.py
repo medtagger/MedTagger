@@ -138,14 +138,14 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
 
 
 def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, bytes],
-              labeling_time: LabelingTime, comment: str) -> Label:
+              labeling_time: LabelingTime, comment: str = None) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
     :param elements: List of JSONs describing elements for a single label
     :param files: mapping of uploaded files (name and content)
     :param labeling_time: time in seconds that user spent on labeling
-    :param comment: comment describing a label
+    :param comment: (optional) comment describing a label
     :return: Label object
     """
     user = get_current_user()

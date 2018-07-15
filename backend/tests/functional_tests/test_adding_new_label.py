@@ -34,7 +34,6 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
             'tool': 'BRUSH',
         }],
         'labeling_time': 12.34,
-        'comment': '',
     }
     with open('tests/assets/example_labels/binary_mask.png', 'rb') as image:
         data = {
@@ -84,7 +83,6 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
             'tool': 'POINT',
         }],
         'labeling_time': 12.34,
-        'comment': '',
     }
     data = {
         'label': json.dumps(payload),

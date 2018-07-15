@@ -86,7 +86,7 @@ elements_schema = {
 in__label_model = api.model('Label model', {
     'elements': fields.List(fields.Raw, required=True),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling', required=True),
-    'comment': fields.String(description='Comment describing a label', required=True),
+    'comment': fields.String(description='Comment describing a label', required=False),
 })
 
 in__label = api.parser()
