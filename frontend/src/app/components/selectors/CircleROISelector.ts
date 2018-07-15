@@ -3,7 +3,6 @@ import {Selector} from './Selector';
 import {RectROISelector} from './RectROISelector';
 
 export class CircleROISelector extends RectROISelector implements Selector<ROISelection2D> {
-
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
     }

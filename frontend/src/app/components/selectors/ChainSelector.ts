@@ -2,7 +2,7 @@ import {Selector} from './Selector';
 import {SelectorBase} from './SelectorBase';
 import {ChainSelection} from '../../model/ChainSelection';
 import {Point} from '../../model/Point';
-import {SelectorAction} from "../../model/SelectorAction";
+import {SelectorAction} from '../../model/SelectorAction';
 
 export class ChainSelector extends SelectorBase<ChainSelection> implements Selector<ChainSelection> {
 
@@ -25,7 +25,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
 
     public getActions(): Array<SelectorAction> {
         return [
-            new SelectorAction("Stop", () => this.selectingInProgress, () => {
+            new SelectorAction('Stop', () => this.selectingInProgress, () => {
                 if (this.selectedArea.points.length > 1) {
                     this.addSelection(this.selectedArea);
                 }
@@ -33,14 +33,14 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
                 this.selectingInProgress = undefined;
                 this.requestRedraw();
             }),
-            new SelectorAction("Loop", () => this.selectingInProgress && this.selectedArea.points.length > 2, () => {
+            new SelectorAction('Loop', () => this.selectingInProgress && this.selectedArea.points.length > 2, () => {
                 this.selectedArea.isLoop = true;
                 this.addSelection(this.selectedArea);
                 this.selectedArea = undefined;
                 this.selectingInProgress = undefined;
                 this.requestRedraw();
             })
-        ]
+        ];
     }
 
     public drawSelection(selection: ChainSelection, color: string): void {

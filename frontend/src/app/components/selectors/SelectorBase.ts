@@ -1,8 +1,7 @@
 import {EventEmitter} from '@angular/core';
 import {SliceSelection} from '../../model/SliceSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {SelectorAction} from "../../model/SelectorAction";
-import {Selector} from "./Selector";
+import {SelectorAction} from '../../model/SelectorAction';
 
 export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> {
 

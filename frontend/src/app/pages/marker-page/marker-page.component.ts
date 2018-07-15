@@ -17,7 +17,7 @@ import {LabelExplorerComponent} from '../../components/label-explorer/label-expl
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
 import {ChainSelector} from '../../components/selectors/ChainSelector';
-import {SelectorAction} from "../../model/SelectorAction";
+import {SelectorAction} from '../../model/SelectorAction';
 
 
 @Component({

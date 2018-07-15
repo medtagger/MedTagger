@@ -10,7 +10,6 @@ import {LabelListItem} from '../../model/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from '../selectors/Selector';
 import {Subscription} from 'rxjs/Subscription';
-import {SelectorAction} from "../../model/SelectorAction";
 
 @Component({
     selector: 'app-marker-component',

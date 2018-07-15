@@ -1,6 +1,6 @@
 import {EventEmitter} from '@angular/core';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {SelectorAction} from "../../model/SelectorAction";
+import {SelectorAction} from '../../model/SelectorAction';
 
 export interface Selector<SliceSelection> {
 
