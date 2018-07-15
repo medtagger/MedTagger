@@ -104,18 +104,20 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
             this.selectedArea.points.push(point);
             this.requestRedraw();
         } else {
-            const currentSliceSelections = this.selections.get(this.currentSlice) || [];
-            currentSliceSelections.forEach((selection: ChainSelection) => {
-                if (!selection.hidden) {
-                    for (const index in selection.points) {
-                        if (this.checkDistance(selection.points[index], x, y)) {
-                            this.selectedArea = selection;
-                            this.selectedAreaPointIndex = +index;
-                            return;
+            const currentSliceSelections = this.selections.get(this.currentSlice);
+            if (currentSliceSelections) {
+                currentSliceSelections.forEach((selection: ChainSelection) => {
+                    if (!selection.hidden) {
+                        for (const index in selection.points) {
+                            if (this.checkDistance(selection.points[index], x, y)) {
+                                this.selectedArea = selection;
+                                this.selectedAreaPointIndex = +index;
+                                return;
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
 
             if (!this.selectedArea) {
                 const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
