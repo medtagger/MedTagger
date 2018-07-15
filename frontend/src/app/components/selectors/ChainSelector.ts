@@ -1,8 +1,8 @@
 import {Selector} from './Selector';
 import {SelectorBase} from './SelectorBase';
-import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {ChainSelection} from '../../model/ChainSelection';
 import {Point} from '../../model/Point';
+import {SelectorAction} from "../../model/SelectorAction";
 
 export class ChainSelector extends SelectorBase<ChainSelection> implements Selector<ChainSelection> {
 
@@ -23,6 +23,26 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         };
     }
 
+    public getActions(): Array<SelectorAction> {
+        return [
+            new SelectorAction("Stop", () => this.selectingInProgress, () => {
+                if (this.selectedArea.points.length > 1) {
+                    this.addSelection(this.selectedArea);
+                }
+                this.selectedArea = undefined;
+                this.selectingInProgress = undefined;
+                this.requestRedraw();
+            }),
+            new SelectorAction("Loop", () => this.selectingInProgress && this.selectedArea.points.length > 2, () => {
+                this.selectedArea.isLoop = true;
+                this.addSelection(this.selectedArea);
+                this.selectedArea = undefined;
+                this.selectingInProgress = undefined;
+                this.requestRedraw();
+            })
+        ]
+    }
+
     public drawSelection(selection: ChainSelection, color: string): void {
         console.log('ChainSelector | drawSelection | selection: ', selection);
 
@@ -35,7 +55,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
             const scaledPointPosition: { x: number, y: number } = this.scaleToView(point.x, point.y);
 
             this.canvasCtx.beginPath();
-            this.canvasCtx.arc(scaledPointPosition.x , scaledPointPosition.y, this.getStyle().RADIUS, 0, 2 * Math.PI);
+            this.canvasCtx.arc(scaledPointPosition.x, scaledPointPosition.y, this.getStyle().RADIUS, 0, 2 * Math.PI);
             this.canvasCtx.fill();
 
             if (lastPosition) {
@@ -66,21 +86,6 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         }
     }
 
-    private raycast(x: number, y: number, selections: Array<ChainSelection>): [ChainSelection, number] {
-        let result: [ChainSelection, number] = [undefined, -1];
-        selections.forEach((selection: ChainSelection) => {
-            if (!selection.hidden) {
-                for (const index in selection.points) {
-                    if (this.checkDistance(selection.points[index], x, y)) {
-                        result = [selection, +index];
-                        return;
-                    }
-                }
-            }
-        });
-        return result;
-    }
-
     private checkDistance(point: Point, x: number, y: number) {
         const scaledPoint: { x: number, y: number } = this.scaleToView(point.x, point.y);
         const distance = Math.sqrt(Math.pow(scaledPoint.x - x, 2) + Math.pow(scaledPoint.y - y, 2));
@@ -88,82 +93,58 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         return distance < this.getStyle().RADIUS;
     }
 
-    public onMouseDown(event: MouseEvent): boolean {
+    public onMouseDown(event: MouseEvent): void {
         console.log('ChainSelector | onMouseDown | event: ', event);
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
 
-        if (event.button === 0) {
-            if (this.selectingInProgress) {
-                const [overSelection, index] = this.raycast(x, y, [this.selectedArea]);
-                if (overSelection && index === 0 && overSelection.points.length > 2) {
-                    this.selectedArea.points.pop();
-                    this.selectedArea.isLoop = true;
-                    this.selectedArea = undefined;
-                    this.selectingInProgress = false;
-                } else {
-                    const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-                    const point = new Point(normalizedPoint.x, normalizedPoint.y);
-                    this.selectedArea.points.push(point);
-                    this.selectedAreaPointIndex += 1;
+        if (this.selectingInProgress) {
+            const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
+            const point = new Point(normalizedPoint.x, normalizedPoint.y);
+            this.selectedArea.points.push(point);
+            this.requestRedraw();
+        } else {
+            const currentSliceSelections = this.selections.get(this.currentSlice) || [];
+            currentSliceSelections.forEach((selection: ChainSelection) => {
+                if (!selection.hidden) {
+                    for (const index in selection.points) {
+                        if (this.checkDistance(selection.points[index], x, y)) {
+                            this.selectedArea = selection;
+                            this.selectedAreaPointIndex = +index;
+                            return;
+                        }
+                    }
                 }
-                return true;
-            } else {
-                const currentSliceSelections = this.selections.get(this.currentSlice) || [];
-                [this.selectedArea, this.selectedAreaPointIndex] = this.raycast(x, y, currentSliceSelections);
+            });
 
-                if (!this.selectedArea) {
-                    const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-                    const point = new Point(normalizedPoint.x, normalizedPoint.y);
-                    this.selectedArea = new ChainSelection([point, point], this.currentSlice);
-                    this.selectedAreaPointIndex = 1;
-                    this.addSelection(this.selectedArea);
-                    this.selectingInProgress = true;
-                    return true;
-                }
+            if (!this.selectedArea) {
+                const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
+                const point = new Point(normalizedPoint.x, normalizedPoint.y);
+                this.selectedArea = new ChainSelection([point], this.currentSlice);
+                this.selectingInProgress = true;
+                this.requestRedraw();
             }
-        } else if (event.button === 2 && this.selectingInProgress) {
-            if (this.selectedArea.points.length === 2) {
-                this.removeSelection(this.selectedArea.getId());
-                this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, true));
-            } else {
-                this.selectedArea.points.pop();
-            }
-            this.selectedArea = undefined;
-            this.selectingInProgress = false;
-            return true;
         }
-
-        return false;
     }
 
-    public onMouseMove(mouseEvent: MouseEvent): boolean {
-        if (this.selectedArea) {
-            console.log('ChainSelector | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            this.updateSelection(mouseEvent);
-            return true;
-        }
-        return false;
-    }
+    public onMouseMove(event: MouseEvent): void {
+        if (this.selectedArea && !this.selectingInProgress) {
+            console.log('ChainSelector | updateSelection | event: ', event);
 
-    private updateSelection(event: MouseEvent): void {
-        console.log('ChainSelector | updateSelection | event: ', event);
-
-        if (this.selectedArea) {
             const newX = event.clientX - this.canvasPosition.left;
             const newY = event.clientY - this.canvasPosition.top;
 
             const normalizedValues: { x: number, y: number } = this.normalizeByView(newX, newY);
 
             this.selectedArea.points[this.selectedAreaPointIndex] = new Point(normalizedValues.x, normalizedValues.y);
+            this.requestRedraw();
         }
     }
 
-    public onMouseUp(event: MouseEvent): boolean {
+    public onMouseUp(event: MouseEvent): void {
         if (!this.selectingInProgress) {
             this.selectedArea = undefined;
         }
-        return false;
     }
 
     public getSelectorName(): string {

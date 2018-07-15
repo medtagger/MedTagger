@@ -1,6 +1,8 @@
 import {EventEmitter} from '@angular/core';
 import {SliceSelection} from '../../model/SliceSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
+import {SelectorAction} from "../../model/SelectorAction";
+import {Selector} from "./Selector";
 
 export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> {
 
@@ -12,6 +14,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     protected canvasPosition: ClientRect;
     protected canvasSize: { width: number, height: number };
     protected stateChange: EventEmitter<SelectionStateMessage>;
+    protected redrawRequestEmitter: EventEmitter<void>;
 
     protected constructor(canvas: HTMLCanvasElement) {
         this.canvasCtx = canvas.getContext('2d');
@@ -81,6 +84,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     protected addSelection(selection: CustomSliceSelection): void {
         console.log('Selector | addCurrentSelection');
         if (this.isOnlyOneSelectionPerSlice()) {
+            this.removeSelectionsOnCurrentSlice();
             this.selections.set(this.currentSlice, [selection]);
         } else {
             const currentSliceSelections = this.selections.get(this.currentSlice);
@@ -206,5 +210,17 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     }
 
     public abstract drawSelection(selection: CustomSliceSelection, color: string): any;
+
+    public getActions(): Array<SelectorAction> {
+        return [];
+    }
+
+    public setRedrawRequestEmitter(emitter: EventEmitter<void>): void {
+        this.redrawRequestEmitter = emitter;
+    }
+
+    protected requestRedraw(): void {
+        this.redrawRequestEmitter.emit();
+    }
 }
 

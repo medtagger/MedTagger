@@ -17,6 +17,7 @@ import {LabelExplorerComponent} from '../../components/label-explorer/label-expl
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
 import {ChainSelector} from '../../components/selectors/ChainSelector';
+import {SelectorAction} from "../../model/SelectorAction";
 
 
 @Component({
@@ -43,6 +44,7 @@ export class MarkerPageComponent implements OnInit {
     lastSliceID = 0;
     startTime: Date;
     selectors: Map<string, Selector<any>>;
+    selectorActions: Array<SelectorAction> = [];
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar) {
@@ -137,7 +139,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
-        this.scanService.skipScan(this.scan.scanId);
+        this.scanService.skipScan(this.scan.scanId).then();
         this.nextScan();
     }
 
@@ -197,6 +199,7 @@ export class MarkerPageComponent implements OnInit {
         const selector = this.selectors.get(selectorName);
         if (selector) {
             this.marker.setCurrentSelector(selector);
+            this.selectorActions = selector.getActions();
         } else {
             console.warn(`MarkerPage | setSelector | Selector "${selectorName}" doesn't exist`);
         }

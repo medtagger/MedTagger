@@ -38,7 +38,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
         this.canvasCtx.fillText(selection.getId().toString(), scaledStartPoint.x + (fontSize / 4), scaledStartPoint.y + fontSize);
     }
 
-    public onMouseDown(event: MouseEvent): boolean {
+    public onMouseDown(event: MouseEvent): void {
         console.log('RectROISelector | startMouseSelection | event: ', event);
         const selectionStartX = (event.clientX) - this.canvasPosition.left;
         const selectionStartY = (event.clientY) - this.canvasPosition.top;
@@ -46,12 +46,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
         const normalizedPoint: { x: number, y: number } = this.normalizeByView(selectionStartX, selectionStartY);
 
         this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice);
-        if (this.isOnlyOneSelectionPerSlice() && this.selections.get(this.currentSlice)) {
-            this.selections.get(this.currentSlice).forEach((selection: SliceSelection) => this.stateChange.emit(
-                new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
-            this.selections.delete(this.currentSlice);
-        }
-        return true;
+        this.requestRedraw();
     }
 
     public onMouseMove(mouseEvent: MouseEvent): boolean {

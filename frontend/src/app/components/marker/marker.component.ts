@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, OnInit, ViewChild} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs';
@@ -10,6 +10,7 @@ import {LabelListItem} from '../../model/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from '../selectors/Selector';
 import {Subscription} from 'rxjs/Subscription';
+import {SelectorAction} from "../../model/SelectorAction";
 
 @Component({
     selector: 'app-marker-component',
@@ -21,6 +22,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     currentImage: HTMLImageElement;
     downloadingScanInProgress = false;
     downloadingSlicesInProgress = false;
+    redrawRequestEmitter: EventEmitter<void> = new EventEmitter<void>();
 
     @ViewChild('image')
     set viewImage(viewElement: ElementRef) {
@@ -34,9 +36,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     @ViewChild('canvas')
     set viewCanvas(viewElement: ElementRef) {
         this.canvas = viewElement.nativeElement;
-        this.canvas.oncontextmenu = function (e) {
-            e.preventDefault();
-        };
     }
 
     @ViewChild('slider') slider: MatSlider;
@@ -60,6 +59,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     constructor() {
         super();
+
+        this.redrawRequestEmitter.subscribe(() => {
+           this.redrawSelections();
+        });
     }
 
     get currentSlice() {
@@ -70,6 +73,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         super.setSelectors(newSelectors);
         this.selectorsByName.clear();
         this.selectors.forEach((selector: Selector<SliceSelection>) => {
+            selector.setRedrawRequestEmitter(this.redrawRequestEmitter);
             this.selectorsByName.set(selector.getSelectorName(), selector);
         });
         this.hookUpStateChangeSubscription();

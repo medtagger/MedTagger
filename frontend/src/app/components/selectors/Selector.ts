@@ -1,5 +1,6 @@
 import {EventEmitter} from '@angular/core';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
+import {SelectorAction} from "../../model/SelectorAction";
 
 export interface Selector<SliceSelection> {
 
@@ -7,13 +8,15 @@ export interface Selector<SliceSelection> {
 
     drawSelection(selection: SliceSelection, color: string): any;
 
-    onMouseDown(event: MouseEvent): boolean;
+    onMouseDown(event: MouseEvent): void;
 
-    onMouseMove(event: MouseEvent): boolean;
+    onMouseMove(event: MouseEvent): void;
 
-    onMouseUp(event: MouseEvent): boolean;
+    onMouseUp(event: MouseEvent): void;
 
     clearData(): any;
+
+    setRedrawRequestEmitter(emitter: EventEmitter<void>): void;
 
     getStateChangeEmitter(): EventEmitter<SelectionStateMessage>;
 
@@ -52,4 +55,6 @@ export interface Selector<SliceSelection> {
     hideSelection(selectionId: number, newValue: boolean): boolean;
 
     getSelectorName(): string;
+
+    getActions(): Array<SelectorAction>;
 }

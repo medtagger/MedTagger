@@ -41,7 +41,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         return distance < this.getStyle().RADIUS;
     }
 
-    public onMouseDown(event: MouseEvent): boolean {
+    public onMouseDown(event: MouseEvent): void {
         console.log('PointSelector | onMouseDown | event: ', event);
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
@@ -59,18 +59,16 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         if (!this.selectedArea) {
             const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
             this.addSelection(new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice));
-            return true;
+            this.requestRedraw();
         }
-        return false;
     }
 
-    public onMouseMove(mouseEvent: MouseEvent): boolean {
+    public onMouseMove(mouseEvent: MouseEvent): void {
         if (this.selectedArea) {
             console.log('PointSelector | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
             this.updateSelection(mouseEvent);
-            return true;
+            this.requestRedraw();
         }
-        return false;
     }
 
     public updateSelection(event: MouseEvent): void {
@@ -87,9 +85,8 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         }
     }
 
-    public onMouseUp(event: MouseEvent): boolean {
+    public onMouseUp(event: MouseEvent): void {
         this.selectedArea = undefined;
-        return false;
     }
 
     public getSelectorName(): string {
