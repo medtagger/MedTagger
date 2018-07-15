@@ -3,7 +3,7 @@ import json
 from typing import Dict, Any
 
 from tests.functional_tests import get_api_client, get_headers
-from tests.functional_tests.helpers import create_tag_and_assign_to_category
+from tests.functional_tests.helpers import create_tag_and_assign_to_task
 from medtagger.api.users.business import set_user_role
 from medtagger.api.auth.business import create_user
 from medtagger.definitions import LabelTool
@@ -113,7 +113,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
     set_user_role(admin_id, 'admin')
     tag_key = 'EXAMPLE_TAG'
-    create_tag_and_assign_to_category(tag_key, 'Example tag', 'LUNGS')
+    create_tag_and_assign_to_task(tag_key, 'Example tag', 'MARK_KIDNEYS')
 
     # Step 1. Admin user logs in
     payload: Dict[str, Any] = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}

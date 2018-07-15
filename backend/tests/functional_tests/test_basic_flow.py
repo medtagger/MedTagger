@@ -5,7 +5,7 @@ from typing import Any
 from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
 from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
-from tests.functional_tests.helpers import create_tag_and_assign_to_category
+from tests.functional_tests.helpers import create_tag_and_assign_to_task
 
 
 # pylint: disable=too-many-locals
@@ -22,6 +22,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert isinstance(json_response, list)
     category = json_response[0]
     category_key = category['key']
+    task_key = category['tasks'][0]['key']
     assert isinstance(category_key, str)
     assert len(category_key) > 1
 
@@ -49,7 +50,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert len(slice_id) >= 1
 
     # Step 4. Get random scan
-    response = api_client.get('/api/v1/scans/random?category={}'.format(category_key),
+    response = api_client.get('/api/v1/scans/random?task={}'.format(task_key),
                               headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
@@ -71,7 +72,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
 
     # Step 6. Label it
     tag_key = 'EXAMPLE_TAG'
-    create_tag_and_assign_to_category(tag_key, 'Example tag', category_key)
+    create_tag_and_assign_to_task(tag_key, 'Example tag', task_key)
     payload = {
         'elements': [{
             'x': 0.5,

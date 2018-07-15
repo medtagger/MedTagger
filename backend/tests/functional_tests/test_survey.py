@@ -7,7 +7,7 @@ from medtagger.types import SurveyElementKey
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
-from tests.functional_tests.helpers import create_tag_and_assign_to_category
+from tests.functional_tests.helpers import create_tag_and_assign_to_task
 
 
 def test_adding_new_survey(prepare_environment: Any) -> None:
@@ -39,8 +39,8 @@ def test_adding_new_survey(prepare_environment: Any) -> None:
     ]
     survey.save()
 
-    # Assign above Survey to an Example Tag available for LUNGS Scan Category
-    label_tag = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'LUNGS')
+    # Assign above Survey to an Example Tag available for MARK_KIDNEYS Task
+    label_tag = create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS')
     label_tag.actions.append(survey)
     label_tag.save()
 
@@ -102,11 +102,11 @@ def test_adding_new_survey(prepare_environment: Any) -> None:
         'details': 'Action "2" not found.',
     }
 
-    # Check if above Action is available from Scan Categories endpoint
-    response = api_client.get('/api/v1/scans/categories', headers=get_headers(token=user_token))
+    # Check if above Action is available from Task endpoint
+    response = api_client.get('/api/v1/scans/tasks', headers=get_headers(token=user_token))
     json_response = json.loads(response.data)
-    lungs_category = next(category for category in json_response if category['key'] == 'LUNGS')
-    example_tag = next(tag for tag in lungs_category['tags'] if tag['key'] == 'EXAMPLE_TAG')
+    mark_kidneys_task = next(task for task in json_response if task['key'] == 'MARK_KIDNEYS')
+    example_tag = next(tag for tag in mark_kidneys_task['tags'] if tag['key'] == 'EXAMPLE_TAG')
     assert example_tag['actions_ids'] == [1]
 
 

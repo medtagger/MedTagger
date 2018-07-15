@@ -110,7 +110,14 @@ def get_tasks() -> List[Task]:
     return TasksRepository.get_all_tasks()
 
 
-def create_tast(key: str, name: str, image_path: str) -> Task:
+def create_task(key: str, name: str, image_path: str) -> Task:
+    """Create new Task.
+
+    :param key: unique key representing Task
+    :param name: name which describes this Task
+    :param image_path: path to the image which is located on the frontend
+    :return: Task object
+    """
     return TasksRepository.add_task(key, name, image_path)
 
 

@@ -3,7 +3,7 @@ import os
 from typing import Any
 
 
-class AppConfiguration(object):
+class AppConfiguration:
     """Class that represents application configuration."""
 
     def __init__(self) -> None:

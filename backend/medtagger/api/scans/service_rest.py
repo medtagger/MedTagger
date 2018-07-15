@@ -102,7 +102,7 @@ class Tasks(Resource):
         name = payload['name']
         image_path = payload['image_path']
 
-        return business.create_tast(key, name, image_path), 201
+        return business.create_task(key, name, image_path), 201
 
 
 @scans_ns.route('/random')

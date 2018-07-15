@@ -4,7 +4,7 @@ from typing import Optional, List
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, Scan, Slice, User, Label, Task
+from medtagger.database.models import ScanCategory, Scan, Slice, User, Label, Task, scan_categories_tasks
 from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.types import ScanID
 
@@ -29,7 +29,7 @@ def get_random_scan(task: Task = None, user: User = None) -> Scan:
     """
     query = Scan.query
     if task:
-        query = query.join(Scan).join(Task)
+        query = query.join(ScanCategory).join(scan_categories_tasks).join(Task)
         query = query.filter(Task.key == task.key)
     if user:
         labelled_scans = Label.query.filter(Label.owner == user).all()
