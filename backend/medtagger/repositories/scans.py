@@ -9,7 +9,7 @@ from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.types import ScanID
 
 
-class ScansRepository(object):
+class ScansRepository:
     """Repository for Scans."""
 
     @staticmethod

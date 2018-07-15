@@ -5,7 +5,7 @@ from medtagger.database import db_session
 from medtagger.database.models import LabelTag
 
 
-class LabelTagRepository(object):
+class LabelTagRepository:
     """Repository for Label Tags."""
 
     @staticmethod

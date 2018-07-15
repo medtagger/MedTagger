@@ -73,14 +73,14 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public sliderFocus() {
-        if(this.focusable) {
+        if (this.focusable) {
             this.slider._elementRef.nativeElement.focus();
         }
     }
 
     public setFocusable(focusable: boolean) {
         this.focusable = focusable;
-        if(!this.focusable) {
+        if (!this.focusable) {
             this.slider._elementRef.nativeElement.focus();
         } else {
             this.slider._elementRef.nativeElement.blur();

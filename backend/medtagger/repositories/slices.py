@@ -7,7 +7,7 @@ from medtagger.storage.models import OriginalSlice, ProcessedSlice
 from medtagger.types import SliceID, ScanID
 
 
-class SlicesRepository(object):
+class SlicesRepository:
     """Repository for Slices."""
 
     @staticmethod

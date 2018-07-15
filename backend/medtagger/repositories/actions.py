@@ -18,7 +18,7 @@ class InvalidResponseException(Exception):
     pass
 
 
-class ActionsRepository(object):
+class ActionsRepository:
     """Repository for Actions."""
 
     @staticmethod

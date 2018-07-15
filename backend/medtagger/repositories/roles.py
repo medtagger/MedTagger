@@ -9,7 +9,7 @@ from medtagger.database.models import Role
 from medtagger.repositories.users import UsersRepository
 
 
-class RolesRepository(object):
+class RolesRepository:
     """Repository for Roles."""
 
     @staticmethod
