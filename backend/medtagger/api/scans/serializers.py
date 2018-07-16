@@ -114,7 +114,7 @@ out__scan_category = api.model('Scan Category model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
-    'tasks': fields.List(fields.Nested(out__task))
+    'tasks': fields.List(fields.Nested(out__task)),
 })
 
 in__task = api.model('New Task model', {
@@ -122,7 +122,7 @@ in__task = api.model('New Task model', {
     'name': fields.String(),
     'image_path': fields.String(),
     'tags': fields.List(fields.Nested(out__label_tag)),
-    'categories': fields.List(fields.String())
+    'categories': fields.List(fields.String()),
 })
 
 out__scan = api.model('Scan model', {

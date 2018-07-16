@@ -13,7 +13,7 @@ import {concat, delay, flatMap, map, mergeAll, retryWhen, take} from 'rxjs/opera
 import {of} from 'rxjs/internal/observable/of';
 import {from} from 'rxjs/internal/observable/from';
 import {defer} from 'rxjs/internal/observable/defer';
-import {Task} from "../model/Task";
+import {Task} from '../model/Task';
 
 interface ScanResponse {
     scan_id: string;
@@ -27,21 +27,21 @@ interface AvailableCategoryResponse {
     key: string;
     name: string;
     image_path: string;
-    tasks: Array<TaskResponse>
+    tasks: Array<TaskResponse>;
 }
 
 interface TaskResponse {
     key: string;
     name: string;
     image_path: string;
-    tags: Array<LabelTagResponse>
-    categories: Array<string>
+    tags: Array<LabelTagResponse>;
+    categories: Array<string>;
 }
 
 interface LabelTagResponse {
-    key: string,
-    name: string,
-    actions_id: Array<number>
+    key: string;
+    name: string;
+    actions_id: Array<number>;
 }
 
 interface NewScanResponse {
