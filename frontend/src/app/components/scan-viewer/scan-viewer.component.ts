@@ -138,8 +138,11 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         });
         console.log('ScanViewer | updateSliderRange | sortedKeys: ', sortedKeys);
 
-        if (sortedKeys[0] == 0) this.slider.min = 0;
-        else this.slider.min = sortedKeys[0] - 1;
+        if (sortedKeys[0] === 0) {
+            this.slider.min = 0;
+        } else {
+            this.slider.min = sortedKeys[0] - 1;
+        }
         this.slider.max = sortedKeys[sortedKeys.length - 1];
     }
 
