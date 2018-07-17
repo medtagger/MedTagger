@@ -25,8 +25,8 @@
 
             <div *ngIf="selectorActions.length > 0">
                 <h3>Actions</h3>
-                <div class="buttons">
-                    <button mat-mini-fab *ngFor="let action of selectorActions; let i = index" [disabled]="!action.enable()" (click)="action.trigger()">{{ action.name }}</button>
+                <div class="buttons action-buttons">
+                    <button mat-raised-button *ngFor="let action of selectorActions" [disabled]="!action.enable()" (click)="action.trigger()">{{ action.name }}</button>
                 </div>
             </div>
         </div>

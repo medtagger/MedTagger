@@ -43,6 +43,19 @@ button {
         .buttons {
             margin: 8px 16px;
         }
+
+        .action-buttons {
+            button {
+                font-size: 14px;
+                min-width: 0;
+                border-radius: 30px;
+            }
+
+            button:not([disabled]) {
+                background-color: #2a98da;
+                color: white;
+            }
+        }
     }
 
     app-label-explorer {
