@@ -8,6 +8,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     archivedSelections: Array<CustomSliceSelection> = [];
     canvasCtx: CanvasRenderingContext2D;
     protected currentSlice;
+    protected currentTag;
     protected mouseDrag = false;
     protected canvasPosition: ClientRect;
     canvasSize: { width: number, height: number };

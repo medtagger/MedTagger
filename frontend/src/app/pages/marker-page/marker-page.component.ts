@@ -75,8 +75,10 @@ export class MarkerPageComponent implements OnInit {
         ]);
 
         this.marker.setSelectors(Array.from(this.selectors.values()));
-        this.categoryTags.setValue(this.category.tags[0]);
         this.setSelector('RECTANGLE');
+
+        this.categoryTags.setValue(this.category.tags[0]);
+        this.setTag(this.category.tags[0]);
 
         this.marker.setLabelExplorer(this.labelExplorer);
 
@@ -218,7 +220,6 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public setTag(tag: LabelTag) {
-        console.log("TAG",tag);
         this.marker.setCurrentTag(tag);
     }
 

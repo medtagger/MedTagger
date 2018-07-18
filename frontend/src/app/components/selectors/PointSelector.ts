@@ -3,6 +3,7 @@ import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {SelectorBase} from './SelectorBase';
 import {PointSelection} from '../../model/PointSelection';
 import {Selector} from './Selector';
+import { LabelTag } from '../../model/LabelTag';
 
 export class PointSelector extends SelectorBase<PointSelection> implements Selector<PointSelection> {
 
@@ -25,6 +26,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         this.selections = new Map<number, [PointSelection]>();
         this.selectedArea = undefined;
         this.currentSlice = undefined;
+        this.currentTag = undefined;
         this.stateChange = new EventEmitter<SelectionStateMessage>();
     }
 
@@ -95,7 +97,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
 
         if (!this.mouseDrag) {
             const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-            this.selectedArea = new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice);
+            this.selectedArea = new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag);
             this.addCurrentSelection();
             return true;
         }
@@ -132,5 +134,9 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
 
     public getSelectorName(): string {
         return 'POINT';
+    }
+
+    public setCurrentTag(tag: LabelTag) {
+        this.currentTag = tag;
     }
 }

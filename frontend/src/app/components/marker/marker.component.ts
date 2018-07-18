@@ -75,8 +75,13 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.currentSelector = selector;
     }
 
+    public setCurrentTagForSelector(tag: LabelTag) {
+        this.currentSelector.setCurrentTag(this.currentTag);
+    }
+
     public setCurrentTag(tag: LabelTag) {
         this.currentTag = tag;
+        this.setCurrentTagForSelector(this.currentTag);
     }
 
     public setDownloadScanInProgress(isInProgress: boolean) {
@@ -103,7 +108,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.updateSelectionState();
 
         this.clearCanvasSelections();
-
         const coordinates: SliceSelection[] = this.selectors
             .map((selector) => selector.getSelections())
             .reduce((x, y) => x.concat(y), []);
@@ -128,7 +132,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                     } else {
                         console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
                             selection.selectionId);
-                        console.log("Current tag", this.currentTag);
                         this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTag,
                             this.currentSelector.getSelectorName());
                     }

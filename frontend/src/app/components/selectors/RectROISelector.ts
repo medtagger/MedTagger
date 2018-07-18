@@ -4,6 +4,7 @@ import {SelectorBase} from './SelectorBase';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from './Selector';
 import {SliceSelection} from '../../model/SliceSelection';
+import { LabelTag } from '../../model/LabelTag';
 
 export class RectROISelector extends SelectorBase<ROISelection2D> implements Selector<ROISelection2D> {
     readonly STYLE = {
@@ -24,6 +25,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
         this.selections = new Map<number, [ROISelection2D]>();
         this.selectedArea = undefined;
         this.currentSlice = undefined;
+        this.currentTag = undefined;
         this.stateChange = new EventEmitter<SelectionStateMessage>();
     }
 
@@ -80,7 +82,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
 
         const normalizedPoint: { x: number, y: number } = this.normalizeByView(selectionStartX, selectionStartY);
 
-        this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice);
+        this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag);
         if (this.isOnlyOneSelectionPerSlice() && this.selections.get(this.currentSlice)) {
             this.selections.get(this.currentSlice).forEach((selection: SliceSelection) => this.stateChange.emit(
                 new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
@@ -135,5 +137,9 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
 
     public getSelectorName(): string {
         return 'RECTANGLE';
+    }
+
+    public setCurrentTag(tag: LabelTag) {
+        this.currentTag = tag;
     }
 }

@@ -1,5 +1,6 @@
 import {EventEmitter} from '@angular/core';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
+import { LabelTag } from '../../model/LabelTag';
 
 export interface Selector<SliceSelection> {
 
@@ -58,4 +59,6 @@ export interface Selector<SliceSelection> {
     hideSelection(selectionId: number, newValue: boolean): boolean;
 
     getSelectorName(): string;
+
+    setCurrentTag(tag: LabelTag);
 }
