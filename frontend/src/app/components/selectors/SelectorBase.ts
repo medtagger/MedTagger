@@ -1,20 +1,67 @@
 import {EventEmitter} from '@angular/core';
 import {SliceSelection} from '../../model/SliceSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
+import {SelectorAction} from '../../model/SelectorAction';
 
 export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> {
-    selectedArea: CustomSliceSelection;
-    selections: Map<number, [CustomSliceSelection]>;
-    archivedSelections: Array<CustomSliceSelection> = [];
-    canvasCtx: CanvasRenderingContext2D;
+
+    protected selectedArea: CustomSliceSelection;
+    protected selections: Map<number, [CustomSliceSelection]>;
+    protected archivedSelections: Array<CustomSliceSelection> = [];
+    protected canvasCtx: CanvasRenderingContext2D;
     protected currentSlice;
-    protected mouseDrag = false;
     protected canvasPosition: ClientRect;
-    canvasSize: { width: number, height: number };
+    protected canvasSize: { width: number, height: number };
+    protected stateChange: EventEmitter<SelectionStateMessage>;
+    protected redrawRequestEmitter: EventEmitter<void>;
 
-    public stateChange: EventEmitter<SelectionStateMessage>;
+    protected constructor(canvas: HTMLCanvasElement) {
+        this.canvasCtx = canvas.getContext('2d');
+        this.canvasSize = {
+            width: canvas.width,
+            height: canvas.height
+        };
+        this.stateChange = new EventEmitter<SelectionStateMessage>();
+        this.selections = new Map<number, [CustomSliceSelection]>();
+    }
 
-    public isOnlyOneSelectionPerSlice(): boolean {
+    protected getStyle(): any {
+        return {
+            SELECTION_FONT_SIZE: 14,
+            CURRENT_SELECTION_COLOR: '#ff0000',
+            OTHER_SELECTION_COLOR: '#256fde',
+            ARCHIVED_SELECTION_COLOR: '#5f27e5'
+        };
+    }
+
+    public formArchivedSelections(selectionMap: CustomSliceSelection[]): CustomSliceSelection[] {
+        selectionMap.forEach((selection: CustomSliceSelection) => {
+            this.drawSelection(selection, this.getStyle().ARCHIVED_SELECTION_COLOR);
+            console.log('Selector | scaleToView selection: ', selection);
+        });
+        return selectionMap;
+    }
+
+    public drawSelections(): void {
+        console.log('RectROISelector | drawSelections | selection: ', this.selections);
+        this.getSelections().forEach((selection: CustomSliceSelection) => {
+            let color: string;
+            const isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
+            if (isCurrent) {
+                color = this.getStyle().CURRENT_SELECTION_COLOR;
+            } else {
+                color = this.getStyle().OTHER_SELECTION_COLOR;
+            }
+            if ((selection.pinned || isCurrent) && (!selection.hidden)) {
+                this.drawSelection(selection, color);
+            }
+        });
+        if (this.selectedArea) {
+            this.drawSelection(this.selectedArea, this.getStyle().CURRENT_SELECTION_COLOR);
+        }
+    }
+
+    protected isOnlyOneSelectionPerSlice(): boolean {
         return false;
     }
 
@@ -33,26 +80,20 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         this.stateChange = new EventEmitter<SelectionStateMessage>();
     }
 
-    public addCurrentSelection(): void {
-        if (this.selectedArea) {
-            console.log('RectROISelector | addCurrentSelection');
-            if (this.isOnlyOneSelectionPerSlice()) {
-                this.selections.set(this.currentSlice, [this.selectedArea]);
+    protected addSelection(selection: CustomSliceSelection): void {
+        console.log('Selector | addCurrentSelection');
+        if (this.isOnlyOneSelectionPerSlice()) {
+            this.removeSelectionsOnCurrentSlice();
+            this.selections.set(this.currentSlice, [selection]);
+        } else {
+            const currentSliceSelections = this.selections.get(this.currentSlice);
+            if (currentSliceSelections) {
+                currentSliceSelections.push(selection);
             } else {
-                const currentSliceSelections = this.selections.get(this.currentSlice);
-                if (currentSliceSelections) {
-                    currentSliceSelections.push(this.selectedArea);
-                } else {
-                    this.selections.set(this.currentSlice, [this.selectedArea]);
-                }
+                this.selections.set(this.currentSlice, [selection]);
             }
-            this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
-            this.clearSelectedArea();
         }
-    }
-
-    protected clearSelectedArea() {
-        this.selectedArea = undefined;
+        this.stateChange.emit(new SelectionStateMessage(selection.getId(), selection.sliceIndex, false));
     }
 
     public updateCurrentSlice(currentSliceId: number): void {
@@ -153,17 +194,32 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         return false;
     }
 
-    public normalizeByView(paramX: number, paramY: number): { x: number, y: number } {
+    protected normalizeByView(paramX: number, paramY: number): { x: number, y: number } {
         return {
             x: paramX / this.canvasSize.width,
             y: paramY / this.canvasSize.height
         };
     }
 
-    public scaleToView(paramX: number, paramY: number): { x: number, y: number } {
+    protected scaleToView(paramX: number, paramY: number): { x: number, y: number } {
         return {
             x: paramX * this.canvasSize.width,
             y: paramY * this.canvasSize.height
         };
     }
+
+    public abstract drawSelection(selection: CustomSliceSelection, color: string): any;
+
+    public getActions(): Array<SelectorAction> {
+        return [];
+    }
+
+    public setRedrawRequestEmitter(emitter: EventEmitter<void>): void {
+        this.redrawRequestEmitter = emitter;
+    }
+
+    protected requestRedraw(): void {
+        this.redrawRequestEmitter.emit();
+    }
 }
+
