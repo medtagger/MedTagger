@@ -22,6 +22,8 @@ export interface Selector<SliceSelection> {
 
     updateCurrentSlice(currentSliceId: number): any;
 
+    updateCurrentTag(tag: LabelTag): any;
+
     updateCanvasPosition(canvasRect: ClientRect): any;
 
     hasArchivedSelections(): boolean;
@@ -59,6 +61,4 @@ export interface Selector<SliceSelection> {
     hideSelection(selectionId: number, newValue: boolean): boolean;
 
     getSelectorName(): string;
-
-    setCurrentTag(tag: LabelTag);
 }

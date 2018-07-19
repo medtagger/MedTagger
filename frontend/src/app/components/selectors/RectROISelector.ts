@@ -4,7 +4,6 @@ import {SelectorBase} from './SelectorBase';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from './Selector';
 import {SliceSelection} from '../../model/SliceSelection';
-import { LabelTag } from '../../model/LabelTag';
 
 export class RectROISelector extends SelectorBase<ROISelection2D> implements Selector<ROISelection2D> {
     readonly STYLE = {
@@ -137,9 +136,5 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
 
     public getSelectorName(): string {
         return 'RECTANGLE';
-    }
-
-    public setCurrentTag(tag: LabelTag) {
-        this.currentTag = tag;
     }
 }

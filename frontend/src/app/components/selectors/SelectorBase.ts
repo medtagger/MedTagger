@@ -1,4 +1,5 @@
 import {EventEmitter} from '@angular/core';
+import { LabelTag } from '../../model/LabelTag';
 import {SliceSelection} from '../../model/SliceSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 
@@ -58,6 +59,10 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
 
     public updateCurrentSlice(currentSliceId: number): void {
         this.currentSlice = currentSliceId;
+    }
+
+    public updateCurrentTag(tag: LabelTag): void {
+        this.currentTag = tag;
     }
 
     public updateCanvasPosition(canvasRect: ClientRect) {

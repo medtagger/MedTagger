@@ -135,8 +135,4 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
     public getSelectorName(): string {
         return 'POINT';
     }
-
-    public setCurrentTag(tag: LabelTag) {
-        this.currentTag = tag;
-    }
 }
