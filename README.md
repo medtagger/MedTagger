@@ -22,7 +22,7 @@ Documentation for the MedTagger can be found [here](/docs).
 
  - User Interface uses [TypeScript 2.7+](http://typescriptlang.org/) with [Angular 6](http://angular.io/) and [Material Design](http://material.angular.io/) style,
  - REST API and WebSockets for communication with Backend,
- - Backend written in [Python 3.6+](https://www.python.org),
+ - Backend written in [Python 3.7](https://www.python.org),
  - [Flask](http://flask.pocoo.org/) with [Flask-RESTPlus](http://flask-restplus.readthedocs.io/) as a REST API framework,
  - [Celery](http://www.celeryproject.org/) workers using [RabbitMQ](https://www.rabbitmq.com/) for communication,
  - [PostgreSQL](https://www.postgresql.org/) as a storage for metadata,

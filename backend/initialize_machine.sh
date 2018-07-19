@@ -2,12 +2,12 @@
 
 echo "Installing all APT packages..."
 apt install -y make
-if [ ! -e /usr/bin/python3.6 ]
+if [ ! -e /usr/bin/python3.7 ]
 then
-    add-apt-repository ppa:jonathonf/python-3.6
+    add-apt-repository ppa:jonathonf/python-3.7
     apt-get update
-    apt install -y python3.6
-    apt install -y python3.6-dev
+    apt install -y python3.7
+    apt install -y python3.7-dev
     apt install -y python3-pip
 fi
 
