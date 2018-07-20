@@ -71,7 +71,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
 
     # Step 6. Label it
     tag_key = 'EXAMPLE_TAG'
-    create_tag_and_assign_to_category(tag_key, 'Example tag', category_key)
+    create_tag_and_assign_to_category(tag_key, 'Example tag', category_key, [LabelTool.RECTANGLE.value])
     payload = {
         'elements': [{
             'x': 0.5,

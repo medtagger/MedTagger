@@ -3,6 +3,7 @@ import json
 from typing import Any
 
 from medtagger.storage.models import BrushLabelElement
+from medtagger.definitions import LabelTool
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
@@ -23,7 +24,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Brush
-    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS')
+    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.BRUSH.name])
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -31,7 +32,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
             'height': 128,
             'image_key': 'SLICE_1',
             'tag': 'EXAMPLE_TAG',
-            'tool': 'BRUSH',
+            'tool': LabelTool.BRUSH.value,
         }],
         'labeling_time': 12.34,
     }
@@ -72,15 +73,15 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Label it with Brush
-    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS')
+    # Step 2. Label it with Point
+    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.POINT.name])
     payload = {
         'elements': [{
             'slice_index': 0,
             'x': 0.25,
             'y': 0.5,
             'tag': 'EXAMPLE_TAG',
-            'tool': 'POINT',
+            'tool': LabelTool.POINT.value,
         }],
         'labeling_time': 12.34,
     }

@@ -4,6 +4,7 @@ from typing import Any
 
 from medtagger.database.models import Survey, SurveySingleChoiceQuestion
 from medtagger.types import SurveyElementKey
+from medtagger.definitions import LabelTool
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
@@ -40,7 +41,7 @@ def test_adding_new_survey(prepare_environment: Any) -> None:
     survey.save()
 
     # Assign above Survey to an Example Tag available for LUNGS Scan Category
-    label_tag = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'LUNGS')
+    label_tag = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'LUNGS', [LabelTool.RECTANGLE.name])
     label_tag.actions.append(survey)
     label_tag.save()
 
