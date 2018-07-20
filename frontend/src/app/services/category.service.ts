@@ -34,6 +34,7 @@ export class CategoryService {
                     const categories = [];
                     for (const category of response) {
                         categories.push(new ScanCategory(category.key, category.name, category.image_path, category.tags));
+                        console.log("TAGS", category.tags);
                     }
                     resolve(categories);
                 },

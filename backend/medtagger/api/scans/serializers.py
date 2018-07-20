@@ -2,7 +2,7 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
-from medtagger.definitions import ScanStatus, LabelVerificationStatus
+from medtagger.definitions import ScanStatus, LabelVerificationStatus, LabelTool
 
 in__new_scan = api.model('New Scan model', {
     'category': fields.String(description='Scan\'s category', required=True),
@@ -76,7 +76,8 @@ in__scan_category = api.model('New Scan Category model', {
 out__label_tag = api.model('Label Tag model', {
     'key': fields.String(),
     'name': fields.String(),
-    'actions_ids': fields.List(fields.Integer(), attribute=lambda category: [action.id for action in category.actions]),
+    'actions_ids': fields.List(fields.Integer(), attribute=lambda label_tag: [action.id for action in label_tag.actions]),
+    'tools': fields.List(fields.String(), description='Tag\'s tools', enum=[tool.name for tool in LabelTool], attribute=lambda label_tag: [tool.name for tool in label_tag.tools]),
 })
 
 out__scan_category = api.model('Scan Category model', {

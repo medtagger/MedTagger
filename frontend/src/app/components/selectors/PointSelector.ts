@@ -97,7 +97,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
 
         if (!this.mouseDrag) {
             const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-            this.selectedArea = new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag);
+            this.selectedArea = new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag.key);
             this.addCurrentSelection();
             return true;
         }

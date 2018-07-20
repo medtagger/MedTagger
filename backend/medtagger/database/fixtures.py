@@ -5,6 +5,7 @@ from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
 
 from medtagger.database import db_session
+from medtagger.definitions import LabelTool
 from medtagger.database.models import ScanCategory, Role, LabelTag
 
 logging.config.fileConfig('logging.conf')
@@ -44,10 +45,12 @@ TAGS = [{
     'key': 'LEFT_KIDNEY',
     'name': 'Left Kidney',
     'category_key': 'KIDNEYS',
+    'tools': [LabelTool.RECTANGLE.name, LabelTool.POINT.name],
 }, {
     'key': 'RIGHT_KIDNEY',
     'name': 'Right Kidney',
     'category_key': 'KIDNEYS',
+    'tools': [LabelTool.RECTANGLE.name],
 }]
 
 
@@ -76,7 +79,7 @@ def insert_labels_tags() -> None:
                 logger.info('Label Tag exists with key "%s"', tag_key)
                 continue
 
-            tag = LabelTag(row.get('key', ''), row.get('name', ''))
+            tag = LabelTag(row.get('key', ''), row.get('name', ''), row.get('tools', []))
             tag_category_key = row.get('category_key', '')
             category = session.query(ScanCategory).filter(ScanCategory.key == tag_category_key).one()
             tag.scan_category_id = category.id

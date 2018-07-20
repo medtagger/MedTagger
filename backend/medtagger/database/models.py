@@ -1,10 +1,11 @@
 """Module responsible for defining all of the relational database models."""
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
-import uuid
+import uuid, re
 from typing import List, Dict, cast, Optional, Any
 
+import sqlalchemy as sa
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, ARRAY
 from sqlalchemy.orm import relationship
 
 from medtagger.database import Base, db_session
@@ -312,6 +313,23 @@ class Label(Base):
         return self
 
 
+class ArrayOfEnum(ARRAY):
+
+    def bind_expression(self, bindvalue):
+        return sa.cast(bindvalue, self)
+
+    def result_processor(self, dialect, coltype):
+        super_rp = super(ArrayOfEnum, self).result_processor(dialect, coltype)
+
+        def handle_raw_string(value):
+            inner = re.match(r"^{(.*)}$", value).group(1)
+            return inner.split(",")
+
+        def process(value):
+            return super_rp(handle_raw_string(value))
+        return process
+
+
 class LabelTag(Base):
     """Definition of tag for label."""
 
@@ -323,17 +341,20 @@ class LabelTag(Base):
     scan_category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
     scan_category: ScanCategory = relationship('ScanCategory', back_populates="available_tags")
 
+    tools: List[LabelTool] = Column(ArrayOfEnum(Enum(LabelTool, name='label_tool', create_constraint=False)))
     actions: List['Action'] = relationship('Action', back_populates='label_tag')
 
-    def __init__(self, key: str, name: str, actions: List['Action'] = None) -> None:
+    def __init__(self, key: str, name: str, tools: List[LabelTool], actions: List['Action'] = None) -> None:
         """Initialize Label Tag.
 
         :param key: unique key representing Label Tag
         :param name: name which describes this Label Tag
+        :param tools: list of tools for given Label Tag
         :param actions: (optional) list of required actions for this Label Tag
         """
         self.key = key
         self.name = name
+        self.tools = tools
         self.actions = actions or []
 
     def __repr__(self) -> str:

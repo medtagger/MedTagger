@@ -81,7 +81,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
 
         const normalizedPoint: { x: number, y: number } = this.normalizeByView(selectionStartX, selectionStartY);
 
-        this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag);
+        this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag.key);
         if (this.isOnlyOneSelectionPerSlice() && this.selections.get(this.currentSlice)) {
             this.selections.get(this.currentSlice).forEach((selection: SliceSelection) => this.stateChange.emit(
                 new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
