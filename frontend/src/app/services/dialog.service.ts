@@ -18,12 +18,12 @@ export class DialogService {
         return infoDialogRef;
     }
 
-    public openInputDialog(title: string, content: string, buttonText?: string): MatDialogRef<any> {
+    public openInputDialog(title: string, content: string, inputData: string, buttonText?: string): MatDialogRef<any> {
         const buttonLabel: string = buttonText ? buttonText : 'Submit';
 
         const inputDialogRef = this.dialog.open(InputDialogComponent, {
             width: '450px',
-            data: {title: title, content: content, buttonText: buttonLabel}
+            data: {title: title, content: content, input: inputData, buttonText: buttonLabel}
         });
 
         return inputDialogRef;

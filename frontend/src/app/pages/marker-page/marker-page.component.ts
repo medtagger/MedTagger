@@ -42,10 +42,12 @@ export class MarkerPageComponent implements OnInit {
     lastSliceID = 0;
     startTime: Date;
     selectors: Map<string, Selector<any>>;
+    labelComment: string;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar) {
         console.log('MarkerPage constructor', this.marker);
+        this.labelComment = '';
     }
 
     ngOnInit() {
@@ -146,16 +148,11 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
-        this.marker.setFocusable(false);
-        this.dialogService.openInputDialog('Leave a comment (optional)', 'If you\'d like, you can add a comment to the label below:',
-            'Send label').afterClosed().subscribe(comment => {
-            this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()), comment);
-            this.marker.setFocusable(true);
-        });
+        this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()), this.labelComment);
     }
 
     public sendEmptyLabel(): void {
-        this.sendSelection(new ROISelection3D(), '');
+        this.sendSelection(new ROISelection3D(), 'This is an empty Label');
         this.nextScan();
     }
 
@@ -207,5 +204,14 @@ export class MarkerPageComponent implements OnInit {
 
     public getToolIconName(iconName: string): string {
         return LabelExplorerComponent.toolIconNames.get(iconName);
+    }
+
+    public addLabelComment(): void {
+        this.marker.setFocusable(false);
+        this.dialogService.openInputDialog('Add comment to your label (optional)', 'If you\'d like, you can add a comment to the label' +
+            ' below:', this.labelComment, 'Add comment').afterClosed().subscribe(comment => {
+                this.labelComment = comment;
+                this.marker.setFocusable(true);
+        });
     }
 }

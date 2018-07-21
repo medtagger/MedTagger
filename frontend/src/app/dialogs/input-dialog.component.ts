@@ -12,7 +12,7 @@ export class InputDialogComponent {
     userInput = new FormControl('', []);
 
     constructor(private dialogRef: MatDialogRef<InputDialogComponent>,
-                @Inject(MAT_DIALOG_DATA) public data: { title: string, content: string, buttonText: string }) {
+                @Inject(MAT_DIALOG_DATA) public data: { title: string, content: string, input: string, buttonText: string }) {
     }
 
     closeDialog(): void {

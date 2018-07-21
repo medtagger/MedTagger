@@ -2,7 +2,7 @@
 <div mat-dialog-content>
     <p>{{data.content}}</p>
     <mat-form-field style="width: 100%;">
-        <textarea matInput matTextareaAutosize [formControl]="userInput"></textarea>
+        <textarea matInput matTextareaAutosize [formControl]="userInput" placeholder="{{data.input}}"></textarea>
     </mat-form-field>
 </div>
 <div mat-dialog-actions align="center">
