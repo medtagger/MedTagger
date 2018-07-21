@@ -21,7 +21,8 @@ from medtagger.api.utils import get_current_user
 
 logger = logging.getLogger(__name__)
 
-LabelElementHandler = Callable[[Dict[str, Any], LabelID, Dict[str, bytes]], None]
+LabelElementHandler = Callable[[
+    Dict[str, Any], LabelID, Dict[str, bytes]], None]
 
 
 def get_available_scan_categories() -> List[ScanCategory]:
@@ -79,7 +80,8 @@ def get_random_scan(category_key: str) -> Scan:
     try:
         scan = ScansRepository.get_random_scan(category, user)
         if not scan:
-            raise NotFoundException('Could not find any Scan for this category!')
+            raise NotFoundException(
+                'Could not find any Scan for this category!')
         return scan
     except NoResultFound:
         raise NotFoundException('Could not find any Scan for this category!')
@@ -95,7 +97,8 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
     :param orientation: orientation for Slices (by default set to Z axis)
     :return: generator for Slices
     """
-    slices = SlicesRepository.get_slices_by_scan_id(scan_id, orientation=orientation)
+    slices = SlicesRepository.get_slices_by_scan_id(
+        scan_id, orientation=orientation)
     for _slice in slices[begin:begin + count]:
         image = SlicesRepository.get_slice_converted_image(_slice.id)
         yield _slice, image
@@ -109,6 +112,16 @@ def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> Non
     """
     _validate_files(files)
     _validate_label_elements(elements, files)
+    _validate_tool(elements)
+
+
+def _validate_tool(elements: List[Dict]):
+    """Validate if the tool for given Label Element is available for given tag"""
+    for label_element in elements:
+        tag = _get_label_tag(label_element['tag'])
+        if label_element['tool'] not in {tool.name for tool in tag.tools}:
+            raise InvalidArgumentsException('{} tool is not available for {} tag'.format(
+                label_element['tool'], tag.name))
 
 
 def _validate_files(files: Dict[str, bytes]) -> None:
@@ -119,7 +132,8 @@ def _validate_files(files: Dict[str, bytes]) -> None:
             image.verify()
             assert image.format == 'PNG'
         except Exception:
-            raise InvalidArgumentsException('Type of file "{}" is not supported!'.format(file_name))
+            raise InvalidArgumentsException(
+                'Type of file "{}" is not supported!'.format(file_name))
 
 
 def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> None:
@@ -131,7 +145,8 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
                 files[label_element['image_key']]
             except KeyError:
                 message = 'Request does not have field named {} that could contain the image!'
-                raise InvalidArgumentsException(message.format(label_element['image_key']))
+                raise InvalidArgumentsException(
+                    message.format(label_element['image_key']))
 
 
 def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, bytes],
@@ -177,10 +192,12 @@ def _add_rectangle_element(element: Dict[str, Any], label_id: LabelID, *_: Any) 
     :param element: JSON describing single element
     :param label_id: ID of a given Label that the element should be added to
     """
-    position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
+    position = LabelPosition(
+        x=element['x'], y=element['y'], slice_index=element['slice_index'])
     shape = LabelShape(width=element['width'], height=element['height'])
     label_tag = _get_label_tag(element['tag'])
-    LabelsRepository.add_new_rectangular_label_element(label_id, position, shape, label_tag)
+    LabelsRepository.add_new_rectangular_label_element(
+        label_id, position, shape, label_tag)
 
 
 def _add_brush_element(element: Dict[str, Any], label_id: LabelID, files: Dict[str, bytes]) -> None:
@@ -195,7 +212,8 @@ def _add_brush_element(element: Dict[str, Any], label_id: LabelID, files: Dict[s
     label_tag = _get_label_tag(element['tag'])
     slice_index = element['slice_index']
     image = files[element['image_key']]
-    LabelsRepository.add_new_brush_label_element(label_id, slice_index, width, height, image, label_tag)
+    LabelsRepository.add_new_brush_label_element(
+        label_id, slice_index, width, height, image, label_tag)
 
 
 def _add_point_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> None:
@@ -204,7 +222,8 @@ def _add_point_element(element: Dict[str, Any], label_id: LabelID, *_: Any) -> N
     :param element: JSON describing single element
     :param label_id: ID of a given Label that the element should be added to
     """
-    position = LabelPosition(x=element['x'], y=element['y'], slice_index=element['slice_index'])
+    position = LabelPosition(
+        x=element['x'], y=element['y'], slice_index=element['slice_index'])
     label_tag = _get_label_tag(element['tag'])
     LabelsRepository.add_new_point_label_element(label_id, position, label_tag)
 

@@ -24,7 +24,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Brush
-    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.BRUSH.name])
+    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.BRUSH])
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -74,7 +74,7 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Point
-    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.POINT.name])
+    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.POINT])
     payload = {
         'elements': [{
             'slice_index': 0,
