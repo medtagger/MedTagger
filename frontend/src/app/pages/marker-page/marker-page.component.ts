@@ -201,8 +201,7 @@ export class MarkerPageComponent implements OnInit {
         const selector = this.selectors.get(selectorName);
         if (selector) {
             this.marker.setCurrentSelector(selector);
-            this.
-              = selector.getActions();
+            this.selectorActions = selector.getActions();
         } else {
             console.warn(`MarkerPage | setSelector | Selector "${selectorName}" doesn't exist`);
         }
