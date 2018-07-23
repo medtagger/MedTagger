@@ -108,9 +108,6 @@ main {
     @include media-breakpoint-up(lg) {
         max-width: 80%;
     }
-    @include media-breakpoint-up(md) {
-        overflow-y: auto;
-    }
     h3 {
         font-weight: bold;
     }
