@@ -57,6 +57,7 @@ import {InfoDialogComponent} from '../dialogs/info-dialog.component';
 import {MedTaggerWebSocket} from '../services/websocket.service';
 
 import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
+import {NavbarComponent} from '../components/navbar/navbar.component';
 
 @NgModule({
     declarations: [
@@ -73,7 +74,8 @@ import {LabelExplorerComponent} from '../components/label-explorer/label-explore
         UploadPageComponent,
         SettingsPageComponent,
         ValidationPageComponent,
-        InfoDialogComponent
+        InfoDialogComponent,
+        NavbarComponent
     ],
     imports: [
         routing,
