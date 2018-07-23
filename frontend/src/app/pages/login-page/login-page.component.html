@@ -1,13 +1,10 @@
-<!--suppress XmlDuplicatedId -->
 <div class="row">
     <header class="col-sm-12 col-lg-4">
         <div class="logo">
             <img src="../../../assets/icon/medtagger_logo.svg"/>
             <h1>MedTagger</h1>
         </div>
-        <h3>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at leo vitae est
-            fermentum suscipit quis
-            vestibulum leo.</h3>
+        <h3>The first open-source platform for labeling and aggregation of datasets with a usage of a crowdsourcing idea.</h3>
     </header>
     <div class="col-sm-12 col-lg-8 login">
         <div class="buttons-pill">
@@ -20,8 +17,7 @@
         </div>
         <main *ngIf="loginPageMode == LoginPageMode.LOG_IN">
             <h3>Hello!</h3>
-            <h4>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at leo vitae est fermentum suscipit quis
-                vestibulum leo.</h4>
+            <h4>Good to see you back! Log in and continue your work.</h4>
             <form [formGroup]="userForm" (keyup.enter)="logIn()">
                 <mat-form-field appearance="fill">
                     <mat-label>Email</mat-label>
@@ -52,8 +48,7 @@
         <main *ngIf="loginPageMode == LoginPageMode.REGISTER">
             <h3>Hello!</h3>
             <h4>Start labeling with MedTagger today. It is easy! Just take your time and fill this registration form and
-                you
-                are ready to go. </h4>
+                you are ready to go. </h4>
             <form [formGroup]="userForm" (keyup.enter)="register()">
                 <div class="row">
                     <mat-form-field appearance="fill" class="col-12 col-lg-6">
@@ -98,7 +93,6 @@
                 </button>
                 <mat-progress-spinner *ngIf="registrationInProgress" class="login-spinner" mode="indeterminate"
                                       [diameter]="36" strokeWidth="2"></mat-progress-spinner>
-                <!--<mat-icon *ngIf="registrationInError" color="warn">error</mat-icon>-->
             </div>
         </main>
     </div>
