@@ -44,23 +44,62 @@ export class UploadScansSelectorComponent {
     public totalNumberOfSlices = 0;
     public incompatibleFiles: IncompatibleFile[] = [];
 
-    private isCompatibleSliceFile(sliceFile: File): boolean {
+    // https://en.wikipedia.org/wiki/List_of_file_signatures -> dicom format
+    private DICOM_BYTE_SIGNATURE = '4449434D';
+    private DICOM_BYTE_SIGNATURE_OFFSET = 128;
+
+    private async isCompatibleSliceFile(sliceFile: File): Promise<boolean> {
+        let isCompatible = null;
+
         // Skip all files that are not DICOMs
-        if (sliceFile.type !== 'application/dicom') {
+        await this.isFileDicom(sliceFile).then( () => {
+            // Check for size limit (5 MB)
+            if (sliceFile.size > FILE_SIZE_LIMIT * 1024 * 1024) {
+                const fileSize = Math.round(sliceFile.size / 1024 / 1024);
+                const reason = 'Too large File! This file has ' + fileSize + 'MB but the limit is ' + FILE_SIZE_LIMIT + 'MB.';
+                this.incompatibleFiles.push(new IncompatibleFile(sliceFile, reason));
+                isCompatible = false;
+            }
+
+            isCompatible = true;
+        }, () => {
             const reason = 'Incompatible MIME Type! Should be "application/dicom" but File has type "' + sliceFile.type + '".';
+            console.log(reason);
             this.incompatibleFiles.push(new IncompatibleFile(sliceFile, reason));
-            return false;
-        }
+            isCompatible = false;
+        });
 
-        // Check for size limit (5 MB)
-        if (sliceFile.size > FILE_SIZE_LIMIT * 1024 * 1024) {
-            const fileSize = Math.round(sliceFile.size / 1024 / 1024);
-            const reason = 'Too large File! This file has ' + fileSize + 'MB but the limit is ' + FILE_SIZE_LIMIT + 'MB.';
-            this.incompatibleFiles.push(new IncompatibleFile(sliceFile, reason));
-            return false;
-        }
+        return isCompatible;
+    }
 
-        return true;
+    private async isFileDicom(sliceFile: File): Promise<any> {
+        return new Promise(((resolve, reject) => {
+            if (sliceFile.type === 'application/dicom') {
+                resolve();
+            } else {
+                const fileReader: FileReader = new FileReader();
+
+                fileReader.onloadend = (e: ProgressEvent) => {
+                    const fileHeaderBytes = new Uint8Array(fileReader.result);
+
+                    const singatureBytesValues: string[] = [];
+
+                    fileHeaderBytes.forEach((byte) => {
+                        singatureBytesValues.push(byte.toString(16));
+                    });
+
+                    const fileSignature: string = singatureBytesValues.join('').toUpperCase();
+
+                    if (fileSignature === this.DICOM_BYTE_SIGNATURE) {
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                };
+                const blob = sliceFile.slice(this.DICOM_BYTE_SIGNATURE_OFFSET, this.DICOM_BYTE_SIGNATURE_OFFSET + 4);
+                fileReader.readAsArrayBuffer(blob);
+            }
+        }));
     }
 
     private prepareScans(): void {

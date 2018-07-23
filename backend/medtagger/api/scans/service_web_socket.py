@@ -21,13 +21,21 @@ class Slices(Namespace):
         scan_id = ScanID(str(request['scan_id']))
         begin = max(0, request.get('begin', 0))
         count = request.get('count', 1)
+        reversed_order = request.get('reversed', False)
         orientation = request.get('orientation', SliceOrientation.Z.value)
         self._raise_on_invalid_request_slices(count, orientation)
 
         orientation = SliceOrientation[orientation]
         slices = business.get_slices_for_scan(scan_id, begin, count, orientation=orientation)
-        for index, (_slice, image) in enumerate(slices):
-            emit('slice', {'scan_id': scan_id, 'index': begin + index, 'image': image})
+        slices_to_send = reversed(list(enumerate(slices))) if reversed_order else enumerate(slices)
+        last_in_batch = begin if reversed_order else begin + count - 1
+        for index, (_slice, image) in slices_to_send:
+            emit('slice', {
+                'scan_id': scan_id,
+                'index': begin + index,
+                'last_in_batch': last_in_batch,
+                'image': image,
+            })
 
     def _raise_on_invalid_request_slices(self, count: int, orientation: str) -> None:
         """Validate incoming request and raise an exception if there are issues with given arguments.

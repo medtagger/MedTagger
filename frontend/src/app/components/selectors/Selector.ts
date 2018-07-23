@@ -1,5 +1,6 @@
 import {EventEmitter} from '@angular/core';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
+import {SelectorAction} from '../../model/SelectorAction';
 
 export interface Selector<SliceSelection> {
 
@@ -7,17 +8,17 @@ export interface Selector<SliceSelection> {
 
     drawSelection(selection: SliceSelection, color: string): any;
 
-    onMouseDown(event: MouseEvent): boolean;
+    onMouseDown(event: MouseEvent): void;
 
-    onMouseMove(event: MouseEvent): boolean;
+    onMouseMove(event: MouseEvent): void;
 
-    onMouseUp(event: MouseEvent): boolean;
+    onMouseUp(event: MouseEvent): void;
 
     clearData(): any;
 
-    getStateChangeEmitter(): EventEmitter<SelectionStateMessage>;
+    setRedrawRequestEmitter(emitter: EventEmitter<void>): void;
 
-    addCurrentSelection(): any;
+    getStateChangeEmitter(): EventEmitter<SelectionStateMessage>;
 
     updateCurrentSlice(currentSliceId: number): any;
 
@@ -47,10 +48,6 @@ export interface Selector<SliceSelection> {
 
     updateCanvasHeight(height: number): void;
 
-    normalizeByView(paramX: number, paramY: number): {x: number, y: number};
-
-    scaleToView(paramX: number, paramY: number): {x: number, y: number};
-
     // Show selection on all slice images, return true if selection with selectionId exists
     pinSelection(selectionId: number, newValue: boolean): boolean;
 
@@ -58,4 +55,6 @@ export interface Selector<SliceSelection> {
     hideSelection(selectionId: number, newValue: boolean): boolean;
 
     getSelectorName(): string;
+
+    getActions(): Array<SelectorAction>;
 }

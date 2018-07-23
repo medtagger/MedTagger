@@ -5,8 +5,7 @@ import pytest
 
 from medtagger.api import InvalidArgumentsException
 from medtagger.database.models import User
-from medtagger.repositories.users import UsersRepository
-from medtagger.repositories.roles import RolesRepository
+from medtagger.repositories import users as UsersRepository, roles as RolesRepository
 from medtagger.api.auth.business import create_user
 from medtagger.api.auth.business import sign_in_user
 

@@ -118,15 +118,15 @@ export class ScanService {
 
     slicesObservable(): Observable<MarkerSlice> {
         return this.websocket.fromEvent<any>('slice').pipe(
-            map((slice: { scan_id: string, index: number, image: ArrayBuffer }) => {
-                return new MarkerSlice(slice.scan_id, slice.index, slice.image);
+            map((slice: { scan_id: string, index: number, last_in_batch: number, image: ArrayBuffer }) => {
+                return new MarkerSlice(slice.scan_id, slice.index, slice.last_in_batch, slice.image);
             })
         );
     }
 
-    requestSlices(scanId: string, begin: number, count: number) {
+    requestSlices(scanId: string, begin: number, count: number, reversed: boolean) {
         console.log('ScanService | requestSlices | begin:', begin);
-        this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count});
+        this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count, reversed: reversed});
     }
 
     createNewScan(category: string, numberOfSlices: number) {
@@ -140,14 +140,13 @@ export class ScanService {
                 .pipe(
                     retryWhen((error: Observable<HttpErrorResponse>) => {
                         return error.pipe(
-                            flatMap((scanRequestError: HttpErrorResponse) => {
+                            map((scanRequestError: HttpErrorResponse) => {
                                 console.warn('Retrying request for creating new Scan (attempt: ' + (++retryAttempt) + ').');
-                                return of(scanRequestError.status).pipe(
-                                    delay(5000), // Let's give it a try after 5 seconds
-                                    take(5), // Let's give it 5 retries (each after 5 seconds)
-                                    concat(observableThrowError({error: 'Cannot create new Scan.'}))
-                                );
+                                return of(scanRequestError.status);
                             }),
+                            delay(5000), // Let's give it a try after 5 seconds
+                            take(5), // Let's give it 5 retries (each after 5 seconds)
+                            concat(observableThrowError({error: 'Cannot create new Scan.'}))
                         );
                     })
                 ).toPromise().then(
@@ -166,7 +165,7 @@ export class ScanService {
 
         return from(files).pipe(
             map((file: File) => {
-                console.log('uploading...', file);
+                console.log('Uploading file...', file);
                 let retryAttempt = 0;
                 const form = new FormData();
                 form.append('image', file, file.name);
@@ -175,16 +174,14 @@ export class ScanService {
                         .pipe(
                             retryWhen((error: Observable<HttpErrorResponse>) => {
                                 return error.pipe(
-                                    flatMap((uploadRequestError: HttpErrorResponse) => {
+                                    map((uploadRequestError: HttpErrorResponse) => {
                                         console.warn('Retrying request for uploading a single Slice ('
                                             + file.name + ', attempt: ' + (++retryAttempt) + ').');
-                                        return of(uploadRequestError.status).pipe(
-                                            delay(5000),  // Let's give it a try after 5 seconds
-                                            take(5),  // Let's give it 5 retries (each after 5 seconds)
-                                            concat(observableThrowError({error: 'Cannot upload Slice ' + file.name}))
-                                            // TODO: use some new way of dealing with
-                                        );
-                                    })
+                                        return of(uploadRequestError.status);
+                                    }),
+                                    delay(5000),  // Let's give it a try after 5 seconds
+                                    take(5),  // Let's give it 5 retries (each after 5 seconds)
+                                    concat(observableThrowError({error: 'Cannot upload Slice ' + file.name}))
                                 );
                             })
                         )
@@ -192,5 +189,17 @@ export class ScanService {
             }),
             mergeAll(CONCURRENT_API_CALLS)
         );
+    }
+
+    skipScan(scanId: string): Promise<Response> {
+        return new Promise((resolve, reject) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/skip`, {}).toPromise().then((response: Response) => {
+                console.log('ScanService | skipScan | response: ', response);
+                resolve(response);
+            }).catch((error: Response) => {
+                console.log('ScanService | skipScan | error: ', error);
+                reject(error);
+            });
+        });
     }
 }

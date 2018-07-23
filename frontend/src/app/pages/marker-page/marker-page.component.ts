@@ -8,6 +8,7 @@ import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
+import {SliceRequest} from '../../model/SliceRequest';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 import {MatSnackBar} from '@angular/material';
@@ -15,6 +16,8 @@ import {LabelTag} from '../../model/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
+import {ChainSelector} from '../../components/selectors/ChainSelector';
+import {SelectorAction} from '../../model/SelectorAction';
 
 
 @Component({
@@ -41,6 +44,7 @@ export class MarkerPageComponent implements OnInit {
     lastSliceID = 0;
     startTime: Date;
     selectors: Map<string, Selector<any>>;
+    selectorActions: Array<SelectorAction> = [];
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar) {
@@ -52,7 +56,8 @@ export class MarkerPageComponent implements OnInit {
 
         this.selectors = new Map<string, Selector<any>>([
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
-            ['POINT', new PointSelector(this.marker.getCanvas())]
+            ['POINT', new PointSelector(this.marker.getCanvas())],
+            ['CHAIN', new ChainSelector(this.marker.getCanvas())]
         ]);
         this.marker.setSelectors(Array.from(this.selectors.values()));
         this.setSelector('RECTANGLE');
@@ -73,26 +78,36 @@ export class MarkerPageComponent implements OnInit {
             if (this.marker.downloadingScanInProgress === true) {
                 this.indicateNewScanAppeared();
             }
-            this.marker.setDownloadSlicesInProgress(false);
+            if (slice.isLastInBatch()) {
+                this.marker.setDownloadSlicesInProgress(false);
+            }
             this.marker.setDownloadScanInProgress(false);
         });
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
             if (isObserverHooked) {
-                this.marker.observableSliceRequest.subscribe((sliceRequest: number) => {
-                    console.log('MarkerPage | observable sliceRequest: ', sliceRequest);
-                    this.marker.setDownloadSlicesInProgress(true);
+                this.marker.observableSliceRequest.subscribe((request: SliceRequest) => {
+                    const reversed = request.reversed;
+                    let sliceRequest = request.slice;
+                    console.log('MarkerPage | observable sliceRequest: ', sliceRequest, ' reversed: ', reversed);
                     let count = MarkerPageComponent.SLICE_BATCH_SIZE;
-                    if (sliceRequest + count > this.scan.numberOfSlices) {
+                    if (reversed === false && sliceRequest + count > this.scan.numberOfSlices) {
                         count = this.scan.numberOfSlices - sliceRequest;
-                        this.marker.setDownloadSlicesInProgress(false);
                     }
-                    if (sliceRequest < 0) {
-                        count = count + sliceRequest;
-                        sliceRequest = 0;
-                        this.marker.setDownloadSlicesInProgress(false);
+                    if (reversed === true) {
+                        sliceRequest -= count;
+                        if (sliceRequest < 0) {
+                            count += sliceRequest;
+                            sliceRequest = 0;
+                        }
                     }
-                    this.scanService.requestSlices(this.scan.scanId, sliceRequest, count);
+                    if (count <= 0) {
+                        return;
+                    }
+                    if (this.marker.downloadingSlicesInProgress === false) {
+                        this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
+                        this.marker.setDownloadSlicesInProgress(true);
+                    }
                 });
             }
         });
@@ -108,7 +123,7 @@ export class MarkerPageComponent implements OnInit {
                 const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
                 this.startMeasuringLabelingTime();
-                this.scanService.requestSlices(scan.scanId, begin, count);
+                this.scanService.requestSlices(scan.scanId, begin, count, false);
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);
@@ -124,6 +139,11 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
+        this.scanService.skipScan(this.scan.scanId).then();
+        this.nextScan();
+    }
+
+    public nextScan(): void {
         this.marker.setDownloadScanInProgress(true);
         this.marker.prepareForNewScan();
         this.requestScan();
@@ -135,7 +155,7 @@ export class MarkerPageComponent implements OnInit {
 
     public sendEmptyLabel(): void {
         this.sendSelection(new ROISelection3D());
-        this.skipScan();
+        this.nextScan();
     }
 
     private sendSelection(roiSelection: ROISelection3D) {
@@ -146,7 +166,7 @@ export class MarkerPageComponent implements OnInit {
                 console.log('MarkerPage | sendSelection | success!');
                 this.indicateLabelHasBeenSend();
                 this.labelExplorer.reinitializeExplorer();
-                this.skipScan();
+                this.nextScan();
                 this.startMeasuringLabelingTime();
             })
             .catch((errorResponse: Error) => {
@@ -179,6 +199,7 @@ export class MarkerPageComponent implements OnInit {
         const selector = this.selectors.get(selectorName);
         if (selector) {
             this.marker.setCurrentSelector(selector);
+            this.selectorActions = selector.getActions();
         } else {
             console.warn(`MarkerPage | setSelector | Selector "${selectorName}" doesn't exist`);
         }

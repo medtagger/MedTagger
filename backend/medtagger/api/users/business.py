@@ -6,8 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from medtagger.api import InvalidArgumentsException
 from medtagger.api.utils import get_current_user
 from medtagger.database.models import User
-from medtagger.repositories.users import UsersRepository
-from medtagger.repositories.roles import RolesRepository
+from medtagger.repositories import users as UsersRepository, roles as RolesRepository
 
 
 def get_all_users() -> List[User]:
