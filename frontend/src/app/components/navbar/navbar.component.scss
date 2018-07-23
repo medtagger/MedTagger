@@ -1,0 +1,49 @@
+@import "../../../styles";
+
+.wrap {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 5em;
+    height: 100vh;
+    background: mat-color($primary, 800);
+    @include mat-elevation(2);
+    @include mat-elevation-transition;
+    &:hover {
+        @include mat-elevation(5);
+    }
+}
+
+.company-logo{
+    @include size(3em);
+    margin: 3em 0;
+    background: url($path-icons + "medtagger_logo.svg") center center/contain no-repeat;
+}
+
+
+.item{
+    padding: 1em 0;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+    &:hover{
+        background-color: mat-color($accent);
+        @include transition(background-color 0.2s);
+    }
+    .mat-icon {
+        @include size(1em);
+        font-size: 2.8em;
+        color: $white-high-emphasis;
+    }
+}
+
+button{
+    @include size(3em);
+    outline: none;
+    border: none;
+    border-radius: 3em;
+    &:hover, &:active, &:focus{
+        outline: none;
+    }
+}
