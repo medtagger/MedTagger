@@ -66,23 +66,18 @@ export class LabelExplorerComponent implements OnInit {
         }
     }
 
-    // TODO: tools should be part of dict stored in backend (available tools)
     public addLabel(selectionId: number, labelSlice: number, tag: LabelTag, tool: string): void {
-        const t: LabelTag = this.getLabelTag(tag.key, tool);
-        const newItem: LabelListItem = new LabelListItem(selectionId, labelSlice, t, tool);
+        this.setUpTag(tag);
+        const newItem: LabelListItem = new LabelListItem(selectionId, labelSlice, tag, tool);
         this.labels.push(newItem);
     }
 
-    private getLabelTag(tagKey: string, tool: string): LabelTag {
-        const found: LabelTag = this.tags.find(tag => tag.key === tagKey);
+    private setUpTag(tag: LabelTag) {
+        const found: LabelTag = this.tags.find(labelTag => labelTag.key === tag.key);
         if (found) {
-            return found;
+            return;
         } else {
-            // TODO: get name for tag key, now mocked generic name
-            const name = 'All';
-            const created = new LabelTag(name, tagKey, [tool]);
-            this.tags.push(created);
-            return created;
+            this.tags.push(tag);
         }
     }
 

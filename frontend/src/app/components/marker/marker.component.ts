@@ -120,6 +120,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         return coordinates;
     }
 
+    public getCurrentTag() {
+        return this.currentTag;
+    }
+
     private hookUpStateChangeSubscription(): void {
         this.selectorSubscriptions.forEach((subscription) => subscription.unsubscribe());
         this.selectorSubscriptions = this.selectors

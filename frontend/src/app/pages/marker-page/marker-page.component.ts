@@ -18,6 +18,7 @@ import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
 import {CategoryService} from '../../services/category.service';
 import {FormControl, Validators} from '@angular/forms';
+import { isUndefined } from 'util';
 
 
 @Component({
@@ -75,10 +76,6 @@ export class MarkerPageComponent implements OnInit {
         ]);
 
         this.marker.setSelectors(Array.from(this.selectors.values()));
-        this.setSelector('RECTANGLE');
-
-        this.categoryTags.setValue(this.category.tags[0]);
-        this.setTag(this.category.tags[0]);
 
         this.marker.setLabelExplorer(this.labelExplorer);
 
@@ -208,6 +205,14 @@ export class MarkerPageComponent implements OnInit {
 
     private indicateNewScanAppeared(): void {
         this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
+    }
+
+    private availableForTag(tool: string) {
+        const tag = this.marker.getCurrentTag();
+        if (isUndefined(tag)) {
+            return false;
+        }
+        return tag.tools.includes(tool);
     }
 
     public setSelector(selectorName: string) {
