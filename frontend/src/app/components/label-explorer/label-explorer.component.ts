@@ -67,12 +67,12 @@ export class LabelExplorerComponent implements OnInit {
     }
 
     public addLabel(selectionId: number, labelSlice: number, tag: LabelTag, tool: string): void {
-        this.setUpTag(tag);
+        this.addTag(tag);
         const newItem: LabelListItem = new LabelListItem(selectionId, labelSlice, tag, tool);
         this.labels.push(newItem);
     }
 
-    private setUpTag(tag: LabelTag) {
+    private addTag(tag: LabelTag) {
         const found: LabelTag = this.tags.find(labelTag => labelTag.key === tag.key);
         if (found) {
             return;

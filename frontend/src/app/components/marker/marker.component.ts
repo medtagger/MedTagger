@@ -11,6 +11,8 @@ import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from '../selectors/Selector';
 import {Subscription} from 'rxjs/Subscription';
 import {LabelTag} from '../../model/LabelTag';
+import { isUndefined } from 'util';
+import {MatSnackBar} from '@angular/material';
 
 @Component({
     selector: 'app-marker-component',
@@ -54,7 +56,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     private selectorsByName: Map<string, Selector<SliceSelection>> = new Map();
 
-    constructor() {
+    constructor(public snackBar: MatSnackBar) {
         super();
     }
 
@@ -73,16 +75,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setCurrentSelector(selector: Selector<any>) {
         this.currentSelector = selector;
-        this.setCurrentTagForSelector(this.currentTag);
+        super.setCurrentTagForSelector(this.currentSelector, this.currentTag);
     }
 
     public setCurrentTag(tag: LabelTag) {
+        super.setCurrentTag(tag);
         this.currentTag = tag;
-        this.setCurrentTagForSelector(this.currentTag);
-    }
-
-    public setCurrentTagForSelector(tag: LabelTag) {
-        this.currentSelector.updateCurrentTag(tag);
     }
 
     public setDownloadScanInProgress(isInProgress: boolean) {
@@ -206,6 +204,13 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.canvas.onmousedown = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmousedown clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
+            if (isUndefined(this.currentTag)) {
+                this.snackBar.open('Please select Tag and Tool to start labeling.', '', {duration: 2000});
+                return;
+            } else if (isUndefined(this.currentSelector)) {
+                this.snackBar.open('Please select Tool to start labeling.', '', {duration: 2000});
+                return;
+            }
             if (this.currentSelector.onMouseDown(mouseEvent)) {
                 this.redrawSelections();
             }
@@ -213,13 +218,13 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            if (this.currentSelector.onMouseUp(mouseEvent)) {
+            if (this.currentSelector && this.currentSelector.onMouseUp(mouseEvent)) {
                 this.redrawSelections();
             }
         };
 
         this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
-            if (this.currentSelector.onMouseMove(mouseEvent)) {
+            if (this.currentSelector && this.currentSelector.onMouseMove(mouseEvent)) {
                 this.redrawSelections();
             }
         };

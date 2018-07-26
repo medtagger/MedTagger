@@ -61,7 +61,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         this.currentSlice = currentSliceId;
     }
 
-    public updateCurrentTag(tag: LabelTag): void {
+    public updateCurrentTag(tag: LabelTag) {
         this.currentTag = tag;
     }
 

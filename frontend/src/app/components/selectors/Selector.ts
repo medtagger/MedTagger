@@ -22,7 +22,7 @@ export interface Selector<SliceSelection> {
 
     updateCurrentSlice(currentSliceId: number): any;
 
-    updateCurrentTag(tag: LabelTag): any;
+    updateCurrentTag(tag: LabelTag);
 
     updateCanvasPosition(canvasRect: ClientRect): any;
 

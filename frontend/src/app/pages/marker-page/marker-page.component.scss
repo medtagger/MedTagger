@@ -35,10 +35,7 @@ button {
     .tags {
         mat-form-field {
             width: $toolbox-width - 30px;
-            margin: 10px 15px 15px 15px;
-            mat-error {
-                font-size: 1.25em;
-            }
+            margin: 10px 15px 0px 15px;
         }
     }
 
