@@ -217,6 +217,20 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                 this.redrawSelections();
             }
         };
+
+        this.canvas.onmousewheel = (wheelEvent: WheelEvent) => {
+            const sliderValue = wheelEvent.deltaY > 0 ? this.slider.value - 1 : this.slider.value + 1;
+            if (sliderValue < 0 || sliderValue > this.slider.max) {
+                return;
+            }
+
+            this.selectors.forEach((selector) => selector.updateCurrentSlice(sliderValue));
+            this.requestSlicesIfNeeded(sliderValue);
+
+            this.changeMarkerImage(sliderValue);
+
+            this.drawSelections();
+        }
     }
 
     public setLabelExplorer(labelExplorerRef: LabelExplorerComponent): void {
