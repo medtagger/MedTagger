@@ -230,7 +230,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             this.changeMarkerImage(sliderValue);
 
             this.drawSelections();
-        }
+        };
     }
 
     public setLabelExplorer(labelExplorerRef: LabelExplorerComponent): void {
