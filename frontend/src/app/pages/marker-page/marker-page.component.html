@@ -18,11 +18,20 @@
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('BRUSH')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('ERASER')"></mat-icon></button>
                 <button mat-mini-fab disabled="{{!availableForTag('POINT')}}" (click)="setSelector('POINT')"><mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon></button>
-                <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon></button>
+                <button mat-mini-fab disabled="{{!availableForTag('CHAIN')}}" (click)="setSelector('CHAIN')"><mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon></button>
             </div>
+
+            <div *ngIf="selectorActions.length > 0">
+                <h3>Actions</h3>
+                <div class="buttons action-buttons">
+                    <button mat-raised-button color="primary" *ngFor="let action of selectorActions" [disabled]="!action.enable()" (click)="action.trigger()">{{ action.name }}</button>
+                </div>
+            </div>
         </div>
+
+
 
         <h3>Your Labels</h3>
         <app-label-explorer></app-label-explorer>

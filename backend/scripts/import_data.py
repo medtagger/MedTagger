@@ -30,8 +30,7 @@ import glob
 import logging
 import logging.config
 
-from medtagger.repositories.scans import ScansRepository
-from medtagger.repositories.scan_categories import ScanCategoriesRepository
+from medtagger.repositories import scans as ScansRepository, scan_categories as ScanCategoriesRepository
 from medtagger.workers.storage import parse_dicom_and_update_slice
 
 

@@ -3,8 +3,7 @@ from typing import List
 
 from medtagger.definitions import LabelTool
 from medtagger.database.models import LabelTag
-from medtagger.repositories.label_tag import LabelTagRepository
-from medtagger.repositories.scan_categories import ScanCategoriesRepository
+from medtagger.repositories import label_tags as LabelTagsRepository, scan_categories as ScanCategoriesRepository
 
 
 def create_tag_and_assign_to_category(key: str, name: str, scan_category_key: str, tools: List[LabelTool]) -> LabelTag:
@@ -16,6 +15,6 @@ def create_tag_and_assign_to_category(key: str, name: str, scan_category_key: st
     :param tools: list of tools for given Label Tag
     :return: Label Tag
     """
-    label_tag = LabelTagRepository.add_new_tag(key, name, tools)
+    label_tag = LabelTagsRepository.add_new_tag(key, name, tools)
     ScanCategoriesRepository.assign_label_tag(label_tag, scan_category_key)
     return label_tag

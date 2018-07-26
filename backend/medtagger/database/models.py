@@ -13,8 +13,7 @@ from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, Lab
     LabelElementStatus, LabelTool
 from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime, LabelTagID, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
-    ActionResponseID, SurveyResponseID
-
+    ActionResponseID, SurveyResponseID, PointID
 
 #########################
 #
@@ -159,6 +158,7 @@ class Scan(Base):
         random_slice = Slice.query.filter(and_(
             Slice.scan_id == self.id,
             Slice.orientation == SliceOrientation.Z,
+            Slice.width.isnot(None),  # type: ignore  # "int" has no attribute "isnot"
         )).first()
         return random_slice.width if random_slice else None
 
@@ -168,6 +168,7 @@ class Scan(Base):
         random_slice = Slice.query.filter(and_(
             Slice.scan_id == self.id,
             Slice.orientation == SliceOrientation.Z,
+            Slice.height.isnot(None),  # type: ignore  # "int" has no attribute "isnot"
         )).first()
         return random_slice.height if random_slice else None
 
@@ -502,6 +503,69 @@ class PointLabelElement(LabelElement):
     def __repr__(self) -> str:
         """Return string representation for Point Label Element."""
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
+
+
+class ChainLabelElement(LabelElement):
+    """Definition of a Label Element made with Chain Tool."""
+
+    __tablename__ = 'ChainLabelElements'
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+
+    points: List['ChainLabelElementPoint'] = relationship('ChainLabelElementPoint',
+                                                          order_by='ChainLabelElementPoint.order',
+                                                          back_populates='label_element')
+    loop: bool = Column(Boolean, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': LabelTool.CHAIN,
+    }
+
+    def __init__(self, slice_index: int, tag: LabelTag, loop: bool) -> None:
+        """Initialize LabelElement made with Point Tool.
+
+        :param slice_index: index of slice
+        :param tag: tag of the label
+        :param loop: true if chain is loop (first and last points are connected)
+        """
+        super().__init__(tag)
+        self.slice_index = slice_index
+        self.loop = loop
+
+    def __repr__(self) -> str:
+        """Return string representation for Chain Label Element."""
+        return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, len(self.points), self.loop)
+
+
+class ChainLabelElementPoint(Base):
+    """Definition of one point in a chain created by Chain Tool."""
+
+    __tablename__ = 'ChainLabelElementPoints'
+    id: PointID = Column(String, primary_key=True)
+
+    x: float = Column(Float, nullable=False)
+    y: float = Column(Float, nullable=False)
+    label_element_id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), nullable=False)
+    label_element: ChainLabelElement = relationship('ChainLabelElement', back_populates='points')
+    order: int = Column(Integer, nullable=False)
+
+    def __init__(self, x: float, y: float, label_element_id: LabelElementID, order: int) -> None:
+        """Initialize Point made with Chain Tool.
+
+        :param x: position x of point
+        :param y: position y of point
+        :param label_element_id: id of ChainLabelElement that point belongs to
+        :param order: 0-indexed position of point in chain, points with consecutive order numbers are connected,
+                      points with order 0 and last order are connected if chain is loop
+        """
+        self.id = PointID(str(uuid.uuid4()))
+        self.x = x
+        self.y = y
+        self.label_element_id = label_element_id
+        self.order = order
+
+    def __repr__(self) -> str:
+        """Return string representation for Chain Label Element Point."""
+        return '<{}: {}: {} {}>'.format(self.__class__.__name__, self.id, self.x, self.y)
 
 
 ###########################

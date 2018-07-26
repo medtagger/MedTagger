@@ -1,5 +1,3 @@
-import {EventEmitter} from '@angular/core';
-import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {SelectorBase} from './SelectorBase';
 import {PointSelection} from '../../model/PointSelection';
 import {Selector} from './Selector';
@@ -7,51 +5,16 @@ import { LabelTag } from '../../model/LabelTag';
 
 export class PointSelector extends SelectorBase<PointSelection> implements Selector<PointSelection> {
 
-    readonly STYLE = {
-        RADIUS: 10,
-        SELECTION_FONT_SIZE: 14,
-        SELECTION_FONT_COLOR: '#ffffff',
-        CURRENT_SELECTION_COLOR: '#ff0000',
-        OTHER_SELECTION_COLOR: '#256fde',
-        ARCHIVED_SELECTION_COLOR: '#5f27e5'
-    };
-
     constructor(canvas: HTMLCanvasElement) {
-        super();
-        this.canvasCtx = canvas.getContext('2d');
-        this.canvasSize = {
-            width: canvas.width,
-            height: canvas.height
+        super(canvas);
+    }
+
+    protected getStyle(): any {
+        return {
+            ...super.getStyle(),
+            RADIUS: 10,
+            SELECTION_FONT_COLOR: '#ffffff',
         };
-        this.selections = new Map<number, [PointSelection]>();
-        this.selectedArea = undefined;
-        this.currentSlice = undefined;
-        this.currentTag = undefined;
-        this.stateChange = new EventEmitter<SelectionStateMessage>();
-    }
-
-    public formArchivedSelections(selectionMap: PointSelection[]): PointSelection[] {
-        selectionMap.forEach((selection: PointSelection) => {
-            this.drawSelection(selection, this.STYLE.ARCHIVED_SELECTION_COLOR);
-            console.log('PointSelector | scaleToView selection: ', selection);
-        });
-        return selectionMap;
-    }
-
-    public drawSelections(): void {
-        console.log('PointSelector | drawSelections | selection: ', this.selections);
-        this.getSelections().forEach((selection: PointSelection) => {
-            let color: string;
-            const isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
-            if (isCurrent) {
-                color = this.STYLE.CURRENT_SELECTION_COLOR;
-            } else {
-                color = this.STYLE.OTHER_SELECTION_COLOR;
-            }
-            if ((selection.pinned || isCurrent) && (!selection.hidden)) {
-                this.drawSelection(selection, color);
-            }
-        });
     }
 
     public drawSelection(selection: PointSelection, color: string): void {
@@ -61,25 +24,25 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         const scaledPointPosition: { x: number, y: number } = this.scaleToView(selection.positionX, selection.positionY);
 
         this.canvasCtx.beginPath();
-        this.canvasCtx.arc(scaledPointPosition.x , scaledPointPosition.y, this.STYLE.RADIUS, 0, 2 * Math.PI);
+        this.canvasCtx.arc(scaledPointPosition.x , scaledPointPosition.y, this.getStyle().RADIUS, 0, 2 * Math.PI);
         this.canvasCtx.fill();
 
-        const fontSize = this.STYLE.SELECTION_FONT_SIZE;
+        const fontSize = this.getStyle().SELECTION_FONT_SIZE;
         this.canvasCtx.font = `${fontSize}px Arial`;
-        this.canvasCtx.fillStyle = this.STYLE.SELECTION_FONT_COLOR;
+        this.canvasCtx.fillStyle = this.getStyle().SELECTION_FONT_COLOR;
         this.canvasCtx.textAlign = 'center';
         this.canvasCtx.fillText(selection.getId().toString(), scaledPointPosition.x,
-            scaledPointPosition.y + this.STYLE.SELECTION_FONT_SIZE * 0.25);
+            scaledPointPosition.y + this.getStyle().SELECTION_FONT_SIZE * 0.25);
     }
 
     private checkDistance(point: PointSelection, x: number, y: number) {
         const scaledPoint: { x: number, y: number } = this.scaleToView(point.positionX, point.positionY);
         const distance = Math.sqrt(Math.pow(scaledPoint.x - x, 2) + Math.pow(scaledPoint.y - y, 2));
 
-        return distance < this.STYLE.RADIUS;
+        return distance < this.getStyle().RADIUS;
     }
 
-    public onMouseDown(event: MouseEvent): boolean {
+    public onMouseDown(event: MouseEvent): void {
         console.log('PointSelector | onMouseDown | event: ', event);
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
@@ -88,29 +51,25 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         if (currentSliceSelections) {
             currentSliceSelections.forEach((selection: PointSelection) => {
                 if (!selection.hidden && this.checkDistance(selection, x, y)) {
-                    this.mouseDrag = true;
                     this.selectedArea = selection;
                     return;
                 }
             });
         }
 
-        if (!this.mouseDrag) {
+        if (!this.selectedArea) {
             const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-            this.selectedArea = new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag.key);
-            this.addCurrentSelection();
-            return true;
+            this.addSelection(new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice));
+            this.requestRedraw();
         }
-        return false;
     }
 
-    public onMouseMove(mouseEvent: MouseEvent): boolean {
-        if (this.mouseDrag && this.selectedArea) {
+    public onMouseMove(mouseEvent: MouseEvent): void {
+        if (this.selectedArea) {
             console.log('PointSelector | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
             this.updateSelection(mouseEvent);
-            return true;
+            this.requestRedraw();
         }
-        return false;
     }
 
     public updateSelection(event: MouseEvent): void {
@@ -127,9 +86,8 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         }
     }
 
-    public onMouseUp(event: MouseEvent): boolean {
-        this.mouseDrag = false;
-        return false;
+    public onMouseUp(event: MouseEvent): void {
+        this.selectedArea = undefined;
     }
 
     public getSelectorName(): string {

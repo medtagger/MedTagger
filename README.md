@@ -36,8 +36,8 @@ Documentation for the MedTagger can be found [here](/docs).
 
  - [ ] Labeling using multiple tools
    - [x] Rectangle
-   - [ ] Points
-   - [ ] Connected Points
+   - [x] Points
+   - [x] Connected Points
    - [ ] Brush
  - [ ] Zoom for labeling small objects
  - [ ] Surveys as additional actions for provided labels
