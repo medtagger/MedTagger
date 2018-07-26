@@ -12,7 +12,6 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     protected canvasCtx: CanvasRenderingContext2D;
     protected currentSlice;
     protected currentTag;
-    protected mouseDrag = false;
     protected canvasPosition: ClientRect;
     protected canvasSize: { width: number, height: number };
     protected stateChange: EventEmitter<SelectionStateMessage>;
