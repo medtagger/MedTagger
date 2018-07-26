@@ -316,24 +316,23 @@ class Label(Base):
 
 
 class ArrayOfEnum(ARRAY):
-    """Helper class for processing enums."""
+    """Helper class for processing enums arrays."""
+
+    def bind_expression(self, bindvalue):
+        return sa.cast(bindvalue, self)
 
 
-def bind_expression(self, bindvalue):
-    return sa.cast(bindvalue, self)
+    def result_processor(self, dialect, coltype):
+        super_rp = super(ArrayOfEnum, self).result_processor(dialect, coltype)
 
+        def handle_raw_string(value):
+            inner = re.match(r"^{(.*)}$", value).group(1)
+            return inner.split(",")
 
-def result_processor(self, dialect, coltype):
-    super_rp = super(ArrayOfEnum, self).result_processor(dialect, coltype)
+        def process(value):
+            return super_rp(handle_raw_string(value))
 
-    def handle_raw_string(value):
-        inner = re.match(r"^{(.*)}$", value).group(1)
-        return inner.split(",")
-
-    def process(value):
-        return super_rp(handle_raw_string(value))
-
-    return process
+        return process
 
 
 class LabelTag(Base):
