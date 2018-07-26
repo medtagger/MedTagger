@@ -1,7 +1,7 @@
 """Add tools array to Label Tag
 
 Revision ID: 3f2c98c1710b
-Revises: 01dc85c25335
+Revises: 617bf951f6a2
 Create Date: 2018-07-20 19:40:44.050854
 
 """
@@ -12,7 +12,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 # revision identifiers, used by Alembic.
 revision = '3f2c98c1710b'
-down_revision = '01dc85c25335'
+down_revision = '617bf951f6a2'
 branch_labels = None
 depends_on = None
 

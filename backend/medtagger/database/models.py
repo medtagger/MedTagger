@@ -1,6 +1,7 @@
 """Module responsible for defining all of the relational database models."""
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
-import uuid, re
+import uuid
+import re
 from typing import List, Dict, cast, Optional, Any
 
 import sqlalchemy as sa
@@ -315,20 +316,24 @@ class Label(Base):
 
 
 class ArrayOfEnum(ARRAY):
+    """Helper class for processing enums."""
 
-    def bind_expression(self, bindvalue):
-        return sa.cast(bindvalue, self)
 
-    def result_processor(self, dialect, coltype):
-        super_rp = super(ArrayOfEnum, self).result_processor(dialect, coltype)
+def bind_expression(self, bindvalue):
+    return sa.cast(bindvalue, self)
 
-        def handle_raw_string(value):
-            inner = re.match(r"^{(.*)}$", value).group(1)
-            return inner.split(",")
 
-        def process(value):
-            return super_rp(handle_raw_string(value))
-        return process
+def result_processor(self, dialect, coltype):
+    super_rp = super(ArrayOfEnum, self).result_processor(dialect, coltype)
+
+    def handle_raw_string(value):
+        inner = re.match(r"^{(.*)}$", value).group(1)
+        return inner.split(",")
+
+    def process(value):
+        return super_rp(handle_raw_string(value))
+
+    return process
 
 
 class LabelTag(Base):
