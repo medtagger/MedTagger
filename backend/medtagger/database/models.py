@@ -315,21 +315,24 @@ class Label(Base):
         return self
 
 
-class ArrayOfEnum(ARRAY):
+class ArrayOfEnum(ARRAY):  # pylint: disable=too-many-ancestors
     """Helper class for processing enums arrays."""
 
     def bind_expression(self, bindvalue):
+        """Binds expression."""
         return sa.cast(bindvalue, self)
 
-
     def result_processor(self, dialect, coltype):
+        """Get results."""
         super_rp = super(ArrayOfEnum, self).result_processor(dialect, coltype)
 
         def handle_raw_string(value):
+            """Handle strings."""
             inner = re.match(r"^{(.*)}$", value).group(1)
             return inner.split(",")
 
         def process(value):
+            """Process."""
             return super_rp(handle_raw_string(value))
 
         return process

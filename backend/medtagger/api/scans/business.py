@@ -115,8 +115,8 @@ def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> Non
     _validate_tool(elements)
 
 
-def _validate_tool(elements: List[Dict]):
-    """Validate if the tool for given Label Element is available for given tag"""
+def _validate_tool(elements: List[Dict]) -> None:
+    """Validate if the tool for given Label Element is available for given tag."""
     for label_element in elements:
         tag = _get_label_tag(label_element['tag'])
         if label_element['tool'] not in {tool.name for tool in tag.tools}:

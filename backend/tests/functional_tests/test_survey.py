@@ -41,7 +41,7 @@ def test_adding_new_survey(prepare_environment: Any) -> None:
     survey.save()
 
     # Assign above Survey to an Example Tag available for LUNGS Scan Category
-    label_tag = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'LUNGS', [LabelTool.RECTANGLE.name])
+    label_tag = create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'LUNGS', [LabelTool.RECTANGLE])
     label_tag.actions.append(survey)
     label_tag.save()
 
