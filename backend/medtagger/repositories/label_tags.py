@@ -21,7 +21,7 @@ def add_new_tag(key: str, name: str, tools: List[LabelTool]) -> LabelTag:
 
     :param key: key that will identify such Label Tag
     :param name: name that will be used in the User Interface for such Label Tag
-    :param tools: list of tools for given LabelTag
+    :param tools: list of tools for given LabelTag that will be available on labeling page
     :return: Label Tag object
     """
     with db_session() as session:

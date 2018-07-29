@@ -1,14 +1,13 @@
 """Module responsible for defining all of the relational database models."""
 # pylint: disable=too-few-public-methods,too-many-instance-attributes
 import uuid
-import re
 from typing import List, Dict, cast, Optional, Any
 
-import sqlalchemy as sa
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_
-from sqlalchemy.dialects.postgresql import JSONB, ARRAY
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
+from medtagger.database.utils import ArrayOfEnum
 from medtagger.database import Base, db_session
 from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
     LabelElementStatus, LabelTool
@@ -315,29 +314,6 @@ class Label(Base):
         return self
 
 
-class ArrayOfEnum(ARRAY):  # pylint: disable=too-many-ancestors
-    """Helper class for processing enums arrays."""
-
-    def bind_expression(self, bindvalue):
-        """Binds expression."""
-        return sa.cast(bindvalue, self)
-
-    def result_processor(self, dialect, coltype):
-        """Get results."""
-        super_rp = super(ArrayOfEnum, self).result_processor(dialect, coltype)
-
-        def handle_raw_string(value):
-            """Handle strings."""
-            inner = re.match(r"^{(.*)}$", value).group(1)
-            return inner.split(",")
-
-        def process(value):
-            """Process."""
-            return super_rp(handle_raw_string(value))
-
-        return process
-
-
 class LabelTag(Base):
     """Definition of tag for label."""
 
@@ -357,7 +333,7 @@ class LabelTag(Base):
 
         :param key: unique key representing Label Tag
         :param name: name which describes this Label Tag
-        :param tools: list of tools for given Label Tag
+        :param tools: list of tools for given Label Tag that will be available on labeling page
         :param actions: (optional) list of required actions for this Label Tag
         """
         self.key = key

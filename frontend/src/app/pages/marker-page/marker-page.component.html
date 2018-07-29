@@ -14,11 +14,11 @@
         <div class="tools">
             <h3>Available Tools</h3>
             <div class="buttons">
-                <button mat-mini-fab disabled="{{!availableForTag('RECTANGLE')}}" (click)="setSelector('RECTANGLE')"><mat-icon [svgIcon]="getToolIconName('RECTANGLE')"></mat-icon></button>
+                <button mat-mini-fab [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')" (click)="setSelector('RECTANGLE')"><mat-icon [svgIcon]="getToolIconName('RECTANGLE')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('BRUSH')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('ERASER')"></mat-icon></button>
-                <button mat-mini-fab disabled="{{!availableForTag('POINT')}}" (click)="setSelector('POINT')"><mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon></button>
-                <button mat-mini-fab disabled="{{!availableForTag('CHAIN')}}" (click)="setSelector('CHAIN')"><mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon></button>
+                <button mat-mini-fab [disabled]="!isToolSupportedByCurrentTag('POINT')" (click)="setSelector('POINT')"><mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon></button>
+                <button mat-mini-fab [disabled]="!isToolSupportedByCurrentTag('CHAIN')" (click)="setSelector('CHAIN')"><mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon></button>
                 <button mat-mini-fab disabled><mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon></button>
             </div>

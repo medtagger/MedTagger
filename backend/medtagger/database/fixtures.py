@@ -1,5 +1,6 @@
 """Insert all database fixtures."""
 import logging.config
+from typing import List, cast
 
 from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
@@ -79,7 +80,10 @@ def insert_labels_tags() -> None:
                 logger.info('Label Tag exists with key "%s"', tag_key)
                 continue
 
-            tag = LabelTag(row.get('key', ''), row.get('name', ''), row.get('tools', []))
+            key = cast(str, row.get('key', ''))
+            name = cast(str, row.get('name', ''))
+            tools = cast(List[LabelTool], row.get('tools', []))
+            tag = LabelTag(key, name, tools)
             tag_category_key = row.get('category_key', '')
             category = session.query(ScanCategory).filter(ScanCategory.key == tag_category_key).one()
             tag.scan_category_id = category.id

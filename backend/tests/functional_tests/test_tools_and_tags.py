@@ -157,8 +157,7 @@ def test_add_label_wrong_tool_for_tag(prepare_environment: Any) -> None:
     scan_id = json_response['scan_id']
 
     # Step 2. Create label
-    create_tag_and_assign_to_category(
-        'EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.BRUSH])
+    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.BRUSH])
     payload = {
         'elements': [{
             'x': 0.5,

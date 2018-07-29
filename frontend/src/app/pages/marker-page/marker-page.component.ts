@@ -211,7 +211,7 @@ export class MarkerPageComponent implements OnInit {
         this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
     }
 
-    public availableForTag(tool: string) {
+    public isToolSupportedByCurrentTag(tool: string) {
         const tag = this.marker.getCurrentTag();
         if (isUndefined(tag)) {
             return false;

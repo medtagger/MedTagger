@@ -12,7 +12,7 @@ def create_tag_and_assign_to_category(key: str, name: str, scan_category_key: st
     :param key: key that will identify such Label Tag
     :param name: name that will be used in the User Interface for such Label Tag
     :param scan_category_key: key of the Scan Category that Label Tag will be assigned to
-    :param tools: list of tools for given Label Tag
+    :param tools: list of tools for given Label Tag that will be available on labeling page
     :return: Label Tag
     """
     label_tag = LabelTagsRepository.add_new_tag(key, name, tools)

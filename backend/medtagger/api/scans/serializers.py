@@ -102,7 +102,8 @@ out__label_tag = api.model('Label Tag model', {
     'name': fields.String(),
     'actions_ids': fields.List(fields.Integer(),
                                attribute=lambda label_tag: [action.id for action in label_tag.actions]),
-    'tools': fields.List(fields.String(), description='Tag\'s tools', enum=[tool.name for tool in LabelTool],
+    'tools': fields.List(fields.String(), description='Available tools for Label Tag',
+                         enum=[tool.name for tool in LabelTool],
                          attribute=lambda label_tag: [tool.name for tool in label_tag.tools]),
 })
 

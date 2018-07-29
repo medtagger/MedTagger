@@ -17,7 +17,8 @@ branch_labels = None
 depends_on = None
 
 # Using existing enum with Label Tools
-label_tool_enum = ENUM('RECTANGLE', 'BRUSH', 'POINT', name='label_tool', create_type=False)
+label_tool_enum = ENUM('RECTANGLE', 'BRUSH', 'POINT', 'CHAIN', name='label_tool', create_type=False)
+
 
 def upgrade():
     op.add_column('LabelTags', sa.Column('tools', postgresql.ARRAY(label_tool_enum), nullable=True))
