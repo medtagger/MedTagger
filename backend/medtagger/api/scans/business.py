@@ -112,6 +112,16 @@ def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> Non
     """
     _validate_files(files)
     _validate_label_elements(elements, files)
+    _validate_tool(elements)
+
+
+def _validate_tool(elements: List[Dict]) -> None:
+    """Validate if the tool for given Label Element is available for given tag."""
+    for label_element in elements:
+        tag = _get_label_tag(label_element['tag'])
+        if label_element['tool'] not in {tool.name for tool in tag.tools}:
+            raise InvalidArgumentsException('{} tool is not available for {} tag'.format(
+                label_element['tool'], tag.name))
 
 
 def _validate_files(files: Dict[str, bytes]) -> None:
@@ -128,7 +138,7 @@ def _validate_files(files: Dict[str, bytes]) -> None:
 def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> None:
     """Validate Label Elements and make sure that all Brush Elements have images."""
     for label_element in elements:
-        # Each Brush Label Element should have its own image attatched
+        # Each Brush Label Element should have its own image attached
         if label_element['tool'] == LabelTool.BRUSH.value:
             try:
                 files[label_element['image_key']]

@@ -1,6 +1,7 @@
 import {SelectorBase} from './SelectorBase';
 import {PointSelection} from '../../model/PointSelection';
 import {Selector} from './Selector';
+import { LabelTag } from '../../model/LabelTag';
 
 export class PointSelector extends SelectorBase<PointSelection> implements Selector<PointSelection> {
 
@@ -58,7 +59,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
 
         if (!this.selectedArea) {
             const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-            this.addSelection(new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice));
+            this.addSelection(new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag));
             this.requestRedraw();
         }
     }
