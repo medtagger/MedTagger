@@ -4,6 +4,7 @@ import {FormBuilder, FormGroup, FormControl, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
 
 import {ScanService} from '../../services/scan.service';
+import {CategoryService} from '../../services/category.service';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {
     UploadScansSelectorComponent,
@@ -111,7 +112,7 @@ export class UploadPageComponent implements OnInit {
     uploadCompletedFormGroup: FormGroup;
     chooseCategoryFormGroup: FormGroup;
 
-    constructor(private scanService: ScanService, private formBuilder: FormBuilder) {
+    constructor(private scanService: ScanService, private categoryService: CategoryService, private formBuilder: FormBuilder) {
     }
 
     ngOnInit() {
@@ -122,7 +123,7 @@ export class UploadPageComponent implements OnInit {
         this.chooseCategoryFormGroup = this.formBuilder.group({
             'category': new FormControl(this.category, [Validators.required]),
         });
-        this.scanService.getAvailableCategories().then((availableCategories) => {
+        this.categoryService.getAvailableCategories().then((availableCategories) => {
             this.availableCategories = availableCategories;
         });
     }

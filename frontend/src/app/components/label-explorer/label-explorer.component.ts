@@ -1,6 +1,6 @@
-import {Component, EventEmitter, OnInit} from '@angular/core';
-import {LabelTag} from '../../model/LabelTag';
-import {LabelListItem} from '../../model/LabelListItem';
+import { Component, EventEmitter, OnInit } from '@angular/core';
+import { LabelTag } from '../../model/LabelTag';
+import { LabelListItem } from '../../model/LabelListItem';
 
 @Component({
     selector: 'app-label-explorer',
@@ -66,24 +66,18 @@ export class LabelExplorerComponent implements OnInit {
         }
     }
 
-    // TODO: tagKey should be part of dict stored in backend (labelling context)
-    // TODO: tools should be part of dict stored in backend (available tools)
-    public addLabel(selectionId: number, labelSlice: number, tagKey: string, tool: string): void {
-        const tag: LabelTag = this.getLabelTag(tagKey, tool);
+    public addLabel(selectionId: number, labelSlice: number, tag: LabelTag, tool: string): void {
+        this.addTag(tag);
         const newItem: LabelListItem = new LabelListItem(selectionId, labelSlice, tag, tool);
         this.labels.push(newItem);
     }
 
-    private getLabelTag(tagKey: string, tool: string): LabelTag {
-        const found: LabelTag = this.tags.find(tag => tag.key === tagKey);
+    private addTag(tag: LabelTag) {
+        const found: LabelTag = this.tags.find(labelTag => labelTag.key === tag.key);
         if (found) {
-            return found;
+            return;
         } else {
-            // TODO: get name for tag key, now mocked generic name
-            const name = 'All';
-            const created = new LabelTag(name, tagKey, [tool]);
-            this.tags.push(created);
-            return created;
+            this.tags.push(tag);
         }
     }
 
