@@ -9,8 +9,7 @@
        <button mat-button id="back-button" color="accent" routerLink="/home">Go back</button>
     </div>
     <div class="button-row" *ngIf="!downloadingCategoriesInProgress && categories?.length > 0">
-        <button mat-fab *ngFor="let category of categories" routerLink="/labelling"
-                [queryParams]="{category: category.key}">
+        <button mat-fab *ngFor="let category of categories" routerLink="/labelling" (click)="setCurrentCategory(category)">
             <mat-icon svgIcon="{{category.key}}"></mat-icon>
             <div>{{category.name}}</div>
         </button>

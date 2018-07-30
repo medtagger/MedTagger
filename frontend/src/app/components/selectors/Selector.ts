@@ -1,6 +1,7 @@
 import {EventEmitter} from '@angular/core';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {SelectorAction} from '../../model/SelectorAction';
+import { LabelTag } from '../../model/LabelTag';
 
 export interface Selector<SliceSelection> {
 
@@ -21,6 +22,8 @@ export interface Selector<SliceSelection> {
     getStateChangeEmitter(): EventEmitter<SelectionStateMessage>;
 
     updateCurrentSlice(currentSliceId: number): any;
+
+    updateCurrentTag(tag: LabelTag);
 
     updateCanvasPosition(canvasRect: ClientRect): any;
 
