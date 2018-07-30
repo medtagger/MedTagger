@@ -7,6 +7,7 @@ import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
 import {SliceRequest} from '../../model/SliceRequest';
 import {SliceSelection} from '../../model/selections/SliceSelection';
+import {LabelTag} from '../../model/labels/LabelTag';
 
 @Component({
     selector: 'app-scan-viewer',
@@ -47,8 +48,10 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     protected sliceBatchSize: number;
 
     protected selectors: Array<Selector<SliceSelection>>;
+    protected _currentTag;
 
-    constructor() {}
+    constructor() {
+    }
 
     @HostListener('window:resize', ['$event'])
     onResize() {
@@ -82,6 +85,14 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
             selector.updateCanvasHeight(this.canvas.height);
             selector.drawSelections();
         });
+    }
+
+    public setCurrentTagForSelector(selector: Selector<SliceSelection>, tag: LabelTag) {
+        selector.updateCurrentTag(tag);
+    }
+
+    public setCurrentTag(tag: LabelTag) {
+        this._currentTag = tag;
     }
 
     public setArchivedSelections(selections: Array<SliceSelection>): void {

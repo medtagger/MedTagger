@@ -6,12 +6,12 @@ export class PointSelection extends SliceSelection {
     _positionX: number;
     _positionY: number;
 
-    constructor(x: number, y: number, depth: number) {
+    constructor(x: number, y: number, depth: number, tag: string) {
         super();
         this._positionX = x;
         this._positionY = y;
         this.sliceIndex = depth;
-        this.label_tag = 'LEFT_KIDNEY'; // TODO: Change these when introducing new marker page
+        this.label_tag = tag;
         this.label_tool = 'POINT';
     }
 

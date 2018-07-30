@@ -2,7 +2,6 @@ import {SelectorBase} from './SelectorBase';
 import {Selector} from './Selector';
 import {BrushSelection} from '../../model/selections/BrushSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {EventEmitter} from '@angular/core';
 
 export class BrushSelector extends SelectorBase<BrushSelection> implements Selector<BrushSelection> {
     readonly STYLE = {
@@ -16,21 +15,15 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     };
 
     private canvas: HTMLCanvasElement;
+    private mouseDrag = false;
     constructor(canvas: HTMLCanvasElement) {
-        super();
-        this.canvasCtx = canvas.getContext('2d');
+        super(canvas);
 
         // Aye, we cannot get data url from context so....
         this.canvas = canvas;
 
-        this.canvasSize = {
-            width: canvas.width,
-            height: canvas.height
-        };
-        this.selections = new Map<number, [BrushSelection]>();
         this.selectedArea = undefined;
         this.currentSlice = undefined;
-        this.stateChange = new EventEmitter<SelectionStateMessage>();
         console.log('BrushSelector created!');
     }
 
@@ -123,7 +116,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
                 }
             }
             this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
-            this.clearSelectedArea();
+            this.selectedArea = undefined;
             return true;
         }
         return false;

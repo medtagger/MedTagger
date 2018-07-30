@@ -53,6 +53,7 @@ import {routing} from './app.routes';
 import {AuthGuard} from '../guards/auth.guard';
 import {AccountService} from '../services/account.service';
 import {DialogService} from '../services/dialog.service';
+import {CategoryService} from '../services/category.service';
 import {InfoDialogComponent} from '../dialogs/info-dialog.component';
 import {MedTaggerWebSocket} from '../services/websocket.service';
 
@@ -116,6 +117,7 @@ import {LabelExplorerComponent} from '../components/label-explorer/label-explore
             useClass: HttpAuthenticationInterceptor,
             multi: true
         },
+        CategoryService,
         AuthGuard,
         AccountService,
         DialogService,

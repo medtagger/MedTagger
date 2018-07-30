@@ -8,14 +8,14 @@ export class ROISelection2D extends SliceSelection {
     _width: number;
     _height: number;
 
-    constructor(x: number, y: number, depth: number, width?: number, height?: number) {
+    constructor(x: number, y: number, depth: number, tag: string, width?: number, height?: number) {
         super();
         this._positionX = x;
         this._positionY = y;
         this._width = width ? width : 0;
         this._height = height ? height : 0;
         this.sliceIndex = depth;
-        this.label_tag = 'LEFT_KIDNEY'; // TODO: Change these when introducing new marker page
+        this.label_tag = tag;
         this.label_tool = 'RECTANGLE';
     }
 

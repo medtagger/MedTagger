@@ -35,13 +35,21 @@ button {
     .tags {
         mat-form-field {
             width: $toolbox-width - 30px;
-            margin: 10px 15px 0 15px;
+            margin: 10px 15px 0px 15px;
         }
     }
 
     .tools {
         .buttons {
             margin: 8px 16px;
+        }
+
+        .action-buttons {
+            button {
+                font-size: 14px;
+                min-width: 0;
+                border-radius: 30px;
+            }
         }
     }
 

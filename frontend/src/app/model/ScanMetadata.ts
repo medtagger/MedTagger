@@ -1,12 +1,16 @@
+import {LabelTag} from './labels/LabelTag';
+
 export class ScanCategory {
     key: string;
     name: string;
     imagePath: string;
+    tags: LabelTag[];
 
-    constructor(key: string, name: string, imagePath: string) {
+    constructor(key: string, name: string, imagePath: string, tags: LabelTag[]) {
         this.key = key;
         this.name = name;
         this.imagePath = imagePath;
+        this.tags = tags;
     }
 }
 
