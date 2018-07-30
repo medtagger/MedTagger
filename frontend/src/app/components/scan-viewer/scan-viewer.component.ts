@@ -6,6 +6,8 @@ import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
 import {SliceSelection} from '../../model/SliceSelection';
+import {SliceRequest} from '../../model/SliceRequest';
+import {LabelTag} from '../../model/LabelTag';
 
 @Component({
     selector: 'app-scan-viewer',
@@ -42,10 +44,11 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public slices: Map<number, MarkerSlice>;
     protected _currentSlice;
 
-    public observableSliceRequest: Subject<number>;
+    public observableSliceRequest: Subject<SliceRequest>;
     protected sliceBatchSize: number;
 
     protected selectors: Array<Selector<SliceSelection>>;
+    protected _currentTag;
 
     constructor() {}
 
@@ -81,6 +84,14 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
             selector.updateCanvasHeight(this.canvas.height);
             selector.drawSelections();
         });
+    }
+
+    public setCurrentTagForSelector(selector: Selector<SliceSelection>, tag: LabelTag) {
+        selector.updateCurrentTag(tag);
+    }
+
+    public setCurrentTag(tag: LabelTag) {
+        this._currentTag = tag;
     }
 
     public setArchivedSelections(selections: Array<SliceSelection>): void {
@@ -155,7 +166,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public hookUpSliceObserver(sliceBatchSize: number): Promise<boolean> {
         this.sliceBatchSize = sliceBatchSize;
         return new Promise((resolve) => {
-            this.observableSliceRequest = new Subject<number>();
+            this.observableSliceRequest = new Subject<SliceRequest>();
             resolve(true);
         });
     }
@@ -190,12 +201,12 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         if (this.slider.max === sliderValue) {
             requestSliceIndex = sliderValue + 1;
             console.log('ScanViewer | requestSlicesIfNeeded more (higher indexes): ', requestSliceIndex);
-            this.observableSliceRequest.next(requestSliceIndex);
+            this.observableSliceRequest.next(new SliceRequest(requestSliceIndex));
         }
         if (this.slider.min === sliderValue) {
-            requestSliceIndex = sliderValue - this.sliceBatchSize;
+            requestSliceIndex = sliderValue - 1;
             console.log('ScanViewer | requestSlicesIfNeeded more (lower indexes): ', requestSliceIndex);
-            this.observableSliceRequest.next(requestSliceIndex);
+            this.observableSliceRequest.next(new SliceRequest(requestSliceIndex, true));
         }
     }
 

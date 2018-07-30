@@ -1,17 +1,23 @@
+## Current Behavior
+
+_[Describe what is wrong with the MedTagger]_
+
 ## Expected Behavior
 
-[Describe expected behavior for the your issue]
-
-## Actual Behavior
-
-[Describe what is actually happening in the MedTagger]
+_[Describe expected behavior in the MedTagger]_
 
 ## Steps to Reproduce the Problem
 
-  1. [Describe step by step how to reproduce this issue]
-  2. [Fill me!]
-  3. [Fill me!]
+  1. _[Describe step by step how to reproduce this Issue]_
+  2. _[Describe step by step how to reproduce this Issue]_
+  3. _[Describe step by step how to reproduce this Issue]_
 
-## Additional comment
+## Tasks to do (optional)
 
-[Feel free to leave some additional comments about your issue]
+- [ ] _[First task]_
+- [ ] _[Second task]_
+- [ ] _[Third task]_
+
+## Additional comment (optional)
+
+_[Feel free to leave some additional comment about your Issue]_

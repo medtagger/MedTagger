@@ -1,11 +1,13 @@
 export class MarkerSlice {
     private readonly _id: number;
     private readonly _index: number;
+    private readonly _lastInBatch: number;
     private readonly _source: string;
 
-    constructor(id: string, index: number, source: ArrayBuffer | string) {
+    constructor(id: string, index: number, lastInBatch: number, source: ArrayBuffer | string) {
         this._id = +id;
         this._index = index;
+        this._lastInBatch = lastInBatch;
         if (source instanceof ArrayBuffer) {
             this._source = MarkerSlice.byteToBase64(source);
         } else if (typeof String) {
@@ -34,5 +36,9 @@ export class MarkerSlice {
             binary += String.fromCharCode(bytes[i]);
         }
         return 'data:image/png;base64,' + btoa(binary);
+    }
+
+    public isLastInBatch(): boolean {
+        return this._index === this._lastInBatch;
     }
 }
