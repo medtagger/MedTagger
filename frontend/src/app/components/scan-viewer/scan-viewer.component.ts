@@ -71,7 +71,9 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public sliderFocus() {
-        this.slider._elementRef.nativeElement.focus();
+        window.setTimeout(() => {
+            this.slider._elementRef.nativeElement.focus();
+        }, 10);
     }
 
     public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {
