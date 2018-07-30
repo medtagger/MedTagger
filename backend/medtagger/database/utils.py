@@ -21,6 +21,8 @@ class ArrayOfEnum(ARRAY):  # pylint: disable=too-many-ancestors
 
         def handle_raw_string(value: Any) -> Any:
             """Parse raw string values of Enum and return list of values."""
+            if not value:
+                return []
             inner = re.match(r"^{(.*)}$", value)
             if not inner:
                 raise InternalErrorException('Enum values did not match the pattern!')
