@@ -71,6 +71,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public sliderFocus() {
+        // setTimeout() fixes slider focus issues in IE/Firefox
         window.setTimeout(() => {
             this.slider._elementRef.nativeElement.focus();
         }, 10);
