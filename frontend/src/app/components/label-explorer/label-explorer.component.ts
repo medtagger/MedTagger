@@ -72,6 +72,17 @@ export class LabelExplorerComponent implements OnInit {
         this.labels.push(newItem);
     }
 
+    public replaceExistingLabel(selectionId: number, labelSlice: number, tag: LabelTag, tool: string): void {
+        const currentLabelIndex = this.labels.findIndex(label => label.tag === tag && label.sliceIndex === labelSlice);
+        console.log('currentLabelIndex: ', currentLabelIndex);
+        if (currentLabelIndex > -1) {
+            this.labels[currentLabelIndex] = new LabelListItem(selectionId, labelSlice, tag, tool);
+            console.log('Replace existing label');
+        } else {
+            this.addLabel(selectionId, labelSlice, tag, tool);
+        }
+    }
+
     private addTag(tag: LabelTag) {
         const found: LabelTag = this.tags.find(labelTag => labelTag.key === tag.key);
         if (found) {

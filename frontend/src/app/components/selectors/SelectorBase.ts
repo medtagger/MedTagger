@@ -16,6 +16,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     protected canvasSize: { width: number, height: number };
     protected stateChange: EventEmitter<SelectionStateMessage>;
     protected redrawRequestEmitter: EventEmitter<void>;
+    protected singleSelectionPerSlice = false;
 
     protected constructor(canvas: HTMLCanvasElement) {
         this.canvasCtx = canvas.getContext('2d');
@@ -34,6 +35,10 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
             OTHER_SELECTION_COLOR: '#256fde',
             ARCHIVED_SELECTION_COLOR: '#5f27e5'
         };
+    }
+
+    public isSingleSelectionPerSlice(): boolean {
+        return this.singleSelectionPerSlice;
     }
 
     public formArchivedSelections(selectionMap: CustomSliceSelection[]): CustomSliceSelection[] {

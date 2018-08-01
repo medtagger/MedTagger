@@ -60,4 +60,6 @@ export interface Selector<SliceSelection> {
     getSelectorName(): string;
 
     getActions(): Array<SelectorAction>;
+
+    isSingleSelectionPerSlice(): boolean;
 }

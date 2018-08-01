@@ -141,8 +141,14 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                     } else {
                         console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
                             selection.selectionId);
-                        this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTag,
-                            this.currentSelector.getSelectorName());
+                        const selectorName: string = this.currentSelector.getSelectorName();
+                        if (this.currentSelector.isSingleSelectionPerSlice()) {
+                            this.labelExplorer.replaceExistingLabel(selection.selectionId, selection.sliceId,
+                                this.currentTag, selectorName);
+                        } else {
+                            this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTag,
+                                selectorName);
+                        }
                     }
                 }
             }));

@@ -16,6 +16,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     private canvas: HTMLCanvasElement;
     private mouseDrag = false;
+
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
 
@@ -24,13 +25,14 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
         this.selectedArea = undefined;
         this.currentSlice = undefined;
+        this.singleSelectionPerSlice = true;
         console.log('BrushSelector created!');
     }
 
     drawSelection(selection: BrushSelection, color: string): any {
         console.log('BrushSelector | drawSelection | selection: ', selection);
 
-        selection.getSelectionLayer().then( (selectionLayerImage: HTMLImageElement) => {
+        selection.getSelectionLayer().then((selectionLayerImage: HTMLImageElement) => {
             this.canvasCtx.drawImage(selectionLayerImage, 0, 0, this.canvasSize.width, this.canvasSize.height);
         }, (error: Error) => {
             console.error('Error while drawing brush selections!: ', error);
@@ -64,9 +66,6 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     onMouseDown(event: MouseEvent): boolean {
         console.log('BrushSelector | onMouseDown | event: ', event);
-
-        // starting new brush selection needs temporary canvas clear
-        this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
 
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
@@ -105,16 +104,8 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             const selectionImage: string = this.canvas.toDataURL();
             this.selectedArea = new BrushSelection(selectionImage, this.currentSlice);
 
-            if (this.isOnlyOneSelectionPerSlice()) {
-                this.selections.set(this.currentSlice, [this.selectedArea]);
-            } else {
-                const currentSliceSelections = this.selections.get(this.currentSlice);
-                if (currentSliceSelections) {
-                    currentSliceSelections.push(this.selectedArea);
-                } else {
-                    this.selections.set(this.currentSlice, [this.selectedArea]);
-                }
-            }
+            this.selections.set(this.currentSlice, [this.selectedArea]);
+
             this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
             this.selectedArea = undefined;
             return true;
