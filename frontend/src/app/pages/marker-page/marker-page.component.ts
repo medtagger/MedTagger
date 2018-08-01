@@ -22,6 +22,7 @@ import {FormControl, Validators} from '@angular/forms';
 import {isUndefined} from 'util';
 import {ChainSelector} from '../../components/selectors/ChainSelector';
 import {SelectorAction} from '../../model/SelectorAction';
+import {EraserSelector} from "../../components/selectors/EraserSelector";
 
 
 @Component({
@@ -78,7 +79,8 @@ export class MarkerPageComponent implements OnInit {
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
             ['POINT', new PointSelector(this.marker.getCanvas())],
             ['CHAIN', new ChainSelector(this.marker.getCanvas())],
-            ['BRUSH', new BrushSelector(this.marker.getCanvas())]
+            ['BRUSH', new BrushSelector(this.marker.getCanvas())],
+            ['ERASER', new EraserSelector(this.marker.getCanvas())]
         ]);
 
         this.marker.setSelectors(Array.from(this.selectors.values()));

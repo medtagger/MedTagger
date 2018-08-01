@@ -4,18 +4,8 @@ import {BrushSelection} from '../../model/selections/BrushSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 
 export class BrushSelector extends SelectorBase<BrushSelection> implements Selector<BrushSelection> {
-    readonly STYLE = {
-        LINE_WIDTH: 10,
-        LINE_LINKS: 'round',
-        SELECTION_FONT_SIZE: 14,
-        SELECTION_FONT_COLOR: '#ffffff',
-        CURRENT_SELECTION_COLOR: '#ff0000',
-        OTHER_SELECTION_COLOR: '#256fde',
-        ARCHIVED_SELECTION_COLOR: '#5f27e5'
-    };
-
-    private canvas: HTMLCanvasElement;
-    private mouseDrag = false;
+    protected canvas: HTMLCanvasElement;
+    protected mouseDrag = false;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -27,6 +17,16 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.currentSlice = undefined;
         this.singleSelectionPerSlice = true;
         console.log('BrushSelector created!');
+    }
+
+    protected getStyle(): any {
+        return {
+            ...super.getStyle(),
+            LINE_WIDTH: 10,
+            LINE_LINKS: 'round',
+            SELECTION_FONT_COLOR: '#ffffff',
+            GLOBAL_COMPOSITE_OPERATION: 'source-over'
+        };
     }
 
     drawSelection(selection: BrushSelection, color: string): any {
@@ -46,9 +46,9 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             let color: string;
             const isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
             if (isCurrent) {
-                color = this.STYLE.CURRENT_SELECTION_COLOR;
+                color = this.getStyle().CURRENT_SELECTION_COLOR;
             } else {
-                color = this.STYLE.OTHER_SELECTION_COLOR;
+                color = this.getStyle().OTHER_SELECTION_COLOR;
             }
             if ((selection.pinned || isCurrent) && (!selection.hidden)) {
                 this.drawSelection(selection, color);
@@ -58,23 +58,21 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     formArchivedSelections(selectionMap: Array<BrushSelection>): Array<BrushSelection> {
         selectionMap.forEach((selection: BrushSelection) => {
-            this.drawSelection(selection, this.STYLE.ARCHIVED_SELECTION_COLOR);
+            this.drawSelection(selection, this.getStyle().ARCHIVED_SELECTION_COLOR);
             console.log('BrushSelector | scaleToView selection: ', selection);
         });
         return selectionMap;
     }
 
     onMouseDown(event: MouseEvent): boolean {
-        console.log('BrushSelector | onMouseDown | event: ', event);
-
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
 
         this.mouseDrag = true;
-        this.canvasCtx.lineWidth = this.STYLE.LINE_WIDTH;
-        this.canvasCtx.lineJoin = this.STYLE.LINE_LINKS;
-        this.canvasCtx.lineCap = this.STYLE.LINE_LINKS;
-        this.canvasCtx.strokeStyle = this.STYLE.CURRENT_SELECTION_COLOR;
+        this.canvasCtx.lineWidth = this.getStyle().LINE_WIDTH;
+        this.canvasCtx.lineJoin = this.getStyle().LINE_LINKS;
+        this.canvasCtx.lineCap = this.getStyle().LINE_LINKS;
+        this.canvasCtx.strokeStyle = this.getStyle().CURRENT_SELECTION_COLOR;
 
         this.canvasCtx.beginPath();
         this.canvasCtx.moveTo(x, y);
@@ -84,11 +82,11 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     onMouseMove(event: MouseEvent): boolean {
         if (this.mouseDrag) {
-            console.log('BrushSelector | onMove | event: ', event);
             const x = (event.clientX) - this.canvasPosition.left;
             const y = (event.clientY) - this.canvasPosition.top;
 
             this.canvasCtx.lineTo(x, y);
+            this.canvasCtx.globalCompositeOperation = this.getStyle().GLOBAL_COMPOSITE_OPERATION;
             this.canvasCtx.stroke();
         }
         return false;
@@ -96,7 +94,6 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     onMouseUp(event: MouseEvent): boolean {
         if (this.mouseDrag) {
-            console.log('BrushSelector | onUp | event: ', event);
             this.mouseDrag = false;
             this.canvasCtx.closePath();
 
