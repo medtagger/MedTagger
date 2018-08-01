@@ -46,12 +46,17 @@ TAGS = [{
     'key': 'LEFT_KIDNEY',
     'name': 'Left Kidney',
     'category_key': 'KIDNEYS',
-    'tools': [LabelTool.RECTANGLE, LabelTool.POINT, LabelTool.CHAIN],
+    'tools': [LabelTool.RECTANGLE, LabelTool.POINT, LabelTool.CHAIN, LabelTool.BRUSH],
 }, {
     'key': 'RIGHT_KIDNEY',
     'name': 'Right Kidney',
     'category_key': 'KIDNEYS',
     'tools': [LabelTool.RECTANGLE],
+}, {
+    'key': 'NODULE',
+    'name': 'Nodule',
+    'category_key': 'LUNGS',
+    'tools': [LabelTool.BRUSH],
 }]
 
 
