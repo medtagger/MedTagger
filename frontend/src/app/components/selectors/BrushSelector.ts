@@ -9,8 +9,8 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         LINE_LINKS: 'round',
         SELECTION_FONT_SIZE: 14,
         SELECTION_FONT_COLOR: '#ffffff',
-        CURRENT_SELECTION_COLOR: '#ff0000',
-        OTHER_SELECTION_COLOR: '#256fde',
+        CURRENT_SELECTION_COLOR: 'rgba(255, 0, 0, 0.5)',
+        OTHER_SELECTION_COLOR: 'rgba(37, 111, 222, 0.5)',
         ARCHIVED_SELECTION_COLOR: '#5f27e5'
     };
 
@@ -35,6 +35,13 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
         selection.getSelectionLayer().then((selectionLayerImage: HTMLImageElement) => {
             this.canvasCtx.drawImage(selectionLayerImage, 0, 0, this.canvasSize.width, this.canvasSize.height);
+
+            // Recoloring of original selection
+            this.canvasCtx.fillStyle = color;
+            this.canvasCtx.globalCompositeOperation = 'source-in';
+            this.canvasCtx.fillRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+            this.canvasCtx.globalCompositeOperation = 'source-over';
+
         }, (error: Error) => {
             console.error('Error while drawing brush selections!: ', error);
         });
@@ -71,7 +78,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         // starting new brush selection needs temporary canvas clear
         this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
 
-        const lastDrawing = this.lastTagDrawings[this.currentTag.name];
+        const lastDrawing = this.lastTagDrawings[this.getSelectingContext()];
 
         if (!!lastDrawing) {
             this.canvasCtx.drawImage(lastDrawing, 0, 0,
@@ -113,8 +120,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             this.selectedArea = new BrushSelection(selectionImageURL, this.currentSlice, this.currentTag.name);
 
             this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
-
-                this.lastTagDrawings[this.currentTag.name] = image;
+                this.lastTagDrawings[this.getSelectingContext()] = image;
 
                 const currentSliceSelections = this.selections.get(this.currentSlice);
 
@@ -137,6 +143,11 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
                 this.requestRedraw();
             });
         }
+    }
+
+    // To differentiate selections by tags and slices
+    private getSelectingContext(): string {
+        return this.currentTag.name + this.currentSlice;
     }
 
     getSelectorName(): string {
