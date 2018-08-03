@@ -1,4 +1,4 @@
-import {LabelTag} from "./LabelTag";
+import {LabelTag} from './LabelTag';
 
 export class Task {
     id: number;

@@ -58,7 +58,7 @@ import {InfoDialogComponent} from '../dialogs/info-dialog.component';
 import {MedTaggerWebSocket} from '../services/websocket.service';
 
 import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
-import {TaskService} from "../services/task.service";
+import {TaskService} from '../services/task.service';
 
 @NgModule({
     declarations: [

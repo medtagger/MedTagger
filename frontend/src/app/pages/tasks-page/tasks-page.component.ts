@@ -2,8 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {MatSnackBar, MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
 
-import {TaskService} from "../../services/task.service";
-import {Task} from "../../model/Task";
+import {TaskService} from '../../services/task.service';
+import {Task} from '../../model/Task';
 
 @Component({
     selector: 'app-tasks-page',

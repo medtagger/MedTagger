@@ -18,10 +18,10 @@ import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
 import {ChainSelector} from '../../components/selectors/ChainSelector';
 import {SelectorAction} from '../../model/SelectorAction';
-import {FormControl, Validators} from "@angular/forms";
-import {TaskService} from "../../services/task.service";
-import {isUndefined} from "util";
-import {Task} from "../../model/Task";
+import {FormControl, Validators} from '@angular/forms';
+import {TaskService} from '../../services/task.service';
+import {isUndefined} from 'util';
+import {Task} from '../../model/Task';
 
 
 @Component({
