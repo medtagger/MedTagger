@@ -37,6 +37,22 @@ def add_new_category(key: str, name: str, image_path: str) -> ScanCategory:
     return category
 
 
+def disable(scan_category_key: str):
+    """Disable existing Scan Category."""
+    disabling_query = ScanCategory.query.filter(ScanCategory.key == scan_category_key)
+    updated = disabling_query.update({'disabled': True}, synchronize_session='fetch')
+    if not updated:
+        raise Exception()  # TODO: Change me!
+
+
+def enable(scan_category_key: str) -> None:
+    """Enable existing Scan Category."""
+    enabling_query = ScanCategory.query.filter(ScanCategory.key == scan_category_key)
+    updated = enabling_query.update({'disabled': False}, synchronize_session='fetch')
+    if not updated:
+        raise Exception()  # TODO: Change me!
+
+
 def assign_label_tag(tag: LabelTag, scan_category_key: str) -> None:
     """Assign existing Label Tag to Scan Category.
 
