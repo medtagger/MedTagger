@@ -2,7 +2,7 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
-from medtagger.definitions import ScanStatus, LabelVerificationStatus
+from medtagger.definitions import ScanStatus, LabelVerificationStatus, LabelTool
 
 in__new_scan = api.model('New Scan model', {
     'category': fields.String(description='Scan\'s category', required=True),
@@ -17,6 +17,7 @@ elements_schema = {
             {'$ref': '#/definitions/rectangular_label_element_schema'},
             {'$ref': '#/definitions/brush_label_element_schema'},
             {'$ref': '#/definitions/point_label_element_schema'},
+            {'$ref': '#/definitions/chain_label_element_schema'},
         ],
     },
     'definitions': {
@@ -56,6 +57,29 @@ elements_schema = {
             'required': ['x', 'y', 'slice_index', 'tag', 'tool'],
             'additionalProperties': False,
         },
+        'chain_label_element_schema': {
+            'properties': {
+                'slice_index': {'type': 'integer'},
+                'tag': {'type': 'string'},
+                'tool': {'type': 'string', 'pattern': 'CHAIN'},
+                'points': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'properties': {
+                            'x': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                            'y': {'type': 'number', 'minimum': 0.0, 'maximum': 1.0},
+                        },
+                        'required': ['x', 'y'],
+                        'additionalProperties': False,
+                    },
+                    'minItems': 2,
+                },
+                'loop': {'type': 'boolean'},
+            },
+            'required': ['points', 'slice_index', 'tag', 'tool', 'loop'],
+            'additionalProperties': False,
+        },
     },
 }
 
@@ -76,7 +100,11 @@ in__scan_category = api.model('New Scan Category model', {
 out__label_tag = api.model('Label Tag model', {
     'key': fields.String(),
     'name': fields.String(),
-    'actions_ids': fields.List(fields.Integer(), attribute=lambda category: [action.id for action in category.actions]),
+    'actions_ids': fields.List(fields.Integer(),
+                               attribute=lambda label_tag: [action.id for action in label_tag.actions]),
+    'tools': fields.List(fields.String(), description='Available tools for Label Tag',
+                         enum=[tool.name for tool in LabelTool],
+                         attribute=lambda label_tag: [tool.name for tool in label_tag.tools]),
 })
 
 out__scan_category = api.model('Scan Category model', {

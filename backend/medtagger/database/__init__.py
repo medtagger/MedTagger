@@ -10,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from medtagger.config import AppConfiguration
 
 
-class MedTaggerBase(object):  # pylint: disable=too-few-public-methods
+class MedTaggerBase:  # pylint: disable=too-few-public-methods
     """Base class for all of the models."""
 
     _created = Column(DateTime, nullable=False, server_default=func.now(), default=datetime.utcnow)
