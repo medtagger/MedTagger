@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from medtagger.database import db_session
 from medtagger.database.models import ScanCategory, Role, LabelTag
+from medtagger.repositories import scan_categories as ScanCategoriesRepository
 
 
 logging.config.fileConfig('logging.conf')
@@ -18,45 +19,70 @@ def sync_configuration(configuration: Dict) -> None:
 
     :param configuration: content of YAML configuration file
     """
+    logger.info('Running Configuration Synchronization...')
+
     datasets = configuration.get('datasets', [])
     _sync_datasets(datasets)
 
-    tasks = configuration.get('tasks', [])
-    _sync_tasks(tasks)
+    # tasks = configuration.get('tasks', [])
+    # _sync_tasks(tasks)
 
 
 def _sync_datasets(datasets: List[Dict]) -> None:
     """Synchronize Datasets from configuration file with database entries.
 
-    Things to do:
-        - add support for Tasks,
-        - disabling Datasets that does not longer exists in configuration file
-        - find difference in Tasks.
+    Example DataSets in the configuration file:
+    ```
+    datasets:
+      - name: Kidneys
+        key: KIDNEYS
+        image_path: assets/icon/kidneys_category_icon.svg
+        tasks:
+          - KIDNEYS_SEGMENTATION
+    ```
 
     :param tasks: definitions of all Datasets
     """
-    with db_session() as session:
-        datasets = configuration.get('datasets', [])
-        for dataset in datasets:
-            key = dataset.get('key', '')
-            name = dataset.get('name', '')
-            image_path = dataset.get('image_path', '')
+    datasets = configuration.get('datasets', [])
+    configuration_datasets_keys = {dataset['key'] for dataset in datasets}
+    database_datasets_keys = {dataset.key for dataset in ScanCategory.query.all()}
 
-            # Make sure we won't create it again!
-            dataset_exists = session.query(exists().where(ScanCategory.key == key)).scalar()
-            if dataset_exists:
-                logger.info('Dataset exists with key "%s"', key)
-                continue
+    datasets_to_add = configuration_datasets_keys - database_datasets_keys
+    datasets_to_disable = database_datasets_keys - configuration_datasets_keys
+    datasets_to_enable = database_datasets_keys & configuration_datasets_keys
 
-            # Create this Dataset if not exists
-            category = ScanCategory(key=key, name=name, image_path=image_path)
-            session.add(category)
-            session.commit()
-            logger.info('Dataset added for key "%s"', key)
+    for dataset in datasets:
+        if dataset['key'] in datasets_to_add:
+            ScanCategoriesRepository.add_new_category(dataset['key'], dataset['name'], dataset['image_path'])
+            logger.info('New DataSet added: %s', dataset['key'])
+        elif dataset['key'] in datasets_to_disable:
+            ScanCategoriesRepository.disable(dataset['key'])
+            logger.info('DataSet disabled: %s', dataset['key'])
+        elif dataset['key'] in datasets_to_enable:
+            ScanCategoriesRepository.enable(dataset['key'])
+            logger.info('DataSet enabled: %s', dataset['key'])
+
+    # TODO: Find out difference in Tasks (Piotr patch is needed here!)
 
 
 def _sync_tasks(tasks: List[Dict]) -> None:
     """Synchronize Tasks from configuration file with database entries.
+
+    Example Tasks in the configuration file:
+    ```
+    tasks:
+      - name: Kidneys segmentation
+        key: KIDNEYS_SEGMENTATION
+        tags:
+          - name: Left Kidney
+            key: LEFT_KIDNEY
+            tools:
+              - CHAIN
+          - name: Right Kidney
+            key: RIGHT_KIDNEY
+            tools:
+              - CHAIN
+    ```
 
     Things to do:
         - support for Tools in Label Tags,

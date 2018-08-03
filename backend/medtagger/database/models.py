@@ -99,6 +99,7 @@ class ScanCategory(Base):
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
     image_path: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
     available_tags: List['LabelTag'] = relationship("LabelTag", back_populates="scan_category")
 

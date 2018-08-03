@@ -5,10 +5,13 @@ from medtagger.database import db_session
 from medtagger.database.models import ScanCategory, LabelTag
 
 
-def get_all_categories() -> List[ScanCategory]:
+def get_all_categories(include_disabled: bool = False) -> List[ScanCategory]:
     """Return list of all Scan Categories."""
     with db_session() as session:
-        categories = session.query(ScanCategory).order_by(ScanCategory.id).all()
+        query = session.query(ScanCategory)
+        if not include_disabled:
+            query = query.filter(~ScanCategory.disabled)
+        categories = query.order_by(ScanCategory.id).all()
     return categories
 
 
@@ -35,6 +38,22 @@ def add_new_category(key: str, name: str, image_path: str) -> ScanCategory:
         category = ScanCategory(key, name, image_path)
         session.add(category)
     return category
+
+
+def disable(scan_category_key: str):
+    """Disable existing Scan Category."""
+    disabling_query = ScanCategory.query.filter(ScanCategory.key == scan_category_key)
+    updated = disabling_query.update({'disabled': True}, synchronize_session='fetch')
+    if not updated:
+        raise Exception()  # TODO: Change me!
+
+
+def enable(scan_category_key: str) -> None:
+    """Enable existing Scan Category."""
+    enabling_query = ScanCategory.query.filter(ScanCategory.key == scan_category_key)
+    updated = enabling_query.update({'disabled': False}, synchronize_session='fetch')
+    if not updated:
+        raise Exception()  # TODO: Change me!
 
 
 def assign_label_tag(tag: LabelTag, scan_category_key: str) -> None:
