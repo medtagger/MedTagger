@@ -59,7 +59,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
 
         if (!this.selectedArea) {
             const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-            this.addSelection(new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag));
+            this.addSelection(new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag.name));
             this.requestRedraw();
         }
     }

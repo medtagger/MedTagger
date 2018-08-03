@@ -15,6 +15,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     };
 
     private canvas: HTMLCanvasElement;
+    private lastTagDrawings: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
     private mouseDrag = false;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -64,8 +65,18 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         return selectionMap;
     }
 
-    onMouseDown(event: MouseEvent): boolean {
+    onMouseDown(event: MouseEvent): void {
         console.log('BrushSelector | onMouseDown | event: ', event);
+
+        // starting new brush selection needs temporary canvas clear
+        this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+
+        const lastDrawing = this.lastTagDrawings[this.currentTag.name];
+
+        if (!!lastDrawing) {
+            this.canvasCtx.drawImage(lastDrawing, 0, 0,
+                this.canvasSize.width, this.canvasSize.height);
+        }
 
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
@@ -78,11 +89,9 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
         this.canvasCtx.beginPath();
         this.canvasCtx.moveTo(x, y);
-
-        return false;
     }
 
-    onMouseMove(event: MouseEvent): boolean {
+    onMouseMove(event: MouseEvent): void {
         if (this.mouseDrag) {
             console.log('BrushSelector | onMove | event: ', event);
             const x = (event.clientX) - this.canvasPosition.left;
@@ -91,26 +100,43 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             this.canvasCtx.lineTo(x, y);
             this.canvasCtx.stroke();
         }
-        return false;
     }
 
-    onMouseUp(event: MouseEvent): boolean {
+    onMouseUp(event: MouseEvent): void {
         if (this.mouseDrag) {
             console.log('BrushSelector | onUp | event: ', event);
             this.mouseDrag = false;
             this.canvasCtx.closePath();
 
             // when canvas is cleared, we have only our brush selection in canvas
-            const selectionImage: string = this.canvas.toDataURL();
-            this.selectedArea = new BrushSelection(selectionImage, this.currentSlice);
+            const selectionImageURL: string = this.canvas.toDataURL();
+            this.selectedArea = new BrushSelection(selectionImageURL, this.currentSlice, this.currentTag.name);
 
-            this.selections.set(this.currentSlice, [this.selectedArea]);
+            this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
 
-            this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
-            this.selectedArea = undefined;
-            return true;
+                this.lastTagDrawings[this.currentTag.name] = image;
+
+                const currentSliceSelections = this.selections.get(this.currentSlice);
+
+                if (currentSliceSelections) {
+                    const labelTagSelectionIndex: number = currentSliceSelections.findIndex(
+                        (selection: BrushSelection) => selection.label_tag === this.currentTag.name
+                    );
+
+                    if (labelTagSelectionIndex > -1) {
+                        currentSliceSelections[labelTagSelectionIndex] = this.selectedArea;
+                    } else {
+                        currentSliceSelections.push(this.selectedArea);
+                    }
+                } else {
+                    this.selections.set(this.currentSlice, [this.selectedArea]);
+                }
+
+                this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
+                this.selectedArea = undefined;
+                this.requestRedraw();
+            });
         }
-        return false;
     }
 
     getSelectorName(): string {

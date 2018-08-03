@@ -233,6 +233,7 @@ export class MarkerPageComponent implements OnInit {
 
     public setTag(tag: LabelTag) {
         this.marker.setCurrentTag(tag);
+        this.marker.updateTagForCurrentSelector(tag);
     }
 
     public getToolIconName(iconName: string): string {

@@ -88,6 +88,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public setCurrentTagForSelector(selector: Selector<SliceSelection>, tag: LabelTag) {
+        console.log('Updating tag for selector: ', selector);
         selector.updateCurrentTag(tag);
     }
 

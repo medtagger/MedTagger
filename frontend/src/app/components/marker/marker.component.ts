@@ -81,7 +81,11 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setCurrentSelector(selector: Selector<any>) {
         this.currentSelector = selector;
-        super.setCurrentTagForSelector(this.currentSelector, this.currentTag);
+        this.updateTagForCurrentSelector(this.currentTag);
+    }
+
+    public updateTagForCurrentSelector(tag: LabelTag): void {
+        super.setCurrentTagForSelector(this.currentSelector, tag);
     }
 
     public setCurrentTag(tag: LabelTag) {
@@ -223,21 +227,21 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                 this.snackBar.open('Please select Tool to start labeling.', '', {duration: 2000});
                 return;
             }
-            if (this.currentSelector.onMouseDown(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseDown(mouseEvent);
             }
         };
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            if (this.currentSelector && this.currentSelector.onMouseUp(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseUp(mouseEvent);
             }
         };
 
         this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
-            if (this.currentSelector && this.currentSelector.onMouseMove(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseMove(mouseEvent);
             }
         };
     }
