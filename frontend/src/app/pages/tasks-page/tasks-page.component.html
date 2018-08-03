@@ -9,8 +9,7 @@
        <button mat-button id="back-button" color="accent" routerLink="/home">Go back</button>
     </div>
     <div class="button-row" *ngIf="!downloadingTasksInProgress && tasks?.length > 0">
-        <button mat-fab *ngFor="let task of tasks" routerLink="/labelling"
-                [queryParams]="{task: task.key}">
+        <button mat-fab *ngFor="let task of tasks" routerLink="/labelling" (click)="setCurrentTask(task)">
             <mat-icon svgIcon="{{task.key}}"></mat-icon>
             <div>{{task.name}}</div>
         </button>

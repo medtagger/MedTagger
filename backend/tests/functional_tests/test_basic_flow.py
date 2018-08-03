@@ -3,6 +3,7 @@ import json
 from typing import Any
 
 from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
+from medtagger.repositories import tasks
 from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 from tests.functional_tests.helpers import create_tag_and_assign_to_task
@@ -72,7 +73,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
 
     # Step 6. Label it
     tag_key = 'EXAMPLE_TAG'
-    create_tag_and_assign_to_task(tag_key, 'Example tag', task_key)
+    create_tag_and_assign_to_task(tag_key, 'Example tag', task_key, [LabelTool.RECTANGLE])
     payload = {
         'elements': [{
             'x': 0.5,
@@ -84,6 +85,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
             'tool': LabelTool.RECTANGLE.value,
         }],
         'labeling_time': 12.34,
+        'task_id': tasks.get_task_by_key('MARK_KIDNEYS').id,
     }
     response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))

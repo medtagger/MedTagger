@@ -1,11 +1,12 @@
 """Insert all database fixtures."""
 import logging.config
-from typing import Dict, List
+from typing import Dict, List, cast
 
 from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
 
 from medtagger.database import db_session
+from medtagger.definitions import LabelTool
 from medtagger.database.models import ScanCategory, Role, LabelTag, Task
 
 logging.config.fileConfig('logging.conf')
@@ -16,6 +17,10 @@ TASKS = [{
     'key': 'MARK_KIDNEYS',
     'name': 'Mark kidneys',
     'image_path': 'assets/icon/kidneys_category_icon.svg',
+}, {
+    'key': 'MARK_LUNGS_NODULES',
+    'name': 'Mark nodules on lungs',
+    'image_path': 'assets/icon/lungs_category_icon.svg',
 }]
 
 CATEGORIES: List[Dict] = [{
@@ -27,17 +32,15 @@ CATEGORIES: List[Dict] = [{
     'key': 'LIVER',
     'name': 'Liver',
     'image_path': 'assets/icon/liver_category_icon.svg',
-    'tasks': [],
 }, {
     'key': 'HEART',
     'name': 'Heart',
     'image_path': 'assets/icon/heart_category_icon.svg',
-    'tasks': [],
 }, {
     'key': 'LUNGS',
     'name': 'Lungs',
     'image_path': 'assets/icon/lungs_category_icon.svg',
-    'tasks': [],
+    'tasks': ['MARK_LUNGS_NODULES'],
 }]
 
 ROLES = [
@@ -56,10 +59,17 @@ TAGS = [{
     'key': 'LEFT_KIDNEY',
     'name': 'Left Kidney',
     'task_key': 'MARK_KIDNEYS',
+    'tools': [LabelTool.RECTANGLE, LabelTool.POINT, LabelTool.CHAIN, LabelTool.BRUSH],
 }, {
     'key': 'RIGHT_KIDNEY',
     'name': 'Right Kidney',
     'task_key': 'MARK_KIDNEYS',
+    'tools': [LabelTool.RECTANGLE],
+}, {
+    'key': 'NODULE',
+    'name': 'Nodule',
+    'task_key': 'MARK_LUNGS_NODULES',
+    'tools': [LabelTool.BRUSH],
 }]
 
 
@@ -110,7 +120,10 @@ def insert_labels_tags() -> None:
                 logger.info('Label Tag exists with key "%s"', tag_key)
                 continue
 
-            tag = LabelTag(row.get('key', ''), row.get('name', ''))
+            key = cast(str, row.get('key', ''))
+            name = cast(str, row.get('name', ''))
+            tools = cast(List[LabelTool], row.get('tools', []))
+            tag = LabelTag(key, name, tools)
             tag_task_key = row.get('task_key', '')
             task = session.query(Task).filter(Task.key == tag_task_key).one()
             tag.task_id = task.id

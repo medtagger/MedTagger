@@ -4,6 +4,7 @@ from typing import Any
 
 from medtagger.database.models import Survey, SurveySingleChoiceQuestion
 from medtagger.types import SurveyElementKey
+from medtagger.definitions import LabelTool
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
@@ -40,7 +41,7 @@ def test_adding_new_survey(prepare_environment: Any) -> None:
     survey.save()
 
     # Assign above Survey to an Example Tag available for MARK_KIDNEYS Task
-    label_tag = create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS')
+    label_tag = create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.RECTANGLE])
     label_tag.actions.append(survey)
     label_tag.save()
 
@@ -103,7 +104,7 @@ def test_adding_new_survey(prepare_environment: Any) -> None:
     }
 
     # Check if above Action is available from Task endpoint
-    response = api_client.get('/api/v1/scans/tasks', headers=get_headers(token=user_token))
+    response = api_client.get('/api/v1/tasks', headers=get_headers(token=user_token))
     json_response = json.loads(response.data)
     mark_kidneys_task = next(task for task in json_response if task['key'] == 'MARK_KIDNEYS')
     example_tag = next(tag for tag in mark_kidneys_task['tags'] if tag['key'] == 'EXAMPLE_TAG')

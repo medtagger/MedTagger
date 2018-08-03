@@ -14,6 +14,7 @@ import {of} from 'rxjs/internal/observable/of';
 import {from} from 'rxjs/internal/observable/from';
 import {defer} from 'rxjs/internal/observable/defer';
 import {Task} from '../model/Task';
+import {TaskResponse} from "./task.service";
 
 interface ScanResponse {
     scan_id: string;
@@ -28,14 +29,6 @@ interface AvailableCategoryResponse {
     name: string;
     image_path: string;
     tasks: Array<TaskResponse>;
-}
-
-interface TaskResponse {
-    key: string;
-    name: string;
-    image_path: string;
-    tags: Array<LabelTagResponse>;
-    categories: Array<string>;
 }
 
 interface LabelTagResponse {
@@ -57,11 +50,12 @@ export class ScanService {
         this.websocket = socket;
     }
 
-    public sendSelection(scanId: string, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {
+    public sendSelection(scanId: string, taskId: number, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {
         console.log('ScanService | send3dSelection | sending ROI:',
             selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
 
         const payload = selection.toJSON();
+        payload['task_id'] = taskId;
         payload['labeling_time'] = labelingTime;
         const form = new FormData();
         form.append('label', JSON.stringify(payload));
@@ -107,48 +101,6 @@ export class ScanService {
                 },
                 (error: Error) => {
                     console.log('ScanService | getScanForScanId | error: ', error);
-                    reject(error);
-                }
-            );
-        });
-    }
-
-    getAvailableCategories(): Promise<ScanCategory[]> {
-        return new Promise((resolve, reject) => {
-            this.http.get<Array<AvailableCategoryResponse>>(environment.API_URL + '/scans/categories').toPromise().then(
-                response => {
-                    console.log('ScanService | getAvailableCategories | response: ', response);
-                    const categories: Array<ScanCategory> = [];
-                    for (const category of response) {
-                        const tasks: Array<Task> = [];
-                        for (const task of category.tasks) {
-                            tasks.push(new Task(task.key, task.name, task.image_path));
-                        }
-                        categories.push(new ScanCategory(category.key, category.name, category.image_path, tasks));
-                    }
-                    resolve(categories);
-                },
-                error => {
-                    console.log('ScanService | getAvailableCategories | error: ', error);
-                    reject(error);
-                }
-            );
-        });
-    }
-
-    getTasks(): Promise<Task[]> {
-        return new Promise((resolve, reject) => {
-            this.http.get<Array<TaskResponse>>(environment.API_URL + '/scans/tasks').toPromise().then(
-                response => {
-                    console.log('ScanService | getTasks | response: ', response);
-                    const tasks: Array<Task> = [];
-                    for (const task of response) {
-                        tasks.push(new Task(task.key, task.name, task.image_path));
-                    }
-                    resolve(tasks);
-                },
-                error => {
-                    console.log('ScanService | getTasks | error: ', error);
                     reject(error);
                 }
             );

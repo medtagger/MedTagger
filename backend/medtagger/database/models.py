@@ -7,6 +7,7 @@ from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
+from medtagger.database.utils import ArrayOfEnum
 from medtagger.database import Base, db_session
 from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
     LabelElementStatus, LabelTool
@@ -91,8 +92,8 @@ class UserSettings(Base):
 
 
 scan_categories_tasks = Table('ScanCategories_Tasks', Base.metadata,
-                              Column('scan_category_id', Integer, ForeignKey('ScanCategories.id')),
-                              Column('task_id', Integer, ForeignKey('Tasks.id')))
+                              Column('scan_category_id', Integer, ForeignKey('ScanCategories.id'), nullable=False),
+                              Column('task_id', Integer, ForeignKey('Tasks.id'), nullable=False))
 
 
 class ScanCategory(Base):
@@ -311,7 +312,7 @@ class Label(Base):
     id: LabelID = Column(String, primary_key=True)
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
     scan: Scan = relationship('Scan', back_populates='labels')
-    task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'))
+    task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
     task: Task = relationship('Task')
 
     labeling_time: LabelingTime = Column(Float, nullable=True)
@@ -358,20 +359,23 @@ class LabelTag(Base):
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
 
-    task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'))
+    task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
     task: Task = relationship('Task', back_populates="available_tags")
 
+    tools: List[LabelTool] = Column(ArrayOfEnum(Enum(LabelTool, name='label_tool', create_constraint=False)))
     actions: List['Action'] = relationship('Action', back_populates='label_tag')
 
-    def __init__(self, key: str, name: str, actions: List['Action'] = None) -> None:
+    def __init__(self, key: str, name: str, tools: List[LabelTool], actions: List['Action'] = None) -> None:
         """Initialize Label Tag.
 
         :param key: unique key representing Label Tag
         :param name: name which describes this Label Tag
+        :param tools: list of tools for given Label Tag that will be available on labeling page
         :param actions: (optional) list of required actions for this Label Tag
         """
         self.key = key
         self.name = name
+        self.tools = tools
         self.actions = actions or []
 
     def __repr__(self) -> str:

@@ -2,25 +2,25 @@ import {Component, OnInit} from '@angular/core';
 import {MatSnackBar, MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
 
-import {ScanService} from '../../services/scan.service';
+import {TaskService} from "../../services/task.service";
+import {Task} from "../../model/Task";
 
 @Component({
-    selector: 'app-category-page',
+    selector: 'app-tasks-page',
     templateUrl: './tasks-page.component.html',
-    providers: [ScanService],
     styleUrls: ['./tasks-page.component.scss']
 })
 export class TasksPageComponent implements OnInit {
 
     tasks = [];
     downloadingTasksInProgress = false;
-    constructor(private iconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private scanService: ScanService,
+    constructor(private iconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private taskService: TaskService,
                 public snackBar: MatSnackBar) {
     }
 
     ngOnInit() {
       this.downloadingTasksInProgress = true;
-        this.scanService.getTasks().then((tasks) => {
+        this.taskService.getTasks().then((tasks) => {
             this.tasks = tasks;
             for (const task of tasks) {
                 this.iconRegistry.addSvgIcon(task.key, this.sanitizer.bypassSecurityTrustResourceUrl(task.imagePath));
@@ -32,5 +32,9 @@ export class TasksPageComponent implements OnInit {
                 duration: 5000,
             });
         });
+    }
+
+    public setCurrentTask(task: Task) {
+        this.taskService.setCurrentTask(task);
     }
 }

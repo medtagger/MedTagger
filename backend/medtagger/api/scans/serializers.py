@@ -2,6 +2,7 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
+from medtagger.api.tasks.serializers import out__task
 from medtagger.definitions import ScanStatus, LabelVerificationStatus
 
 in__new_scan = api.model('New Scan model', {
@@ -86,6 +87,7 @@ elements_schema = {
 in__label_model = api.model('Label model', {
     'elements': fields.List(fields.Raw, required=True),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling', required=True),
+    'task_id': fields.Integer(description='ID of the Task that label refers to', required=True),
 })
 
 in__label = api.parser()
@@ -97,32 +99,11 @@ in__scan_category = api.model('New Scan Category model', {
     'image_path': fields.String(),
 })
 
-out__label_tag = api.model('Label Tag model', {
-    'key': fields.String(),
-    'name': fields.String(),
-    'actions_ids': fields.List(fields.Integer(), attribute=lambda category: [action.id for action in category.actions]),
-})
-
-out__task = api.model('Task model', {
-    'key': fields.String(),
-    'name': fields.String(),
-    'image_path': fields.String(),
-    'tags': fields.List(fields.Nested(out__label_tag), attribute='available_tags'),
-})
-
 out__scan_category = api.model('Scan Category model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
     'tasks': fields.List(fields.Nested(out__task)),
-})
-
-in__task = api.model('New Task model', {
-    'key': fields.String(),
-    'name': fields.String(),
-    'image_path': fields.String(),
-    'tags': fields.List(fields.Nested(out__label_tag)),
-    'categories': fields.List(fields.String()),
 })
 
 out__scan = api.model('Scan model', {

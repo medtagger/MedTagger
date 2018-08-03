@@ -16,6 +16,12 @@ import {LabelTag} from '../../model/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
+import {ChainSelector} from '../../components/selectors/ChainSelector';
+import {SelectorAction} from '../../model/SelectorAction';
+import {FormControl, Validators} from "@angular/forms";
+import {TaskService} from "../../services/task.service";
+import {isUndefined} from "util";
+import {Task} from "../../model/Task";
 
 
 @Component({
@@ -32,38 +38,53 @@ export class MarkerPageComponent implements OnInit {
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
 
-    // TODO: get labelling context from category
-    tags: Array<LabelTag> = [
-        new LabelTag('All', 'ALL', ['RECTANGLE'])
-    ];
-
     scan: ScanMetadata;
-    task: string;
+    task: Task;
     lastSliceID = 0;
     startTime: Date;
     selectors: Map<string, Selector<any>>;
+    taskTags: FormControl;
+    selectorActions: Array<SelectorAction> = [];
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private location: Location, private snackBar: MatSnackBar) {
+                private location: Location, private snackBar: MatSnackBar, private taskService: TaskService) {
         console.log('MarkerPage constructor', this.marker);
     }
 
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
 
+        this.task = this.taskService.getCurrentTask();
+
+        if (!this.task) {
+            this.dialogService
+                .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
+                .afterClosed()
+                .subscribe(() => {
+                    this.location.back();
+                });
+        } else if (this.task.tags.length === 0) {
+            this.dialogService
+                .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
+                .afterClosed()
+                .subscribe(() => {
+                    this.location.back();
+                });
+        }
+
+        this.taskTags = new FormControl('', [Validators.required]);
+
         this.selectors = new Map<string, Selector<any>>([
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
-            ['POINT', new PointSelector(this.marker.getCanvas())]
+            ['POINT', new PointSelector(this.marker.getCanvas())],
+            ['CHAIN', new ChainSelector(this.marker.getCanvas())]
         ]);
+
         this.marker.setSelectors(Array.from(this.selectors.values()));
-        this.setSelector('RECTANGLE');
 
         this.marker.setLabelExplorer(this.labelExplorer);
 
-        this.route.queryParamMap.subscribe(params => {
-            this.task = params.get('task') || '';
-            this.requestScan();
-        });
+        this.requestScan();
 
         this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
             console.log('MarkerPage | ngOnInit | slicesObservable: ', slice);
@@ -111,7 +132,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.scanService.getRandomScan(this.task).then(
+        this.scanService.getRandomScan(this.task.key).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
@@ -135,7 +156,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public skipScan(): void {
-        this.scanService.skipScan(this.scan.scanId);
+        this.scanService.skipScan(this.scan.scanId).then();
         this.nextScan();
     }
 
@@ -157,7 +178,7 @@ export class MarkerPageComponent implements OnInit {
     private sendSelection(roiSelection: ROISelection3D) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
 
-        this.scanService.sendSelection(this.scan.scanId, roiSelection, labelingTime)
+        this.scanService.sendSelection(this.scan.scanId, this.task.id, roiSelection, labelingTime)
             .then((response: Response) => {
                 console.log('MarkerPage | sendSelection | success!');
                 this.indicateLabelHasBeenSend();
@@ -191,13 +212,26 @@ export class MarkerPageComponent implements OnInit {
         this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
     }
 
+    public isToolSupportedByCurrentTag(tool: string) {
+        const tag = this.marker.getCurrentTag();
+        if (isUndefined(tag)) {
+            return false;
+        }
+        return tag.tools.includes(tool);
+    }
+
     public setSelector(selectorName: string) {
         const selector = this.selectors.get(selectorName);
         if (selector) {
             this.marker.setCurrentSelector(selector);
+            this.selectorActions = selector.getActions();
         } else {
             console.warn(`MarkerPage | setSelector | Selector "${selectorName}" doesn't exist`);
         }
+    }
+
+    public setTag(tag: LabelTag) {
+        this.marker.setCurrentTag(tag);
     }
 
     public getToolIconName(iconName: string): string {

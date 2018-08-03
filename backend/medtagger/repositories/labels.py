@@ -8,7 +8,7 @@ from medtagger.database.models import Label, LabelTag, User, RectangularLabelEle
     PointLabelElement, ChainLabelElement, ChainLabelElementPoint
 from medtagger.definitions import LabelVerificationStatus
 from medtagger.storage.models import BrushLabelElement as BrushLabelElementStorage
-from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime, Point
+from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime, Point, TaskID
 
 
 def get_all_labels() -> List[Label]:
@@ -34,11 +34,12 @@ def get_random_label(status: LabelVerificationStatus = None) -> Label:
     return query.first()
 
 
-def add_new_label(scan_id: ScanID, user: User, labeling_time: LabelingTime) -> Label:
+def add_new_label(scan_id: ScanID, task_id: TaskID, user: User, labeling_time: LabelingTime) -> Label:
     """Add new Label for given Scan."""
     with db_session() as session:
         label = Label(user, labeling_time)
         label.scan_id = scan_id
+        label.task_id = task_id
         session.add(label)
     return label
 

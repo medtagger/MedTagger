@@ -9,8 +9,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException, InternalErrorException
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
-from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation, Task
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point, TaskID
+from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
     labels as LabelsRepository,
@@ -49,19 +49,6 @@ def scan_category_is_valid(category_key: str) -> bool:
         return False
 
 
-def task_key_is_valid(task_key: str) -> bool:
-    """Check if Task for such key exists.
-
-    :param task_key: key representing Task
-    :return: boolean information if Task key is valid
-    """
-    try:
-        TasksRepository.get_task_by_key(task_key)
-        return True
-    except NoResultFound:
-        return False
-
-
 def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
     """Create new Scan ScanCategory.
 
@@ -93,32 +80,12 @@ def get_random_scan(task_key: str) -> Scan:
     """
     user = get_current_user()
     task = TasksRepository.get_task_by_key(task_key)
-    try:
-        scan = ScansRepository.get_random_scan(task, user)
-        if not scan:
-            raise NotFoundException('Could not find any Scan for this task!')
-        return scan
-    except NoResultFound:
+    if not task:
+        raise InvalidArgumentsException('Task key {} is invalid!'.format(task_key))
+    scan = ScansRepository.get_random_scan(task, user)
+    if not scan:
         raise NotFoundException('Could not find any Scan for this task!')
-
-
-def get_tasks() -> List[Task]:
-    """Fetch all tasks.
-
-    :return: list of tasks
-    """
-    return TasksRepository.get_all_tasks()
-
-
-def create_task(key: str, name: str, image_path: str) -> Task:
-    """Create new Task.
-
-    :param key: unique key representing Task
-    :param name: name which describes this Task
-    :param image_path: path to the image which is located on the frontend
-    :return: Task object
-    """
-    return TasksRepository.add_task(key, name, image_path)
+    return scan
 
 
 def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
@@ -145,6 +112,16 @@ def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> Non
     """
     _validate_files(files)
     _validate_label_elements(elements, files)
+    _validate_tool(elements)
+
+
+def _validate_tool(elements: List[Dict]) -> None:
+    """Validate if the tool for given Label Element is available for given tag."""
+    for label_element in elements:
+        tag = _get_label_tag(label_element['tag'])
+        if label_element['tool'] not in {tool.name for tool in tag.tools}:
+            raise InvalidArgumentsException('{} tool is not available for {} tag'.format(
+                label_element['tool'], tag.name))
 
 
 def _validate_files(files: Dict[str, bytes]) -> None:
@@ -161,7 +138,7 @@ def _validate_files(files: Dict[str, bytes]) -> None:
 def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> None:
     """Validate Label Elements and make sure that all Brush Elements have images."""
     for label_element in elements:
-        # Each Brush Label Element should have its own image attatched
+        # Each Brush Label Element should have its own image attached
         if label_element['tool'] == LabelTool.BRUSH.value:
             try:
                 files[label_element['image_key']]
@@ -170,11 +147,12 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
                 raise InvalidArgumentsException(message.format(label_element['image_key']))
 
 
-def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, bytes],
+def add_label(scan_id: ScanID, task_id: TaskID, elements: List[Dict], files: Dict[str, bytes],
               labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
+    :param task_id: ID of Task
     :param elements: List of JSONs describing elements for a single label
     :param files: mapping of uploaded files (name and content)
     :param labeling_time: time in seconds that user spent on labeling
@@ -182,7 +160,7 @@ def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, bytes],
     """
     user = get_current_user()
     try:
-        label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
+        label = LabelsRepository.add_new_label(scan_id, task_id, user, labeling_time)
     except IntegrityError:
         raise NotFoundException('Could not find Scan for that id!')
     for element in elements:

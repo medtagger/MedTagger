@@ -20,10 +20,8 @@ def get_scan_by_id(scan_id: ScanID) -> Scan:
 
 
 def get_random_scan(task: Task = None, user: User = None) -> Scan:
-    """Fetch random Scan.
+    """Fetch random Scan from database.
 
-    Fetch random Scan from all database or from specified task. If user provided, fetch only scan that isn't labeled by
-    this user.
     :param task: (optional) Task from which scan should be fetched
     :param user: (optional) User for which Scan should be randomized
     :return: Label object

@@ -1,4 +1,7 @@
-<mat-drawer-container>
+<div *ngIf="!currentUser" class="container-fluid">
+<router-outlet></router-outlet>
+</div>
+<mat-drawer-container  *ngIf="!!currentUser">
     <!-- Right navigation bar -->
     <mat-drawer #sidenav mode="over" position="end" class="right-sidebar mat-typography">
         <div *ngIf="!!currentUser">

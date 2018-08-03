@@ -2,7 +2,9 @@
 import json
 from typing import Any
 
+from medtagger.repositories import tasks
 from medtagger.storage.models import BrushLabelElement
+from medtagger.definitions import LabelTool
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
@@ -23,7 +25,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Brush
-    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS')
+    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.BRUSH])
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -31,9 +33,10 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
             'height': 128,
             'image_key': 'SLICE_1',
             'tag': 'EXAMPLE_TAG',
-            'tool': 'BRUSH',
+            'tool': LabelTool.BRUSH.value,
         }],
         'labeling_time': 12.34,
+        'task_id': tasks.get_task_by_key('MARK_KIDNEYS').id,
     }
     with open('tests/assets/example_labels/binary_mask.png', 'rb') as image:
         data = {
@@ -73,16 +76,17 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Point Tool
-    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS')
+    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.POINT])
     payload = {
         'elements': [{
             'slice_index': 0,
             'x': 0.25,
             'y': 0.5,
             'tag': 'EXAMPLE_TAG',
-            'tool': 'POINT',
+            'tool': LabelTool.POINT.value,
         }],
         'labeling_time': 12.34,
+        'task_id': tasks.get_task_by_key('MARK_KIDNEYS').id,
     }
     data = {
         'label': json.dumps(payload),
@@ -120,7 +124,7 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Chain Tool
-    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS')
+    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.CHAIN])
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -135,10 +139,11 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
                 },
             ],
             'tag': 'EXAMPLE_TAG',
-            'tool': 'CHAIN',
+            'tool': LabelTool.CHAIN.value,
             'loop': False,
         }],
         'labeling_time': 12.34,
+        'task_id': tasks.get_task_by_key('MARK_KIDNEYS').id,
     }
     data = {
         'label': json.dumps(payload),
@@ -179,7 +184,7 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Chain Tool
-    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS')
+    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.CHAIN])
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -190,10 +195,11 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
                 },
             ],
             'tag': 'EXAMPLE_TAG',
-            'tool': 'CHAIN',
+            'tool': LabelTool.CHAIN.value,
             'loop': False,
         }],
         'labeling_time': 12.34,
+        'task_id': tasks.get_task_by_key('MARK_KIDNEYS').id,
     }
     data = {
         'label': json.dumps(payload),

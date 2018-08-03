@@ -59,7 +59,7 @@ class ScanCategories(Resource):
     @login_required
     @role_required('doctor', 'admin')
     @scans_ns.expect(serializers.in__scan_category)
-    @scans_ns.marshal_with(serializers.in__scan_category)
+    @scans_ns.marshal_with(serializers.out__scan_category)
     @scans_ns.doc(security='token')
     @scans_ns.doc(description='Create new Scan Category.')
     @scans_ns.doc(responses={201: 'Success'})
@@ -71,38 +71,6 @@ class ScanCategories(Resource):
         image_path = payload['image_path']
 
         return business.create_scan_category(key, name, image_path), 201
-
-
-@scans_ns.route('/tasks')
-class Tasks(Resource):
-    """Endpoint that manages tasks."""
-
-    @staticmethod
-    @login_required
-    @scans_ns.marshal_with(serializers.out__task)
-    @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Return all available tasks.')
-    @scans_ns.doc(responses={200: 'Success'})
-    def get() -> Any:
-        """Return all available tasks."""
-        return business.get_tasks()
-
-    @staticmethod
-    @login_required
-    @role_required('doctor', 'admin')
-    @scans_ns.expect(serializers.in__task)
-    @scans_ns.marshal_with(serializers.in__scan_category)
-    @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Create new Scan Category.')
-    @scans_ns.doc(responses={201: 'Success'})
-    def post() -> Any:
-        """Create Scan Category."""
-        payload = request.json
-        key = payload['key']
-        name = payload['name']
-        image_path = payload['image_path']
-
-        return business.create_task(key, name, image_path), 201
 
 
 @scans_ns.route('/random')
@@ -120,8 +88,6 @@ class Random(Resource):
         """Return random Scan."""
         args = serializers.args__random_scan.parse_args(request)
         task_key = args.task
-        if not business.task_key_is_valid(task_key):
-            raise InvalidArgumentsException('Task "{}" is not available.'.format(task_key))
         return business.get_random_scan(task_key)
 
 
@@ -169,7 +135,8 @@ class Label(Resource):
         business.validate_label_payload(elements, files)
 
         labeling_time = label['labeling_time']
-        label = business.add_label(scan_id, elements, files, labeling_time)
+        task_id = label['task_id']
+        label = business.add_label(scan_id, task_id, elements, files, labeling_time)
         return label, 201
 
 
