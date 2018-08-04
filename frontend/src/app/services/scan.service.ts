@@ -14,7 +14,7 @@ import {of} from 'rxjs/internal/observable/of';
 import {from} from 'rxjs/internal/observable/from';
 import {defer} from 'rxjs/internal/observable/defer';
 import {Task} from '../model/Task';
-import {TaskResponse} from "./task.service";
+import {TaskResponse} from './task.service';
 
 interface ScanResponse {
     scan_id: string;
