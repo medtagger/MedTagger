@@ -97,6 +97,14 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.downloadingSlicesInProgress = isInProgress;
     }
 
+    public selectMiddleSlice(): void {
+        const slicesCount = this.slider.max - this.slider.min + 1;
+        const middleSliceNumber = this.slider.min + Math.floor(slicesCount / 2) - 1;
+        this.slider.value = middleSliceNumber;
+        this.changeMarkerImage(middleSliceNumber);
+        this.drawSelections();
+    }
+
     public removeAllSelectionsOnCurrentSlice(): void {
         this.selectors.forEach((selector) => selector.removeSelectionsOnCurrentSlice());
         this.updateSelectionState();
