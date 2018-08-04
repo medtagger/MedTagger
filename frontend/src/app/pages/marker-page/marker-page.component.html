@@ -39,11 +39,9 @@
         <div class="actions">
             <h3>Actions</h3>
             <div class="buttons" *ngIf="this.labelExplorer.getLabelsLength() > 0">
-                <button mat-raised-button color="primary" (click)="addLabelComment()" *ngIf="this.labelComment != ''">
-                    Modify existing comment
-                </button>
-                <button mat-raised-button color="primary" (click)="addLabelComment()" *ngIf="this.labelComment === ''">
-                    Add a comment to label
+                <button mat-raised-button color="primary" (click)="addLabelComment()">
+                    <span *ngIf="this.labelComment !== ''">Modify existing comment</span>
+                    <span *ngIf="this.labelComment === ''">Add a comment to label</span>
                 </button>
             </div>
             <div class="buttons">
