@@ -3,7 +3,7 @@ import {MatDialog, MatDialogRef} from '@angular/material';
 import {InfoDialogComponent} from '../dialogs/info-dialog.component';
 import {InputDialogComponent} from '../dialogs/input-dialog.component';
 
-const DIALOG_BOX_WIDTH: string = '450px';
+const DIALOG_BOX_WIDTH = '450px';
 
 @Injectable()
 export class DialogService {
