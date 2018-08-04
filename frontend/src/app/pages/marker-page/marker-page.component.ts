@@ -45,11 +45,13 @@ export class MarkerPageComponent implements OnInit {
     categoryTags: FormControl;
     selectorActions: Array<SelectorAction> = [];
     labelComment: string;
+    isInitialSliceLoad: boolean;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private categoryService: CategoryService, private location: Location, private snackBar: MatSnackBar) {
         console.log('MarkerPage constructor', this.marker);
         this.labelComment = '';
+        this.isInitialSliceLoad = true;
     }
 
     ngOnInit() {
@@ -97,6 +99,10 @@ export class MarkerPageComponent implements OnInit {
                 this.indicateNewScanAppeared();
             }
             if (slice.isLastInBatch()) {
+                if (this.isInitialSliceLoad === true) {
+                    this.marker.selectMiddleSlice();
+                    this.isInitialSliceLoad = false;
+                }
                 this.marker.setDownloadSlicesInProgress(false);
             }
             this.marker.setDownloadScanInProgress(false);
@@ -141,6 +147,7 @@ export class MarkerPageComponent implements OnInit {
                 const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
                 this.startMeasuringLabelingTime();
+                this.isInitialSliceLoad = true;
                 this.scanService.requestSlices(scan.scanId, begin, count, false);
             },
             (errorResponse: Error) => {

@@ -172,9 +172,6 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     protected addSlice(newSlice: MarkerSlice) {
         this.slices.set(newSlice.index, newSlice);
-        if (this.slices.size === 1) {
-            this.setCanvasImage();
-        }
     }
 
     public setScanMetadata(scanMetadata: ScanMetadata): void {
