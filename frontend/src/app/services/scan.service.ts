@@ -50,7 +50,8 @@ export class ScanService {
         this.websocket = socket;
     }
 
-    public sendSelection(scanId: string, taskId: number, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {
+    public sendSelection(scanId: string, taskId: number, selection: ScanSelection<SliceSelection>, labelingTime: number)
+        : Promise<Response> {
         console.log('ScanService | send3dSelection | sending ROI:',
             selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
 
