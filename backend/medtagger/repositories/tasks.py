@@ -35,7 +35,7 @@ def add_task(key: str, name: str, image_path: str, categories_keys: List[str], t
     """
     with db_session() as session:
         task = Task(key, name, image_path)
-        scan_categories = ScanCategory.query.filter(ScanCategory.key.in_(categories_keys)).all()
+        scan_categories = ScanCategory.query.filter(ScanCategory.key.in_(categories_keys)).all()  # type: ignore
         task.scan_categories = scan_categories
         task.available_tags = tags
         session.add(task)

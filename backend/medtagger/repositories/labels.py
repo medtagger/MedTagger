@@ -3,7 +3,6 @@ from typing import List
 
 from sqlalchemy.sql.expression import func
 
-from medtagger.repositories import tasks as TasksRepository
 from medtagger.database import db_session
 from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement, BrushLabelElement, \
     PointLabelElement, ChainLabelElement, ChainLabelElementPoint, Task
