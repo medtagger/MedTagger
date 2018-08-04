@@ -86,7 +86,7 @@ class Random(Resource):
     def get() -> Any:
         """Return random Scan."""
         args = serializers.args__random_scan.parse_args(request)
-        task_key = args.task_key
+        task_key = args.task
         return business.get_random_scan(task_key)
 
 

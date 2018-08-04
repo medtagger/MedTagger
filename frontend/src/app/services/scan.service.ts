@@ -72,7 +72,7 @@ export class ScanService {
     public getRandomScan(taskKey: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
             let params = new HttpParams();
-            params = params.set('task_key', taskKey);
+            params = params.set('task', taskKey);
             this.http.get<ScanResponse>(environment.API_URL + '/scans/random', {params: params})
                 .subscribe(
                     (response: ScanResponse) => {

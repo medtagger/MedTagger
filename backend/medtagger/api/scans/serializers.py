@@ -130,4 +130,4 @@ out__new_slice = api.model('Newly created Slice model', {
 })
 
 args__random_scan = reqparse.RequestParser()
-args__random_scan.add_argument('task_key', type=str, required=True, help='Task\'s key')
+args__random_scan.add_argument('task', type=str, required=True, help='Task\'s key')
