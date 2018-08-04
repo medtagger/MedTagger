@@ -61,9 +61,11 @@ def upgrade():
 
     op.drop_constraint('fk_LabelTags_scan_category_id_ScanCategories', 'LabelTags', type_='foreignkey')
     op.drop_column('LabelTags', 'scan_category_id')
+    op.drop_column('ScanCategories', 'image_path')
 
 
 def downgrade():
+    op.add_column(sa.Column('image_path', sa.String(length=100), nullable=False))
     op.drop_constraint(op.f('fk_Labels_task_id_Tasks'), 'Labels', type_='foreignkey')
     op.drop_column('Labels', 'task_id')
     op.add_column('LabelTags', sa.Column('scan_category_id', sa.INTEGER(), autoincrement=False, nullable=True))

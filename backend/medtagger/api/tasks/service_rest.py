@@ -7,6 +7,7 @@ from flask_restplus import Resource
 from medtagger.api import api
 from medtagger.api.tasks import business, serializers
 from medtagger.api.security import login_required, role_required
+from medtagger.database.models import LabelTag
 
 tasks_ns = api.namespace('tasks', 'Methods related with tasks')
 
@@ -27,7 +28,7 @@ class Tasks(Resource):
 
     @staticmethod
     @login_required
-    @role_required('doctor', 'admin')
+    @role_required('admin')
     @tasks_ns.expect(serializers.in__task)
     @tasks_ns.marshal_with(serializers.out__task)
     @tasks_ns.doc(security='token')
@@ -40,6 +41,7 @@ class Tasks(Resource):
         key = payload['key']
         name = payload['name']
         image_path = payload['image_path']
-        categories_ids = payload['categories_ids']
+        categories_keys = payload['categories_keys']
+        tags = [LabelTag(tag['key'], tag['name'], tag['tools']) for tag in payload['tags']]
 
-        return business.create_task(key, name, image_path, categories_ids), 201
+        return business.create_task(key, name, image_path, categories_keys, tags), 201

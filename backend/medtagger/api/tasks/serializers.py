@@ -14,8 +14,17 @@ out__label_tag = api.model('Label Tag model', {
                          attribute=lambda label_tag: [tool.name for tool in label_tag.tools]),
 })
 
+in__label_tag = api.model('Label Tag model', {
+    'key': fields.String(),
+    'name': fields.String(),
+    'actions_ids': fields.List(fields.Integer(),
+                               attribute=lambda label_tag: [action.id for action in label_tag.actions]),
+    'tools': fields.List(fields.String(), description='Available tools for Label Tag',
+                         enum=[tool.name for tool in LabelTool],
+                         attribute=lambda label_tag: [tool.name for tool in label_tag.tools]),
+})
+
 out__task = api.model('Task model', {
-    'task_id': fields.Integer(attribute='id'),
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
@@ -26,5 +35,6 @@ in__task = api.model('New Task model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
-    'categories_ids': fields.List(fields.String()),
+    'categories_keys': fields.List(fields.String()),
+    'tags': fields.List(fields.Nested(in__label_tag), attribute='available_tags'),
 })

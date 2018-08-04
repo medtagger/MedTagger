@@ -3,12 +3,13 @@ from typing import List
 
 from sqlalchemy.sql.expression import func
 
+from medtagger.repositories import tasks as TasksRepository
 from medtagger.database import db_session
 from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement, BrushLabelElement, \
-    PointLabelElement, ChainLabelElement, ChainLabelElementPoint
+    PointLabelElement, ChainLabelElement, ChainLabelElementPoint, Task
 from medtagger.definitions import LabelVerificationStatus
 from medtagger.storage.models import BrushLabelElement as BrushLabelElementStorage
-from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime, Point, TaskID
+from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime, Point
 
 
 def get_all_labels() -> List[Label]:
@@ -34,12 +35,12 @@ def get_random_label(status: LabelVerificationStatus = None) -> Label:
     return query.first()
 
 
-def add_new_label(scan_id: ScanID, task_id: TaskID, user: User, labeling_time: LabelingTime) -> Label:
+def add_new_label(scan_id: ScanID, task_key: str, user: User, labeling_time: LabelingTime) -> Label:
     """Add new Label for given Scan."""
     with db_session() as session:
         label = Label(user, labeling_time)
         label.scan_id = scan_id
-        label.task_id = task_id
+        label.task = Task.query.filter(Task.key == task_key).one()
         session.add(label)
     return label
 
@@ -67,6 +68,7 @@ def add_new_brush_label_element(label_id: LabelID, slice_index: int, width: int,
     """Add new Brush Element for given Label.
 
     :param label_id: Label's ID
+    :param slice_index: index of Slice
     :param width: width of the Label's image
     :param height: height of the Label's image
     :param image: bytes with image representation of a binary mask

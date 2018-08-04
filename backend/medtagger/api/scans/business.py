@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException, InternalErrorException
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point, TaskID
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
 from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
@@ -49,15 +49,14 @@ def scan_category_is_valid(category_key: str) -> bool:
         return False
 
 
-def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
+def create_scan_category(key: str, name: str) -> ScanCategory:
     """Create new Scan ScanCategory.
 
     :param key: unique key representing Scan Category
     :param name: name which describes this Category
-    :param image_path: path to the image which is located on the frontend
     :return: Scan Category object
     """
-    return ScanCategoriesRepository.add_new_category(key, name, image_path)
+    return ScanCategoriesRepository.add_new_category(key, name)
 
 
 def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan:
@@ -147,12 +146,12 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
                 raise InvalidArgumentsException(message.format(label_element['image_key']))
 
 
-def add_label(scan_id: ScanID, task_id: TaskID, elements: List[Dict], files: Dict[str, bytes],
+def add_label(scan_id: ScanID, task_key: str, elements: List[Dict], files: Dict[str, bytes],
               labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
-    :param task_id: ID of Task
+    :param task_key: Key of Task
     :param elements: List of JSONs describing elements for a single label
     :param files: mapping of uploaded files (name and content)
     :param labeling_time: time in seconds that user spent on labeling
@@ -160,7 +159,7 @@ def add_label(scan_id: ScanID, task_id: TaskID, elements: List[Dict], files: Dic
     """
     user = get_current_user()
     try:
-        label = LabelsRepository.add_new_label(scan_id, task_id, user, labeling_time)
+        label = LabelsRepository.add_new_label(scan_id, task_key, user, labeling_time)
     except IntegrityError:
         raise NotFoundException('Could not find Scan for that id!')
     for element in elements:

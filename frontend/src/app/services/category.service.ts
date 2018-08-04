@@ -7,8 +7,6 @@ import {LabelTag} from '../model/LabelTag';
 interface AvailableCategoryResponse {
     key: string;
     name: string;
-    image_path: string;
-    tags: LabelTag[];
 }
 
 @Injectable()
@@ -23,7 +21,7 @@ export class CategoryService {
                     console.log('ScanService | getAvailableCategories | response: ', response);
                     const categories = [];
                     for (const category of response) {
-                        categories.push(new ScanCategory(category.key, category.name, category.image_path));
+                        categories.push(new ScanCategory(category.key, category.name));
                     }
                     resolve(categories);
                 },

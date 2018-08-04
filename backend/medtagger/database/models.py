@@ -103,20 +103,17 @@ class ScanCategory(Base):
     id: int = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
-    image_path: str = Column(String(100), nullable=False)
 
     tasks: List['Task'] = relationship('Task', back_populates='scan_categories', secondary=scan_categories_tasks)
 
-    def __init__(self, key: str, name: str, image_path: str) -> None:
+    def __init__(self, key: str, name: str) -> None:
         """Initialize Scan Category.
 
         :param key: unique key representing Scan Category
         :param name: name which describes this Category
-        :param image_path: path to the image which is located on the frontend
         """
         self.key = key
         self.name = name
-        self.image_path = image_path
 
     def __repr__(self) -> str:
         """Return string representation for Scan Category."""
@@ -124,7 +121,7 @@ class ScanCategory(Base):
 
 
 class Task(Base):
-    """It describes what user should mark and what tools are provided."""
+    """Describe what user should mark on Scans in given Categories."""
 
     __tablename__ = 'Tasks'
     id: TaskID = Column(Integer, autoincrement=True, primary_key=True)

@@ -27,7 +27,6 @@ interface ScanResponse {
 interface AvailableCategoryResponse {
     key: string;
     name: string;
-    image_path: string;
     tasks: Array<TaskResponse>;
 }
 
@@ -50,18 +49,17 @@ export class ScanService {
         this.websocket = socket;
     }
 
-    public sendSelection(scanId: string, taskId: number, selection: ScanSelection<SliceSelection>, labelingTime: number)
+    public sendSelection(scanId: string, taskKey: string, selection: ScanSelection<SliceSelection>, labelingTime: number)
         : Promise<Response> {
         console.log('ScanService | send3dSelection | sending ROI:',
             selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
 
         const payload = selection.toJSON();
-        payload['task_id'] = taskId;
         payload['labeling_time'] = labelingTime;
         const form = new FormData();
         form.append('label', JSON.stringify(payload));
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/label`, form).toPromise().then((response: Response) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label`, form).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
                 resolve(response);
             }).catch((error: Response) => {
@@ -71,10 +69,10 @@ export class ScanService {
         });
     }
 
-    public getRandomScan(task: string): Promise<ScanMetadata> {
+    public getRandomScan(taskKey: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
             let params = new HttpParams();
-            params = params.set('task', task);
+            params = params.set('task_key', taskKey);
             this.http.get<ScanResponse>(environment.API_URL + '/scans/random', {params: params})
                 .subscribe(
                     (response: ScanResponse) => {

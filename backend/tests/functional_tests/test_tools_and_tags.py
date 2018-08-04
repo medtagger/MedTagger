@@ -5,7 +5,6 @@ from typing import Any
 from flask import json
 
 from medtagger.definitions import LabelTool
-from medtagger.repositories import tasks
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 from tests.functional_tests.helpers import create_tag_and_assign_to_task
@@ -37,7 +36,8 @@ def test_add_label_non_existing_tag(prepare_environment: Any) -> None:
         }],
         'labeling_time': 12.34,
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id),
+                               data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 404
     json_response = json.loads(response.data)
@@ -70,7 +70,8 @@ def test_add_label_non_supported_tool(prepare_environment: Any) -> None:
         }],
         'labeling_time': 12.34,
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id),
+                               data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 400
     # [Related #288] Please fix this details message!
@@ -103,7 +104,8 @@ def test_add_label_missing_tag(prepare_environment: Any) -> None:
         }],
         'labeling_time': 12.34,
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id),
+                               data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 400
     # [Related #288] Please fix this details message!
@@ -135,9 +137,9 @@ def test_add_label_missing_tool(prepare_environment: Any) -> None:
             'tag': 'LEFT_KIDNEY',
         }],
         'labeling_time': 12.34,
-        'task_id': tasks.get_task_by_key('MARK_KIDNEYS').id,
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id),
+                               data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 400
     # [Related #288] Please fix this details message!
@@ -171,6 +173,7 @@ def test_add_label_wrong_tool_for_tag(prepare_environment: Any) -> None:
         }],
         'labeling_time': 12.34,
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id),
+                               data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 400

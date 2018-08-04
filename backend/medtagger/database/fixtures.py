@@ -26,20 +26,16 @@ TASKS = [{
 CATEGORIES: List[Dict] = [{
     'key': 'KIDNEYS',
     'name': 'Kidneys',
-    'image_path': 'assets/icon/kidneys_category_icon.svg',
     'tasks': ['MARK_KIDNEYS'],
 }, {
     'key': 'LIVER',
     'name': 'Liver',
-    'image_path': 'assets/icon/liver_category_icon.svg',
 }, {
     'key': 'HEART',
     'name': 'Heart',
-    'image_path': 'assets/icon/heart_category_icon.svg',
 }, {
     'key': 'LUNGS',
     'name': 'Lungs',
-    'image_path': 'assets/icon/lungs_category_icon.svg',
     'tasks': ['MARK_LUNGS_NODULES'],
 }]
 
@@ -99,7 +95,7 @@ def insert_scan_categories() -> None:
                 logger.info('Scan Category exists with key "%s"', category_key)
                 continue
 
-            category = ScanCategory(category_key, row.get('name', ''), row.get('image_path', ''))
+            category = ScanCategory(category_key, row.get('name', ''))
 
             tasks = row.get('tasks', [])
             for task_key in tasks:

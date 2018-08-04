@@ -5,7 +5,6 @@ from typing import Dict, Any
 from medtagger.api.auth.business import create_user
 from medtagger.api.users.business import set_user_role
 from medtagger.definitions import LabelTool
-from medtagger.repositories import tasks
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.helpers import create_tag_and_assign_to_task
 
@@ -153,9 +152,9 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
             'tool': LabelTool.RECTANGLE.value,
         }],
         'labeling_time': 12.34,
-        'task_id': tasks.get_task_by_key('MARK_KIDNEYS').id,
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id),
+                               data={'label': json.dumps(payload)},
                                headers=get_headers(token=admin_user_token, multipart=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)

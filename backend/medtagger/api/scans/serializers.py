@@ -87,7 +87,6 @@ elements_schema = {
 in__label_model = api.model('Label model', {
     'elements': fields.List(fields.Raw, required=True),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling', required=True),
-    'task_id': fields.Integer(description='ID of the Task that label refers to', required=True),
 })
 
 in__label = api.parser()
@@ -96,13 +95,11 @@ in__label.add_argument('label', type=in__label_model, help='Label model object',
 in__scan_category = api.model('New Scan Category model', {
     'key': fields.String(),
     'name': fields.String(),
-    'image_path': fields.String(),
 })
 
 out__scan_category = api.model('Scan Category model', {
     'key': fields.String(),
     'name': fields.String(),
-    'image_path': fields.String(),
     'tasks': fields.List(fields.Nested(out__task)),
 })
 
@@ -133,4 +130,4 @@ out__new_slice = api.model('Newly created Slice model', {
 })
 
 args__random_scan = reqparse.RequestParser()
-args__random_scan.add_argument('task', type=str, required=True, help='Task\'s key')
+args__random_scan.add_argument('task_key', type=str, required=True, help='Task\'s key')
