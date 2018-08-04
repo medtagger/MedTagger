@@ -44,7 +44,10 @@ export class LabelExplorerComponent implements OnInit {
     }
 
     public getLabelsForTag(tag: LabelTag): Array<LabelListItem> {
-        return this.labels.filter(label => label.tag.key === tag.key);
+        let labels = this.labels.filter(label => label.tag.key === tag.key);
+        labels = labels.sort((tagA, tagB) => tagA.selectionId - tagB.selectionId);  // Sorts ascending by SelectionID
+        labels = labels.sort((tagA, tagB) => tagA.sliceIndex - tagB.sliceIndex);  // Sorts ascending by SliceIndex (leaving order by SelectionID)
+        return labels;
     }
 
     public deleteLabel(label: LabelListItem): void {

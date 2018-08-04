@@ -218,6 +218,12 @@ export class MarkerPageComponent implements OnInit {
         this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
     }
 
+    public isCurrentSelector(selectorName: string): boolean {
+        const currentSelector = this.marker.getCurrentSelector();
+        const selectorToCheck = this.selectors.get(selectorName);
+        return !!selectorToCheck && currentSelector === selectorToCheck;
+    }
+
     public isToolSupportedByCurrentTag(tool: string) {
         const tag = this.marker.getCurrentTag();
         if (isUndefined(tag)) {
