@@ -7,6 +7,7 @@ import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
 import {SliceSelection} from '../../model/SliceSelection';
 import {SliceRequest} from '../../model/SliceRequest';
+import {LabelTag} from '../../model/LabelTag';
 
 @Component({
     selector: 'app-scan-viewer',
@@ -47,6 +48,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     protected sliceBatchSize: number;
 
     protected selectors: Array<Selector<SliceSelection>>;
+    protected _currentTag;
 
     constructor() {}
 
@@ -69,7 +71,10 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public sliderFocus() {
-        this.slider._elementRef.nativeElement.focus();
+        // setTimeout() fixes slider focus issues in IE/Firefox
+        window.setTimeout(() => {
+            this.slider._elementRef.nativeElement.focus();
+        }, 10);
     }
 
     public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {
@@ -82,6 +87,14 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
             selector.updateCanvasHeight(this.canvas.height);
             selector.drawSelections();
         });
+    }
+
+    public setCurrentTagForSelector(selector: Selector<SliceSelection>, tag: LabelTag) {
+        selector.updateCurrentTag(tag);
+    }
+
+    public setCurrentTag(tag: LabelTag) {
+        this._currentTag = tag;
     }
 
     public setArchivedSelections(selections: Array<SliceSelection>): void {

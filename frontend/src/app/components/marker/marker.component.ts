@@ -10,6 +10,9 @@ import {LabelListItem} from '../../model/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from '../selectors/Selector';
 import {Subscription} from 'rxjs/Subscription';
+import {LabelTag} from '../../model/LabelTag';
+import { isUndefined } from 'util';
+import {MatSnackBar} from '@angular/material';
 
 @Component({
     selector: 'app-marker-component',
@@ -31,6 +34,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     canvas: HTMLCanvasElement;
 
     private currentSelector: Selector<SliceSelection>;
+    private currentTag: LabelTag;
 
     @ViewChild('canvas')
     set viewCanvas(viewElement: ElementRef) {
@@ -49,14 +53,11 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     private labelExplorer: LabelExplorerComponent;
 
-    // TODO: dynamic context and tool changes
-    private currentTaggingContext = 'ALL';
-
     private selectorSubscriptions: Array<Subscription> = [];
 
     private selectorsByName: Map<string, Selector<SliceSelection>> = new Map();
 
-    constructor() {
+    constructor(public snackBar: MatSnackBar) {
         super();
 
         this.redrawRequestEmitter.subscribe(() => {
@@ -80,6 +81,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setCurrentSelector(selector: Selector<any>) {
         this.currentSelector = selector;
+        super.setCurrentTagForSelector(this.currentSelector, this.currentTag);
+    }
+
+    public setCurrentTag(tag: LabelTag) {
+        super.setCurrentTag(tag);
+        this.currentTag = tag;
     }
 
     public setDownloadScanInProgress(isInProgress: boolean) {
@@ -114,7 +121,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.updateSelectionState();
 
         this.clearCanvasSelections();
-
         const coordinates: SliceSelection[] = this.selectors
             .map((selector) => selector.getSelections())
             .reduce((x, y) => x.concat(y), []);
@@ -124,6 +130,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.drawSelections();
 
         return coordinates;
+    }
+
+    public getCurrentTag() {
+        return this.currentTag;
     }
 
     private hookUpStateChangeSubscription(): void {
@@ -139,7 +149,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                     } else {
                         console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
                             selection.selectionId);
-                        this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTaggingContext,
+                        this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTag,
                             this.currentSelector.getSelectorName());
                     }
                 }
@@ -208,6 +218,13 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.canvas.onmousedown = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmousedown clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
+            if (isUndefined(this.currentTag)) {
+                this.snackBar.open('Please select Tag and Tool to start labeling.', '', {duration: 2000});
+                return;
+            } else if (isUndefined(this.currentSelector)) {
+                this.snackBar.open('Please select Tool to start labeling.', '', {duration: 2000});
+                return;
+            }
             if (this.currentSelector.onMouseDown(mouseEvent)) {
                 this.redrawSelections();
             }
@@ -215,14 +232,27 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            if (this.currentSelector.onMouseUp(mouseEvent)) {
+            if (this.currentSelector && this.currentSelector.onMouseUp(mouseEvent)) {
                 this.redrawSelections();
             }
         };
 
         this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
-            if (this.currentSelector.onMouseMove(mouseEvent)) {
+            if (this.currentSelector && this.currentSelector.onMouseMove(mouseEvent)) {
                 this.redrawSelections();
+            }
+        };
+
+        this.canvas.onwheel = (wheelEvent: WheelEvent) => {
+            const sliderValue = wheelEvent.deltaY > 0 ? this.slider.value - 1 : this.slider.value + 1;
+
+            if (sliderValue >= this.slider.min && sliderValue <= this.slider.max) {
+                this.selectors.forEach((selector) => selector.updateCurrentSlice(sliderValue));
+                this.requestSlicesIfNeeded(sliderValue);
+
+                this.changeMarkerImage(sliderValue);
+
+                this.drawSelections();
             }
         };
     }

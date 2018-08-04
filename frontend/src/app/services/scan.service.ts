@@ -2,7 +2,7 @@ import {throwError as observableThrowError, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 
-import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
+import {ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
@@ -20,12 +20,6 @@ interface ScanResponse {
     number_of_slices: number;
     width: number;
     height: number;
-}
-
-interface AvailableCategoryResponse {
-    key: string;
-    name: string;
-    image_path: string;
 }
 
 interface NewScanResponse {
@@ -91,25 +85,6 @@ export class ScanService {
                 },
                 (error: Error) => {
                     console.log('ScanService | getScanForScanId | error: ', error);
-                    reject(error);
-                }
-            );
-        });
-    }
-
-    getAvailableCategories(): Promise<ScanCategory[]> {
-        return new Promise((resolve, reject) => {
-            this.http.get<Array<AvailableCategoryResponse>>(environment.API_URL + '/scans/categories').toPromise().then(
-                response => {
-                    console.log('ScanService | getAvailableCategories | response: ', response);
-                    const categories = [];
-                    for (const category of response) {
-                        categories.push(new ScanCategory(category.key, category.name, category.image_path));
-                    }
-                    resolve(categories);
-                },
-                error => {
-                    console.log('ScanService | getAvailableCategories | error: ', error);
                     reject(error);
                 }
             );

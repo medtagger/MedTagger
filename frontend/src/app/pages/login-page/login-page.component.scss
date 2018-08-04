@@ -1,99 +1,163 @@
-@import "../../utils/mixins";
-@import '~@angular/material/theming';
+@import "../../../styles";
 
-.mat-card-title {
-    font-size: 1.5em;
-    position: relative;
-    right: 0.5em;
-}
-
-.mat-card-actions {
-    margin-left: 0;
-    margin-right: 1em;
-}
-
-.login-side {
-    position: relative;
-    @include size(100%);
+header {
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
-
     &:before {
-        @include absolute(top -1em);
-        @include size(100%, 110%);
-        @include respond-to('medium') {
-            @include absolute(top 0em);
-            @include size(100%);
-        }
+        @include absolute(top 0);
+        @include size(100%);
         display: block;
         background-size: cover;
         background: white url("../../../assets/img/login_pic.jpg") no-repeat center;
         content: " ";
+        z-index: -2;
     }
-
-    mat-card {
-        min-height: 60%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        @include respond-to('medium') {
-            @include absolute(top 20% right 20%);
-            min-height: 25em;
-            min-width: 20em;
-            margin: 0;
-        }
-        @include mat-elevation-transition;
-        @include mat-elevation(2);
-        &:hover {
-            @include mat-elevation(3);
+    &:after {
+        @include absolute(top 0 left 0);
+        @include size(100%);
+        display: block;
+        background: rgba(mat-color($primary, 800), 0.8);
+        content: " ";
+        z-index: -1;
+    }
+    h3 {
+        color: $white-medium-emphasis;
+        margin-top: 3em;
+        font-weight: lighter;
+        max-width: 15em;
+        @include media-breakpoint-only(lg) {
+            max-width: 10em;
         }
     }
 }
 
-mat-card-content {
-    @include size(100%);
-    flex: 1;
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    img {
+        display: inline-block;
+        margin: 0 .5em 0 0;
+        height: 2em;
+        @include fluid-type(576px, 1200px, 33.184px, 50.512px);
+    }
+    h1 {
+        display: inline-block;
+        color: $white-high-emphasis;
+        font-weight: bold;
+        margin: .5em 0 0 0;
+    }
+}
+
+.login {
+    max-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    form {
-        max-width: 90%;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        padding: 0 .5em;
-        @include respond-to('medium') {
-            max-width: 80%;
-            padding: 1em 0;
-        }
+    align-items: center;
+    padding: 3em 5em;
+    @include media-breakpoint-only(lg) {
+        padding: 1.5em 5em;
     }
-    mat-card-actions {
-        padding: 0;
+}
+
+.buttons-pill {
+    margin: 0 0 5em 0;
+    display: flex;
+    align-items: center;
+    h4 {
         display: flex;
         align-items: center;
-
-        :not(:last-child) {
-            margin-right: 0.5em;
+        justify-content: center;
+        height: 2em;
+        width: 7em;
+        background: $black-8-opacity;
+        text-transform: uppercase;
+        cursor: pointer;
+        &:first-child {
+            border-radius: 50px 0 0 50px;
         }
-
-        .error {
-            color: red;
+        &:last-child {
+            border-radius: 0 50px 50px 0;
         }
-    }
-
-    button {
-        &:not(:disabled) {
-            @include mat-elevation-transition;
-            @include mat-elevation(3);
-            &:hover {
-                @include mat-elevation(5);
+        a {
+            color: $black-disabled;
+            @include transition(color .2s ease-out);
+            &:hover, &:active, &:focus {
+                color: $black-medium-emphasis;
+                text-decoration: none;
+            }
+        }
+        &.active {
+            background: mat-color($accent);
+            @include transition(background .2s ease-out);
+            a {
+                color: $white-high-emphasis;
+            }
+            &:hover, &:active, &:focus {
+                background: mat-color($accent, 600);
             }
         }
     }
+}
 
-    .register-link {
-        padding-top: 15px;
-        border-top: 1px solid #bbb;
+main {
+    @include media-breakpoint-up(lg) {
+        max-width: 80%;
+    }
+    @include media-breakpoint-up(md) {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    h3 {
+        font-weight: bold;
+    }
+    h4 {
+        color: $black-medium-emphasis;
+        font-weight: lighter;
+    }
+    form {
+        margin: 2em 0 0 0;
+        @include media-breakpoint-only(lg) {
+            margin-bottom: 0;
+        }
+        display: flex;
+        flex-direction: column;
+        @include remove-autofill;
+        mat-form-field {
+            margin-bottom: 1.2em;
+            mat-icon {
+                cursor: pointer;
+                z-index: 3;
+            }
+        }
+    }
+}
+
+.submit {
+    display: flex;
+    align-items: center;
+    font-size: 1.5em;
+    text-align: center;
+    margin: 0 .5em .5em .5em;
+    button {
+        font-size: 1em;
+        text-transform: uppercase;
+        border-radius: 5px;
+        width: 100%;
+        @include media-breakpoint-up(md) {
+            width: 10em;
+        }
+        @include mat-elevation(2);
+        @include mat-elevation-transition;
+        &:hover {
+            @include mat-elevation(5);
+        }
+    }
+    mat-icon {
+        font-size: 1.2em;
     }
 }

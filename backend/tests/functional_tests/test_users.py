@@ -113,7 +113,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
     set_user_role(admin_id, 'admin')
     tag_key = 'EXAMPLE_TAG'
-    create_tag_and_assign_to_category(tag_key, 'Example tag', 'LUNGS')
+    create_tag_and_assign_to_category(tag_key, 'Example tag', 'LUNGS', [LabelTool.RECTANGLE])
 
     # Step 1. Admin user logs in
     payload: Dict[str, Any] = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
