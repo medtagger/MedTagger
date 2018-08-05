@@ -220,8 +220,7 @@ export class MarkerPageComponent implements OnInit {
 
     public isCurrentSelector(selectorName: string): boolean {
         const currentSelector = this.marker.getCurrentSelector();
-        const selectorToCheck = this.selectors.get(selectorName);
-        return !!selectorToCheck && currentSelector === selectorToCheck;
+        return currentSelector && currentSelector.getSelectorName() === selectorName;
     }
 
     public isToolSupportedByCurrentTag(tool: string) {
