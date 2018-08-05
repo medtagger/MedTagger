@@ -18,6 +18,7 @@ from medtagger.repositories import (
     slices as SlicesRepository,
     scans as ScansRepository,
     scan_categories as ScanCategoriesRepository,
+    tasks as TasksRepository,
 )
 from medtagger.workers.storage import parse_dicom_and_update_slice
 from medtagger.api.utils import get_current_user
@@ -48,15 +49,14 @@ def scan_category_is_valid(category_key: str) -> bool:
         return False
 
 
-def create_scan_category(key: str, name: str, image_path: str) -> ScanCategory:
+def create_scan_category(key: str, name: str) -> ScanCategory:
     """Create new Scan ScanCategory.
 
     :param key: unique key representing Scan Category
     :param name: name which describes this Category
-    :param image_path: path to the image which is located on the frontend
     :return: Scan Category object
     """
-    return ScanCategoriesRepository.add_new_category(key, name, image_path)
+    return ScanCategoriesRepository.add_new_category(key, name)
 
 
 def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan:
@@ -71,21 +71,20 @@ def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan
     return ScansRepository.add_new_scan(category, declared_number_of_slices, user)
 
 
-def get_random_scan(category_key: str) -> Scan:
-    """Fetch random scan for labeling.
+def get_random_scan(task_key: str) -> Scan:
+    """Fetch random scan from specified Task for labeling.
 
-    :param category_key: unique key identifying category
+    :param task_key: unique key identifying task
     :return: Scan Metadata object
     """
     user = get_current_user()
-    category = ScanCategoriesRepository.get_category_by_key(category_key)
-    try:
-        scan = ScansRepository.get_random_scan(category, user)
-        if not scan:
-            raise NotFoundException('Could not find any Scan for this category!')
-        return scan
-    except NoResultFound:
-        raise NotFoundException('Could not find any Scan for this category!')
+    task = TasksRepository.get_task_by_key(task_key)
+    if not task:
+        raise InvalidArgumentsException('Task key {} is invalid!'.format(task_key))
+    scan = ScansRepository.get_random_scan(task, user)
+    if not scan:
+        raise NotFoundException('Could not find any Scan for this task!')
+    return scan
 
 
 def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
@@ -147,11 +146,12 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
                 raise InvalidArgumentsException(message.format(label_element['image_key']))
 
 
-def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, bytes],
+def add_label(scan_id: ScanID, task_key: str, elements: List[Dict], files: Dict[str, bytes],
               labeling_time: LabelingTime) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
+    :param task_key: Key of Task
     :param elements: List of JSONs describing elements for a single label
     :param files: mapping of uploaded files (name and content)
     :param labeling_time: time in seconds that user spent on labeling
@@ -159,7 +159,7 @@ def add_label(scan_id: ScanID, elements: List[Dict], files: Dict[str, bytes],
     """
     user = get_current_user()
     try:
-        label = LabelsRepository.add_new_label(scan_id, user, labeling_time)
+        label = LabelsRepository.add_new_label(scan_id, task_key, user, labeling_time)
     except IntegrityError:
         raise NotFoundException('Could not find Scan for that id!')
     for element in elements:

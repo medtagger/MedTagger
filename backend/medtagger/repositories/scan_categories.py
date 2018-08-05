@@ -2,7 +2,7 @@
 from typing import List
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, LabelTag
+from medtagger.database.models import ScanCategory
 
 
 def get_all_categories() -> List[ScanCategory]:
@@ -23,37 +23,14 @@ def get_category_by_key(key: str) -> ScanCategory:
     return category
 
 
-def add_new_category(key: str, name: str, image_path: str) -> ScanCategory:
+def add_new_category(key: str, name: str) -> ScanCategory:
     """Add new Scan Category to the database.
 
     :param key: key that will identify such Scan Category
     :param name: name that will be used in the Use Interface for such Scan Category
-    :param image_path: path to the image that represents such Scan Category (used in User Interface)
     :return: Scan Category object
     """
     with db_session() as session:
-        category = ScanCategory(key, name, image_path)
+        category = ScanCategory(key, name)
         session.add(category)
     return category
-
-
-def assign_label_tag(tag: LabelTag, scan_category_key: str) -> None:
-    """Assign existing Label Tag to Scan Category.
-
-    :param tag: tag that should be assigned to Scan Category
-    :param scan_category_key: key that will identify such Scan Category
-    """
-    scan_category = ScanCategory.query.filter(ScanCategory.key == scan_category_key).one()
-    scan_category.available_tags.append(tag)
-    scan_category.save()
-
-
-def unassign_label_tag(tag: LabelTag, scan_category_key: str) -> None:
-    """Unassign Label Tag from Scan Category.
-
-    :param tag: tag that should be unassigned from Scan Category
-    :param scan_category_key: key that will identify such Scan Category
-    """
-    scan_category = ScanCategory.query.filter(ScanCategory.key == scan_category_key).one()
-    scan_category.available_tags.remove(tag)
-    scan_category.save()
