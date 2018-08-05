@@ -8,6 +8,7 @@ import {SliceSelection} from '../model/SliceSelection';
 interface RandomLabelResponse {
     label_id: string;
     scan_id: string;
+    task_id: string;
     status: string;
     selections: Array<SliceSelection>;
     labeling_time: number;
