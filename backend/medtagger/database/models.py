@@ -338,7 +338,7 @@ class Label(Base):
     def __repr__(self) -> str:
         """Return string representation for Label."""
         return '<{}: {}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.task_id,
-                                               self.labeling_time, self.owner, self.comment)
+                                                  self.labeling_time, self.owner, self.comment)
 
     def update_status(self, status: LabelVerificationStatus) -> 'Label':
         """Update Label's verification status.

@@ -34,7 +34,8 @@ def get_random_label(status: LabelVerificationStatus = None) -> Label:
     return query.first()
 
 
-def add_new_label(scan_id: ScanID, task_key: str, user: User, labeling_time: LabelingTime, comment: str = None) -> Label:
+def add_new_label(scan_id: ScanID, task_key: str, user: User, labeling_time: LabelingTime,
+                  comment: str = None) -> Label:
     """Add new Label for given Scan."""
     with db_session() as session:
         label = Label(user, labeling_time, comment)
