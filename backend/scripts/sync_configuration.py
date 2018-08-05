@@ -6,9 +6,13 @@ from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, Role, LabelTag
-from medtagger.repositories import scan_categories as ScanCategoriesRepository
-
+from medtagger.database.models import ScanCategory, Task, Role, LabelTag
+from medtagger.definitions import LabelTool
+from medtagger.repositories import (
+    scan_categories as ScanCategoriesRepository,
+    tasks as TasksRepository,
+    label_tags as LabelTagsRepository,
+)
 
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
@@ -20,15 +24,11 @@ def sync_configuration(configuration: Dict) -> None:
     :param configuration: content of YAML configuration file
     """
     logger.info('Running Configuration Synchronization...')
-
-    datasets = configuration.get('datasets', [])
-    _sync_datasets(datasets)
-
-    # tasks = configuration.get('tasks', [])
-    # _sync_tasks(tasks)
+    _sync_datasets(configuration)
+    _sync_tasks(configuration)
 
 
-def _sync_datasets(datasets: List[Dict]) -> None:
+def _sync_datasets(configuration: Dict) -> None:
     """Synchronize Datasets from configuration file with database entries.
 
     Example DataSets in the configuration file:
@@ -36,14 +36,13 @@ def _sync_datasets(datasets: List[Dict]) -> None:
     datasets:
       - name: Kidneys
         key: KIDNEYS
-        image_path: assets/icon/kidneys_category_icon.svg
         tasks:
           - KIDNEYS_SEGMENTATION
     ```
 
-    :param tasks: definitions of all Datasets
+    :param configuration: content of YAML configuration file
     """
-    datasets = configuration.get('datasets', [])
+    datasets = configuration.get('datasets', []) or []
     configuration_datasets_keys = {dataset['key'] for dataset in datasets}
     database_datasets_keys = {dataset.key for dataset in ScanCategory.query.all()}
 
@@ -51,66 +50,112 @@ def _sync_datasets(datasets: List[Dict]) -> None:
     datasets_to_disable = database_datasets_keys - configuration_datasets_keys
     datasets_to_enable = database_datasets_keys & configuration_datasets_keys
 
-    for dataset in datasets:
-        if dataset['key'] in datasets_to_add:
-            ScanCategoriesRepository.add_new_category(dataset['key'], dataset['name'], dataset['image_path'])
-            logger.info('New DataSet added: %s', dataset['key'])
-        elif dataset['key'] in datasets_to_disable:
-            ScanCategoriesRepository.disable(dataset['key'])
-            logger.info('DataSet disabled: %s', dataset['key'])
-        elif dataset['key'] in datasets_to_enable:
-            ScanCategoriesRepository.enable(dataset['key'])
-            logger.info('DataSet enabled: %s', dataset['key'])
+    for dataset_key in datasets_to_add:
+        dataset = next(dataset for dataset in datasets if dataset['key'] == dataset_key)
+        ScanCategoriesRepository.add_new_category(dataset['key'], dataset['name'], dataset['image_path'])
+        logger.info('New DataSet added: %s', dataset['key'])
 
-    # TODO: Find out difference in Tasks (Piotr patch is needed here!)
+    for dataset_key in datasets_to_disable:
+        ScanCategoriesRepository.disable(dataset_key)
+        logger.info('DataSet disabled: %s', dataset_key)
+
+    for dataset_key in datasets_to_enable:
+        ScanCategoriesRepository.enable(dataset_key)
+        logger.info('DataSet enabled: %s', dataset_key)
 
 
-def _sync_tasks(tasks: List[Dict]) -> None:
+def _sync_tasks(configuration: Dict) -> None:
     """Synchronize Tasks from configuration file with database entries.
 
     Example Tasks in the configuration file:
     ```
     tasks:
-      - name: Kidneys segmentation
-        key: KIDNEYS_SEGMENTATION
+      - key: KIDNEYS_SEGMENTATION
+        name: Kidneys segmentation
+        image_path: assets/icon/kidneys_category_icon.svg
         tags:
-          - name: Left Kidney
-            key: LEFT_KIDNEY
+          - key: LEFT_KIDNEY
+            name: Left Kidney
             tools:
               - CHAIN
-          - name: Right Kidney
-            key: RIGHT_KIDNEY
+          - key: RIGHT_KIDNEY
+            name: Right Kidney
             tools:
               - CHAIN
     ```
 
     Things to do:
-        - support for Tools in Label Tags,
-        - disabling Tasks that does not longer exists in configuration file,
         - find differences in Tasks.
 
-    :param tasks: definitions of all Tasks
+    :param configuration: content of YAML configuration file
     """
-    with db_session() as session:
-        for task in tasks:
-            tags = task.get('tags', [])
-            for tag in tags:
-                key = entry.get('key', '')
-                name = entry.get('name', '')
+    datasets = configuration.get('datasets', []) or []
+    tasks = configuration.get('tasks', []) or []
+    configuration_tasks_keys = {task['key'] for task in tasks}
+    database_tasks_keys = {task.key for task in Task.query.all()}
 
-                # Make sure we won't create it again!
-                tag_exists = session.query(exists().where(LabelTag.key == key)).scalar()
-                if tag_exists:
-                    logger.info('Label Tag exists with key "%s"', key)
-                    continue
+    tasks_to_add = configuration_tasks_keys - database_tasks_keys
+    tasks_to_disable = database_tasks_keys - configuration_tasks_keys
+    tasks_to_enable = database_tasks_keys & configuration_tasks_keys
 
-                # Create this Label tag if not exists
-                tag = LabelTag(key, name)
-                tag.scan_category_id = category.id
-                session.add(tag)
-                session.commit()
-                logger.info('Label Tag added for key "%s" and assigned to category for key "%s"', key,
-                            category.key)
+    # Add all new Tasks that haven't ever been in the DB
+    for task_key in tasks_to_add:
+        task = next(task for task in tasks if task['key'] == task_key)
+        datasets_keys = [dataset['key'] for dataset in datasets if task['key'] in dataset['tasks']]
+        db_task = TasksRepository.add_task(task['key'], task['name'], task['image_path'], datasets_keys, [])
+        for tag in task['tags']:
+            tools = [LabelTool[tool] for tool in tag['tools']]
+            LabelTagsRepository.add_new_tag(tag['key'], tag['name'], tools, db_task.id)
+        logger.info('New Task added: %s', task['key'])
+
+    # Enable back all Tasks that were previously commented-out or removed from configuration file
+    for task_key in tasks_to_enable:
+        TasksRepository.enable(task_key)
+        _sync_label_tags_in_task(configuration, task_key)
+        # TODO: DataSets could have changed!
+        logger.info('Task enabled: %s', task_key)
+
+    # Disable all Tasks that exists in the DB but are missing in configuration file
+    for task_key in tasks_to_disable:
+        TasksRepository.disable(task_key)
+        task = TasksRepository.get_task_by_key(task_key)
+        for tag in task.available_tags:
+            LabelTagsRepository.disable(tag.key)
+            logger.info('LabelTag disabled: %s', tag.key)
+        logger.info('Task disabled: %s', task_key)
+
+
+def _sync_label_tags_in_task(configuration: Dict, task_key: str) -> None:
+    """Synchronize Label Tags in given Task based on configuration file and database entries.
+
+    :param configuration: content of YAML configuration file
+    :param task_key: key for the Task that should be synchronized
+    """
+    db_task = TasksRepository.get_task_by_key(task_key)
+    configuration_task = next(task for task in configuration['tasks'] if task['key'] == task_key)
+    configuration_tags_keys = {tag['key'] for tag in configuration_task['tags']}
+    database_tags_keys = {tag.key for tag in db_task.available_tags}
+
+    tags_to_add = configuration_tags_keys - database_tags_keys
+    tags_to_disable = database_tags_keys - configuration_tags_keys
+    tags_to_enable = database_tags_keys & configuration_tags_keys
+
+    for tag_key in tags_to_add:
+        tag = next(tag for tag in configuration_task['tags'] if tag_key == tag['key'])
+        tools = [LabelTool[tool] for tool in tag['tools']]
+        LabelTagsRepository.add_new_tag(tag['key'], tag['name'], tools, db_task.id)
+        logger.info('New LabelTag added: %s', tag_key)
+
+    for tag_key in tags_to_disable:
+        LabelTagsRepository.disable(tag_key)
+        logger.info('LabelTag disabled: %s', tag_key)
+
+    for tag_key in tags_to_enable:
+        tag = next(tag for tag in configuration_task['tags'] if tag_key == tag['key'])
+        tools = [LabelTool[tool] for tool in tag['tools']]
+        LabelTagsRepository.enable(tag_key)
+        LabelTagsRepository.update_tools_in_tag(tag_key, tools)
+        logger.info('LabelTag enabled: %s', tag_key)
 
 if __name__ == '__main__':
     try:

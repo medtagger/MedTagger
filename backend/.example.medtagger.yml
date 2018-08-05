@@ -1,0 +1,65 @@
+tasks:
+  - name: Kidneys segmentation
+    key: KIDNEYS_SEGMENTATION
+    image_path: assets/icon/kidneys_category_icon.svg
+    tags:
+        - name: Left Kidney
+          key: LEFT_KIDNEY
+          tools:
+              - CHAIN
+        - name: Right Kidney
+          key: RIGHT_KIDNEY
+          tools:
+              - CHAIN
+
+  - name: Find nodules
+    key: FIND_NODULES
+    image_path: assets/icon/lungs_category_icon.svg
+    tags:
+        - name: Nodule
+          key: NODULE
+          tools:
+              - BRUSH
+
+  - name: Find narrowings in vains
+    key: FIND_NARROWINGS
+    image_path: assets/icon/heart_category_icon.svg
+    tags:
+        - name: Narrowing (region)
+          key: NARROWING
+          tools:
+              - BRUSH
+        - name: Narrowing (lenghtwise)
+          key: NARROWING_LENGHTWISE
+          tools:
+              - CHAIN
+        - name: Narrowing (across)
+          key: NARROWING_ACROSS
+          tools:
+              - CHAIN
+
+  - name: Find middle of the Spine
+    key: FIND_MIDDLE_OF_THE_SPINE
+    image_path: assets/icon/lungs_category_icon.svg
+    tags:
+        - name: Middle of the Spine
+          key: MIDDLE_OF_THE_SPINE
+          tools:
+              - POINT
+
+datasets:
+  - name: Kidneys
+    key: KIDNEYS
+    tasks:
+      - KIDNEYS_SEGMENTATION
+
+  - name: Lungs
+    key: LUNGS
+    tasks:
+      - FIND_NODULES
+      - FIND_MIDDLE_OF_THE_SPINE
+
+  - name: Heart
+    key: HEART
+    tasks:
+      - FIND_NARROWINGS

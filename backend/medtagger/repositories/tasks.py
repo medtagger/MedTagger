@@ -64,3 +64,19 @@ def unassign_label_tag(tag: LabelTag, task_key: str) -> None:
         task = Task.query.filter(Task.key == task_key).one()
         task.available_tags.remove(tag)
         task.save()
+
+
+def disable(task_key: str) -> None:
+    """Disable existing Task."""
+    disabling_query = Task.query.filter(Task.key == task_key)
+    updated = disabling_query.update({'disabled': True}, synchronize_session='fetch')
+    if not updated:
+        raise Exception()  # TODO: Change me!
+
+
+def enable(task_key: str) -> None:
+    """Enable existing Task."""
+    enabling_query = Task.query.filter(Task.key == task_key)
+    updated = enabling_query.update({'disabled': False}, synchronize_session='fetch')
+    if not updated:
+        raise Exception()  # TODO: Change me!

@@ -129,6 +129,7 @@ class Task(Base):
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
     image_path: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
     scan_categories: List[ScanCategory] = relationship('ScanCategory', back_populates='tasks',
                                                        secondary=scan_categories_tasks)
@@ -356,6 +357,7 @@ class LabelTag(Base):
     id: LabelTagID = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
     task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
     task: Task = relationship('Task', back_populates="available_tags")

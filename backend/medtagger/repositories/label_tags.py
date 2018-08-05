@@ -37,3 +37,33 @@ def delete_tag_by_key(key: str) -> None:
     """Remove Label Tag from database."""
     with db_session() as session:
         session.query(LabelTag).filter(LabelTag.key == key).delete()
+
+
+def update_tools_in_tag(key: str, tools: List[LabelTool]) -> LabelTag:
+    """Update Tools that are available in Label Tag.
+
+    :param key: key that will identify such Label Tag
+    :param tools: list of tools for given LabelTag that will be available on labeling page
+    :return: Label Tag object
+    """
+    with db_session() as session:
+        label_tag = get_label_tag_by_key(key)
+        label_tag.tools = tools
+        session.add(label_tag)
+    return label_tag
+
+
+def disable(label_tag_key: str) -> None:
+    """Disable existing Label Tag."""
+    disabling_query = LabelTag.query.filter(LabelTag.key == label_tag_key)
+    updated = disabling_query.update({'disabled': True}, synchronize_session='fetch')
+    if not updated:
+        raise Exception()  # TODO: Change me!
+
+
+def enable(label_tag_key: str) -> None:
+    """Enable existing Label Tag."""
+    enabling_query = LabelTag.query.filter(LabelTag.key == label_tag_key)
+    updated = enabling_query.update({'disabled': False}, synchronize_session='fetch')
+    if not updated:
+        raise Exception()  # TODO: Change me!

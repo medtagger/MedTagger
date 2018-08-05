@@ -39,7 +39,7 @@ def add_new_category(key: str, name: str) -> ScanCategory:
     return category
 
 
-def disable(scan_category_key: str):
+def disable(scan_category_key: str) -> None:
     """Disable existing Scan Category."""
     disabling_query = ScanCategory.query.filter(ScanCategory.key == scan_category_key)
     updated = disabling_query.update({'disabled': True}, synchronize_session='fetch')
