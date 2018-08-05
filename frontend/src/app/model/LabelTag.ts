@@ -1,12 +1,12 @@
 export class LabelTag {
-    name: string;
     key: string;
+    name: string;
     tools: Array<string>;
     hidden: boolean;
 
-    constructor(name: string, key: string, tools: Array<string>) {
-        this.name = name;
+    constructor(key: string, name: string, tools: Array<string>) {
         this.key = key;
+        this.name = name;
         this.tools = tools;
         this.hidden = false;
     }

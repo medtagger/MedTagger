@@ -1,19 +1,18 @@
 """Insert all database fixtures."""
 import logging.config
-from typing import List, cast
+from typing import Dict, List, cast
 
 from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
 
 from medtagger.database import db_session
 from medtagger.definitions import LabelTool
-from medtagger.database.models import ScanCategory, Role, LabelTag
+from medtagger.database.models import ScanCategory, Role, LabelTag, Task
 
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
 
 ROLES = ['admin', 'doctor', 'volunteer']
-
 
 def insert_user_roles() -> None:
     """Insert default user Roles."""
