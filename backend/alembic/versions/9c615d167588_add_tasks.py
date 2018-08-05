@@ -34,9 +34,9 @@ def upgrade():
                     sa.ForeignKeyConstraint(['task_id'], ['Tasks.id'],
                                             name=op.f('fk_ScanCategories_Tasks_task_id_Tasks'))
                     )
-    op.add_column('LabelTags', sa.Column('task_id', sa.Integer(), nullable=False))
+    op.add_column('LabelTags', sa.Column('task_id', sa.Integer(), nullable=True))
     op.create_foreign_key(op.f('fk_LabelTags_task_id_Tasks'), 'LabelTags', 'Tasks', ['task_id'], ['id'])
-    op.add_column('Labels', sa.Column('task_id', sa.Integer(), nullable=False))
+    op.add_column('Labels', sa.Column('task_id', sa.Integer(), nullable=True))
     op.create_foreign_key(op.f('fk_Labels_task_id_Tasks'), 'Labels', 'Tasks', ['task_id'], ['id'])
 
     # For each Category create one Task with the same name
@@ -47,17 +47,31 @@ def upgrade():
     op.execute("""
         INSERT INTO "ScanCategories_Tasks"(scan_category_id, task_id)
         SELECT SC.id, T.id
-        FROM "ScanCategories" SC JOIN "Tasks" T
-        ON SC.key = T.key
+        FROM "ScanCategories" SC
+        JOIN "Tasks" T ON SC.key = T.key
     """)
     op.execute("""
         UPDATE "LabelTags"
         SET task_id = (
           SELECT T.id
-          FROM "Tasks" T JOIN "ScanCategories" SC
-          ON SC.key = T.key AND SC.id = "LabelTags".scan_category_id
+          FROM "Tasks" T
+          JOIN "ScanCategories" SC ON SC.key = T.key
+          WHERE SC.id = "LabelTags".scan_category_id
         )
     """)
+    op.execute("""
+        UPDATE "Labels" L
+        SET task_id = (
+          SELECT T.id
+          FROM "Tasks" T
+          JOIN "ScanCategories" SC ON SC.key = T.key
+          JOIN "Scans" S ON S.category_id = SC.id
+          WHERE L.scan_id = S.id         
+        )
+    """)
+
+    op.alter_column('LabelTags', 'task_id', nullable=False)
+    op.alter_column('Labels', 'task_id', nullable=False)
 
     op.drop_constraint('fk_LabelTags_scan_category_id_ScanCategories', 'LabelTags', type_='foreignkey')
     op.drop_column('LabelTags', 'scan_category_id')
@@ -65,7 +79,9 @@ def upgrade():
 
 
 def downgrade():
-    op.add_column('ScanCategories', sa.Column('image_path', sa.String(length=100), nullable=False))
+    op.add_column('ScanCategories', sa.Column('image_path', sa.String(length=100), nullable=False,
+                                              server_default='assets/icon/meddtagger_logo.svg'))
+    op.alter_column('ScanCategories', 'image_path', server_default=None)
     op.drop_constraint(op.f('fk_Labels_task_id_Tasks'), 'Labels', type_='foreignkey')
     op.drop_column('Labels', 'task_id')
     op.add_column('LabelTags', sa.Column('scan_category_id', sa.INTEGER(), autoincrement=False, nullable=True))
@@ -76,4 +92,5 @@ def downgrade():
     op.drop_table('ScanCategories_Tasks')
     op.drop_table('Tasks')
 
-    op.execute('DELETE FROM "LabelTags" CASCADE')
+    op.execute('TRUNCATE "LabelTags" CASCADE')
+    op.execute('TRUNCATE "Labels" CASCADE')
