@@ -147,7 +147,7 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
 
 
 def add_label(scan_id: ScanID, task_key: str, elements: List[Dict], files: Dict[str, bytes],
-              labeling_time: LabelingTime, comment: str = None) -> Label:   # pylint: disable=too-many-arguments
+              labeling_time: LabelingTime, comment: str = None) -> Label:   # pylint: disable-msg=too-many-arguments
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
