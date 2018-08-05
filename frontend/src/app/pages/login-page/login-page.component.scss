@@ -122,9 +122,9 @@
         @include media-breakpoint-only(lg) {
             margin-bottom: 0;
         }
-        margin: 2em 0;
         display: flex;
         flex-direction: column;
+        margin: 2em 0;
         mat-form-field {
             margin-bottom: 1.2em;
             mat-icon {
