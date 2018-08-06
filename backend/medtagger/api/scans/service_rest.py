@@ -135,7 +135,8 @@ class Label(Resource):
         business.validate_label_payload(elements, files)
 
         labeling_time = label['labeling_time']
-        label = business.add_label(scan_id, task_key, elements, files, labeling_time)
+        comment = label.get('comment')
+        label = business.add_label(scan_id, task_key, elements, files, labeling_time, comment)
         return label, 201
 
 
