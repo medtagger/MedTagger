@@ -4,7 +4,7 @@ import {Point} from './Point';
 export class ChainSelection extends SliceSelection {
 
     points: Array<Point>;
-    isLoop = false;
+    loop = false;
 
     constructor(points: Array<Point>, depth: number, tag: string) {
         super();
@@ -22,7 +22,7 @@ export class ChainSelection extends SliceSelection {
         return {
             'slice_index': this.sliceIndex,
             'points': this.points,
-            'loop': this.isLoop,
+            'loop': this.loop,
             'tag': this.label_tag,
             'tool': this.label_tool
         };

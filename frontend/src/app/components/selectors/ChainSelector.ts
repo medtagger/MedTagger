@@ -34,7 +34,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
                 this.requestRedraw();
             }),
             new SelectorAction('Loop', () => this.selectingInProgress && this.selectedArea.points.length > 2, () => {
-                this.selectedArea.isLoop = true;
+                this.selectedArea.loop = true;
                 this.addSelection(this.selectedArea);
                 this.selectedArea = undefined;
                 this.selectingInProgress = undefined;
@@ -67,7 +67,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
 
             lastPosition = scaledPointPosition;
         }
-        if (selection.isLoop) {
+        if (selection.loop) {
             const scaledPointPosition: { x: number, y: number } = this.scaleToView(selection.points[0].x, selection.points[0].y);
             this.canvasCtx.beginPath();
             this.canvasCtx.moveTo(lastPosition.x, lastPosition.y);
