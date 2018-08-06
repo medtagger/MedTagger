@@ -146,8 +146,8 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
                 raise InvalidArgumentsException(message.format(label_element['image_key']))
 
 
-def add_label(scan_id: ScanID, task_key: str, elements: List[Dict], files: Dict[str, bytes],
-              labeling_time: LabelingTime, comment: str = None) -> Label:   # pylint: disable-msg=too-many-arguments
+def add_label(scan_id: ScanID, task_key: str, elements: List[Dict],   # pylint: disable-msg=too-many-arguments
+              files: Dict[str, bytes], labeling_time: LabelingTime, comment: str = None) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
