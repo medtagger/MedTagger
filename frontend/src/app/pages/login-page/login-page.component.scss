@@ -127,10 +127,7 @@
         margin: 2em 0;
         mat-form-field {
             margin-bottom: 1.2em;
-            mat-icon {
-                z-index: 3;
-                cursor: pointer;
-            }
+            cursor: pointer;
         }
         &__submit {
             @include media-breakpoint-up(md) {
