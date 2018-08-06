@@ -7,6 +7,7 @@ SliceID = NewType('SliceID', str)
 LabelID = NewType('LabelID', str)
 LabelElementID = NewType('LabelElementID', str)
 LabelTagID = NewType('LabelTagID', int)
+TaskID = NewType('TaskID', int)
 PointID = NewType('PointID', str)
 
 SliceLocation = NewType('SliceLocation', float)

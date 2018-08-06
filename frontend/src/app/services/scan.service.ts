@@ -2,7 +2,7 @@ import {throwError as observableThrowError, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 
-import {ScanMetadata} from '../model/ScanMetadata';
+import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
@@ -13,6 +13,8 @@ import {concat, delay, flatMap, map, mergeAll, retryWhen, take} from 'rxjs/opera
 import {of} from 'rxjs/internal/observable/of';
 import {from} from 'rxjs/internal/observable/from';
 import {defer} from 'rxjs/internal/observable/defer';
+import {Task} from '../model/Task';
+import {TaskResponse} from './task.service';
 
 interface ScanResponse {
     scan_id: string;
@@ -20,6 +22,18 @@ interface ScanResponse {
     number_of_slices: number;
     width: number;
     height: number;
+}
+
+interface AvailableCategoryResponse {
+    key: string;
+    name: string;
+    tasks: Array<TaskResponse>;
+}
+
+interface LabelTagResponse {
+    key: string;
+    name: string;
+    actions_id: Array<number>;
 }
 
 interface NewScanResponse {
@@ -35,16 +49,18 @@ export class ScanService {
         this.websocket = socket;
     }
 
-    public sendSelection(scanId: string, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {
+    public sendSelection(scanId: string, taskKey: string, selection: ScanSelection<SliceSelection>, labelingTime: number,
+                         comment: string): Promise<Response> {
         console.log('ScanService | send3dSelection | sending ROI:',
             selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
 
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
+        payload['comment'] = comment;
         const form = new FormData();
         form.append('label', JSON.stringify(payload));
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/label`, form).toPromise().then((response: Response) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label`, form).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
                 resolve(response);
             }).catch((error: Response) => {
@@ -54,10 +70,10 @@ export class ScanService {
         });
     }
 
-    public getRandomScan(category: string): Promise<ScanMetadata> {
+    public getRandomScan(taskKey: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
             let params = new HttpParams();
-            params = params.set('category', category);
+            params = params.set('task', taskKey);
             this.http.get<ScanResponse>(environment.API_URL + '/scans/random', {params: params})
                 .subscribe(
                     (response: ScanResponse) => {

@@ -10,7 +10,7 @@ import {HomePageComponent} from '../pages/home-page/home-page.component';
 import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
 import {MarkerTutorialPageComponent} from '../pages/marker-tutorial-page/marker-tutorial-page.component';
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
-import {CategoryPageComponent} from '../pages/category-page/category-page.component';
+import {TasksPageComponent} from '../pages/tasks-page/tasks-page.component';
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
@@ -58,6 +58,8 @@ import {InfoDialogComponent} from '../dialogs/info-dialog.component';
 import {MedTaggerWebSocket} from '../services/websocket.service';
 
 import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
+import {InputDialogComponent} from '../dialogs/input-dialog.component';
+import {TaskService} from '../services/task.service';
 
 @NgModule({
     declarations: [
@@ -65,7 +67,7 @@ import {LabelExplorerComponent} from '../components/label-explorer/label-explore
         LoginPageComponent,
         MarkerPageComponent,
         HomePageComponent,
-        CategoryPageComponent,
+        TasksPageComponent,
         MarkerComponent,
         LabelExplorerComponent,
         ScanViewerComponent,
@@ -74,7 +76,8 @@ import {LabelExplorerComponent} from '../components/label-explorer/label-explore
         UploadPageComponent,
         SettingsPageComponent,
         ValidationPageComponent,
-        InfoDialogComponent
+        InfoDialogComponent,
+        InputDialogComponent
     ],
     imports: [
         routing,
@@ -109,7 +112,8 @@ import {LabelExplorerComponent} from '../components/label-explorer/label-explore
         MatCheckboxModule,
     ],
     entryComponents: [
-        InfoDialogComponent
+        InfoDialogComponent,
+        InputDialogComponent
     ],
     providers: [
         {
@@ -118,6 +122,7 @@ import {LabelExplorerComponent} from '../components/label-explorer/label-explore
             multi: true
         },
         CategoryService,
+        TaskService,
         AuthGuard,
         AccountService,
         DialogService,

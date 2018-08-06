@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 
 import {ScanService} from '../../services/scan.service';
 import {MarkerComponent} from '../../components/marker/marker.component';
-import {ScanCategory, ScanMetadata} from '../../model/ScanMetadata';
+import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ROISelection3D} from '../../model/ROISelection3D';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
@@ -16,11 +16,12 @@ import {LabelTag} from '../../model/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
-import {CategoryService} from '../../services/category.service';
-import {FormControl, Validators} from '@angular/forms';
-import { isUndefined } from 'util';
 import {ChainSelector} from '../../components/selectors/ChainSelector';
 import {SelectorAction} from '../../model/SelectorAction';
+import {FormControl, Validators} from '@angular/forms';
+import {TaskService} from '../../services/task.service';
+import {isUndefined} from 'util';
+import {Task} from '../../model/Task';
 
 
 @Component({
@@ -38,42 +39,44 @@ export class MarkerPageComponent implements OnInit {
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
 
     scan: ScanMetadata;
-    category: ScanCategory;
+    task: Task;
     lastSliceID = 0;
     startTime: Date;
     selectors: Map<string, Selector<any>>;
-    categoryTags: FormControl;
+    taskTags: FormControl;
     selectorActions: Array<SelectorAction> = [];
+    labelComment: string;
     isInitialSliceLoad: boolean;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private categoryService: CategoryService, private location: Location, private snackBar: MatSnackBar) {
+                private location: Location, private snackBar: MatSnackBar, private taskService: TaskService) {
         console.log('MarkerPage constructor', this.marker);
+        this.labelComment = '';
         this.isInitialSliceLoad = true;
     }
 
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
 
-        this.category = this.categoryService.getCurrentCategory();
+        this.task = this.taskService.getCurrentTask();
 
-        if (!this.category) {
+        if (!this.task) {
             this.dialogService
-                .openInfoDialog('You did not choose category properly!', 'Please choose it again!', 'Go back')
+                .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
                 .afterClosed()
                 .subscribe(() => {
                     this.location.back();
                 });
-        } else if (this.category.tags.length === 0) {
+        } else if (this.task.tags.length === 0) {
             this.dialogService
-                .openInfoDialog('There are no tags assigned to this category!', 'Please try another category!', 'Go back')
+                .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
                 .afterClosed()
                 .subscribe(() => {
                     this.location.back();
                 });
         }
 
-        this.categoryTags = new FormControl('', [Validators.required]);
+        this.taskTags = new FormControl('', [Validators.required]);
 
         this.selectors = new Map<string, Selector<any>>([
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
@@ -137,7 +140,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.scanService.getRandomScan(this.category.key).then(
+        this.scanService.getRandomScan(this.task.key).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
@@ -173,18 +176,18 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
-        this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()));
+        this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()), this.labelComment);
     }
 
     public sendEmptyLabel(): void {
-        this.sendSelection(new ROISelection3D());
+        this.sendSelection(new ROISelection3D(), 'This is an empty Label');
         this.nextScan();
     }
 
-    private sendSelection(roiSelection: ROISelection3D) {
+    private sendSelection(roiSelection: ROISelection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
 
-        this.scanService.sendSelection(this.scan.scanId, roiSelection, labelingTime)
+        this.scanService.sendSelection(this.scan.scanId, this.task.key, roiSelection, labelingTime, comment)
             .then((response: Response) => {
                 console.log('MarkerPage | sendSelection | success!');
                 this.indicateLabelHasBeenSend();
@@ -247,5 +250,14 @@ export class MarkerPageComponent implements OnInit {
 
     public getToolIconName(iconName: string): string {
         return LabelExplorerComponent.toolIconNames.get(iconName);
+    }
+
+    public addLabelComment(): void {
+        this.marker.setFocusable(false);
+        this.dialogService.openInputDialog('Add comment to your label (optional)', 'If you\'d like, you can add a comment to the label' +
+            ' below:', this.labelComment, 'Add comment').afterClosed().subscribe(comment => {
+                this.labelComment = comment;
+                this.marker.setFocusable(true);
+        });
     }
 }

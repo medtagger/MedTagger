@@ -59,7 +59,7 @@ class ScanCategories(Resource):
     @login_required
     @role_required('doctor', 'admin')
     @scans_ns.expect(serializers.in__scan_category)
-    @scans_ns.marshal_with(serializers.in__scan_category)
+    @scans_ns.marshal_with(serializers.out__scan_category)
     @scans_ns.doc(security='token')
     @scans_ns.doc(description='Create new Scan Category.')
     @scans_ns.doc(responses={201: 'Success'})
@@ -68,33 +68,31 @@ class ScanCategories(Resource):
         payload = request.json
         key = payload['key']
         name = payload['name']
-        image_path = payload['image_path']
 
-        return business.create_scan_category(key, name, image_path), 201
+        return business.create_scan_category(key, name), 201
 
 
 @scans_ns.route('/random')
 class Random(Resource):
-    """Endpoint that returns random scan for labeling."""
+    """Endpoint that returns random scan for labeling from specified task."""
 
     @staticmethod
     @login_required
     @scans_ns.expect(serializers.args__random_scan)
     @scans_ns.marshal_with(serializers.out__scan)
     @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Returns random scan.')
+    @scans_ns.doc(description='Returns random scan from task.')
     @scans_ns.doc(responses={200: 'Success', 400: 'Invalid arguments', 404: 'No Scans available'})
     def get() -> Any:
         """Return random Scan."""
         args = serializers.args__random_scan.parse_args(request)
-        category_key = args.category
-        if not business.scan_category_is_valid(category_key):
-            raise InvalidArgumentsException('Category "{}" is not available.'.format(category_key))
-        return business.get_random_scan(category_key)
+        task_key = args.task
+        return business.get_random_scan(task_key)
 
 
-@scans_ns.route('/<string:scan_id>/label')
+@scans_ns.route('/<string:scan_id>/<string:task_key>/label')
 @scans_ns.param('scan_id', 'Scan identifier')
+@scans_ns.param('task_key', 'Key of Task')
 class Label(Resource):
     """Endpoint that stores label for given scan."""
 
@@ -105,7 +103,7 @@ class Label(Resource):
     @scans_ns.doc(security='token')
     @scans_ns.doc(description='Stores label and assigns it to given scan.')
     @scans_ns.doc(responses={201: 'Successfully saved', 400: 'Invalid arguments', 404: 'Could not find scan or tag'})
-    def post(scan_id: ScanID) -> Any:
+    def post(scan_id: ScanID, task_key: str) -> Any:
         """Add new Label for given scan.
 
         This endpoint needs a multipart/form-data content where there is one mandatory section called "label".
@@ -121,7 +119,7 @@ class Label(Resource):
                     -F "label={"elements": [{"width": 1, "height": 1, "image_key": "SLICE_1",
                                "slice_index": 1, "tag": "LEFT_KIDNEY", "tool": "BRUSH"}],
                                "labeling_time": 0.1};type=application/json"
-                     http://localhost:51000/api/v1/scans/c5102707-cb36-4869-8041-f00421c03fa1/label
+                     http://localhost:51000/api/v1/scans/c5102707-cb36-4869-8041-f00421c03fa1/MARK_KIDNEYS/label
         """
         files = {name: file_data.read() for name, file_data in request.files.items()}
         label = json.loads(request.form['label'])
@@ -137,7 +135,8 @@ class Label(Resource):
         business.validate_label_payload(elements, files)
 
         labeling_time = label['labeling_time']
-        label = business.add_label(scan_id, elements, files, labeling_time)
+        comment = label.get('comment')
+        label = business.add_label(scan_id, task_key, elements, files, labeling_time, comment)
         return label, 201
 
 
