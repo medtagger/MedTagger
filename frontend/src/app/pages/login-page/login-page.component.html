@@ -18,8 +18,7 @@
                 <a routerLink="/login">Sign in</a>
             </h4>
         </div>
-        <main *ngIf="loginPageMode == LoginPageMode.LOG_IN">
-            <div class="action-content mx-auto">
+        <main *ngIf="loginPageMode == LoginPageMode.LOG_IN" class="action-content mx-auto">
                 <div class="action-welcoming">
                     <h3 class="action-welcoming__header">Hello!</h3>
                     <h4 class="action-welcoming__description">Good to see you back! Log in and continue your work.</h4>
@@ -48,12 +47,10 @@
                                           [diameter]="36" strokeWidth="2"></mat-progress-spinner>
                     <mat-icon *ngIf="loggingInError" color="warn">error</mat-icon>
                 </div>
-            </div>
         </main>
 
 
-        <main *ngIf="loginPageMode == LoginPageMode.REGISTER">
-            <div class="action-content mx-auto">
+        <main *ngIf="loginPageMode == LoginPageMode.REGISTER" class="action-content mx-auto">
                 <div class="action-welcoming">
                     <h3 class="action-welcoming__header">Hello!</h3>
                     <h4 class="action-welcoming__description">Start labeling with MedTagger today. It is easy! Just take
@@ -108,7 +105,6 @@
                     <mat-progress-spinner *ngIf="registrationInProgress" class="login-spinner" mode="indeterminate"
                                           [diameter]="36" strokeWidth="2"></mat-progress-spinner>
                 </div>
-            </div>
         </main>
     </div>
 </div>

@@ -90,8 +90,8 @@
                 }
             }
             &.active {
-                background: mat-color($accent);
                 @include transition(background .2s ease-out);
+                background: mat-color($accent);
                 a {
                     color: $white-high-emphasis;
                 }
@@ -103,7 +103,7 @@
     }
     &-content {
         @include media-breakpoint-up(lg) {
-            max-width: 80%;
+            width: 60%;
         }
     }
     &-welcoming {
@@ -130,14 +130,18 @@
             cursor: pointer;
         }
         &__submit {
-            @include media-breakpoint-up(md) {
-                width: 10em;
-            }
+            width: 100%;
+            display: flex;
+            align-items: center;
             font-size: 1.5em;
             text-align: left;
             button {
                 @include mat-elevation(2);
                 @include mat-elevation-transition;
+                @include media-breakpoint-up(md) {
+                    width: 10em;
+                }
+                height: 1.8em;
                 width: 100%;
                 font-size: 1em;
                 text-transform: uppercase;
@@ -147,6 +151,7 @@
                 }
             }
             mat-icon {
+                margin-left: 0.5em;
                 font-size: 1.2em;
             }
         }
