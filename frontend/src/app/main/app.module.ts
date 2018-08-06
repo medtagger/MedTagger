@@ -58,6 +58,7 @@ import {InfoDialogComponent} from '../dialogs/info-dialog.component';
 import {MedTaggerWebSocket} from '../services/websocket.service';
 
 import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
+import {InputDialogComponent} from '../dialogs/input-dialog.component';
 import {TaskService} from '../services/task.service';
 
 @NgModule({
@@ -75,7 +76,8 @@ import {TaskService} from '../services/task.service';
         UploadPageComponent,
         SettingsPageComponent,
         ValidationPageComponent,
-        InfoDialogComponent
+        InfoDialogComponent,
+        InputDialogComponent
     ],
     imports: [
         routing,
@@ -110,7 +112,8 @@ import {TaskService} from '../services/task.service';
         MatCheckboxModule,
     ],
     entryComponents: [
-        InfoDialogComponent
+        InfoDialogComponent,
+        InputDialogComponent
     ],
     providers: [
         {

@@ -50,7 +50,11 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     protected selectors: Array<Selector<SliceSelection>>;
     protected _currentTag;
 
-    constructor() {}
+    focusable: boolean;
+
+    constructor() {
+        this.focusable = true;
+    }
 
     @HostListener('window:resize', ['$event'])
     onResize() {
@@ -71,10 +75,21 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public sliderFocus() {
-        // setTimeout() fixes slider focus issues in IE/Firefox
-        window.setTimeout(() => {
+        if (this.focusable) {
+            // setTimeout() fixes slider focus issues in IE/Firefox
+            window.setTimeout(() => {
+              this.slider._elementRef.nativeElement.focus();
+            }, 10);
+        }
+    }
+
+    public setFocusable(focusable: boolean) {
+        this.focusable = focusable;
+        if (!this.focusable) {
             this.slider._elementRef.nativeElement.focus();
-        }, 10);
+        } else {
+            this.slider._elementRef.nativeElement.blur();
+        }
     }
 
     public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {

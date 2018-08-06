@@ -322,7 +322,9 @@ class Label(Base):
     status: LabelVerificationStatus = Column(Enum(LabelVerificationStatus), nullable=False,
                                              server_default=LabelVerificationStatus.NOT_VERIFIED.value)
 
-    def __init__(self, user: User, labeling_time: LabelingTime) -> None:
+    comment: Optional[str] = Column(String, nullable=True)
+
+    def __init__(self, user: User, labeling_time: LabelingTime, comment: str = None) -> None:
         """Initialize Label.
 
         By default all of the labels are not verified
@@ -331,11 +333,12 @@ class Label(Base):
         self.owner = user
         self.labeling_time = labeling_time
         self.status = LabelVerificationStatus.NOT_VERIFIED
+        self.comment = comment
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
-        return '<{}: {}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.task_id,
-                                               self.labeling_time, self.owner)
+        return '<{}: {}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.task_id,
+                                                  self.labeling_time, self.owner, self.comment)
 
     def update_status(self, status: LabelVerificationStatus) -> 'Label':
         """Update Label's verification status.
