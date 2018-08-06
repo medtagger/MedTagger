@@ -2,11 +2,11 @@
 import json
 from typing import Dict, Any
 
-from tests.functional_tests import get_api_client, get_headers
-from tests.functional_tests.helpers import create_tag_and_assign_to_category
-from medtagger.api.users.business import set_user_role
 from medtagger.api.auth.business import create_user
+from medtagger.api.users.business import set_user_role
 from medtagger.definitions import LabelTool
+from tests.functional_tests import get_api_client, get_headers
+from tests.functional_tests.helpers import create_tag_and_assign_to_task
 
 EXAMPLE_USER_EMAIL = 'test@mail.com'
 EXAMPLE_USER_PASSWORD = 'medtagger1'
@@ -113,7 +113,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
     set_user_role(admin_id, 'admin')
     tag_key = 'EXAMPLE_TAG'
-    create_tag_and_assign_to_category(tag_key, 'Example tag', 'LUNGS', [LabelTool.RECTANGLE])
+    create_tag_and_assign_to_task(tag_key, 'Example tag', 'MARK_KIDNEYS', [LabelTool.RECTANGLE])
 
     # Step 1. Admin user logs in
     payload: Dict[str, Any] = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
@@ -153,7 +153,8 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
         }],
         'labeling_time': 12.34,
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data={'label': json.dumps(payload)},
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id),
+                               data={'label': json.dumps(payload)},
                                headers=get_headers(token=admin_user_token, multipart=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)

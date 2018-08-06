@@ -1,7 +1,7 @@
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
 import {MarkerTutorialPageComponent} from '../pages/marker-tutorial-page/marker-tutorial-page.component';
 import {HomePageComponent} from '../pages/home-page/home-page.component';
-import {CategoryPageComponent} from '../pages/category-page/category-page.component';
+import {TasksPageComponent} from '../pages/tasks-page/tasks-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {RouterModule, Routes} from '@angular/router';
@@ -18,9 +18,9 @@ export const labellingRoutes: Routes = [
         canActivate: [AuthGuard]
     },
     {
-        path: 'labelling/choose-category',
-        component: CategoryPageComponent,
-        data: {title: 'Choosing category'},
+        path: 'labelling/choose-task',
+        component: TasksPageComponent,
+        data: {title: 'Choosing task'},
         canActivate: [AuthGuard]
     },
     {

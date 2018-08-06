@@ -1,8 +1,6 @@
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {SelectorBase} from './SelectorBase';
-import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from './Selector';
-import {SliceSelection} from '../../model/SliceSelection';
 
 export class RectROISelector extends SelectorBase<ROISelection2D> implements Selector<ROISelection2D> {
 
@@ -45,7 +43,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
 
         const normalizedPoint: { x: number, y: number } = this.normalizeByView(selectionStartX, selectionStartY);
 
-        this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag);
+        this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag.key);
         this.requestRedraw();
     }
 
