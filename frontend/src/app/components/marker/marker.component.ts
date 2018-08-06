@@ -79,6 +79,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.hookUpStateChangeSubscription();
     }
 
+    public getCurrentSelector(): Selector<any> {
+        return this.currentSelector;
+    }
+
     public setCurrentSelector(selector: Selector<any>) {
         this.currentSelector = selector;
         super.setCurrentTagForSelector(this.currentSelector, this.currentTag);
