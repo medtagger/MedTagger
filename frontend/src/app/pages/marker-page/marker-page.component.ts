@@ -253,7 +253,7 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setCurrentTag(tag);
         const currentSelector = this.marker.getCurrentSelector();
         if (!isUndefined(currentSelector)) {
-            if(!this.isToolSupportedByCurrentTag(currentSelector.getSelectorName())) {
+            if (!this.isToolSupportedByCurrentTag(currentSelector.getSelectorName())) {
                 this.clearSelector();
             }
         }
