@@ -244,8 +244,19 @@ export class MarkerPageComponent implements OnInit {
         }
     }
 
+    public clearSelector() {
+        this.marker.clearCurrentSelector();
+        this.selectorActions = [];
+    }
+
     public setTag(tag: LabelTag) {
         this.marker.setCurrentTag(tag);
+        const currentSelector = this.marker.getCurrentSelector();
+        if (!isUndefined(currentSelector)) {
+            if(!this.isToolSupportedByCurrentTag(currentSelector.getSelectorName())) {
+                this.clearSelector();
+            }
+        }
     }
 
     public getToolIconName(iconName: string): string {
