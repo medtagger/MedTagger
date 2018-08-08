@@ -146,8 +146,8 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
                 raise InvalidArgumentsException(message.format(label_element['image_key']))
 
 
-def add_label(scan_id: ScanID, task_key: str, elements: List[Dict], files: Dict[str, bytes],
-              labeling_time: LabelingTime) -> Label:
+def add_label(scan_id: ScanID, task_key: str, elements: List[Dict],   # pylint: disable-msg=too-many-arguments
+              files: Dict[str, bytes], labeling_time: LabelingTime, comment: str = None) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
@@ -155,11 +155,12 @@ def add_label(scan_id: ScanID, task_key: str, elements: List[Dict], files: Dict[
     :param elements: List of JSONs describing elements for a single label
     :param files: mapping of uploaded files (name and content)
     :param labeling_time: time in seconds that user spent on labeling
+    :param comment: (optional) comment describing a label
     :return: Label object
     """
     user = get_current_user()
     try:
-        label = LabelsRepository.add_new_label(scan_id, task_key, user, labeling_time)
+        label = LabelsRepository.add_new_label(scan_id, task_key, user, labeling_time, comment)
     except IntegrityError:
         raise NotFoundException('Could not find Scan for that id!')
     for element in elements:

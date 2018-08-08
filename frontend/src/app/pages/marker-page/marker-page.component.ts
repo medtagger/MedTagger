@@ -45,11 +45,13 @@ export class MarkerPageComponent implements OnInit {
     selectors: Map<string, Selector<any>>;
     taskTags: FormControl;
     selectorActions: Array<SelectorAction> = [];
+    labelComment: string;
     isInitialSliceLoad: boolean;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar, private taskService: TaskService) {
         console.log('MarkerPage constructor', this.marker);
+        this.labelComment = '';
         this.isInitialSliceLoad = true;
     }
 
@@ -174,18 +176,18 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
-        this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()));
+        this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()), this.labelComment);
     }
 
     public sendEmptyLabel(): void {
-        this.sendSelection(new ROISelection3D());
+        this.sendSelection(new ROISelection3D(), 'This is an empty Label');
         this.nextScan();
     }
 
-    private sendSelection(roiSelection: ROISelection3D) {
+    private sendSelection(roiSelection: ROISelection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
 
-        this.scanService.sendSelection(this.scan.scanId, this.task.key, roiSelection, labelingTime)
+        this.scanService.sendSelection(this.scan.scanId, this.task.key, roiSelection, labelingTime, comment)
             .then((response: Response) => {
                 console.log('MarkerPage | sendSelection | success!');
                 this.indicateLabelHasBeenSend();
@@ -219,6 +221,11 @@ export class MarkerPageComponent implements OnInit {
         this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
     }
 
+    public isCurrentSelector(selectorName: string): boolean {
+        const currentSelector = this.marker.getCurrentSelector();
+        return currentSelector && currentSelector.getSelectorName() === selectorName;
+    }
+
     public isToolSupportedByCurrentTag(tool: string) {
         const tag = this.marker.getCurrentTag();
         if (isUndefined(tag)) {
@@ -243,5 +250,14 @@ export class MarkerPageComponent implements OnInit {
 
     public getToolIconName(iconName: string): string {
         return LabelExplorerComponent.toolIconNames.get(iconName);
+    }
+
+    public addLabelComment(): void {
+        this.marker.setFocusable(false);
+        this.dialogService.openInputDialog('Add comment to your label (optional)', 'If you\'d like, you can add a comment to the label' +
+            ' below:', this.labelComment, 'Add comment').afterClosed().subscribe(comment => {
+                this.labelComment = comment;
+                this.marker.setFocusable(true);
+        });
     }
 }

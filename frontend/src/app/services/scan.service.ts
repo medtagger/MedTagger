@@ -49,13 +49,14 @@ export class ScanService {
         this.websocket = socket;
     }
 
-    public sendSelection(scanId: string, taskKey: string, selection: ScanSelection<SliceSelection>, labelingTime: number)
-        : Promise<Response> {
+    public sendSelection(scanId: string, taskKey: string, selection: ScanSelection<SliceSelection>, labelingTime: number,
+                         comment: string): Promise<Response> {
         console.log('ScanService | send3dSelection | sending ROI:',
             selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
 
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
+        payload['comment'] = comment;
         const form = new FormData();
         form.append('label', JSON.stringify(payload));
         return new Promise((resolve, reject) => {

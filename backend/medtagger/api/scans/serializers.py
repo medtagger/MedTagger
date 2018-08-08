@@ -87,6 +87,7 @@ elements_schema = {
 in__label_model = api.model('Label model', {
     'elements': fields.List(fields.Raw, required=True),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling', required=True),
+    'comment': fields.String(description='Comment describing a label', required=False),
 })
 
 in__label = api.parser()
@@ -118,6 +119,7 @@ out__label = api.model('Newly created Label model', {
     'owner_id': fields.Integer(description='ID of user that created label'),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
     'status': fields.String(description='Label\'s status', enum=[status.name for status in LabelVerificationStatus]),
+    'comment': fields.String(description='Comment describing a label'),
 })
 
 out__new_scan = api.model('Newly created Scan model', {
