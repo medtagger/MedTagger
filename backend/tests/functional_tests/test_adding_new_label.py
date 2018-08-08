@@ -2,13 +2,16 @@
 import json
 from typing import Any
 
-from medtagger.repositories import tasks as TasksRepository
 from medtagger.storage.models import BrushLabelElement
 from medtagger.definitions import LabelTool
+from medtagger.repositories import (
+    scan_categories as ScanCategoriesRepository,
+    label_tags as LabelTagsRepository,
+    tasks as TasksRepository,
+)
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
-from tests.functional_tests.helpers import create_tag_and_assign_to_task
 
 
 def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> None:
@@ -16,7 +19,12 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
-    # Step 1. Add Scan to the system
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.BRUSH], task.id)
+
+    # Step 2. Add Scan to the system
     payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
@@ -24,8 +32,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Label it with Brush
-    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.BRUSH])
+    # Step 3. Label it with Brush
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -52,7 +59,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     assert isinstance(label_id, str)
     assert len(label_id) >= 1
 
-    # Step 3. Fetch details about above Label and check image storage
+    # Step 4. Fetch details about above Label and check image storage
     response = api_client.get('/api/v1/labels/' + label_id, headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
@@ -67,7 +74,12 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
-    # Step 1. Add Scan to the system
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.POINT], task.id)
+
+    # Step 2. Add Scan to the system
     payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
@@ -75,8 +87,7 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Label it with Point Tool
-    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.POINT])
+    # Step 3. Label it with Point Tool
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -99,7 +110,7 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     assert isinstance(label_id, str)
     assert len(label_id) >= 1
 
-    # Step 3. Fetch details about above Label
+    # Step 4. Fetch details about above Label
     response = api_client.get('/api/v1/labels/' + label_id, headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
@@ -114,7 +125,12 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
-    # Step 1. Add Scan to the system
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.CHAIN], task.id)
+
+    # Step 2. Add Scan to the system
     payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
@@ -122,8 +138,7 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Label it with Chain Tool
-    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.CHAIN])
+    # Step 3. Label it with Chain Tool
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -155,7 +170,7 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
     assert isinstance(label_id, str)
     assert len(label_id) >= 1
 
-    # Step 3. Fetch details about above Label
+    # Step 4. Fetch details about above Label
     response = api_client.get('/api/v1/labels/' + label_id, headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
@@ -173,7 +188,12 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
-    # Step 1. Add Scan to the system
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.CHAIN], task.id)
+
+    # Step 2. Add Scan to the system
     payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
@@ -181,8 +201,7 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Label it with Chain Tool
-    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.CHAIN])
+    # Step 3. Label it with Chain Tool
     payload = {
         'elements': [{
             'slice_index': 0,

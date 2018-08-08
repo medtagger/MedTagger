@@ -5,8 +5,13 @@ from typing import Dict, Any
 from medtagger.api.auth.business import create_user
 from medtagger.api.users.business import set_user_role
 from medtagger.definitions import LabelTool
+from medtagger.repositories import (
+    scan_categories as ScanCategoriesRepository,
+    label_tags as LabelTagsRepository,
+    tasks as TasksRepository,
+)
+
 from tests.functional_tests import get_api_client, get_headers
-from tests.functional_tests.helpers import create_tag_and_assign_to_task
 
 EXAMPLE_USER_EMAIL = 'test@mail.com'
 EXAMPLE_USER_PASSWORD = 'medtagger1'
@@ -110,12 +115,14 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test for checking scan and label ownership."""
     api_client = get_api_client()
 
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('LUNGS', 'Lungs')
+    task = TasksRepository.add_task('FIND_NODULES', 'Find Nodules', 'path/to/image', ['LUNGS'], [])
+    LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
     admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
     set_user_role(admin_id, 'admin')
-    tag_key = 'EXAMPLE_TAG'
-    create_tag_and_assign_to_task(tag_key, 'Example tag', 'MARK_KIDNEYS', [LabelTool.RECTANGLE])
 
-    # Step 1. Admin user logs in
+    # Step 2. Admin user logs in
     payload: Dict[str, Any] = {'email': ADMIN_EMAIL, 'password': ADMIN_PASSWORD}
     response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
                                headers=get_headers(json=True))
@@ -123,7 +130,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     admin_user_token = json_response['token']
     assert response.status_code == 200
 
-    # Step 2. Add Scan to the system
+    # Step 3. Add Scan to the system
     payload = {'category': 'LUNGS', 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=admin_user_token, json=True))
@@ -133,14 +140,14 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert owner_id == admin_id
     scan_id = json_response['scan_id']
 
-    # Step 3. Send slices
+    # Step 4. Send slices
     with open('tests/assets/example_scan/slice_1.dcm', 'rb') as image:
         response = api_client.post('/api/v1/scans/{}/slices'.format(scan_id), data={
             'image': (image, 'slice_1.dcm'),
         }, content_type='multipart/form-data', headers=get_headers(token=admin_user_token))
     assert response.status_code == 201
 
-    # Step 4. Label
+    # Step 5. Label
     payload = {
         'elements': [{
             'x': 0.5,
@@ -148,12 +155,12 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
             'slice_index': 0,
             'width': 0.1,
             'height': 0.1,
-            'tag': tag_key,
+            'tag': 'EXAMPLE_TAG',
             'tool': LabelTool.RECTANGLE.value,
         }],
         'labeling_time': 12.34,
     }
-    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id),
+    response = api_client.post('/api/v1/scans/{}/FIND_NODULES/label'.format(scan_id),
                                data={'label': json.dumps(payload)},
                                headers=get_headers(token=admin_user_token, multipart=True))
     assert response.status_code == 201

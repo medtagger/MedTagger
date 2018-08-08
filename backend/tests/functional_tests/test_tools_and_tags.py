@@ -5,9 +5,14 @@ from typing import Any
 from flask import json
 
 from medtagger.definitions import LabelTool
+from medtagger.repositories import (
+    scan_categories as ScanCategoriesRepository,
+    label_tags as LabelTagsRepository,
+    tasks as TasksRepository,
+)
+
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
-from tests.functional_tests.helpers import create_tag_and_assign_to_task
 
 
 def test_add_label_non_existing_tag(prepare_environment: Any) -> None:
@@ -15,7 +20,12 @@ def test_add_label_non_existing_tag(prepare_environment: Any) -> None:
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
-    # Step 1. Add Scan to the system
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
+
+    # Step 2. Add Scan to the system
     payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
@@ -23,7 +33,7 @@ def test_add_label_non_existing_tag(prepare_environment: Any) -> None:
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Create label
+    # Step 3. Create label
     payload = {
         'elements': [{
             'x': 0.5,
@@ -49,7 +59,12 @@ def test_add_label_non_supported_tool(prepare_environment: Any) -> None:
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
-    # Step 1. Add Scan to the system
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
+
+    # Step 2. Add Scan to the system
     payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
@@ -57,7 +72,7 @@ def test_add_label_non_supported_tool(prepare_environment: Any) -> None:
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Create label
+    # Step 3. Create label
     payload = {
         'elements': [{
             'x': 0.5,
@@ -84,7 +99,12 @@ def test_add_label_missing_tag(prepare_environment: Any) -> None:
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
-    # Step 1. Add Scan to the system
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
+
+    # Step 2. Add Scan to the system
     payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
@@ -92,7 +112,7 @@ def test_add_label_missing_tag(prepare_environment: Any) -> None:
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Create label
+    # Step 3. Create label
     payload = {
         'elements': [{
             'x': 0.5,
@@ -118,7 +138,12 @@ def test_add_label_missing_tool(prepare_environment: Any) -> None:
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
-    # Step 1. Add Scan to the system
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
+
+    # Step 2. Add Scan to the system
     payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
@@ -126,7 +151,7 @@ def test_add_label_missing_tool(prepare_environment: Any) -> None:
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Create label
+    # Step 3. Create label
     payload = {
         'elements': [{
             'x': 0.5,
@@ -152,6 +177,11 @@ def test_add_label_wrong_tool_for_tag(prepare_environment: Any) -> None:
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
+    # Step 1. Prepare a structure for the test
+    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
+
     # Step 1. Add Scan to the system
     payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
@@ -161,7 +191,6 @@ def test_add_label_wrong_tool_for_tag(prepare_environment: Any) -> None:
     scan_id = json_response['scan_id']
 
     # Step 2. Create label
-    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.BRUSH])
     payload = {
         'elements': [{
             'x': 0.5,
@@ -169,7 +198,8 @@ def test_add_label_wrong_tool_for_tag(prepare_environment: Any) -> None:
             'slice_index': 0,
             'width': 0.1,
             'height': 0.1,
-            'tool': LabelTool.RECTANGLE.value,
+            'tag': 'LEFT_KIDNEY',
+            'tool': LabelTool.BRUSH.value,
         }],
         'labeling_time': 12.34,
     }

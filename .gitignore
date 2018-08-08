@@ -118,6 +118,7 @@ Temporary Items
 
 # Tools
 .vagrant/
+.pytest_cache/
 venv/
 
 # Build CLI
