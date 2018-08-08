@@ -53,6 +53,34 @@ def update_tools_in_tag(key: str, tools: List[LabelTool]) -> LabelTag:
     return label_tag
 
 
+def update_name(key: str, name: str) -> LabelTag:
+    """Update name of the Label Tag.
+
+    :param key: key that will identify such Label Tag
+    :param name: new name for such Label Tag
+    :return: Label Tag object
+    """
+    with db_session() as session:
+        label_tag = get_label_tag_by_key(key)
+        label_tag.name = name
+        session.add(label_tag)
+    return label_tag
+
+
+def move_to_task(key: str, task_id: TaskID) -> LabelTag:
+    """Move Label Tag to the new Task.
+
+    :param key: key that will identify such Label Tag
+    :param task_id: Task ID for another Task which should be linked to this Label Tag
+    :return: Label Tag object
+    """
+    with db_session() as session:
+        label_tag = get_label_tag_by_key(key)
+        label_tag.task_id = task_id
+        session.add(label_tag)
+    return label_tag
+
+
 def disable(label_tag_key: str) -> None:
     """Disable existing Label Tag."""
     disabling_query = LabelTag.query.filter(LabelTag.key == label_tag_key)

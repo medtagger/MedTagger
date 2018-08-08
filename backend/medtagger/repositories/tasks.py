@@ -66,6 +66,19 @@ def unassign_label_tag(tag: LabelTag, task_key: str) -> None:
         task.save()
 
 
+def update_datasets(task_key: str, datasets_keys: List[str]) -> Task:
+    """Update Datasets where this Task will be available.
+
+    :param task_key: key that will identify such Task
+    :param datasets_keys: keys of Datasets which should have this Task
+    """
+    with db_session():
+        task = Task.query.filter(Task.key == task_key)
+        datasets = ScanCategory.query.filter(ScanCategory.key.in_(datasets_keys)).all()  # type: ignore
+        task.scan_categories = datasets
+    return task
+
+
 def disable(task_key: str) -> None:
     """Disable existing Task."""
     disabling_query = Task.query.filter(Task.key == task_key)
