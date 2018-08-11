@@ -1,10 +1,14 @@
 """Module responsible for business logic in all Tasks endpoints."""
 from typing import List
 
+from sqlalchemy.orm.exc import NoResultFound
+
+from medtagger.api.exceptions import NotFoundException
 from medtagger.database.models import Task, LabelTag
 from medtagger.repositories import (
     tasks as TasksRepository,
 )
+
 
 
 def get_tasks() -> List[Task]:
@@ -14,6 +18,15 @@ def get_tasks() -> List[Task]:
     """
     return TasksRepository.get_all_tasks()
 
+def get_task_for_key(task_key: str) -> Task:
+    """Fetch Task for given key.
+
+    :return: Task
+    """
+    try:
+        return TasksRepository.get_task_by_key(task_key)
+    except NoResultFound:
+        raise NotFoundException('Did not found task for {} key!'.format(task_key))
 
 def create_task(key: str, name: str, image_path: str, categories_keys: List[str], tags: List[LabelTag]) -> Task:
     """Create new Task.

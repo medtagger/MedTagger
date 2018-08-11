@@ -23,16 +23,22 @@ interface LabelTagResponse {
 @Injectable()
 export class TaskService {
 
-    private currentTask: Task;
-
     constructor(private http: HttpClient) {}
 
-    setCurrentTask(task: Task): void {
-        this.currentTask = task;
-    }
-
-    getCurrentTask(): Task {
-        return this.currentTask;
+    getCurrentTask(taskKey: string): Promise<Task> {
+        return new Promise((resolve, reject) => {
+            this.http.get<TaskResponse>(environment.API_URL + '/tasks/' + taskKey).toPromise().then(
+                response => {
+                    console.log('ScanService | getCurrentTask | response: ', response);
+                    const tags = response.tags.map(tag => new LabelTag(tag.key, tag.name, tag.tools));
+                    resolve(new Task(response.task_id, response.key, response.name, response.image_path, tags));
+                },
+                error => {
+                    console.log('ScanService | getCurrentTask | error: ', error);
+                    reject(error);
+                }
+            );
+        });
     }
 
     getTasks(): Promise<Task[]> {
