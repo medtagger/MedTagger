@@ -11,7 +11,7 @@ import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from '../selectors/Selector';
 import {Subscription} from 'rxjs/Subscription';
 import {LabelTag} from '../../model/LabelTag';
-import { isUndefined } from 'util';
+import {isUndefined} from 'util';
 import {MatSnackBar} from '@angular/material';
 
 @Component({
@@ -121,19 +121,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     public get3dSelection(): SliceSelection[] {
-        this.selectors.forEach((selector) => selector.archiveSelections());
-        this.updateSelectionState();
-
-        this.clearCanvasSelections();
-        const coordinates: SliceSelection[] = this.selectors
+        return this.selectors
             .map((selector) => selector.getSelections())
             .reduce((x, y) => x.concat(y), []);
-        this.selectors.forEach((selector) => selector.clearSelections());
-        this.updateSelectionState();
-
-        this.drawSelections();
-
-        return coordinates;
     }
 
     public getCurrentTag() {
