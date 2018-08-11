@@ -84,6 +84,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     public setCurrentSelector(selector: Selector<any>) {
+        if (this.currentSelector) {
+            this.currentSelector.deselect();
+        }
         this.currentSelector = selector;
         super.setCurrentTagForSelector(this.currentSelector, this.currentTag);
     }

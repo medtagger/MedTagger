@@ -26,19 +26,10 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
     public getActions(): Array<SelectorAction> {
         return [
             new SelectorAction('Stop', () => this.selectingInProgress, () => {
-                if (this.selectedArea.points.length > 1) {
-                    this.addSelection(this.selectedArea);
-                }
-                this.selectedArea = undefined;
-                this.selectingInProgress = undefined;
-                this.requestRedraw();
+                this.completeSelection(false);
             }),
             new SelectorAction('Loop', () => this.selectingInProgress && this.selectedArea.points.length > 2, () => {
-                this.selectedArea.isLoop = true;
-                this.addSelection(this.selectedArea);
-                this.selectedArea = undefined;
-                this.selectingInProgress = undefined;
-                this.requestRedraw();
+                this.completeSelection(true);
             })
         ];
     }
@@ -91,6 +82,16 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         const distance = Math.sqrt(Math.pow(scaledPoint.x - x, 2) + Math.pow(scaledPoint.y - y, 2));
 
         return distance < this.getStyle().RADIUS;
+    }
+
+    private completeSelection(isLoop: boolean) {
+        if (this.selectedArea && this.selectedArea.points.length > 1) {
+            this.selectedArea.isLoop = isLoop;
+            this.addSelection(this.selectedArea);
+        }
+        this.selectedArea = undefined;
+        this.selectingInProgress = undefined;
+        this.requestRedraw();
     }
 
     public onMouseDown(event: MouseEvent): void {
@@ -147,6 +148,10 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         if (!this.selectingInProgress) {
             this.selectedArea = undefined;
         }
+    }
+
+    public deselect(): void {
+        this.completeSelection(false);
     }
 
     public getSelectorName(): string {

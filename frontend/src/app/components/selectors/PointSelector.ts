@@ -1,7 +1,6 @@
 import {SelectorBase} from './SelectorBase';
 import {PointSelection} from '../../model/PointSelection';
 import {Selector} from './Selector';
-import { LabelTag } from '../../model/LabelTag';
 
 export class PointSelector extends SelectorBase<PointSelection> implements Selector<PointSelection> {
 

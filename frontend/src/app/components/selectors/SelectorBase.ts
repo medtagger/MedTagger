@@ -227,5 +227,9 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     protected requestRedraw(): void {
         this.redrawRequestEmitter.emit();
     }
+
+    public deselect(): void {
+        // pass
+    }
 }
 
