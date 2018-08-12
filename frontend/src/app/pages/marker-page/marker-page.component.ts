@@ -66,21 +66,26 @@ export class MarkerPageComponent implements OnInit {
         this.taskService.getCurrentTask(this.taskKey).then(
             (task: Task) => {
                 this.task = task;
+                console.log("asdsad", this.task);
                 this.taskTags = new FormControl('', [Validators.required]);
-            },
-            (errorResponse: Error) => {
-                console.log(errorResponse);
-            });
 
-        if (this.task.tags.length === 0) {
-            this.dialogService
-                .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
-                .afterClosed()
-                .subscribe(() => {
-                    this.location.back();
-                });
-        }
-
+                if (!this.task) {
+                    this.dialogService
+                        .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
+                        .afterClosed()
+                        .subscribe(() => {
+                            this.location.back();
+                    });
+                } else if (this.task.tags.length === 0) {
+                    this.dialogService
+                        .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
+                        .afterClosed()
+                        .subscribe(() => {
+                            this.location.back();
+                        }
+                    );
+                }
+        });
 
         this.selectors = new Map<string, Selector<any>>([
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
