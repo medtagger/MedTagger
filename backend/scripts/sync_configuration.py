@@ -88,9 +88,6 @@ def _sync_tasks(configuration: Dict) -> None:
               - CHAIN
     ```
 
-    Things to do:
-        - find differences in Tasks.
-
     :param configuration: content of YAML configuration file
     """
     datasets = configuration.get('datasets', []) or []
