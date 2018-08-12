@@ -9,8 +9,8 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         LINE_LINKS: 'round',
         SELECTION_FONT_SIZE: 14,
         SELECTION_FONT_COLOR: '#ffffff',
-        CURRENT_SELECTION_COLOR: 'rgba(255, 0, 0, 0.5)',
-        OTHER_SELECTION_COLOR: 'rgba(37, 111, 222, 0.5)',
+        CURRENT_SELECTION_COLOR: 'rgba(255, 0, 0, 1)',
+        OTHER_SELECTION_COLOR: 'rgba(37, 111, 222, 1)',
         ARCHIVED_SELECTION_COLOR: '#5f27e5'
     };
 
@@ -37,10 +37,12 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             this.canvasCtx.drawImage(selectionLayerImage, 0, 0, this.canvasSize.width, this.canvasSize.height);
 
             // Recoloring of original selection
-            this.canvasCtx.fillStyle = color;
-            this.canvasCtx.globalCompositeOperation = 'source-in';
-            this.canvasCtx.fillRect(0, 0, this.canvasSize.width, this.canvasSize.height);
-            this.canvasCtx.globalCompositeOperation = 'source-over';
+            if (color === this.STYLE.OTHER_SELECTION_COLOR) {
+                this.canvasCtx.fillStyle = color;
+                this.canvasCtx.globalCompositeOperation = 'source-in';
+                this.canvasCtx.fillRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+                this.canvasCtx.globalCompositeOperation = 'source-over';
+            }
 
         }, (error: Error) => {
             console.error('Error while drawing brush selections!: ', error);
@@ -50,18 +52,25 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     drawSelections(): any {
         console.log('BrushSelector | drawSelections | selection: ', this.selections);
+
+        let currentSelection: BrushSelection;
+
         this.getSelections().forEach((selection: BrushSelection) => {
             let color: string;
             const isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
             if (isCurrent) {
-                color = this.STYLE.CURRENT_SELECTION_COLOR;
+                currentSelection = selection;
             } else {
                 color = this.STYLE.OTHER_SELECTION_COLOR;
             }
-            if ((selection.pinned || isCurrent) && (!selection.hidden)) {
+            if ((selection.pinned) && (!selection.hidden)) {
                 this.drawSelection(selection, color);
             }
         });
+
+        if (currentSelection) {
+            this.drawSelection(currentSelection, this.STYLE.CURRENT_SELECTION_COLOR);
+        }
     }
 
     formArchivedSelections(selectionMap: Array<BrushSelection>): Array<BrushSelection> {
