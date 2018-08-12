@@ -121,6 +121,9 @@ Temporary Items
 .pytest_cache/
 venv/
 
+# MedTagger
+.medtagger.yml
+
 # Others
 *.log
 *.swp
