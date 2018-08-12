@@ -1,3 +1,0 @@
-include cli/assets/docker-compose.yml
-include cli/assets/.medtagger.yml
-include cli/assets/medtagger.env

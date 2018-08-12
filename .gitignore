@@ -121,11 +121,6 @@ Temporary Items
 .pytest_cache/
 venv/
 
-# Build CLI
-build/
-dist/
-medtagger.egg-info/
-
 # Others
 *.log
 *.swp
