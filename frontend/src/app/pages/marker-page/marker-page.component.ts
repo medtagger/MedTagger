@@ -5,9 +5,7 @@ import {ScanService} from '../../services/scan.service';
 import {MarkerComponent} from '../../components/marker/marker.component';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
-import {Selection3D} from '../../model/selections/Selection3D';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
-import {ROISelection2D} from '../../model/ROISelection2D';
 import {SliceRequest} from '../../model/SliceRequest';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
@@ -16,17 +14,15 @@ import {LabelTag} from '../../model/labels/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
-import {SliceSelection} from '../../model/selections/SliceSelection';
 import {BrushSelector} from '../../components/selectors/BrushSelector';
-import {CategoryService} from '../../services/category.service';
-import {FormControl, Validators} from '@angular/forms';
-import {isUndefined} from 'util';
 import {ChainSelector} from '../../components/selectors/ChainSelector';
 import {SelectorAction} from '../../model/SelectorAction';
 import {FormControl, Validators} from '@angular/forms';
 import {TaskService} from '../../services/task.service';
 import {isUndefined} from 'util';
 import {Task} from '../../model/Task';
+import {ROISelection2D} from '../../model/selections/ROISelection2D';
+import {Selection3D} from '../../model/selections/Selection3D';
 
 
 @Component({
@@ -182,15 +178,15 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
-        this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()), this.labelComment);
+        this.sendSelection(new Selection3D(<ROISelection2D[]>this.marker.get3dSelection()), this.labelComment);
     }
 
     public sendEmptyLabel(): void {
-        this.sendSelection(new ROISelection3D(), 'This is an empty Label');
+        this.sendSelection(new Selection3D(), 'This is an empty Label');
         this.nextScan();
     }
 
-    private sendSelection(roiSelection: ROISelection3D, comment: string) {
+    private sendSelection(roiSelection: Selection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
 
         this.scanService.sendSelection(this.scan.scanId, this.task.key, roiSelection, labelingTime, comment)
