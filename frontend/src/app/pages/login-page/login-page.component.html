@@ -1,87 +1,100 @@
-<div class="login-side">
-    <mat-card *ngIf="loginPageMode == LoginPageMode.LOG_IN">
-        <mat-card-header>
-            <mat-card-title>Sign in</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
+<div class="row">
+    <header class="col-sm-12 col-lg-4">
+        <div class="logo">
+            <img src="assets/icon/medtagger_logo.svg"/>
+            <h1>MedTagger</h1>
+        </div>
+        <h3>The open-source platform for labeling and aggregation of datasets with usage of a crowdsourcing idea.</h3>
+    </header>
+    <div class="col-sm-12 col-lg-8 login">
+        <div class="buttons-pill">
+            <h4 [ngClass]="{active: loginPageMode == LoginPageMode.REGISTER}" (click)="changePageMode()">
+                <a routerLink="/login">Sign up</a>
+            </h4>
+            <h4 [ngClass]="{active: loginPageMode == LoginPageMode.LOG_IN}" (click)="changePageMode()">
+                <a routerLink="/login">Sign in</a>
+            </h4>
+        </div>
+        <main *ngIf="loginPageMode == LoginPageMode.LOG_IN">
+            <h3>Hello!</h3>
+            <h4>Good to see you back! Log in and continue your work.</h4>
             <form [formGroup]="userForm" (keyup.enter)="logIn()">
-                <mat-form-field>
-                    <input matInput type="text" placeholder="E-mail" id="email" formControlName="email"
-                           required>
-                </mat-form-field>
-                <mat-form-field>
-                    <input matInput type="password" placeholder="Password" id="password"
-                           formControlName="password" required>
-                </mat-form-field>
-            </form>
-            <mat-card-actions>
-                <button *ngIf="!loggingInProgress" mat-raised-button color="primary" (click)="logIn()">Sign in
-                </button>
-                <mat-progress-spinner *ngIf="loggingInProgress" class="login-spinner" mode="indeterminate"
-                                      [diameter]="36"
-                                      strokeWidth="2"></mat-progress-spinner>
-                <div *ngIf="loggingInError" class="error">Invalid login/password!</div>
-            </mat-card-actions>
-            <div class="register-link">
-                <span>New to MedTagger? <a routerLink="/login" (click)="changePageMode()">Create an account.</a></span>
-            </div>
-        </mat-card-content>
-    </mat-card>
-
-    <mat-card *ngIf="loginPageMode == LoginPageMode.REGISTER">
-        <mat-card-header>
-            <mat-card-title>Register</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <form [formGroup]="userForm" (keyup.enter)="register()">
-                <mat-form-field>
-                    <input matInput type="text" id="firstName" placeholder="First name"
-                           formControlName="firstName" required>
-                    <mat-error *ngIf="userForm.get('firstName').invalid">{{getFirstNameErrorMessage()}}
-                    </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <input matInput type="text" id="lastName" placeholder="Last name"
-                           formControlName="lastName" required>
-                    <mat-error *ngIf="userForm.get('lastName').invalid">{{getLastNameErrorMessage()}}
-                    </mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <input matInput type="text" id="email" placeholder="E-mail" formControlName="email"
-                           required>
+                <mat-form-field appearance="fill">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="text" placeholder="Insert your email."
+                           id="email" formControlName="email" required>
                     <mat-error *ngIf="userForm.get('email').invalid">{{getEmailErrorMessage()}}</mat-error>
                 </mat-form-field>
-                <mat-form-field>
-                    <input matInput type="password" id="password" placeholder="Password"
-                           formControlName="password" required>
-                    <mat-error *ngIf="userForm.get('password').invalid">{{getPasswordErrorMessage()}}
-                    </mat-error>
-                </mat-form-field>
-                <mat-form-field required>
-                    <input matInput type="password" id="confirmPassword" placeholder="Confirm Password"
-                           formControlName="confirmPassword" required>
-                    <mat-error *ngIf="userForm.get('confirmPassword').invalid">
-                        {{getConfirmPasswordErrorMessage()}}
-                    </mat-error>
+                <mat-form-field appearance="fill">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="{{loginPasswordVisible && 'text' || 'password'}}"
+                           placeholder="Insert your password."
+                           id="password" formControlName="password" required>
+                    <mat-error *ngIf="userForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
+                    <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                 </mat-form-field>
             </form>
-            <mat-card-actions>
-                <button mat-raised-button color="primary-color" (click)="changePageMode()">
-                    <mat-icon>arrow_back</mat-icon>
-                    Back
+            <div class="submit">
+                <button *ngIf="!loggingInProgress" mat-raised-button color="primary" (click)="logIn()">
+                    Sign in
                 </button>
-                <button mat-raised-button color="primary"
-                        *ngIf="!registrationInProgress"
-                        [disabled]="userForm.invalid"
-                        (click)="register()">
-                    Register
-                </button>
-                <mat-progress-spinner mode="indeterminate"
-                                      [diameter]="36"
-                                      strokeWidth="2"
-                                      *ngIf="registrationInProgress"></mat-progress-spinner>
-            </mat-card-actions>
-        </mat-card-content>
-    </mat-card>
-</div>
+                <mat-progress-spinner *ngIf="loggingInProgress" class="login-spinner" mode="indeterminate"
+                                      [diameter]="36" strokeWidth="2"></mat-progress-spinner>
+                <mat-icon *ngIf="loggingInError" color="warn">error</mat-icon>
+            </div>
+        </main>
 
+
+        <main *ngIf="loginPageMode == LoginPageMode.REGISTER">
+            <h3>Hello!</h3>
+            <h4>Start labeling with MedTagger today. It is easy! Just take your time and fill this registration form and
+                you are ready to go. </h4>
+            <form [formGroup]="userForm" (keyup.enter)="register()">
+                <div class="row">
+                    <mat-form-field appearance="fill" class="col-12 col-lg-6">
+                        <mat-label>First name</mat-label>
+                        <input matInput type="text" placeholder="Insert your name."
+                               id="firstName" formControlName="firstName" required>
+                        <mat-error *ngIf="userForm.get('firstName').invalid">{{getFirstNameErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="fill" class="col-12 col-lg-6">
+                        <mat-label>Last name</mat-label>
+                        <input matInput type="text" placeholder="Insert your surname."
+                               id="lastName" formControlName="lastName" required>
+                        <mat-error *ngIf="userForm.get('lastName').invalid">{{getLastNameErrorMessage()}}</mat-error>
+                    </mat-form-field>
+                </div>
+                <mat-form-field appearance="fill">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="text" placeholder="Insert your email."
+                           id="email" formControlName="email" required>
+                    <mat-error *ngIf="userForm.get('email').invalid">{{getEmailErrorMessage()}}</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="{{registerPasswordVisible && 'text' || 'password'}}"
+                           placeholder="Enter your password."
+                           id="password" formControlName="password" required>
+                    <mat-error *ngIf="userForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
+                    <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Confirm password</mat-label>
+                    <input matInput type="{{registerPasswordVisible && 'text' || 'password'}}"
+                           placeholder="Re-enter your password."
+                           id="confirmPassword" formControlName="confirmPassword" required>
+                    <mat-error *ngIf="userForm.get('password').invalid">{{getConfirmPasswordErrorMessage()}}</mat-error>
+                    <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
+                </mat-form-field>
+            </form>
+            <div class="submit">
+                <button *ngIf="!registrationInProgress" mat-raised-button color="primary" (click)="register()">
+                    Sign up
+                </button>
+                <mat-progress-spinner *ngIf="registrationInProgress" class="login-spinner" mode="indeterminate"
+                                      [diameter]="36" strokeWidth="2"></mat-progress-spinner>
+            </div>
+        </main>
+    </div>
+
+</div>

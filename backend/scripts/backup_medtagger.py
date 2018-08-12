@@ -73,10 +73,6 @@ for scan_category in ScanCategoriesRepository.get_all_categories():
         'id': scan_category.id,
         'key': scan_category.key,
         'name': scan_category.name,
-        'image_path': scan_category.image_path,
-        'available_tags': [{
-            'key': label_tag.key,
-        } for label_tag in scan_category.available_tags],
     })
 print('\nFetching Label Tags...')
 for label_tag in LabelTagsRepository.get_all_tags():

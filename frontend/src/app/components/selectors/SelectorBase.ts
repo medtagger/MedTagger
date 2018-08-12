@@ -10,7 +10,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     protected selections: Map<number, [CustomSliceSelection]>;
     protected archivedSelections: Array<CustomSliceSelection> = [];
     protected canvasCtx: CanvasRenderingContext2D;
-    protected currentSlice;
+    protected currentSlice: number;
     protected currentTag: LabelTag;
     protected canvasPosition: ClientRect;
     protected canvasSize: { width: number, height: number };

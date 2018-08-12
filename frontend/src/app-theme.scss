@@ -22,3 +22,14 @@ $tagger-app-theme: mat-light-theme($tagger-app-primary, $tagger-app-accent, $tag
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 @include angular-material-theme($tagger-app-theme);
+
+$primary: mat-palette($mat-light-blue, 600, 500, 800);
+$accent: mat-palette($mat-orange, 500, 300, 600);
+$warn: mat-color($tagger-app-warn);
+
+$black-8-opacity: rgba(0,0,0,0.08);
+$black-disabled: rgba(0,0,0,0.38);
+$white-high-emphasis: #fff;
+$white-medium-emphasis: rgba(#fff, 0.7);
+$black-high-emphasis: #000;
+$black-medium-emphasis: rgba(0,0,0,0.5);
