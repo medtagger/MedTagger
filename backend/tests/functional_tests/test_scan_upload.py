@@ -11,7 +11,7 @@ from PIL import Image
 from medtagger.database.models import SliceOrientation
 from medtagger.repositories import (
     slices as SlicesRepository,
-    scan_categories as ScanCategoriesRepository
+    scan_categories as ScanCategoriesRepository,
 )
 
 from tests.functional_tests import get_api_client, get_headers

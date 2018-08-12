@@ -1,7 +1,8 @@
-import yaml
+"""Script for MedTagger's configuration synchronization."""
 import logging.config
 from typing import Dict
 
+import yaml
 from sqlalchemy.exc import IntegrityError
 
 from medtagger.database.models import ScanCategory, Task
@@ -11,6 +12,7 @@ from medtagger.repositories import (
     tasks as TasksRepository,
     label_tags as LabelTagsRepository,
 )
+from medtagger.types import TaskID
 
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
@@ -55,13 +57,15 @@ def _sync_datasets(configuration: Dict) -> None:
         ScanCategoriesRepository.add_new_category(dataset['key'], dataset['name'])
         logger.info('New DataSet added: %s', dataset['key'])
 
+    for dataset_key in datasets_to_enable:
+        dataset = next(dataset for dataset in datasets if dataset['key'] == dataset_key)
+        ScanCategoriesRepository.enable(dataset['key'])
+        ScanCategoriesRepository.update(dataset['key'], dataset['name'])
+        logger.info('DataSet enabled: %s', dataset['key'])
+
     for dataset_key in datasets_to_disable:
         ScanCategoriesRepository.disable(dataset_key)
         logger.info('DataSet disabled: %s', dataset_key)
-
-    for dataset_key in datasets_to_enable:
-        ScanCategoriesRepository.enable(dataset_key)
-        logger.info('DataSet enabled: %s', dataset_key)
 
 
 def _sync_tasks(configuration: Dict) -> None:
@@ -112,7 +116,7 @@ def _sync_tasks(configuration: Dict) -> None:
         _sync_label_tags_in_task(configuration, task_key)
         task = next(task for task in tasks if task['key'] == task_key)
         datasets_keys = [dataset['key'] for dataset in datasets if task['key'] in dataset['tasks']]
-        TasksRepository.update_datasets(task_key, datasets_keys)
+        TasksRepository.update(task_key, task['name'], task['image_path'], datasets_keys)
         logger.info('Task enabled: %s', task_key)
 
     # Disable all Tasks that exists in the DB but are missing in configuration file
@@ -142,17 +146,7 @@ def _sync_label_tags_in_task(configuration: Dict, task_key: str) -> None:
 
     for tag_key in tags_to_add:
         tag = next(tag for tag in configuration_task['tags'] if tag_key == tag['key'])
-        tools = [LabelTool[tool] for tool in tag['tools']]
-        try:
-            LabelTagsRepository.add_new_tag(tag['key'], tag['name'], tools, db_task.id)
-        except IntegrityError:
-            # Such Label Tag could be previously used in another Task
-            logger.warning('Reusing previously existing Label Tag (%s)! This may cause data inconsistency! '
-                           'Make sure you know what you are doing and clear database entries if necessary!',
-                           tag['key'])
-            LabelTagsRepository.update_tools_in_tag(tag['key'], tools)
-            LabelTagsRepository.update_name(tag['key'], tag['name'])
-            LabelTagsRepository.move_to_task(tag['key'], db_task.id)
+        _add_label_tag(tag, db_task.id)
         logger.info('New LabelTag added: %s', tag_key)
 
     for tag_key in tags_to_disable:
@@ -163,14 +157,37 @@ def _sync_label_tags_in_task(configuration: Dict, task_key: str) -> None:
         tag = next(tag for tag in configuration_task['tags'] if tag_key == tag['key'])
         tools = [LabelTool[tool] for tool in tag['tools']]
         LabelTagsRepository.enable(tag_key)
-        LabelTagsRepository.update_tools_in_tag(tag_key, tools)
+        LabelTagsRepository.update(tag_key, tag['name'], tools)
         logger.info('LabelTag enabled: %s', tag_key)
 
 
-if __name__ == '__main__':
+def _add_label_tag(tag: Dict, db_task_id: TaskID) -> None:
+    """Add Label Tag or reuse previously created one.
+
+    :param tag: configuration of a Label Tag
+    :param db_task_id: TaskID which should be connected with this Label Tag
+    """
+    tools = [LabelTool[tool] for tool in tag['tools']]
+    try:
+        LabelTagsRepository.add_new_tag(tag['key'], tag['name'], tools, db_task_id)
+    except IntegrityError:
+        # Such Label Tag could be previously used in another Task
+        logger.warning('Reusing previously existing Label Tag (%s)! This may cause data inconsistency! '
+                       'Make sure you know what you are doing and clear database entries if necessary!',
+                       tag['key'])
+        LabelTagsRepository.update(tag['key'], tag['name'], tools, db_task_id)
+        LabelTagsRepository.enable(tag['key'])
+
+
+def run() -> None:
+    """Entry point for this script."""
     try:
         with open(CONFIGURATION_FILE_NAME) as config_file:
             configuration = yaml.load(config_file)
             sync_configuration(configuration)
-    except yaml.YAMLError as exc:
-        logger.exception('Unknown error...')
+    except yaml.YAMLError:
+        logger.exception('Invalid MedTagger configuration file format.')
+
+
+if __name__ == '__main__':
+    run()
