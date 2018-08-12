@@ -88,6 +88,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         super.setCurrentTagForSelector(this.currentSelector, this.currentTag);
     }
 
+    public clearCurrentSelector() {
+        this.currentSelector = undefined;
+    }
+
     public setCurrentTag(tag: LabelTag) {
         super.setCurrentTag(tag);
         this.currentTag = tag;
