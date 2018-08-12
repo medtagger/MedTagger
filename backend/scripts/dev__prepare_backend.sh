@@ -9,7 +9,7 @@ echo "Apply database fixtures..."
 python3.6 medtagger/database/fixtures.py
 
 echo "Configuration synchronization..."
-cp -n .example.medtagger.yml .medtagger.yml
+cp -n .example.medtagger.yml .medtagger.yml || :
 python3.6 scripts/sync_configuration.py
 
 echo "Populate database with default user accounts..."
