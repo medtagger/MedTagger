@@ -1,5 +1,5 @@
 import {SliceSelection} from './SliceSelection';
-import {Point} from './Point';
+import {Point} from '../Point';
 
 export class ChainSelection extends SliceSelection {
 

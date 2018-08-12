@@ -6,8 +6,8 @@ import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
-import {ScanSelection} from '../model/ScanSelection';
-import {SliceSelection} from '../model/SliceSelection';
+import {ScanSelection} from '../model/selections/ScanSelection';
+import {SliceSelection} from '../model/selections/SliceSelection';
 import {MedTaggerWebSocket} from './websocket.service';
 import {concat, delay, flatMap, map, mergeAll, retryWhen, take} from 'rxjs/operators';
 import {of} from 'rxjs/internal/observable/of';
