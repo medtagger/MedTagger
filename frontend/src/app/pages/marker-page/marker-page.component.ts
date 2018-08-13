@@ -98,17 +98,17 @@ export class MarkerPageComponent implements OnInit {
                 this.lastSliceID = slice.index;
             }
             this.marker.feedData(slice);
-            if (this.marker.downloadingScanInProgress === true) {
-                this.indicateNewScanAppeared();
-            }
             if (slice.isLastInBatch()) {
+                if (this.marker.downloadingScanInProgress === true) {
+                    this.indicateNewScanAppeared();
+                }
                 if (this.isInitialSliceLoad === true) {
                     this.marker.selectMiddleSlice();
                     this.isInitialSliceLoad = false;
                 }
                 this.marker.setDownloadSlicesInProgress(false);
+                this.marker.setDownloadScanInProgress(false);
             }
-            this.marker.setDownloadScanInProgress(false);
         });
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
