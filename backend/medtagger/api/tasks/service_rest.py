@@ -46,9 +46,10 @@ class Tasks(Resource):
 
         return business.create_task(key, name, image_path, categories_keys, tags), 201
 
+
 @tasks_ns.route('/<string:task_key>')
 class Task(Resource):
-    """Endpoint that manages single task"""
+    """Endpoint that manages single task."""
 
     @staticmethod
     @login_required

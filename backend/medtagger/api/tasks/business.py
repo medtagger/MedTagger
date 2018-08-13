@@ -10,13 +10,13 @@ from medtagger.repositories import (
 )
 
 
-
 def get_tasks() -> List[Task]:
     """Fetch all tasks.
 
     :return: list of tasks
     """
     return TasksRepository.get_all_tasks()
+
 
 def get_task_for_key(task_key: str) -> Task:
     """Fetch Task for given key.
@@ -27,6 +27,7 @@ def get_task_for_key(task_key: str) -> Task:
         return TasksRepository.get_task_by_key(task_key)
     except NoResultFound:
         raise NotFoundException('Did not found task for {} key!'.format(task_key))
+
 
 def create_task(key: str, name: str, image_path: str, categories_keys: List[str], tags: List[LabelTag]) -> Task:
     """Create new Task.
