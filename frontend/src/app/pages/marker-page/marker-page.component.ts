@@ -10,7 +10,7 @@ import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {ROISelection2D} from '../../model/ROISelection2D';
 import {SliceRequest} from '../../model/SliceRequest';
 import {DialogService} from '../../services/dialog.service';
-import {Location} from '@angular/common';
+import {Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
@@ -48,9 +48,10 @@ export class MarkerPageComponent implements OnInit {
     selectorActions: Array<SelectorAction> = [];
     labelComment: string;
     isInitialSliceLoad: boolean;
+    chooseTaskPageUrl = '/labelling/choose-task';
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private location: Location, private snackBar: MatSnackBar, private taskService: TaskService) {
+                private router: Router, private snackBar: MatSnackBar, private taskService: TaskService) {
         console.log('MarkerPage constructor', this.marker);
         this.labelComment = '';
         this.isInitialSliceLoad = true;
@@ -72,7 +73,7 @@ export class MarkerPageComponent implements OnInit {
                         .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
                         .afterClosed()
                         .subscribe(() => {
-                            this.location.back();
+                            this.router.navigateByUrl(this.chooseTaskPageUrl);
                         });
                 }
             },
@@ -82,7 +83,7 @@ export class MarkerPageComponent implements OnInit {
                         .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
                         .afterClosed()
                         .subscribe(() => {
-                            this.location.back();
+                            this.router.navigateByUrl(this.chooseTaskPageUrl);
                         });
                 }
             });
@@ -170,7 +171,7 @@ export class MarkerPageComponent implements OnInit {
                     .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this category!', 'Go back')
                     .afterClosed()
                     .subscribe(() => {
-                        this.location.back();
+                        this.router.navigateByUrl(this.chooseTaskPageUrl);
                     });
             });
     }
