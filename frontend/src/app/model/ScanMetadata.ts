@@ -1,3 +1,5 @@
+import {LabelTag} from './labels/LabelTag';
+
 export class ScanCategory {
     key: string;
     name: string;
