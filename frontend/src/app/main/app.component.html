@@ -18,11 +18,11 @@
                     <mat-icon matListIcon>apps</mat-icon>
                     <h3 matLine>Home</h3>
                 </a>
-                <a mat-list-item routerLink="{{ currentUser.settings.skipTutorial ? '/labelling/choose-task' : '/labelling/tutorial' }}" (click)="sidenav.close()">
+                <a data-cy="sidebar-labelling" mat-list-item routerLink="{{ currentUser.settings.skipTutorial ? '/labelling/choose-task' : '/labelling/tutorial' }}" (click)="sidenav.close()">
                     <mat-icon matListIcon>label_outline</mat-icon>
                     <h3 matLine>Labelling</h3>
                 </a>
-                <a mat-list-item routerLink="/upload" (click)="sidenav.close()"
+                <a data-cy="sidebar-upload" mat-list-item routerLink="/upload" (click)="sidenav.close()"
                    *ngIf="currentUser.role !== 'volunteer'">
                     <mat-icon matListIcon>add</mat-icon>
                     <h3 matLine>Upload new Scans</h3>
@@ -39,7 +39,7 @@
                     <mat-icon matListIcon>settings</mat-icon>
                     <h3 matLine>Settings</h3>
                 </a>
-                <a mat-list-item routerLink="/login" (click)="sidenav.close(); logOut();">
+                <a data-cy="sidebar-logout" mat-list-item routerLink="/login" (click)="sidenav.close(); logOut();">
                     <mat-icon matListIcon>exit_to_app</mat-icon>
                     <h3 matLine>Sign out</h3>
                 </a>
@@ -56,7 +56,7 @@
                 <span class="header-name">MedTagger</span>
             </a>
             <span class="header-page-name">{{pageTitle}}</span>
-            <button mat-icon-button (click)="sidenav.toggle()" class="open-sidebar" *ngIf="!isLoginPage">
+            <button data-cy="sidebar" mat-icon-button (click)="sidenav.toggle()" class="open-sidebar" *ngIf="!isLoginPage">
                 <mat-icon aria-label="Open menu">menu</mat-icon>
             </button>
         </mat-toolbar>

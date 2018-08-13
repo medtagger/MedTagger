@@ -3,7 +3,7 @@
         <div class="tags">
             <h3>Available Tags</h3>
             <mat-form-field>
-                <mat-select placeholder="Current Tag" [formControl]="taskTags">
+                <mat-select data-cy="tags" placeholder="Current Tag" [formControl]="taskTags">
                     <mat-option *ngFor="let tag of (task ? task.tags : [])" [value]="tag" (click)="setTag(tag)">
                         {{ tag.name }}
                     </mat-option>

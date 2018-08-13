@@ -12,7 +12,7 @@
                 <a routerLink="/login">Sign up</a>
             </h4>
             <h4 [ngClass]="{active: loginPageMode == LoginPageMode.LOG_IN}" (click)="changePageMode()">
-                <a routerLink="/login">Sign in</a>
+                <a data-cy="login-toggle" routerLink="/login">Sign in</a>
             </h4>
         </div>
         <main *ngIf="loginPageMode == LoginPageMode.LOG_IN">
@@ -35,7 +35,7 @@
                 </mat-form-field>
             </form>
             <div class="submit">
-                <button *ngIf="!loggingInProgress" mat-raised-button color="primary" (click)="logIn()">
+                <button data-cy="submit" *ngIf="!loggingInProgress" mat-raised-button color="primary" (click)="logIn()">
                     Sign in
                 </button>
                 <mat-progress-spinner *ngIf="loggingInProgress" class="login-spinner" mode="indeterminate"

@@ -10,7 +10,7 @@
                 <mat-card-subtitle>Step 1</mat-card-subtitle>
                 <p>First, choose category of the data you want to label. After that you will be taken to marker
                     page.</p>
-                <button class="nextPage" mat-raised-button matStepperNext color="primary">Next
+                <button data-cy="next1" class="nextPage" mat-raised-button matStepperNext color="primary">Next
                     <mat-icon>navigate_next</mat-icon>
                 </button>
                 <div class="clearfix"></div>
@@ -37,7 +37,7 @@
                     <mat-icon>navigate_before</mat-icon>
                     Back
                 </button>
-                <button class="nextPage" mat-raised-button matStepperNext color="primary">Next
+                <button data-cy="next2" class="nextPage" mat-raised-button matStepperNext color="primary">Next
                     <mat-icon>navigate_next</mat-icon>
                 </button>
                 <div class="clearfix"></div>
@@ -67,7 +67,7 @@
                     <mat-icon>navigate_before</mat-icon>
                     Back
                 </button>
-                <button class="nextPage" mat-raised-button matStepperNext color="primary">Next
+                <button data-cy="next3" class="nextPage" mat-raised-button matStepperNext color="primary">Next
                     <mat-icon>navigate_next</mat-icon>
                 </button>
                 <div class="clearfix"></div>
@@ -89,12 +89,12 @@
                     clicking this button.</p>
                 <p>After sending all of the labels, please click 'Next scan' button to draw another scan for
                     labelling.</p>
-                <mat-checkbox [formControl]="doNotShowAgain">Do not show this tutorial again</mat-checkbox>
+                <mat-checkbox data-cy="not-show" [formControl]="doNotShowAgain">Do not show this tutorial again</mat-checkbox>
                 <button class="prevPage" mat-button matStepperPrevious>
                     <mat-icon>navigate_before</mat-icon>
                     Back
                 </button>
-                <button class="nextPage" mat-raised-button matStepperNext color="primary"
+                <button data-cy="next4" class="nextPage" mat-raised-button matStepperNext color="primary"
                         (click)="endTutorial()">
                     <mat-icon>label_outline</mat-icon>
                     Proceed to labeling

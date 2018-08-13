@@ -11,7 +11,7 @@
                     </mat-card-header>
                     <mat-card-content>
                         <mat-form-field>
-                            <mat-select placeholder="Scan category" formControlName="category" required>
+                            <mat-select data-cy="datasets" placeholder="Scan category" formControlName="category" required>
                                 <mat-option *ngFor="let availableCategory of availableCategories"
                                             [value]="availableCategory.key">
                                     {{availableCategory.name}}
@@ -20,7 +20,7 @@
                         </mat-form-field>
                     </mat-card-content>
                     <mat-card-actions>
-                        <button class="pull-right" mat-raised-button matStepperNext color="primary">Select</button>
+                        <button data-cy="datasets-submit" class="pull-right" mat-raised-button matStepperNext color="primary">Select</button>
                         <div class="clearfix"></div>
                     </mat-card-actions>
                 </mat-card>
@@ -42,7 +42,7 @@
                         <p>Select this option if you want to upload a single 3D Scan.</p>
                     </mat-card-content>
                     <mat-card-actions>
-                        <button class="pull-right" mat-raised-button color="primary"
+                        <button data-cy="single-scan" class="pull-right" mat-raised-button color="primary"
                                 (click)="selectUploadMode(UploadMode.SINGLE_SCAN)">Select
                         </button>
                         <div class="clearfix"></div>
@@ -105,7 +105,7 @@
                         <mat-card-actions>
                             <app-upload-scans-selector #uploadSingleScanSelector (onFileSelect)="chooseFiles($event)"
                                                    [multipleScans]="false" style="float: left;"></app-upload-scans-selector>
-                            <button mat-raised-button color="primary" (click)="uploadFiles()"
+                            <button data-cy="single-scan-upload" mat-raised-button color="primary" (click)="uploadFiles()"
                                     *ngIf="totalNumberOfSlices != 0" style="float: right;">
                                 <mat-icon>file_upload</mat-icon>
                                 Upload Scan!
