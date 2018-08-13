@@ -66,26 +66,28 @@ export class MarkerPageComponent implements OnInit {
         this.taskService.getCurrentTask(this.taskKey).then(
             (task: Task) => {
                 this.task = task;
-                console.log("asdsad", this.task);
-                this.taskTags = new FormControl('', [Validators.required]);
 
+                if (this.task.tags.length === 0) {
+                    this.dialogService
+                        .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
+                        .afterClosed()
+                        .subscribe(() => {
+                            this.location.back();
+                        });
+                }
+            },
+            (errorResponse: Error) => {
                 if (!this.task) {
                     this.dialogService
                         .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
                         .afterClosed()
                         .subscribe(() => {
                             this.location.back();
-                    });
-                } else if (this.task.tags.length === 0) {
-                    this.dialogService
-                        .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
-                        .afterClosed()
-                        .subscribe(() => {
-                            this.location.back();
-                        }
-                    );
+                        });
                 }
-        });
+            });
+
+        this.taskTags = new FormControl('', [Validators.required]);
 
         this.selectors = new Map<string, Selector<any>>([
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
@@ -149,7 +151,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.scanService.getRandomScan(this.task.key).then(
+        this.scanService.getRandomScan(this.taskKey).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);

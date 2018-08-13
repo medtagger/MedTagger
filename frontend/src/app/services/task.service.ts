@@ -23,7 +23,7 @@ interface LabelTagResponse {
 @Injectable()
 export class TaskService {
 
-    tasks: Array<Task> = [];
+    private tasks: Array<Task> = [];
     constructor(private http: HttpClient) { }
 
     getCurrentTask(taskKey: string): Promise<Task> {
@@ -47,6 +47,9 @@ export class TaskService {
     }
 
     getTasks(): Promise<Task[]> {
+        if (this.tasks.length > 0) {
+           this.tasks = [];
+        }
         return new Promise((resolve, reject) => {
             this.http.get<Array<TaskResponse>>(environment.API_URL + '/tasks').toPromise().then(
                 response => {
