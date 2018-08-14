@@ -5,9 +5,9 @@ import {groupBy, toArray} from 'rxjs/operators';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
-import {SliceSelection} from '../../model/SliceSelection';
 import {SliceRequest} from '../../model/SliceRequest';
-import {LabelTag} from '../../model/LabelTag';
+import {SliceSelection} from '../../model/selections/SliceSelection';
+import {LabelTag} from '../../model/labels/LabelTag';
 
 @Component({
     selector: 'app-scan-viewer',
@@ -50,7 +50,11 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     protected selectors: Array<Selector<SliceSelection>>;
     protected _currentTag;
 
-    constructor() {}
+    focusable: boolean;
+
+    constructor() {
+        this.focusable = true;
+    }
 
     @HostListener('window:resize', ['$event'])
     onResize() {
@@ -71,7 +75,21 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public sliderFocus() {
-        this.slider._elementRef.nativeElement.focus();
+        if (this.focusable) {
+            // setTimeout() fixes slider focus issues in IE/Firefox
+            window.setTimeout(() => {
+              this.slider._elementRef.nativeElement.focus();
+            }, 10);
+        }
+    }
+
+    public setFocusable(focusable: boolean) {
+        this.focusable = focusable;
+        if (!this.focusable) {
+            this.slider._elementRef.nativeElement.focus();
+        } else {
+            this.slider._elementRef.nativeElement.blur();
+        }
     }
 
     public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {
@@ -87,6 +105,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public setCurrentTagForSelector(selector: Selector<SliceSelection>, tag: LabelTag) {
+        console.log('Updating tag for selector: ', selector);
         selector.updateCurrentTag(tag);
     }
 
@@ -154,9 +173,6 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     protected addSlice(newSlice: MarkerSlice) {
         this.slices.set(newSlice.index, newSlice);
-        if (this.slices.size === 1) {
-            this.setCanvasImage();
-        }
     }
 
     public setScanMetadata(scanMetadata: ScanMetadata): void {

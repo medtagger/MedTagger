@@ -92,10 +92,10 @@ export class MarkerTutorialPageComponent implements OnInit {
             this.usersService.setUserSettings(this.user.id, settings).then(() => {
                 this.user.settings.skipTutorial = true;
                 sessionStorage.setItem('userInfo', JSON.stringify(this.user));
-                this.router.navigateByUrl('/labelling/choose-category');
+                this.router.navigateByUrl('/labelling/choose-task');
             });
         } else {
-            this.router.navigateByUrl('/labelling/choose-category');
+            this.router.navigateByUrl('/labelling/choose-task');
         }
     }
 }

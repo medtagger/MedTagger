@@ -1,6 +1,6 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
-import { LabelTag } from '../../model/LabelTag';
-import { LabelListItem } from '../../model/LabelListItem';
+import {Component, EventEmitter, OnInit} from '@angular/core';
+import {LabelTag} from '../../model/labels/LabelTag';
+import {LabelListItem} from '../../model/labels/LabelListItem';
 
 @Component({
     selector: 'app-label-explorer',
@@ -44,7 +44,12 @@ export class LabelExplorerComponent implements OnInit {
     }
 
     public getLabelsForTag(tag: LabelTag): Array<LabelListItem> {
-        return this.labels.filter(label => label.tag.key === tag.key);
+        let labels = this.labels.filter(label => label.tag.key === tag.key);
+        // Sorts ascending by SelectionID
+        labels = labels.sort((tagA, tagB) => tagA.selectionId - tagB.selectionId);
+        // Sorts ascending by SliceIndex (leaving order by SelectionID)
+        labels = labels.sort((tagA, tagB) => tagA.sliceIndex - tagB.sliceIndex);
+        return labels;
     }
 
     public deleteLabel(label: LabelListItem): void {
@@ -70,6 +75,17 @@ export class LabelExplorerComponent implements OnInit {
         this.addTag(tag);
         const newItem: LabelListItem = new LabelListItem(selectionId, labelSlice, tag, tool);
         this.labels.push(newItem);
+    }
+
+    public replaceExistingLabel(selectionId: number, labelSlice: number, tag: LabelTag, tool: string): void {
+        const currentLabelIndex = this.labels.findIndex(label => label.tag === tag && label.sliceIndex === labelSlice);
+        console.log('currentLabelIndex: ', currentLabelIndex);
+        if (currentLabelIndex > -1) {
+            this.labels[currentLabelIndex] = new LabelListItem(selectionId, labelSlice, tag, tool);
+            console.log('Replace existing label');
+        } else {
+            this.addLabel(selectionId, labelSlice, tag, tool);
+        }
     }
 
     private addTag(tag: LabelTag) {
