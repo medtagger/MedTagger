@@ -19,7 +19,6 @@ import {FormControl, Validators} from '@angular/forms';
 import {isUndefined} from 'util';
 import {ChainSelector} from '../../components/selectors/ChainSelector';
 import {SelectorAction} from '../../model/SelectorAction';
-import {EraserSelector} from '../../components/selectors/EraserSelector';
 import {TaskService} from '../../services/task.service';
 import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
@@ -84,7 +83,6 @@ export class MarkerPageComponent implements OnInit {
             ['POINT', new PointSelector(this.marker.getCanvas())],
             ['CHAIN', new ChainSelector(this.marker.getCanvas())],
             ['BRUSH', new BrushSelector(this.marker.getCanvas())],
-            ['ERASER', new EraserSelector(this.marker.getCanvas())]
         ]);
 
         this.marker.setSelectors(Array.from(this.selectors.values()));
