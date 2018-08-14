@@ -121,7 +121,9 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
         if (currentSelections) {
             currentSelections.forEach((selection: BrushSelection) => {
-                this.drawSelection(selection, this.getStyle().CURRENT_SELECTION_COLOR);
+                if (!selection.hidden) {
+                    this.drawSelection(selection, this.getStyle().CURRENT_SELECTION_COLOR);
+                }
             });
         }
     }
