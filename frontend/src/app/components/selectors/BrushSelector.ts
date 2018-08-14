@@ -68,7 +68,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             }
         });
 
-        if (currentSelection) {
+        if (currentSelection && (!currentSelection.hidden)) {
             this.drawSelection(currentSelection, this.STYLE.CURRENT_SELECTION_COLOR);
         }
     }
