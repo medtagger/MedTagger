@@ -1,7 +1,7 @@
 import {EventEmitter} from '@angular/core';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {SelectorAction} from '../../model/SelectorAction';
-import { LabelTag } from '../../model/LabelTag';
+import {LabelTag} from '../../model/labels/LabelTag';
 
 export interface Selector<SliceSelection> {
 
@@ -62,4 +62,6 @@ export interface Selector<SliceSelection> {
     getActions(): Array<SelectorAction>;
 
     deselect(): void;
+
+    isSingleSelectionPerSlice(): boolean;
 }

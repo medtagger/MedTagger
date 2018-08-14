@@ -20,7 +20,7 @@ const MIN_PASSWORD_LENGTH = 8;
 
 export class LoginPageComponent implements OnInit {
     LoginPageMode = LoginPageMode;  // Needed in template for comparison with Enum values
-    loginPageMode: LoginPageMode = LoginPageMode.REGISTER;
+    loginPageMode: LoginPageMode = LoginPageMode.LOG_IN;
     userForm: FormGroup;
 
     loggingInProgress: boolean;

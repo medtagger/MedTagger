@@ -1,5 +1,5 @@
 import {SelectorBase} from './SelectorBase';
-import {PointSelection} from '../../model/PointSelection';
+import {PointSelection} from '../../model/selections/PointSelection';
 import {Selector} from './Selector';
 
 export class PointSelector extends SelectorBase<PointSelection> implements Selector<PointSelection> {
@@ -32,6 +32,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         this.canvasCtx.textAlign = 'center';
         this.canvasCtx.fillText(selection.getId().toString(), scaledPointPosition.x,
             scaledPointPosition.y + this.getStyle().SELECTION_FONT_SIZE * 0.25);
+        this.canvasCtx.closePath();
     }
 
     private checkDistance(point: PointSelection, x: number, y: number) {

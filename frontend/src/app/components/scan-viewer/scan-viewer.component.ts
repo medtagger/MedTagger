@@ -5,9 +5,9 @@ import {groupBy, toArray} from 'rxjs/operators';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
 import {Selector} from '../selectors/Selector';
-import {SliceSelection} from '../../model/SliceSelection';
 import {SliceRequest} from '../../model/SliceRequest';
-import {LabelTag} from '../../model/LabelTag';
+import {SliceSelection} from '../../model/selections/SliceSelection';
+import {LabelTag} from '../../model/labels/LabelTag';
 
 @Component({
     selector: 'app-scan-viewer',
@@ -105,6 +105,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public setCurrentTagForSelector(selector: Selector<SliceSelection>, tag: LabelTag) {
+        console.log('Updating tag for selector: ', selector);
         selector.updateCurrentTag(tag);
     }
 

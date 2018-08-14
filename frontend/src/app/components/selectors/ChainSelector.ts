@@ -1,8 +1,8 @@
 import {Selector} from './Selector';
 import {SelectorBase} from './SelectorBase';
-import {ChainSelection} from '../../model/ChainSelection';
 import {Point} from '../../model/Point';
 import {SelectorAction} from '../../model/SelectorAction';
+import {ChainSelection} from '../../model/selections/ChainSelection';
 
 export class ChainSelector extends SelectorBase<ChainSelection> implements Selector<ChainSelection> {
 
