@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {ScanCategory} from '../model/ScanMetadata';
 import {environment} from '../../environments/environment';
 import {HttpClient} from '@angular/common/http';
-import {LabelTag} from '../model/LabelTag';
+import {LabelTag} from '../model/labels/LabelTag';
 
 interface AvailableCategoryResponse {
     key: string;

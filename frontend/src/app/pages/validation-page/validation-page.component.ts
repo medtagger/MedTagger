@@ -1,13 +1,13 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {LabelService} from '../../services/label.service';
-import {Label} from '../../model/Label';
+import {Label} from '../../model/labels/Label';
 import {ScanService} from '../../services/scan.service';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {SliceRequest} from '../../model/SliceRequest';
 import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
-import {ROISelection2D} from '../../model/ROISelection2D';
+import {ROISelection2D} from '../../model/selections/ROISelection2D';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 
