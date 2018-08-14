@@ -86,7 +86,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
 
     private completeSelection(isLoop: boolean) {
         if (this.selectedArea && this.selectedArea.points.length > 1) {
-            this.selectedArea.isLoop = isLoop;
+            this.selectedArea.loop = isLoop;
             this.addSelection(this.selectedArea);
         }
         this.selectedArea = undefined;
