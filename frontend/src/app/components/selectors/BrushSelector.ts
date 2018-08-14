@@ -2,11 +2,19 @@ import {SelectorBase} from './SelectorBase';
 import {Selector} from './Selector';
 import {BrushSelection} from '../../model/selections/BrushSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
+import {SelectorAction} from '../../model/SelectorAction';
+
+export enum BrushMode {
+    BRUSH,
+    ERASER
+}
 
 export class BrushSelector extends SelectorBase<BrushSelection> implements Selector<BrushSelection> {
     protected canvas: HTMLCanvasElement;
     protected mouseDrag = false;
-    private lastTagDrawings: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
+    protected lastTagDrawings: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
+    private mode: BrushMode = BrushMode.BRUSH;
+    private actions: Array<SelectorAction>;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -17,17 +25,60 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.selectedArea = undefined;
         this.currentSlice = undefined;
         this.singleSelectionPerSlice = true;
+
+        this.actions = [
+            new SelectorAction('Eraser', () => !!this.lastTagDrawings[this.getSelectingContext()], () => {
+                this.changeSelectorMode(BrushMode.ERASER);
+                this.deactivateOtherActions('Eraser');
+            }, false),
+            new SelectorAction('Brush', () => true, () => {
+                this.changeSelectorMode(BrushMode.BRUSH);
+                this.deactivateOtherActions('Brush');
+            }, true)
+        ];
         console.log('BrushSelector created!');
     }
 
     protected getStyle(): any {
-        return {
-            ...super.getStyle(),
-            LINE_WIDTH: 10,
-            LINE_LINKS: 'round',
-            SELECTION_FONT_COLOR: '#ffffff',
-            GLOBAL_COMPOSITE_OPERATION: 'source-over'
-        };
+        if (this.mode === BrushMode.BRUSH) {
+            return {
+                ...super.getStyle(),
+                LINE_WIDTH: 10,
+                LINE_LINKS: 'round',
+                SELECTION_FONT_COLOR: '#ffffff',
+                DRAWING_COMPOSITE_OPERATION: 'source-over',
+                SAVING_COMPOSITE_OPERATION: 'source-over'
+            };
+        } else if (this.mode === BrushMode.ERASER) {
+            return {
+                ...super.getStyle(),
+                LINE_WIDTH: 10,
+                LINE_LINKS: 'square',
+                CURRENT_SELECTION_COLOR: 'rgba(0,0,0,1)',
+                OTHER_SELECTION_COLOR: 'rgba(0,0,0,1)',
+                ARCHIVED_SELECTION_COLOR: 'rgba(0,0,0,1)',
+                DRAWING_COMPOSITE_OPERATION: 'destination-out',
+                SAVING_COMPOSITE_OPERATION: 'source-over'
+            };
+        } else {
+            console.error('Error: wrong selector mode: ', this.mode);
+        }
+    }
+
+    public getActions(): Array<SelectorAction> {
+        return this.actions;
+    }
+
+    public deactivateOtherActions(currentAction: string): void {
+        this.actions.forEach(action => {
+            if (action.name !== currentAction && action.isActive !== undefined) {
+                action.isActive = false;
+            }
+        });
+    }
+
+    public changeSelectorMode(newMode: BrushMode): void {
+        this.mode = newMode;
     }
 
     drawSelection(selection: BrushSelection, color: string): any {
@@ -37,7 +88,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             this.canvasCtx.drawImage(selectionLayerImage, 0, 0, this.canvasSize.width, this.canvasSize.height);
 
             // Recoloring of original selection
-            if (color === this.getStyle().OTHER_SELECTION_COLOR) {
+            if (selection.sliceIndex !== this.currentSlice) {
                 this.canvasCtx.fillStyle = color;
                 this.canvasCtx.globalCompositeOperation = 'source-in';
                 this.canvasCtx.fillRect(0, 0, this.canvasSize.width, this.canvasSize.height);
@@ -102,6 +153,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.canvasCtx.lineJoin = this.getStyle().LINE_LINKS;
         this.canvasCtx.lineCap = this.getStyle().LINE_LINKS;
         this.canvasCtx.strokeStyle = this.getStyle().CURRENT_SELECTION_COLOR;
+        this.canvasCtx.globalCompositeOperation = this.getStyle().DRAWING_COMPOSITE_OPERATION;
 
         this.canvasCtx.beginPath();
         this.canvasCtx.moveTo(x, y);
@@ -121,6 +173,9 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     onMouseUp(event: MouseEvent): void {
         if (this.mouseDrag) {
             console.log('BrushSelector | onUp | event: ', event);
+
+            this.canvasCtx.globalCompositeOperation = this.getStyle().SAVING_COMPOSITE_OPERATION;
+
             this.mouseDrag = false;
             this.canvasCtx.closePath();
 
