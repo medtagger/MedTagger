@@ -104,13 +104,13 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     drawSelections(): any {
         console.log('BrushSelector | drawSelections | selection: ', this.selections);
 
-        let currentSelection: BrushSelection;
+        const currentSelections: Array<BrushSelection> = [];
 
         this.getSelections().forEach((selection: BrushSelection) => {
             let color: string;
             const isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
             if (isCurrent) {
-                currentSelection = selection;
+                currentSelections.push(selection);
             } else {
                 color = this.getStyle().OTHER_SELECTION_COLOR;
             }
@@ -119,8 +119,10 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             }
         });
 
-        if (currentSelection) {
-            this.drawSelection(currentSelection, this.getStyle().CURRENT_SELECTION_COLOR);
+        if (currentSelections) {
+            currentSelections.forEach((selection: BrushSelection) => {
+                this.drawSelection(selection, this.getStyle().CURRENT_SELECTION_COLOR);
+            });
         }
     }
 
