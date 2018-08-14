@@ -79,9 +79,21 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.hookUpStateChangeSubscription();
     }
 
+    public getCurrentSelector(): Selector<any> {
+        return this.currentSelector;
+    }
+
     public setCurrentSelector(selector: Selector<any>) {
         this.currentSelector = selector;
-        super.setCurrentTagForSelector(this.currentSelector, this.currentTag);
+        this.updateTagForCurrentSelector(this.currentTag);
+    }
+
+    public updateTagForCurrentSelector(tag: LabelTag): void {
+        super.setCurrentTagForSelector(this.currentSelector, tag);
+    }
+
+    public clearCurrentSelector() {
+        this.currentSelector = undefined;
     }
 
     public setCurrentTag(tag: LabelTag) {
@@ -95,6 +107,14 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setDownloadSlicesInProgress(isInProgress: boolean) {
         this.downloadingSlicesInProgress = isInProgress;
+    }
+
+    public selectMiddleSlice(): void {
+        const slicesCount = this.slider.max - this.slider.min + 1;
+        const middleSliceNumber = this.slider.min + Math.floor(slicesCount / 2) - 1;
+        this.slider.value = middleSliceNumber;
+        this.changeMarkerImage(middleSliceNumber);
+        this.drawSelections();
     }
 
     public removeAllSelectionsOnCurrentSlice(): void {
@@ -223,21 +243,34 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                 this.snackBar.open('Please select Tool to start labeling.', '', {duration: 2000});
                 return;
             }
-            if (this.currentSelector.onMouseDown(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseDown(mouseEvent);
             }
         };
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            if (this.currentSelector && this.currentSelector.onMouseUp(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseUp(mouseEvent);
             }
         };
 
         this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
-            if (this.currentSelector && this.currentSelector.onMouseMove(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseMove(mouseEvent);
+            }
+        };
+
+        this.canvas.onwheel = (wheelEvent: WheelEvent) => {
+            const sliderValue = wheelEvent.deltaY > 0 ? this.slider.value - 1 : this.slider.value + 1;
+
+            if (sliderValue >= this.slider.min && sliderValue <= this.slider.max) {
+                this.selectors.forEach((selector) => selector.updateCurrentSlice(sliderValue));
+                this.requestSlicesIfNeeded(sliderValue);
+
+                this.changeMarkerImage(sliderValue);
+
+                this.drawSelections();
             }
         };
     }

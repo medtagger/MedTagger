@@ -50,7 +50,10 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     protected selectors: Array<Selector<SliceSelection>>;
     protected _currentTag;
 
+    focusable: boolean;
+
     constructor() {
+        this.focusable = true;
     }
 
     @HostListener('window:resize', ['$event'])
@@ -72,7 +75,21 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public sliderFocus() {
-        this.slider._elementRef.nativeElement.focus();
+        if (this.focusable) {
+            // setTimeout() fixes slider focus issues in IE/Firefox
+            window.setTimeout(() => {
+              this.slider._elementRef.nativeElement.focus();
+            }, 10);
+        }
+    }
+
+    public setFocusable(focusable: boolean) {
+        this.focusable = focusable;
+        if (!this.focusable) {
+            this.slider._elementRef.nativeElement.focus();
+        } else {
+            this.slider._elementRef.nativeElement.blur();
+        }
     }
 
     public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {
@@ -88,6 +105,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     public setCurrentTagForSelector(selector: Selector<SliceSelection>, tag: LabelTag) {
+        console.log('Updating tag for selector: ', selector);
         selector.updateCurrentTag(tag);
     }
 
@@ -155,9 +173,6 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     protected addSlice(newSlice: MarkerSlice) {
         this.slices.set(newSlice.index, newSlice);
-        if (this.slices.size === 1) {
-            this.setCanvasImage();
-        }
     }
 
     public setScanMetadata(scanMetadata: ScanMetadata): void {
@@ -285,7 +300,6 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     protected redrawSelections(): void {
-        console.log('ScanViewer | Redrawing selections (clean and draw)');
         this.clearCanvasSelections();
         this.drawSelections();
     }

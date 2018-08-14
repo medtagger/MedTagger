@@ -26,6 +26,8 @@ export class LoginPageComponent implements OnInit {
     loggingInProgress: boolean;
     loggingInError: boolean;
     registrationInProgress: boolean;
+    loginPasswordVisible = false;
+    registerPasswordVisible = false;
 
     constructor(private routerService: Router, private accountService: AccountService) {
     }
@@ -75,12 +77,24 @@ export class LoginPageComponent implements OnInit {
 
     public changePageMode(): void {
         this.userForm.reset();
+        this.loginPasswordVisible = false;
+        this.registerPasswordVisible = false;
         if (this.loginPageMode === LoginPageMode.LOG_IN) {
             this.loginPageMode = LoginPageMode.REGISTER;
             this.resetLogin();
         } else if (this.loginPageMode === LoginPageMode.REGISTER) {
             this.loginPageMode = LoginPageMode.LOG_IN;
             this.resetRegistration();
+        } else {
+            console.error('Unsupported login page mode!');
+        }
+    }
+
+    public changeVisibility(): void {
+        if (this.loginPageMode === LoginPageMode.LOG_IN) {
+            this.loginPasswordVisible = !this.loginPasswordVisible;
+        } else if (this.loginPageMode === LoginPageMode.REGISTER) {
+            this.registerPasswordVisible = !this.registerPasswordVisible;
         } else {
             console.error('Unsupported login page mode!');
         }

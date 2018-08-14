@@ -13,7 +13,7 @@ from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, Lab
     LabelElementStatus, LabelTool
 from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime, LabelTagID, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
-    ActionResponseID, SurveyResponseID, PointID
+    ActionResponseID, SurveyResponseID, PointID, TaskID
 
 #########################
 #
@@ -91,6 +91,11 @@ class UserSettings(Base):
         self.skip_tutorial = False
 
 
+scan_categories_tasks = Table('ScanCategories_Tasks', Base.metadata,
+                              Column('scan_category_id', Integer, ForeignKey('ScanCategories.id'), nullable=False),
+                              Column('task_id', Integer, ForeignKey('Tasks.id'), nullable=False))
+
+
 class ScanCategory(Base):
     """Definition of a Scan Category."""
 
@@ -98,15 +103,42 @@ class ScanCategory(Base):
     id: int = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
-    image_path: str = Column(String(100), nullable=False)
 
-    available_tags: List['LabelTag'] = relationship("LabelTag", back_populates="scan_category")
+    tasks: List['Task'] = relationship('Task', back_populates='scan_categories', secondary=scan_categories_tasks)
 
-    def __init__(self, key: str, name: str, image_path: str) -> None:
+    def __init__(self, key: str, name: str) -> None:
         """Initialize Scan Category.
 
         :param key: unique key representing Scan Category
         :param name: name which describes this Category
+        """
+        self.key = key
+        self.name = name
+
+    def __repr__(self) -> str:
+        """Return string representation for Scan Category."""
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
+
+
+class Task(Base):
+    """Describe what user should mark on Scans in given Categories."""
+
+    __tablename__ = 'Tasks'
+    id: TaskID = Column(Integer, autoincrement=True, primary_key=True)
+    key: str = Column(String(50), nullable=False, unique=True)
+    name: str = Column(String(100), nullable=False)
+    image_path: str = Column(String(100), nullable=False)
+
+    scan_categories: List[ScanCategory] = relationship('ScanCategory', back_populates='tasks',
+                                                       secondary=scan_categories_tasks)
+
+    available_tags: List['LabelTag'] = relationship("LabelTag", back_populates="task")
+
+    def __init__(self, key: str, name: str, image_path: str) -> None:
+        """Initialize Task.
+
+        :param key: unique key representing Task
+        :param name: name which describes this Task
         :param image_path: path to the image which is located on the frontend
         """
         self.key = key
@@ -114,7 +146,7 @@ class ScanCategory(Base):
         self.image_path = image_path
 
     def __repr__(self) -> str:
-        """Return string representation for Scan Category."""
+        """Return string representation for Task."""
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
 
 
@@ -276,9 +308,11 @@ class Label(Base):
     __tablename__ = 'Labels'
     id: LabelID = Column(String, primary_key=True)
     scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
-    labeling_time: LabelingTime = Column(Float, nullable=True)
-
     scan: Scan = relationship('Scan', back_populates='labels')
+    task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
+    task: Task = relationship('Task')
+
+    labeling_time: LabelingTime = Column(Float, nullable=True)
 
     elements: List['LabelElement'] = relationship('LabelElement', back_populates='label')
 
@@ -288,7 +322,9 @@ class Label(Base):
     status: LabelVerificationStatus = Column(Enum(LabelVerificationStatus), nullable=False,
                                              server_default=LabelVerificationStatus.NOT_VERIFIED.value)
 
-    def __init__(self, user: User, labeling_time: LabelingTime) -> None:
+    comment: Optional[str] = Column(String, nullable=True)
+
+    def __init__(self, user: User, labeling_time: LabelingTime, comment: str = None) -> None:
         """Initialize Label.
 
         By default all of the labels are not verified
@@ -297,11 +333,12 @@ class Label(Base):
         self.owner = user
         self.labeling_time = labeling_time
         self.status = LabelVerificationStatus.NOT_VERIFIED
+        self.comment = comment
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
-        return '<{}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id,
-                                           self.labeling_time, self.owner)
+        return '<{}: {}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.task_id,
+                                                  self.labeling_time, self.owner, self.comment)
 
     def update_status(self, status: LabelVerificationStatus) -> 'Label':
         """Update Label's verification status.
@@ -322,8 +359,8 @@ class LabelTag(Base):
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
 
-    scan_category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
-    scan_category: ScanCategory = relationship('ScanCategory', back_populates="available_tags")
+    task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
+    task: Task = relationship('Task', back_populates="available_tags")
 
     tools: List[LabelTool] = Column(ArrayOfEnum(Enum(LabelTool, name='label_tool', create_constraint=False)))
     actions: List['Action'] = relationship('Action', back_populates='label_tag')

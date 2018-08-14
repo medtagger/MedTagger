@@ -2,12 +2,13 @@
 import json
 from typing import Any
 
+from medtagger.repositories import tasks as TasksRepository
 from medtagger.storage.models import BrushLabelElement
 from medtagger.definitions import LabelTool
 
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
-from tests.functional_tests.helpers import create_tag_and_assign_to_category
+from tests.functional_tests.helpers import create_tag_and_assign_to_task
 
 
 def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> None:
@@ -24,7 +25,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Brush
-    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.BRUSH])
+    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.BRUSH])
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -35,13 +36,14 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
             'tool': LabelTool.BRUSH.value,
         }],
         'labeling_time': 12.34,
+        'task_id': TasksRepository.get_task_by_key('MARK_KIDNEYS').id,
     }
     with open('tests/assets/example_labels/binary_mask.png', 'rb') as image:
         data = {
             'label': json.dumps(payload),
             'SLICE_1': (image, 'slice_1'),
         }
-        response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=data,
+        response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id), data=data,
                                    headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -73,8 +75,8 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
 
-    # Step 2. Label it with Point
-    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.POINT])
+    # Step 2. Label it with Point Tool
+    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.POINT])
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -88,7 +90,7 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     data = {
         'label': json.dumps(payload),
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=data,
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id), data=data,
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -121,7 +123,7 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Chain Tool
-    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.CHAIN])
+    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.CHAIN])
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -144,7 +146,7 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
     data = {
         'label': json.dumps(payload),
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=data,
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id), data=data,
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -180,7 +182,7 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
     scan_id = json_response['scan_id']
 
     # Step 2. Label it with Chain Tool
-    create_tag_and_assign_to_category('EXAMPLE_TAG', 'Example tag', 'KIDNEYS', [LabelTool.CHAIN])
+    create_tag_and_assign_to_task('EXAMPLE_TAG', 'Example tag', 'MARK_KIDNEYS', [LabelTool.CHAIN])
     payload = {
         'elements': [{
             'slice_index': 0,
@@ -199,6 +201,6 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
     data = {
         'label': json.dumps(payload),
     }
-    response = api_client.post('/api/v1/scans/{}/label'.format(scan_id), data=data,
+    response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id), data=data,
                                headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 400

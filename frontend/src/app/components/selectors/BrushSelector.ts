@@ -6,6 +6,7 @@ import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 export class BrushSelector extends SelectorBase<BrushSelection> implements Selector<BrushSelection> {
     protected canvas: HTMLCanvasElement;
     protected mouseDrag = false;
+    private lastTagDrawings: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -34,6 +35,15 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
         selection.getSelectionLayer().then((selectionLayerImage: HTMLImageElement) => {
             this.canvasCtx.drawImage(selectionLayerImage, 0, 0, this.canvasSize.width, this.canvasSize.height);
+
+            // Recoloring of original selection
+            if (color === this.getStyle().OTHER_SELECTION_COLOR) {
+                this.canvasCtx.fillStyle = color;
+                this.canvasCtx.globalCompositeOperation = 'source-in';
+                this.canvasCtx.fillRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+                this.canvasCtx.globalCompositeOperation = 'source-over';
+            }
+
         }, (error: Error) => {
             console.error('Error while drawing brush selections!: ', error);
         });
@@ -42,18 +52,25 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     drawSelections(): any {
         console.log('BrushSelector | drawSelections | selection: ', this.selections);
+
+        let currentSelection: BrushSelection;
+
         this.getSelections().forEach((selection: BrushSelection) => {
             let color: string;
             const isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
             if (isCurrent) {
-                color = this.getStyle().CURRENT_SELECTION_COLOR;
+                currentSelection = selection;
             } else {
                 color = this.getStyle().OTHER_SELECTION_COLOR;
             }
-            if ((selection.pinned || isCurrent) && (!selection.hidden)) {
+            if ((selection.pinned) && (!selection.hidden)) {
                 this.drawSelection(selection, color);
             }
         });
+
+        if (currentSelection) {
+            this.drawSelection(currentSelection, this.getStyle().CURRENT_SELECTION_COLOR);
+        }
     }
 
     formArchivedSelections(selectionMap: Array<BrushSelection>): Array<BrushSelection> {
@@ -64,7 +81,19 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         return selectionMap;
     }
 
-    onMouseDown(event: MouseEvent): boolean {
+    onMouseDown(event: MouseEvent): void {
+        console.log('BrushSelector | onMouseDown | event: ', event);
+
+        // starting new brush selection needs temporary canvas clear
+        this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+
+        const lastDrawing = this.lastTagDrawings[this.getSelectingContext()];
+
+        if (!!lastDrawing) {
+            this.canvasCtx.drawImage(lastDrawing, 0, 0,
+                this.canvasSize.width, this.canvasSize.height);
+        }
+
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
 
@@ -76,38 +105,58 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
         this.canvasCtx.beginPath();
         this.canvasCtx.moveTo(x, y);
-
-        return false;
     }
 
-    onMouseMove(event: MouseEvent): boolean {
+    onMouseMove(event: MouseEvent): void {
         if (this.mouseDrag) {
+            console.log('BrushSelector | onMove | event: ', event);
             const x = (event.clientX) - this.canvasPosition.left;
             const y = (event.clientY) - this.canvasPosition.top;
 
             this.canvasCtx.lineTo(x, y);
-            this.canvasCtx.globalCompositeOperation = this.getStyle().GLOBAL_COMPOSITE_OPERATION;
             this.canvasCtx.stroke();
         }
-        return false;
     }
 
-    onMouseUp(event: MouseEvent): boolean {
+    onMouseUp(event: MouseEvent): void {
         if (this.mouseDrag) {
+            console.log('BrushSelector | onUp | event: ', event);
             this.mouseDrag = false;
             this.canvasCtx.closePath();
 
             // when canvas is cleared, we have only our brush selection in canvas
-            const selectionImage: string = this.canvas.toDataURL();
-            this.selectedArea = new BrushSelection(selectionImage, this.currentSlice);
+            const selectionImageURL: string = this.canvas.toDataURL();
+            this.selectedArea = new BrushSelection(selectionImageURL, this.currentSlice, this.currentTag.name);
 
-            this.selections.set(this.currentSlice, [this.selectedArea]);
+            this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
+                this.lastTagDrawings[this.getSelectingContext()] = image;
 
-            this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
-            this.selectedArea = undefined;
-            return true;
+                const currentSliceSelections = this.selections.get(this.currentSlice);
+
+                if (currentSliceSelections) {
+                    const labelTagSelectionIndex: number = currentSliceSelections.findIndex(
+                        (selection: BrushSelection) => selection.label_tag === this.currentTag.name
+                    );
+
+                    if (labelTagSelectionIndex > -1) {
+                        currentSliceSelections[labelTagSelectionIndex] = this.selectedArea;
+                    } else {
+                        currentSliceSelections.push(this.selectedArea);
+                    }
+                } else {
+                    this.selections.set(this.currentSlice, [this.selectedArea]);
+                }
+
+                this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
+                this.selectedArea = undefined;
+                this.requestRedraw();
+            });
         }
-        return false;
+    }
+
+    // To differentiate selections by tags and slices
+    private getSelectingContext(): string {
+        return this.currentTag.name + this.currentSlice;
     }
 
     getSelectorName(): string {
