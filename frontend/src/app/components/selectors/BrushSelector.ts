@@ -5,8 +5,8 @@ import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {SelectorAction} from '../../model/SelectorAction';
 
 export enum BrushMode {
-    BRUSH,
-    ERASER
+    BRUSH = 'Brush',
+    ERASER = 'Eraser'
 }
 
 export class BrushSelector extends SelectorBase<BrushSelection> implements Selector<BrushSelection> {
@@ -27,13 +27,13 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.singleSelectionPerSlice = true;
 
         this.actions = [
-            new SelectorAction('Eraser', () => !!this.lastTagDrawings[this.getSelectingContext()], () => {
+            new SelectorAction(BrushMode.ERASER, () => !!this.lastTagDrawings[this.getSelectingContext()], () => {
                 this.changeSelectorMode(BrushMode.ERASER);
-                this.deactivateOtherActions('Eraser');
+                this.deactivateOtherActions(BrushMode.ERASER);
             }, false),
-            new SelectorAction('Brush', () => true, () => {
+            new SelectorAction(BrushMode.BRUSH, () => true, () => {
                 this.changeSelectorMode(BrushMode.BRUSH);
-                this.deactivateOtherActions('Brush');
+                this.deactivateOtherActions(BrushMode.BRUSH);
             }, true)
         ];
         console.log('BrushSelector created!');
@@ -71,8 +71,8 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     public deactivateOtherActions(currentAction: string): void {
         this.actions.forEach(action => {
-            if (action.name !== currentAction && action.isActive !== undefined) {
-                action.isActive = false;
+            if (action.isActive !== undefined) {
+                action.isActive = action.name === currentAction;
             }
         });
     }
@@ -208,6 +208,16 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
                 this.selectedArea = undefined;
                 this.requestRedraw();
             });
+        }
+    }
+
+    public updateCurrentSlice(currentSliceId: number): any {
+        super.updateCurrentSlice(currentSliceId);
+
+        // Changing mode to avoid situation when we are in eraser mode on slice that lacks brush selection
+        if (this.mode === BrushMode.ERASER && !this.lastTagDrawings[this.getSelectingContext()]) {
+            this.changeSelectorMode(BrushMode.BRUSH);
+            this.deactivateOtherActions(BrushMode.BRUSH);
         }
     }
 
