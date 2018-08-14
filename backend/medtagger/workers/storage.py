@@ -44,9 +44,8 @@ def parse_dicom_and_update_slice(slice_id: SliceID) -> None:
 
     except RuntimeError:
         logger.error('User sent a file that is not a DICOM.')
-        SlicesRepository.delete_slice_by_id(_slice.id)
-        ScansRepository.reduce_number_of_declared_slices(_slice.scan_id)
         os.unlink(temp_file.name)
+        SlicesRepository.delete_slice(_slice)
         trigger_scan_conversion_if_needed(_slice.scan_id)
         return
 
