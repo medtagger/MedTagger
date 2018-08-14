@@ -3,6 +3,7 @@ import {environment} from '../../environments/environment';
 import {Task} from '../model/Task';
 import {HttpClient} from '@angular/common/http';
 import {LabelTag} from '../model/labels/LabelTag';
+import {isUndefined} from 'util';
 
 export interface TaskResponse {
     task_id: number;
@@ -27,7 +28,7 @@ export class TaskService {
     constructor(private http: HttpClient) { }
 
     getTask(taskKey: string): Promise<Task> {
-        if (taskKey == null) {
+        if (isUndefined(taskKey)) {
             return Promise.reject('TaskService | getTask | error: Task key was not found as a query parameter.');
         }
         if (this.tasks.length > 0) {

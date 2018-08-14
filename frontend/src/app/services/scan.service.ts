@@ -15,6 +15,7 @@ import {from} from 'rxjs/internal/observable/from';
 import {defer} from 'rxjs/internal/observable/defer';
 import {Task} from '../model/Task';
 import {TaskResponse} from './task.service';
+import {isUndefined} from 'util';
 
 interface ScanResponse {
     scan_id: string;
@@ -71,8 +72,8 @@ export class ScanService {
     }
 
     public getRandomScan(taskKey: string): Promise<ScanMetadata> {
-        if (taskKey == null) {
-            return Promise.reject('ScanService | getRandomScan | error: Task key is null!');
+        if (isUndefined(taskKey)) {
+            return Promise.reject('ScanService | getRandomScan | error: Task key is undefined!');
         }
         return new Promise((resolve, reject) => {
             let params = new HttpParams();
