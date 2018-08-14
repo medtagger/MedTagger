@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 
 import {environment} from '../../environments/environment';
-import {Label} from '../model/Label';
+import {Label} from '../model/labels/Label';
 import {HttpClient} from '@angular/common/http';
-import {SliceSelection} from '../model/SliceSelection';
+import {SliceSelection} from '../model/selections/SliceSelection';
 
 interface RandomLabelResponse {
     label_id: string;
@@ -12,6 +12,7 @@ interface RandomLabelResponse {
     status: string;
     selections: Array<SliceSelection>;
     labeling_time: number;
+    comment: string;
 }
 
 @Injectable()
@@ -25,7 +26,7 @@ export class LabelService {
                 response => {
                     console.log('LabelsService | getRandomLabel | response: ', response);
                     resolve(new Label(response.label_id, response.scan_id, response.status,
-                                      selectionConverter(response.selections), response.labeling_time));
+                                      selectionConverter(response.selections), response.labeling_time, response.comment));
                 },
                 error => {
                     console.log('LabelsService | getRandomLabel | error: ', error);

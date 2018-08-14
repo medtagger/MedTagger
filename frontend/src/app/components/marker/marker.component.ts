@@ -3,16 +3,16 @@ import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
-import {SliceSelection} from '../../model/SliceSelection';
 import {SliceRequest} from '../../model/SliceRequest';
+import {SliceSelection} from '../../model/selections/SliceSelection';
 import {LabelExplorerComponent} from '../label-explorer/label-explorer.component';
-import {LabelListItem} from '../../model/LabelListItem';
+import {LabelListItem} from '../../model/labels/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from '../selectors/Selector';
 import {Subscription} from 'rxjs/Subscription';
-import {LabelTag} from '../../model/LabelTag';
-import { isUndefined } from 'util';
+import {isUndefined} from 'util';
 import {MatSnackBar} from '@angular/material';
+import {LabelTag} from '../../model/labels/LabelTag';
 
 @Component({
     selector: 'app-marker-component',
@@ -61,7 +61,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         super();
 
         this.redrawRequestEmitter.subscribe(() => {
-           this.redrawSelections();
+            this.redrawSelections();
         });
     }
 
@@ -79,9 +79,21 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.hookUpStateChangeSubscription();
     }
 
+    public getCurrentSelector(): Selector<any> {
+        return this.currentSelector;
+    }
+
     public setCurrentSelector(selector: Selector<any>) {
         this.currentSelector = selector;
-        super.setCurrentTagForSelector(this.currentSelector, this.currentTag);
+        this.updateTagForCurrentSelector(this.currentTag);
+    }
+
+    public updateTagForCurrentSelector(tag: LabelTag): void {
+        super.setCurrentTagForSelector(this.currentSelector, tag);
+    }
+
+    public clearCurrentSelector() {
+        this.currentSelector = undefined;
     }
 
     public setCurrentTag(tag: LabelTag) {
@@ -149,11 +161,17 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                     } else {
                         console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
                             selection.selectionId);
-                        this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTag,
-                            this.currentSelector.getSelectorName());
+                        const selectorName: string = this.currentSelector.getSelectorName();
+                        if (this.currentSelector.isSingleSelectionPerSlice()) {
+                            this.labelExplorer.replaceExistingLabel(selection.selectionId, selection.sliceId,
+                                this.currentTag, selectorName);
+                        } else {
+                            this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTag,
+                                selectorName);
+                        }
                     }
                 }
-        }));
+            }));
     }
 
     private hookUpExplorerLabelChangeSubscription(): void {
@@ -225,21 +243,21 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                 this.snackBar.open('Please select Tool to start labeling.', '', {duration: 2000});
                 return;
             }
-            if (this.currentSelector.onMouseDown(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseDown(mouseEvent);
             }
         };
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            if (this.currentSelector && this.currentSelector.onMouseUp(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseUp(mouseEvent);
             }
         };
 
         this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
-            if (this.currentSelector && this.currentSelector.onMouseMove(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseMove(mouseEvent);
             }
         };
 

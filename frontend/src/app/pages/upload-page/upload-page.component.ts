@@ -116,9 +116,15 @@ export class UploadPageComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.chooseModeFormGroup = this.formBuilder.group({});
-        this.chooseFilesFormGroup = this.formBuilder.group({});
-        this.sendingFilesFormGroup = this.formBuilder.group({});
+        this.chooseModeFormGroup = this.formBuilder.group({
+            'modeChosen': new FormControl(null, [Validators.required]),
+        });
+        this.chooseFilesFormGroup = this.formBuilder.group({
+            'filesChosen': new FormControl(null, [Validators.required]),
+        });
+        this.sendingFilesFormGroup = this.formBuilder.group({
+            'filesSent': new FormControl(null, [Validators.required]),
+        });
         this.uploadCompletedFormGroup = this.formBuilder.group({});
         this.chooseCategoryFormGroup = this.formBuilder.group({
             'category': new FormControl(this.category, [Validators.required]),
@@ -180,12 +186,16 @@ export class UploadPageComponent implements OnInit {
             if (this.errorScans.length + this.availableScans.length === this.scans.length) {
                 console.log('We\'ve uploaded all Scans, let\'s move on!');
                 subscription.unsubscribe();
+                this.sendingFilesFormGroup.controls['filesSent'].setValue('true');
                 this.stepper.next();
             }
         });
     }
 
     public async uploadFiles(): Promise<void> {
+        this.chooseFilesFormGroup.controls['filesChosen'].setValue('true');
+        this.stepper.next();
+
         this.slicesSent = 0;
         this.progress = 0.0;
 
@@ -254,11 +264,6 @@ export class UploadPageComponent implements OnInit {
 
     private resetFormGroup(formGroup: FormGroup): void {
         formGroup.reset();
-        formGroup.markAsUntouched();
-        Object.keys(formGroup.controls).forEach((name) => {
-            const control = formGroup.controls[name];
-            control.setErrors(null);
-        });
     }
 
     public restart(): void {
@@ -285,14 +290,10 @@ export class UploadPageComponent implements OnInit {
         this.totalNumberOfSlices = 0;
         this.slicesSent = 0;
 
-        this.chooseModeStep.completed = false;
-        this.chooseFilesStep.completed = false;
-        this.sendingFilesStep.completed = false;
-        this.uploadCompletedStep.completed = false;
         if (!!this.scansForRetry && !!this.scansForRetry.selectedOptions) {
             this.scansForRetry.selectedOptions.clear();
         }
-        this.stepper.selectedIndex = UploadStep.SELECT_CATEGORY;
+        this.stepper.reset();
     }
 
     public uploadAgain(): void {
@@ -337,5 +338,11 @@ export class UploadPageComponent implements OnInit {
         } else {
             return false;
         }
+    }
+
+    public selectUploadMode(uploadMode: UploadMode): void {
+        this.uploadMode = uploadMode;
+        this.chooseModeFormGroup.controls['modeChosen'].setValue('true');
+        this.stepper.next();
     }
 }

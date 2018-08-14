@@ -6,8 +6,8 @@ import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
-import {ScanSelection} from '../model/ScanSelection';
-import {SliceSelection} from '../model/SliceSelection';
+import {ScanSelection} from '../model/selections/ScanSelection';
+import {SliceSelection} from '../model/selections/SliceSelection';
 import {MedTaggerWebSocket} from './websocket.service';
 import {concat, delay, flatMap, map, mergeAll, retryWhen, take} from 'rxjs/operators';
 import {of} from 'rxjs/internal/observable/of';
@@ -49,13 +49,14 @@ export class ScanService {
         this.websocket = socket;
     }
 
-    public sendSelection(scanId: string, taskKey: string, selection: ScanSelection<SliceSelection>, labelingTime: number)
-        : Promise<Response> {
+    public sendSelection(scanId: string, taskKey: string, selection: ScanSelection<SliceSelection>, labelingTime: number,
+                         comment: string): Promise<Response> {
         console.log('ScanService | send3dSelection | sending ROI:',
             selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
 
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
+        payload['comment'] = comment;
         const form = new FormData();
         form.append('label', JSON.stringify(payload));
         return new Promise((resolve, reject) => {

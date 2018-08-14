@@ -5,23 +5,24 @@ import {ScanService} from '../../services/scan.service';
 import {MarkerComponent} from '../../components/marker/marker.component';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
-import {ROISelection3D} from '../../model/ROISelection3D';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
-import {ROISelection2D} from '../../model/ROISelection2D';
 import {SliceRequest} from '../../model/SliceRequest';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 import {MatSnackBar} from '@angular/material';
-import {LabelTag} from '../../model/LabelTag';
+import {LabelTag} from '../../model/labels/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
+import {BrushSelector} from '../../components/selectors/BrushSelector';
 import {ChainSelector} from '../../components/selectors/ChainSelector';
 import {SelectorAction} from '../../model/SelectorAction';
 import {FormControl, Validators} from '@angular/forms';
 import {TaskService} from '../../services/task.service';
 import {isUndefined} from 'util';
 import {Task} from '../../model/Task';
+import {ROISelection2D} from '../../model/selections/ROISelection2D';
+import {Selection3D} from '../../model/selections/Selection3D';
 
 
 @Component({
@@ -45,11 +46,13 @@ export class MarkerPageComponent implements OnInit {
     selectors: Map<string, Selector<any>>;
     taskTags: FormControl;
     selectorActions: Array<SelectorAction> = [];
+    labelComment: string;
     isInitialSliceLoad: boolean;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar, private taskService: TaskService) {
         console.log('MarkerPage constructor', this.marker);
+        this.labelComment = '';
         this.isInitialSliceLoad = true;
     }
 
@@ -79,7 +82,8 @@ export class MarkerPageComponent implements OnInit {
         this.selectors = new Map<string, Selector<any>>([
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
             ['POINT', new PointSelector(this.marker.getCanvas())],
-            ['CHAIN', new ChainSelector(this.marker.getCanvas())]
+            ['CHAIN', new ChainSelector(this.marker.getCanvas())],
+            ['BRUSH', new BrushSelector(this.marker.getCanvas())]
         ]);
 
         this.marker.setSelectors(Array.from(this.selectors.values()));
@@ -94,17 +98,17 @@ export class MarkerPageComponent implements OnInit {
                 this.lastSliceID = slice.index;
             }
             this.marker.feedData(slice);
-            if (this.marker.downloadingScanInProgress === true) {
-                this.indicateNewScanAppeared();
-            }
             if (slice.isLastInBatch()) {
+                if (this.marker.downloadingScanInProgress === true) {
+                    this.indicateNewScanAppeared();
+                }
                 if (this.isInitialSliceLoad === true) {
                     this.marker.selectMiddleSlice();
                     this.isInitialSliceLoad = false;
                 }
                 this.marker.setDownloadSlicesInProgress(false);
+                this.marker.setDownloadScanInProgress(false);
             }
-            this.marker.setDownloadScanInProgress(false);
         });
 
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
@@ -174,18 +178,18 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
-        this.sendSelection(new ROISelection3D(<ROISelection2D[]>this.marker.get3dSelection()));
+        this.sendSelection(new Selection3D(<ROISelection2D[]>this.marker.get3dSelection()), this.labelComment);
     }
 
     public sendEmptyLabel(): void {
-        this.sendSelection(new ROISelection3D());
+        this.sendSelection(new Selection3D(), 'This is an empty Label');
         this.nextScan();
     }
 
-    private sendSelection(roiSelection: ROISelection3D) {
+    private sendSelection(roiSelection: Selection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
 
-        this.scanService.sendSelection(this.scan.scanId, this.task.key, roiSelection, labelingTime)
+        this.scanService.sendSelection(this.scan.scanId, this.task.key, roiSelection, labelingTime, comment)
             .then((response: Response) => {
                 console.log('MarkerPage | sendSelection | success!');
                 this.indicateLabelHasBeenSend();
@@ -219,6 +223,11 @@ export class MarkerPageComponent implements OnInit {
         this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
     }
 
+    public isCurrentSelector(selectorName: string): boolean {
+        const currentSelector = this.marker.getCurrentSelector();
+        return currentSelector && currentSelector.getSelectorName() === selectorName;
+    }
+
     public isToolSupportedByCurrentTag(tool: string) {
         const tag = this.marker.getCurrentTag();
         if (isUndefined(tag)) {
@@ -237,11 +246,31 @@ export class MarkerPageComponent implements OnInit {
         }
     }
 
+    public clearSelector() {
+        this.marker.clearCurrentSelector();
+        this.selectorActions = [];
+    }
+
     public setTag(tag: LabelTag) {
         this.marker.setCurrentTag(tag);
+        const currentSelector = this.marker.getCurrentSelector();
+        if (!isUndefined(currentSelector)) {
+            if (!this.isToolSupportedByCurrentTag(currentSelector.getSelectorName())) {
+                this.clearSelector();
+            }
+        }
     }
 
     public getToolIconName(iconName: string): string {
         return LabelExplorerComponent.toolIconNames.get(iconName);
+    }
+
+    public addLabelComment(): void {
+        this.marker.setFocusable(false);
+        this.dialogService.openInputDialog('Add comment to your label (optional)', 'If you\'d like, you can add a comment to the label' +
+            ' below:', this.labelComment, 'Add comment').afterClosed().subscribe(comment => {
+                this.labelComment = comment;
+                this.marker.setFocusable(true);
+        });
     }
 }
