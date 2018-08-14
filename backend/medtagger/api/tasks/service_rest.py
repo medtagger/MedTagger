@@ -56,7 +56,7 @@ class Task(Resource):
     @tasks_ns.marshal_with(serializers.out__task)
     @tasks_ns.doc(security='token')
     @tasks_ns.doc(description='Get category for given key.')
-    @tasks_ns.doc(responses={201: 'Success', 404: 'Could not find task'})
+    @tasks_ns.doc(responses={200: 'Success', 404: 'Could not find task'})
     def get(task_key: str) -> Any:
         """Return task for given key."""
         return business.get_task_for_key(task_key)

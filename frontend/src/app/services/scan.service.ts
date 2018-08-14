@@ -71,6 +71,9 @@ export class ScanService {
     }
 
     public getRandomScan(taskKey: string): Promise<ScanMetadata> {
+        if (taskKey == null) {
+            return Promise.reject('ScanService | getRandomScan | error: Task key is null!');
+        }
         return new Promise((resolve, reject) => {
             let params = new HttpParams();
             params = params.set('task', taskKey);

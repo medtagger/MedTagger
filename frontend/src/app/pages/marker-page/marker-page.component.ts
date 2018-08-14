@@ -62,10 +62,10 @@ export class MarkerPageComponent implements OnInit {
         console.log('MarkerPage init', this.marker);
 
         this.route.queryParamMap.subscribe(params => {
-            this.taskKey = params.get('task') || '';
+            this.taskKey = params.get('task');
         });
 
-        this.taskService.getCurrentTask(this.taskKey).then(
+        this.taskService.getTask(this.taskKey).then(
             (task: Task) => {
                 this.task = task;
 

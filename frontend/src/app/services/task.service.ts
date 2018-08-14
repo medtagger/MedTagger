@@ -26,19 +26,24 @@ export class TaskService {
     private tasks: Array<Task> = [];
     constructor(private http: HttpClient) { }
 
-    getCurrentTask(taskKey: string): Promise<Task> {
+    getTask(taskKey: string): Promise<Task> {
+        if (taskKey == null) {
+            return Promise.reject('TaskService | getTask | error: Task key was not found as a query parameter.');
+        }
         if (this.tasks.length > 0) {
+            // When user access labeling page through task page, current task comes from already filled array of tasks
            return Promise.resolve(this.tasks.find(task => task.key === taskKey));
         } else {
             return new Promise((resolve, reject) => {
+                // When user does not access labeling page through task page, current task comes from call to API
                 this.http.get<TaskResponse>(environment.API_URL + '/tasks/' + taskKey).toPromise().then(
                     response => {
-                        console.log('ScanService | getCurrentTask | response: ', response);
+                        console.log('TaskService | getTask | response: ', response);
                         const tags = response.tags.map(tag => new LabelTag(tag.key, tag.name, tag.tools));
                         resolve(new Task(response.task_id, response.key, response.name, response.image_path, tags));
                     },
                     error => {
-                        console.log('ScanService | getCurrentTask | error: ', error);
+                        console.log('TaskService | getTask | error: ', error);
                         reject(error);
                     }
                 );
@@ -53,7 +58,7 @@ export class TaskService {
         return new Promise((resolve, reject) => {
             this.http.get<Array<TaskResponse>>(environment.API_URL + '/tasks').toPromise().then(
                 response => {
-                    console.log('ScanService | getTasks | response: ', response);
+                    console.log('TaskService | getTasks | response: ', response);
                     for (const task of response) {
                         const tags = task.tags.map(tag => new LabelTag(tag.key, tag.name, tag.tools));
                         this.tasks.push(new Task(task.task_id, task.key, task.name, task.image_path, tags));
@@ -61,7 +66,7 @@ export class TaskService {
                     resolve(this.tasks);
                 },
                 error => {
-                    console.log('ScanService | getTasks | error: ', error);
+                    console.log('TaskService | getTasks | error: ', error);
                     reject(error);
                 }
             );
