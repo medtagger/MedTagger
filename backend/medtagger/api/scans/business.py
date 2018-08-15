@@ -109,8 +109,8 @@ def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> Non
     :param elements: List of JSONs describing elements for a single label
     :param files: mapping of uploaded files (name and content)
     """
-    _validate_files(files)
     _validate_label_elements(elements, files)
+    _validate_files(files)
     _validate_tool(elements)
 
 
@@ -139,6 +139,8 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
     for label_element in elements:
         # Each Brush Label Element should have its own image attached
         if label_element['tool'] == LabelTool.BRUSH.value:
+            print('FILES:', files)
+            print('LABEL:', label_element)
             try:
                 files[label_element['image_key']]
             except KeyError:

@@ -57,8 +57,16 @@ export class ScanService {
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
         payload['comment'] = comment;
+
         const form = new FormData();
         form.append('label', JSON.stringify(payload));
+
+        const additionalData = selection.getAdditionalData();
+        for (let key in additionalData) {
+            let value = additionalData[key];
+            form.append(key, value, key);
+        }
+
         return new Promise((resolve, reject) => {
             this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label`, form).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);

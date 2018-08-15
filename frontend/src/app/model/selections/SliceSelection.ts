@@ -19,4 +19,17 @@ export abstract class SliceSelection {
     }
 
     public abstract toJSON(): Object;
+    public getAdditionalData(): Object {
+        return {};
+    }
+
+    protected static base64toBlob(base64: string, dataType: string = 'image/png'): Blob {
+        let byteString = atob(base64.split(',')[1]);
+        let buffer = new ArrayBuffer(byteString.length);
+        let array = new Uint8Array(buffer);
+        for (let i = 0; i < byteString.length; i++) {
+            array[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([buffer], {type: dataType});
+    }
 }
