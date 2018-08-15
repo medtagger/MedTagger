@@ -10,14 +10,14 @@ from PIL import Image
 
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException, InternalErrorException
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
-from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
+from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
     labels as LabelsRepository,
     label_tags as LabelTagsRepository,
     slices as SlicesRepository,
     scans as ScansRepository,
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
     tasks as TasksRepository,
 )
 from medtagger.workers.storage import parse_dicom_and_update_slice
@@ -28,47 +28,47 @@ logger = logging.getLogger(__name__)
 LabelElementHandler = Callable[[Dict[str, Any], LabelID, Dict[str, bytes]], None]
 
 
-def get_available_scan_categories() -> List[ScanCategory]:
-    """Fetch list of all available Scan Categories.
+def get_available_datasets() -> List[Dataset]:
+    """Fetch list of all available Datasets.
 
-    :return: list of Scan Categories
+    :return: list of Datasets
     """
-    return ScanCategoriesRepository.get_all_categories()
+    return DatasetsRepository.get_all_datasets()
 
 
-def scan_category_is_valid(category_key: str) -> bool:
-    """Check if Scan Category for such key exists.
+def dataset_is_valid(dataset_key: str) -> bool:
+    """Check if Dataset for such key exists.
 
-    :param category_key: key representing Scan Category
-    :return: boolean information if Scan Category key is valid
+    :param dataset_key: key representing Dataset
+    :return: boolean information if Dataset key is valid
     """
     try:
-        ScanCategoriesRepository.get_category_by_key(category_key)
+        DatasetsRepository.get_dataset_by_key(dataset_key)
         return True
     except NoResultFound:
         return False
 
 
-def create_scan_category(key: str, name: str) -> ScanCategory:
-    """Create new Scan ScanCategory.
+def create_dataset(key: str, name: str) -> Dataset:
+    """Create new Dataset.
 
-    :param key: unique key representing Scan Category
-    :param name: name which describes this Category
-    :return: Scan Category object
+    :param key: unique key representing Dataset
+    :param name: name which describes this Dataset
+    :return: Dataset object
     """
-    return ScanCategoriesRepository.add_new_category(key, name)
+    return DatasetsRepository.add_new_dataset(key, name)
 
 
-def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan:
+def create_empty_scan(dataset_key: str, declared_number_of_slices: int) -> Scan:
     """Create new empty scan.
 
-    :param category_key: string with category key
+    :param dataset_key: string with dataset key
     :param declared_number_of_slices: number of Slices that will be uploaded
     :return: Newly created Scan object
     """
     user = get_current_user()
-    category = ScanCategoriesRepository.get_category_by_key(category_key)
-    return ScansRepository.add_new_scan(category, declared_number_of_slices, user)
+    dataset = DatasetsRepository.get_dataset_by_key(dataset_key)
+    return ScansRepository.add_new_scan(dataset, declared_number_of_slices, user)
 
 
 def get_random_scan(task_key: str) -> Scan:

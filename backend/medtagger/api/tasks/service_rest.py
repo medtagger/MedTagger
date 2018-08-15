@@ -41,7 +41,7 @@ class Tasks(Resource):
         key = payload['key']
         name = payload['name']
         image_path = payload['image_path']
-        categories_keys = payload['categories_keys']
+        datasets_keys = payload['datasets_keys']
         tags = [LabelTag(tag['key'], tag['name'], tag['tools']) for tag in payload['tags']]
 
-        return business.create_task(key, name, image_path, categories_keys, tags), 201
+        return business.create_task(key, name, image_path, datasets_keys, tags), 201

@@ -33,6 +33,6 @@ in__task = api.model('New Task model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
-    'categories_keys': fields.List(fields.String()),
+    'datasets_keys': fields.List(fields.String()),
     'tags': fields.List(fields.Nested(in__label_tag), attribute='available_tags'),
 })

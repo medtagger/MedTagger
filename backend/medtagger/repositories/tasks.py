@@ -2,7 +2,7 @@
 from typing import List
 
 from medtagger.database import db_session
-from medtagger.database.models import Task, LabelTag, ScanCategory
+from medtagger.database.models import Task, LabelTag, Dataset
 
 
 def get_all_tasks() -> List[Task]:
@@ -23,20 +23,20 @@ def get_task_by_key(key: str) -> Task:
     return task
 
 
-def add_task(key: str, name: str, image_path: str, categories_keys: List[str], tags: List[LabelTag]) -> Task:
+def add_task(key: str, name: str, image_path: str, datasets_keys: List[str], tags: List[LabelTag]) -> Task:
     """Add new Task to the database.
 
     :param key: key that will identify such Task
     :param name: name that will be used in the Use Interface for such Task
     :param image_path: path to the image that represents such Task (used in User Interface)
-    :param categories_keys: Keys of ScanCategories that Task takes Scans from
+    :param datasets_keys: Keys of Datasets that Task takes Scans from
     :param tags: Label Tags that will be created and assigned to Task
     :return: Task object
     """
     with db_session() as session:
         task = Task(key, name, image_path)
-        scan_categories = ScanCategory.query.filter(ScanCategory.key.in_(categories_keys)).all()  # type: ignore
-        task.scan_categories = scan_categories
+        datasets = Dataset.query.filter(Dataset.key.in_(datasets_keys)).all()  # type: ignore
+        task.datasets = datasets
         task.available_tags = tags
         session.add(task)
     return task

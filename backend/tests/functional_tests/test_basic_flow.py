@@ -15,19 +15,19 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     web_socket_client = get_web_socket_client(namespace='/slices')
     user_token = get_token_for_logged_in_user('admin')
 
-    # Step 1. Get all categories
-    response = api_client.get('/api/v1/scans/categories', headers=get_headers(token=user_token))
+    # Step 1. Get all datasets
+    response = api_client.get('/api/v1/scans/datasets', headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, list)
-    category = json_response[0]
-    category_key = category['key']
-    task_key = category['tasks'][0]['key']
-    assert isinstance(category_key, str)
-    assert len(category_key) > 1
+    dataset = json_response[0]
+    dataset_key = dataset['key']
+    task_key = dataset['tasks'][0]['key']
+    assert isinstance(dataset_key, str)
+    assert len(dataset_key) > 1
 
     # Step 2. Add Scan to the system
-    payload = {'category': category_key, 'number_of_slices': 1}
+    payload = {'dataset': dataset_key, 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201

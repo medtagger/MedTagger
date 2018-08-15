@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from medtagger.database import db_session
 from medtagger.definitions import LabelTool
-from medtagger.database.models import ScanCategory, Role, LabelTag, Task
+from medtagger.database.models import Dataset, Role, LabelTag, Task
 
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
@@ -16,14 +16,14 @@ logger = logging.getLogger(__name__)
 TASKS = [{
     'key': 'MARK_KIDNEYS',
     'name': 'Mark kidneys',
-    'image_path': 'assets/icon/kidneys_category_icon.svg',
+    'image_path': 'assets/icon/kidneys_dataset_icon.svg',
 }, {
     'key': 'MARK_LUNGS_NODULES',
     'name': 'Mark nodules on lungs',
-    'image_path': 'assets/icon/lungs_category_icon.svg',
+    'image_path': 'assets/icon/lungs_dataset_icon.svg',
 }]
 
-CATEGORIES: List[Dict] = [{
+DATASETS: List[Dict] = [{
     'key': 'KIDNEYS',
     'name': 'Kidneys',
     'tasks': ['MARK_KIDNEYS'],
@@ -85,29 +85,29 @@ def insert_tasks() -> None:
             logger.info('Task added for key "%s"', task_key)
 
 
-def insert_scan_categories() -> None:
-    """Insert all default Scan Categories if don't exist."""
+def insert_datasets() -> None:
+    """Insert all default Datasets if don't exist."""
     with db_session() as session:
-        for row in CATEGORIES:
-            category_key = row.get('key', '')
-            category_exists = session.query(exists().where(ScanCategory.key == category_key)).scalar()
-            if category_exists:
-                logger.info('Scan Category exists with key "%s"', category_key)
+        for row in DATASETS:
+            dataset_key = row.get('key', '')
+            dataset_exists = session.query(exists().where(Dataset.key == dataset_key)).scalar()
+            if dataset_exists:
+                logger.info('Dataset exists with key "%s"', dataset_key)
                 continue
 
-            category = ScanCategory(category_key, row.get('name', ''))
+            dataset = Dataset(dataset_key, row.get('name', ''))
 
             tasks = row.get('tasks', [])
             for task_key in tasks:
                 task = session.query(Task).filter(Task.key == task_key).one()
-                category.tasks.append(task)
+                dataset.tasks.append(task)
 
-            session.add(category)
-            logger.info('Scan Category added for key "%s"', category_key)
+            session.add(dataset)
+            logger.info('Dataset added for key "%s"', dataset_key)
 
 
 def insert_labels_tags() -> None:
-    """Insert all default Label Tags if they don't exist and assign them to category."""
+    """Insert all default Label Tags if they don't exist and assign them to dataset."""
     with db_session() as session:
         for row in TAGS:
             tag_key = row.get('key', '')
@@ -147,8 +147,8 @@ def apply_all_fixtures() -> None:
     """Apply all available fixtures."""
     logger.info('Applying fixtures for Tasks...')
     insert_tasks()
-    logger.info('Applying fixtures for Scan Categories...')
-    insert_scan_categories()
+    logger.info('Applying fixtures for Datasets...')
+    insert_datasets()
     logger.info('Applying fixtures for Label Tags...')
     insert_labels_tags()
     logger.info('Applying fixtures for user Roles...')

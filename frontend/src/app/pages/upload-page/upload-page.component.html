@@ -1,20 +1,20 @@
 <mat-horizontal-stepper [linear]="true" #stepper>
 
-    <!-- Select Category mode -->
-    <mat-step [stepControl]="chooseCategoryFormGroup">
-        <form [formGroup]="chooseCategoryFormGroup">
-            <ng-template matStepLabel>Select Category</ng-template>
+    <!-- Select Dataset mode -->
+    <mat-step [stepControl]="chooseDatasetFormGroup">
+        <form [formGroup]="chooseDatasetFormGroup">
+            <ng-template matStepLabel>Select Dataset</ng-template>
             <div class="middle-screen-width">
                 <mat-card>
                     <mat-card-header>
-                        <mat-card-title>Select Category</mat-card-title>
+                        <mat-card-title>Select Dataset</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
                         <mat-form-field>
-                            <mat-select placeholder="Scan category" formControlName="category" required>
-                                <mat-option *ngFor="let availableCategory of availableCategories"
-                                            [value]="availableCategory.key">
-                                    {{availableCategory.name}}
+                            <mat-select placeholder="Dataset" formControlName="dataset" required>
+                                <mat-option *ngFor="let availableDataset of availableDatasets"
+                                            [value]="availableDataset.key">
+                                    {{availableDataset.name}}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>

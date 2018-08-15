@@ -22,7 +22,7 @@ def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Add Scan to the system
-    payload = {'category': 'LUNGS', 'number_of_slices': 3}
+    payload = {'dataset': 'LUNGS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)
@@ -73,7 +73,7 @@ def test_scan_upload_with_retrying(fixture_problems_with_storage: Any, prepare_e
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Add Scan to the system
-    payload = {'category': 'LUNGS', 'number_of_slices': 3}
+    payload = {'dataset': 'LUNGS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)
