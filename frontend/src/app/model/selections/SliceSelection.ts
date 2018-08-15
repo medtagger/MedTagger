@@ -18,7 +18,5 @@ export abstract class SliceSelection {
         return this.id;
     }
 
-    public abstract getCoordinates();
-
     public abstract toJSON(): Object;
 }
