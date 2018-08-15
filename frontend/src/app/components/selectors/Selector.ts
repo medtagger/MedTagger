@@ -61,5 +61,7 @@ export interface Selector<SliceSelection> {
 
     getActions(): Array<SelectorAction>;
 
+    deselect(): void;
+
     isSingleSelectionPerSlice(): boolean;
 }
