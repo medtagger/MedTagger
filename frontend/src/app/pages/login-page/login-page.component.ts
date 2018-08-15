@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {passwordValidator} from '../validators/password-validator.directive';
 import {AccountService} from '../../services/account.service';
 
@@ -48,7 +48,7 @@ export class LoginPageComponent implements OnInit {
         this.loginForm = new FormGroup({
             email: new FormControl(null, [Validators.required, Validators.email]),
             password: new FormControl(null, [Validators.required, Validators.minLength(MIN_PASSWORD_LENGTH)])
-        })
+        });
     }
 
     resetLogin(): void {
@@ -129,8 +129,8 @@ export class LoginPageComponent implements OnInit {
 
     getPasswordErrorMessage(): string {
         return this.registerForm.get('password').hasError('required') ? 'Field required' :
-            this.registerForm.get('password').hasError('minlength') ? 'Password should be longer than ' + MIN_PASSWORD_LENGTH + ' characters.' :
-                '';
+            this.registerForm.get('password').hasError('minlength') ? 'Password should be longer than ' + MIN_PASSWORD_LENGTH
+                + ' characters.' : '';
     }
 
     getConfirmPasswordErrorMessage(): string {
@@ -152,11 +152,6 @@ export class LoginPageComponent implements OnInit {
         this.registrationInProgress = true;
         this.registrationError = undefined;
         const formValue = this.registerForm.value;
-        if (formValue['password'] !== formValue['confirmPassword']) {
-            this.resetRegistration();
-            this.registrationError = 'Passwords don\'t match!';
-            return;
-        }
         this.accountService.register(formValue['email'], formValue['password'], formValue['firstName'], formValue['lastName'])
             .then(() => {
                 this.registrationInProgress = false;
