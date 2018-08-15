@@ -1,6 +1,5 @@
 import {ScanSelection} from './ScanSelection';
 import {SliceSelection} from './SliceSelection';
-import {element} from "protractor";
 
 export class Selection3D implements ScanSelection<SliceSelection> {
     _elements: SliceSelection[];

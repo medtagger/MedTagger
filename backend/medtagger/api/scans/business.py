@@ -139,8 +139,6 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
     for label_element in elements:
         # Each Brush Label Element should have its own image attached
         if label_element['tool'] == LabelTool.BRUSH.value:
-            print('FILES:', files)
-            print('LABEL:', label_element)
             try:
                 files[label_element['image_key']]
             except KeyError:
