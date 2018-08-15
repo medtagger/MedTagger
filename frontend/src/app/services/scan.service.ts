@@ -2,7 +2,7 @@ import {throwError as observableThrowError, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 
-import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
+import {Dataset, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
@@ -24,7 +24,7 @@ interface ScanResponse {
     height: number;
 }
 
-interface AvailableCategoryResponse {
+interface AvailableDatasetResponse {
     key: string;
     name: string;
     tasks: Array<TaskResponse>;
@@ -120,10 +120,10 @@ export class ScanService {
         this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count, reversed: reversed});
     }
 
-    createNewScan(category: string, numberOfSlices: number) {
+    createNewScan(dataset: string, numberOfSlices: number) {
         return new Promise((resolve, reject) => {
             const payload = {
-                category: category,
+                dataset: dataset,
                 number_of_slices: numberOfSlices,
             };
             let retryAttempt = 0;

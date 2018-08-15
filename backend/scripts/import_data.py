@@ -30,7 +30,7 @@ import glob
 import logging
 import logging.config
 
-from medtagger.repositories import scans as ScansRepository, scan_categories as ScanCategoriesRepository
+from medtagger.repositories import scans as ScansRepository, datasets as DatasetsRepository
 from medtagger.workers.storage import parse_dicom_and_update_slice
 
 
@@ -39,13 +39,13 @@ logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(description='Import data to the MedTagger.')
 parser.add_argument('--source', type=str, required=True, help='Source directory')
-parser.add_argument('--category', type=str, required=True, help='Category key for these scans')
+parser.add_argument('--dataset', type=str, required=True, help='Dataset key for these scans')
 args = parser.parse_args()
 
 
 if __name__ == '__main__':
-    logger.info('Checking Scan Category...')
-    category = ScanCategoriesRepository.get_category_by_key(args.category)
+    logger.info('Checking Dataset...')
+    dataset = DatasetsRepository.get_dataset_by_key(args.dataset)
 
     source = args.source.rstrip('/')
     for scan_directory in glob.iglob(source + '/*'):
@@ -56,7 +56,7 @@ if __name__ == '__main__':
         logger.info('Adding new Scan from "%s".', scan_directory)
         slice_names = glob.glob(scan_directory + '/*.dcm')
         number_of_slices = len(slice_names)
-        scan = ScansRepository.add_new_scan(category, number_of_slices, None)
+        scan = ScansRepository.add_new_scan(dataset, number_of_slices, None)
 
         for slice_name in slice_names:
             logger.info('Adding new Slice to Scan "%s" based on "%s".', scan.id, slice_name)

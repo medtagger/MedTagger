@@ -53,7 +53,7 @@ import {routing} from './app.routes';
 import {AuthGuard} from '../guards/auth.guard';
 import {AccountService} from '../services/account.service';
 import {DialogService} from '../services/dialog.service';
-import {CategoryService} from '../services/category.service';
+import {DatasetService} from '../services/dataset.service';
 import {InfoDialogComponent} from '../dialogs/info-dialog.component';
 import {MedTaggerWebSocket} from '../services/websocket.service';
 
@@ -121,7 +121,7 @@ import {TaskService} from '../services/task.service';
             useClass: HttpAuthenticationInterceptor,
             multi: true
         },
-        CategoryService,
+        DatasetService,
         TaskService,
         AuthGuard,
         AccountService,

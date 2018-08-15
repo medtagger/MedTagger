@@ -15,7 +15,7 @@ def test_add_task(prepare_environment: Any) -> None:
         'key': 'MARK_NODULES',
         'name': 'Mark nodules',
         'image_path': 'assets/icon/my_icon.svg',
-        'categories_keys': ['KIDNEYS', 'LUNGS'],
+        'datasets_keys': ['KIDNEYS', 'LUNGS'],
         'tags': [{
             'key': 'SMALL_NODULE',
             'name': 'Small nodule',
@@ -36,8 +36,8 @@ def test_add_task(prepare_environment: Any) -> None:
     assert json_response['image_path'] == 'assets/icon/my_icon.svg'
     assert len(json_response['tags']) == 2
 
-    response = api_client.get('/api/v1/scans/categories', headers=get_headers(token=user_token, json=True))
+    response = api_client.get('/api/v1/scans/datasets', headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)
-    categories = [category for category in json_response
-                  if any(task for task in category['tasks'] if task['key'] == 'MARK_NODULES')]
-    assert len(categories) == 2
+    datasets = [dataset for dataset in json_response
+                if any(task for task in dataset['tasks'] if task['key'] == 'MARK_NODULES')]
+    assert len(datasets) == 2

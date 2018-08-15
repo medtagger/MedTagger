@@ -12,7 +12,7 @@ def test_skipping_a_scan(prepare_environment: Any, synchronous_celery: Any) -> N
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201

@@ -124,7 +124,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert response.status_code == 200
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'LUNGS', 'number_of_slices': 1}
+    payload = {'dataset': 'LUNGS', 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=admin_user_token, json=True))
     assert response.status_code == 201
