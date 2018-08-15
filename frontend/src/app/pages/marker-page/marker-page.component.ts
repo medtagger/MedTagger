@@ -80,11 +80,12 @@ export class MarkerPageComponent implements OnInit {
 
         this.taskTags = new FormControl('', [Validators.required]);
 
+        // Brush selector should be first on the list to avoid canvas shenanigans
         this.selectors = new Map<string, Selector<any>>([
+            ['BRUSH', new BrushSelector(this.marker.getCanvas())],
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
             ['POINT', new PointSelector(this.marker.getCanvas())],
-            ['CHAIN', new ChainSelector(this.marker.getCanvas())],
-            ['BRUSH', new BrushSelector(this.marker.getCanvas())]
+            ['CHAIN', new ChainSelector(this.marker.getCanvas())]
         ]);
 
         this.marker.setSelectors(Array.from(this.selectors.values()));

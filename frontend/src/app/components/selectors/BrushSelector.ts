@@ -55,7 +55,6 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
                 LINE_WIDTH: 10,
                 LINE_LINKS: 'square',
                 CURRENT_SELECTION_COLOR: 'rgba(0,0,0,1)',
-                OTHER_SELECTION_COLOR: 'rgba(0,0,0,1)',
                 ARCHIVED_SELECTION_COLOR: 'rgba(0,0,0,1)',
                 DRAWING_COMPOSITE_OPERATION: 'destination-out',
                 SAVING_COMPOSITE_OPERATION: 'source-over'
