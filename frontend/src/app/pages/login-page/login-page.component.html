@@ -27,14 +27,14 @@
                     <mat-form-field appearance="fill">
                         <mat-label>Email</mat-label>
                         <input matInput type="text" placeholder="Insert your email."
-                               id="email" formControlName="email" required>
+                               id="email" formControlName="email" required data-cy="login-email">
                         <mat-error *ngIf="userForm.get('email').invalid">{{getEmailErrorMessage()}}</mat-error>
                     </mat-form-field>
                     <mat-form-field appearance="fill">
                         <mat-label>Password</mat-label>
                         <input matInput type="{{loginPasswordVisible && 'text' || 'password'}}"
                                placeholder="Insert your password."
-                               id="password" formControlName="password" required>
+                               id="password" formControlName="password" required data-cy="login-password">
                         <mat-error *ngIf="userForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
                         <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                     </mat-form-field>

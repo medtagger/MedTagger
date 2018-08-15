@@ -70,8 +70,8 @@
                 <button mat-raised-button color="primary" (click)="skipScan()">
                     Skip scan
                 </button>
-                <button mat-raised-button color="accent" (click)="sendCompleteLabel() data-cy="send-label"
-                        *ngIf="this.labelExplorer.getLabelsLength() > 0">
+                <button mat-raised-button color="accent" (click)="sendCompleteLabel()"
+                        *ngIf="this.labelExplorer.getLabelsLength() > 0" data-cy="send-label">
                     Send label
                 </button>
                 <button mat-raised-button color="accent" (click)="sendEmptyLabel()"

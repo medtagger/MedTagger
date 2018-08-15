@@ -5,7 +5,10 @@ function login(email, password) {
     }).then(response => {
         const token = response.body.token;
         window.sessionStorage.setItem('authorizationToken', token);
-        cy.request({url: Cypress.env('API_URL') + 'users/info', headers: {Authorization: `Bearer ${token}`}}).then(response => {
+        cy.request({
+            url: Cypress.env('API_URL') + 'users/info',
+            headers: {Authorization: `Bearer ${token}`}
+        }).then(response => {
             window.sessionStorage.setItem('userInfo', JSON.stringify(response.body));
         });
     });
@@ -45,6 +48,30 @@ function matSelect(selector, option) {
     cy.get(`mat-option span:contains(${option})`).click();
 }
 
+function uploadScans(datasets, scansCount) {
+    cy.visit(Cypress.env('HOST_URL'));
+    openSidebar();
+    cy.get('[data-cy=sidebar-upload]').click();
+    matSelect('[data-cy=datasets]', datasets);
+    cy.get('[data-cy=datasets-submit]').click();
+    cy.get('[data-cy=single-scan]').click();
+    setFilesInInput('scans/scan.dcm', scansCount);
+    cy.get('[data-cy=single-scan-upload]').click();
+    cy.contains(/Upload completed sucessfully!/, {timeout: 60000}); // uploading scan is time consuming so we must increase timeout
+}
+
+function goToLabeling(task) {
+    cy.visit(Cypress.env('HOST_URL'));
+    openSidebar();
+    cy.get('[data-cy=sidebar-labelling]').click();
+    cy.get('[data-cy=next1]').click();
+    cy.get('[data-cy=next2]').click();
+    cy.get('[data-cy=next3]').click();
+    cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
+    cy.get('[data-cy=next4]').click();
+    cy.get(`[data-cy=task]:nth-child(${task})`).click({force: true}); // clicking on svg has bug, https://github.com/cypress-io/cypress/issues/2245
+}
+
 describe('Basic flow', () => {
 
     beforeEach(() => {
@@ -60,9 +87,8 @@ describe('Basic flow', () => {
 
     it('Login as admin and logout', () => {
         cy.visit(Cypress.env('HOST_URL'));
-        cy.get('[data-cy=login-toggle]').click();
-        cy.get('#email').type('admin@medtagger.com');
-        cy.get('#password').type('medtagger1');
+        cy.get('[data-cy=login-email]').type('admin@medtagger.com');
+        cy.get('[data-cy=login-password]').type('medtagger1');
         cy.get('[data-cy=submit]').click();
         cy.url().should('eq', Cypress.env('HOST_URL') + 'home');
         openSidebar();
@@ -72,28 +98,24 @@ describe('Basic flow', () => {
 
     it('Upload scan', () => {
         loginAsAdmin();
-        cy.visit(Cypress.env('HOST_URL'));
-        openSidebar();
-        cy.get('[data-cy=sidebar-upload]').click();
-        matSelect('[data-cy=datasets]', 'Kidneys');
-        cy.get('[data-cy=datasets-submit]').click();
-        cy.get('[data-cy=single-scan]').click();
-        setFilesInInput('scans/scan.dcm', 11);
-        cy.get('[data-cy=single-scan-upload]').click();
-        cy.contains(/Upload completed sucessfully!/, {timeout: 60000}); // uploading scan is time consuming so we must increase timeout
+        uploadScans('Kidneys', 1);
     });
 
-    it.only('Chain selector', () => {
+    it('Rectangle selector', () => {
         loginAsAdmin();
-        cy.visit(Cypress.env('HOST_URL'));
-        openSidebar();
-        cy.get('[data-cy=sidebar-labelling]').click();
-        cy.get('[data-cy=next1]').click();
-        cy.get('[data-cy=next2]').click();
-        cy.get('[data-cy=next3]').click();
-        cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
-        cy.get('[data-cy=next4]').click();
-        cy.get('[data-cy=task]:nth-child(1)').click({force: true}); // clicking on svg has bug, https://github.com/cypress-io/cypress/issues/2245
+        uploadScans('Kidneys', 11);
+        goToLabeling(1);
+        matSelect('[data-cy=tags]', 'Left Kidney');
+        cy.get('[data-cy=rectangle-tool]').click({force: true});
+        cy.get('canvas').trigger('mousedown', 200, 200);
+        cy.get('canvas').trigger('mouseup', 300, 300);
+        cy.get('[data-cy=send-label]').click();
+    });
+
+    it('Chain selector', () => {
+        loginAsAdmin();
+        uploadScans('Kidneys', 11);
+        goToLabeling(1);
         matSelect('[data-cy=tags]', 'Left Kidney');
         cy.get('[data-cy=chain-tool]').click({force: true});
         cy.get('canvas').click(100, 100);
