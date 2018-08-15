@@ -17,7 +17,7 @@ export class DatasetService {
         return new Promise((resolve, reject) => {
             this.http.get<Array<AvailableDatasetResponse>>(environment.API_URL + '/scans/datasets').toPromise().then(
                 response => {
-                    console.log('ScanService | getAvailableDatasets | response: ', response);
+                    console.log('DatasetService | getAvailableDatasets | response: ', response);
                     const datasets = [];
                     for (const dataset of response) {
                         datasets.push(new Dataset(dataset.key, dataset.name));
@@ -25,7 +25,7 @@ export class DatasetService {
                     resolve(datasets);
                 },
                 error => {
-                    console.log('ScanService | getAvailableDatasets | error: ', error);
+                    console.log('DatasetService | getAvailableDatasets | error: ', error);
                     reject(error);
                 }
             );
