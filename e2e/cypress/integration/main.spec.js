@@ -19,7 +19,7 @@ function openSidebar() {
     cy.get('[data-cy=sidebar]').click();
 }
 
-function setFileInInput(filePath, selector = 'input[type="file"]') {
+function setFilesInInput(filePath, fileCount = 1, selector = 'input[type="file"]') {
     cy.get('input[type="file"]').then(inputs => {
         cy.fixture(filePath, 'binary').then(fileContent => {
             let byteNumbers = new Array(fileContent.length);
@@ -31,7 +31,10 @@ function setFileInInput(filePath, selector = 'input[type="file"]') {
             const fileName = filePath.replace(/^.*\//);
             const file = new File([byteArray], fileName);
             let dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
+
+            for (let i = 0; i < fileCount; i++) {
+                dataTransfer.items.add(file);
+            }
             inputs[0].files = dataTransfer.files;
         });
     });
@@ -75,7 +78,7 @@ describe('Basic flow', () => {
         matSelect('[data-cy=datasets]', 'Kidneys');
         cy.get('[data-cy=datasets-submit]').click();
         cy.get('[data-cy=single-scan]').click();
-        setFileInInput('scans/scan.dcm');
+        setFilesInInput('scans/scan.dcm', 11);
         cy.get('[data-cy=single-scan-upload]').click();
         cy.contains(/Upload completed sucessfully!/, {timeout: 60000}); // uploading scan is time consuming so we must increase timeout
     });
@@ -92,5 +95,15 @@ describe('Basic flow', () => {
         cy.get('[data-cy=next4]').click();
         cy.get('[data-cy=task]:nth-child(1)').click({force: true}); // clicking on svg has bug, https://github.com/cypress-io/cypress/issues/2245
         matSelect('[data-cy=tags]', 'Left Kidney');
+        cy.get('[data-cy=chain-tool]').click({force: true});
+        cy.get('canvas').click(100, 100);
+        cy.get('canvas').click(200, 100);
+        cy.get('canvas').click(200, 200);
+        cy.get('.action-buttons button:contains(Stop)').click();
+        cy.get('canvas').click(300, 300);
+        cy.get('canvas').click(200, 300);
+        cy.get('canvas').click(300, 200);
+        cy.get('.action-buttons button:contains(Loop)').click();
+        cy.get('[data-cy=send-label]').click();
     });
 });

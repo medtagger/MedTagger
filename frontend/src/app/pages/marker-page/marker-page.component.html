@@ -14,11 +14,11 @@
         <div class="tools">
             <h3>Available Tools</h3>
             <div class="buttons">
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('RECTANGLE')}" [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')" (click)="setSelector('RECTANGLE')"><mat-icon [svgIcon]="getToolIconName('RECTANGLE')"></mat-icon></button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('BRUSH')}" disabled><mat-icon [svgIcon]="getToolIconName('BRUSH')"></mat-icon></button>
+                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('RECTANGLE')}" [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')" (click)="setSelector('RECTANGLE')" data-cy="rectangle-tool"><mat-icon [svgIcon]="getToolIconName('RECTANGLE')"></mat-icon></button>
+                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('BRUSH')}" disabled><mat-icon [svgIcon]="getToolIconName('BRUSH')" data-cy="brush-tool"></mat-icon></button>
                 <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('ERASER')}" disabled><mat-icon [svgIcon]="getToolIconName('ERASER')"></mat-icon></button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('POINT')}" [disabled]="!isToolSupportedByCurrentTag('POINT')" (click)="setSelector('POINT')"><mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon></button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('CHAIN')}" [disabled]="!isToolSupportedByCurrentTag('CHAIN')" (click)="setSelector('CHAIN')"><mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon></button>
+                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('POINT')}" [disabled]="!isToolSupportedByCurrentTag('POINT')" (click)="setSelector('POINT')" data-cy="point-tool"><mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon></button>
+                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('CHAIN')}" [disabled]="!isToolSupportedByCurrentTag('CHAIN')" (click)="setSelector('CHAIN')" data-cy="chain-tool"><mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon></button>
                 <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('ZOOM_IN')}" disabled><mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon></button>
                 <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('ZOOM_OUT')}" disabled><mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon></button>
             </div>
@@ -46,7 +46,7 @@
                 <button mat-raised-button color="primary" (click)="skipScan()">
                     Skip scan
                 </button>
-                <button mat-raised-button color="accent" (click)="sendCompleteLabel()" *ngIf="this.labelExplorer.getLabelsLength() > 0">
+                <button mat-raised-button color="accent" (click)="sendCompleteLabel()" *ngIf="this.labelExplorer.getLabelsLength() > 0" data-cy="send-label">
                     Send label
                 </button>
                 <button mat-raised-button color="accent" (click)="sendEmptyLabel()" *ngIf="this.labelExplorer.getLabelsLength() == 0">
