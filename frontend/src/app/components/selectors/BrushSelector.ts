@@ -2,7 +2,7 @@ import {SelectorBase} from './SelectorBase';
 import {Selector} from './Selector';
 import {BrushSelection} from '../../model/selections/BrushSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {SelectorAction} from '../../model/SelectorAction';
+import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
 
 export enum BrushMode {
     BRUSH = 'Brush',
@@ -30,11 +30,11 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             new SelectorAction(BrushMode.ERASER, () => !!this.lastTagDrawings[this.getSelectingContext()], () => {
                 this.changeSelectorMode(BrushMode.ERASER);
                 this.deactivateOtherActions(BrushMode.ERASER);
-            }, false),
+            }, SelectorActionType.BUTTON, false),
             new SelectorAction(BrushMode.BRUSH, () => true, () => {
                 this.changeSelectorMode(BrushMode.BRUSH);
                 this.deactivateOtherActions(BrushMode.BRUSH);
-            }, true)
+            }, SelectorActionType.BUTTON, true)
         ];
         console.log('BrushSelector created!');
     }

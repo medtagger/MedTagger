@@ -18,7 +18,7 @@ import {BrushSelector} from '../../components/selectors/BrushSelector';
 import {FormControl, Validators} from '@angular/forms';
 import {isUndefined} from 'util';
 import {ChainSelector} from '../../components/selectors/ChainSelector';
-import {SelectorAction} from '../../model/SelectorAction';
+import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
 import {TaskService} from '../../services/task.service';
 import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
@@ -47,6 +47,8 @@ export class MarkerPageComponent implements OnInit {
     selectorActions: Array<SelectorAction> = [];
     labelComment: string;
     isInitialSliceLoad: boolean;
+
+    ActionType = SelectorActionType;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private location: Location, private snackBar: MatSnackBar, private taskService: TaskService) {
@@ -82,7 +84,7 @@ export class MarkerPageComponent implements OnInit {
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
             ['POINT', new PointSelector(this.marker.getCanvas())],
             ['CHAIN', new ChainSelector(this.marker.getCanvas())],
-            ['BRUSH', new BrushSelector(this.marker.getCanvas())],
+            ['BRUSH', new BrushSelector(this.marker.getCanvas())]
         ]);
 
         this.marker.setSelectors(Array.from(this.selectors.values()));

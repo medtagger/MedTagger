@@ -41,10 +41,16 @@
             <div *ngIf="selectorActions.length > 0">
                 <h3>Actions</h3>
                 <div class="buttons action-buttons">
-                    <button mat-raised-button color="primary" [ngClass]="{'active-button': action.isActive && action.enable()}"
-                            *ngFor="let action of selectorActions"
-                            [disabled]="!action.enable()" (click)="action.trigger()">{{ action.name }}
-                    </button>
+                    <div *ngFor="let action of selectorActions">
+                        <button *ngIf="action.type === ActionType.BUTTON" color="primary" [ngClass]="{'active-button': action.isActive && action.enable()}"
+                                [disabled]="!action.enable()" (click)="action.trigger()">{{ action.name }}
+                        </button>
+                        <div *ngIf="action.type === ActionType.COLOR">
+                            <input type="color" id="inputColor" name="color"
+                                   value="#f6b73c" [disabled]="!action.enable()"/>
+                            <label for="inputColor">{{ action.name }}</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
