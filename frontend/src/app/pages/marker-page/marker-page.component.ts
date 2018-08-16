@@ -98,7 +98,7 @@ export class MarkerPageComponent implements OnInit {
                 this.lastSliceID = slice.index;
             }
             this.marker.feedData(slice);
-            if (slice.isLastInBatch() || (slice.index === this.scan.numberOfSlices - 1)) {
+            if (slice.isLastInBatch()) {
                 if (this.marker.downloadingScanInProgress === true) {
                     this.indicateNewScanAppeared();
                 }
