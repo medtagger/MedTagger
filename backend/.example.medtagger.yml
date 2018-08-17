@@ -1,7 +1,7 @@
 tasks:
   - name: Kidneys segmentation
     key: KIDNEYS_SEGMENTATION
-    image_path: assets/icon/kidneys_category_icon.svg
+    image_path: assets/icon/kidneys_dataset_icon.svg
     tags:
         - name: Left Kidney
           key: LEFT_KIDNEY
@@ -14,7 +14,7 @@ tasks:
 
   - name: Find nodules
     key: FIND_NODULES
-    image_path: assets/icon/lungs_category_icon.svg
+    image_path: assets/icon/lungs_dataset_icon.svg
     tags:
         - name: Nodule
           key: NODULE
@@ -23,7 +23,7 @@ tasks:
 
   - name: Find narrowings in vains
     key: FIND_NARROWINGS
-    image_path: assets/icon/heart_category_icon.svg
+    image_path: assets/icon/heart_dataset_icon.svg
     tags:
         - name: Narrowing (region)
           key: NARROWING
@@ -40,7 +40,7 @@ tasks:
 
   - name: Find middle of the Spine
     key: FIND_MIDDLE_OF_THE_SPINE
-    image_path: assets/icon/lungs_category_icon.svg
+    image_path: assets/icon/lungs_dataset_icon.svg
     tags:
         - name: Middle of the Spine
           key: MIDDLE_OF_THE_SPINE

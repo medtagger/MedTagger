@@ -1,8 +1,8 @@
 import {Selector} from './Selector';
 import {SelectorBase} from './SelectorBase';
-import {ChainSelection} from '../../model/ChainSelection';
 import {Point} from '../../model/Point';
 import {SelectorAction} from '../../model/SelectorAction';
+import {ChainSelection} from '../../model/selections/ChainSelection';
 
 export class ChainSelector extends SelectorBase<ChainSelection> implements Selector<ChainSelection> {
 
@@ -26,19 +26,10 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
     public getActions(): Array<SelectorAction> {
         return [
             new SelectorAction('Stop', () => this.selectingInProgress, () => {
-                if (this.selectedArea.points.length > 1) {
-                    this.addSelection(this.selectedArea);
-                }
-                this.selectedArea = undefined;
-                this.selectingInProgress = undefined;
-                this.requestRedraw();
+                this.completeSelection(false);
             }),
             new SelectorAction('Loop', () => this.selectingInProgress && this.selectedArea.points.length > 2, () => {
-                this.selectedArea.isLoop = true;
-                this.addSelection(this.selectedArea);
-                this.selectedArea = undefined;
-                this.selectingInProgress = undefined;
-                this.requestRedraw();
+                this.completeSelection(true);
             })
         ];
     }
@@ -67,7 +58,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
 
             lastPosition = scaledPointPosition;
         }
-        if (selection.isLoop) {
+        if (selection.loop) {
             const scaledPointPosition: { x: number, y: number } = this.scaleToView(selection.points[0].x, selection.points[0].y);
             this.canvasCtx.beginPath();
             this.canvasCtx.moveTo(lastPosition.x, lastPosition.y);
@@ -91,6 +82,16 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         const distance = Math.sqrt(Math.pow(scaledPoint.x - x, 2) + Math.pow(scaledPoint.y - y, 2));
 
         return distance < this.getStyle().RADIUS;
+    }
+
+    private completeSelection(isLoop: boolean) {
+        if (this.selectedArea && this.selectedArea.points.length > 1) {
+            this.selectedArea.loop = isLoop;
+            this.addSelection(this.selectedArea);
+        }
+        this.selectedArea = undefined;
+        this.selectingInProgress = undefined;
+        this.requestRedraw();
     }
 
     public onMouseDown(event: MouseEvent): void {
@@ -122,7 +123,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
             if (!this.selectedArea) {
                 const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
                 const point = new Point(normalizedPoint.x, normalizedPoint.y);
-                this.selectedArea = new ChainSelection([point], this.currentSlice);
+                this.selectedArea = new ChainSelection([point], this.currentSlice, this.currentTag.key);
                 this.selectingInProgress = true;
                 this.requestRedraw();
             }
@@ -147,6 +148,10 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         if (!this.selectingInProgress) {
             this.selectedArea = undefined;
         }
+    }
+
+    public deselect(): void {
+        this.completeSelection(false);
     }
 
     public getSelectorName(): string {

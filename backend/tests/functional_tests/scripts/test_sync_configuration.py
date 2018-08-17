@@ -4,7 +4,7 @@ from typing import Any
 import yaml
 
 from medtagger.repositories import (
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
     tasks as TasksRepository,
     label_tags as LabelTagsRepository,
 )
@@ -23,7 +23,7 @@ def test_sync_with_empty_database(prepare_environment: Any) -> None:
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -37,10 +37,10 @@ def test_sync_with_empty_database(prepare_environment: Any) -> None:
     """)
     script.sync_configuration(configuration)
 
-    # Check if Scan Categories were synchronized properly
-    scan_categories = ScanCategoriesRepository.get_all_categories(include_disabled=True)
-    assert len(scan_categories) == 1
-    kidneys = ScanCategoriesRepository.get_category_by_key('KIDNEYS')
+    # Check if Datasets were synchronized properly
+    datasets = DatasetsRepository.get_all_datasets(include_disabled=True)
+    assert len(datasets) == 1
+    kidneys = DatasetsRepository.get_dataset_by_key('KIDNEYS')
     assert kidneys.name == 'Kidneys'
     assert not kidneys.disabled
     assert {task.key for task in kidneys.tasks} == {'KIDNEYS_SEGMENTATION'}
@@ -50,7 +50,7 @@ def test_sync_with_empty_database(prepare_environment: Any) -> None:
     assert len(tasks) == 1
     kidneys_segmentation = TasksRepository.get_task_by_key('KIDNEYS_SEGMENTATION')
     assert kidneys_segmentation.name == 'Kidneys segmentation'
-    assert kidneys_segmentation.image_path == 'assets/icon/kidneys_category_icon.svg'
+    assert kidneys_segmentation.image_path == 'assets/icon/kidneys_dataset_icon.svg'
     assert not kidneys_segmentation.disabled
     assert len(kidneys_segmentation.available_tags) == 2
     assert {tag.key for tag in kidneys_segmentation.available_tags} == {'LEFT_KIDNEY', 'RIGHT_KIDNEY'}
@@ -80,7 +80,7 @@ def test_sync_with_updated_names(prepare_environment: Any) -> None:
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -105,7 +105,7 @@ def test_sync_with_updated_names(prepare_environment: Any) -> None:
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: New Kidneys segmentation
-            image_path: new_assets/icon/kidneys_category_icon.svg
+            image_path: new_assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: LEFT_KIDNEY
                 name: New Left Kidney
@@ -119,10 +119,10 @@ def test_sync_with_updated_names(prepare_environment: Any) -> None:
     """)
     script.sync_configuration(configuration)
 
-    # Check if Scan Categories were synchronized properly
-    scan_categories = ScanCategoriesRepository.get_all_categories(include_disabled=True)
-    assert len(scan_categories) == 1
-    kidneys = ScanCategoriesRepository.get_category_by_key('KIDNEYS')
+    # Check if Datasets were synchronized properly
+    datasets = DatasetsRepository.get_all_datasets(include_disabled=True)
+    assert len(datasets) == 1
+    kidneys = DatasetsRepository.get_dataset_by_key('KIDNEYS')
     assert kidneys.name == 'New Kidneys'
     assert not kidneys.disabled
     assert {task.key for task in kidneys.tasks} == {'KIDNEYS_SEGMENTATION'}
@@ -132,7 +132,7 @@ def test_sync_with_updated_names(prepare_environment: Any) -> None:
     assert len(tasks) == 1
     kidneys_segmentation = TasksRepository.get_task_by_key('KIDNEYS_SEGMENTATION')
     assert kidneys_segmentation.name == 'New Kidneys segmentation'
-    assert kidneys_segmentation.image_path == 'new_assets/icon/kidneys_category_icon.svg'
+    assert kidneys_segmentation.image_path == 'new_assets/icon/kidneys_dataset_icon.svg'
     assert not kidneys_segmentation.disabled
     assert len(kidneys_segmentation.available_tags) == 2
     assert {tag.key for tag in kidneys_segmentation.available_tags} == {'LEFT_KIDNEY', 'RIGHT_KIDNEY'}
@@ -162,7 +162,7 @@ def test_sync_with_changed_tools_in_tag(prepare_environment: Any) -> None:
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -191,7 +191,7 @@ def test_sync_with_changed_tools_in_tag(prepare_environment: Any) -> None:
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -222,7 +222,7 @@ def test_sync_with_changed_tags_in_task(prepare_environment: Any) -> None:
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -251,7 +251,7 @@ def test_sync_with_changed_tags_in_task(prepare_environment: Any) -> None:
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: RIGHT_KIDNEY
                 name: Right Kidney
@@ -285,7 +285,7 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -295,9 +295,9 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
     """)
     script.sync_configuration(configuration)
 
-    # Check if Scan Categories were synchronized properly
-    scan_categories = ScanCategoriesRepository.get_all_categories(include_disabled=True)
-    assert len(scan_categories) == 1
+    # Check if Datasets were synchronized properly
+    datasets = DatasetsRepository.get_all_datasets(include_disabled=True)
+    assert len(datasets) == 1
 
     # Check if Tasks were synchronized properly
     tasks = TasksRepository.get_all_tasks(include_disabled=True)
@@ -317,7 +317,7 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
         tasks:
           - key: FIND_NODULES
             name: Find nodules
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: NODULE
                 name: Nodule
@@ -326,9 +326,9 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
     """)
     script.sync_configuration(configuration)
 
-    # Check if Scan Categories were synchronized properly
-    scan_categories = ScanCategoriesRepository.get_all_categories(include_disabled=True)
-    assert len(scan_categories) == 1
+    # Check if Datasets were synchronized properly
+    datasets = DatasetsRepository.get_all_datasets(include_disabled=True)
+    assert len(datasets) == 1
 
     # Check if Tasks were synchronized properly
     tasks = TasksRepository.get_all_tasks(include_disabled=True)
@@ -351,7 +351,7 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: New Kidneys segmentation
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: NEW_LEFT_KIDNEY
                 name: New Left Kidney
@@ -360,9 +360,9 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
     """)
     script.sync_configuration(configuration)
 
-    # Check if Scan Categories were synchronized properly
-    scan_categories = ScanCategoriesRepository.get_all_categories(include_disabled=True)
-    assert len(scan_categories) == 1
+    # Check if Datasets were synchronized properly
+    datasets = DatasetsRepository.get_all_datasets(include_disabled=True)
+    assert len(datasets) == 1
 
     # Check if Tasks were synchronized properly
     tasks = TasksRepository.get_all_tasks(include_disabled=True)
@@ -372,7 +372,7 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
     assert find_nodules.disabled
     kidneys_segmentation = TasksRepository.get_task_by_key('KIDNEYS_SEGMENTATION')
     assert kidneys_segmentation.name == 'New Kidneys segmentation'
-    assert kidneys_segmentation.image_path == 'assets/icon/kidneys_category_icon.svg'
+    assert kidneys_segmentation.image_path == 'assets/icon/kidneys_dataset_icon.svg'
     assert not kidneys_segmentation.disabled
     assert len(kidneys_segmentation.available_tags) == 1
     assert {tag.key for tag in kidneys_segmentation.available_tags} == {'NEW_LEFT_KIDNEY'}
@@ -399,7 +399,7 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
         tasks:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -439,7 +439,7 @@ def test_sync_with_changed_dataset_and_reused_task(prepare_environment: Any) -> 
         tasks:
           - key: FIND_NODULES
             name: Find nodules
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: NODULE
                 name: Nodule
@@ -448,10 +448,10 @@ def test_sync_with_changed_dataset_and_reused_task(prepare_environment: Any) -> 
     """)
     script.sync_configuration(configuration)
 
-    # Check if Scan Categories were synchronized properly
-    scan_categories = ScanCategoriesRepository.get_all_categories(include_disabled=True)
-    assert len(scan_categories) == 1
-    kidneys = ScanCategoriesRepository.get_category_by_key('KIDNEYS')
+    # Check if Datasets were synchronized properly
+    datasets = DatasetsRepository.get_all_datasets(include_disabled=True)
+    assert len(datasets) == 1
+    kidneys = DatasetsRepository.get_dataset_by_key('KIDNEYS')
     assert kidneys.name == 'Kidneys'
     assert not kidneys.disabled
     assert {task.key for task in kidneys.tasks} == {'FIND_NODULES'}
@@ -467,7 +467,7 @@ def test_sync_with_changed_dataset_and_reused_task(prepare_environment: Any) -> 
         tasks:
           - key: FIND_NODULES
             name: Find nodules
-            image_path: assets/icon/kidneys_category_icon.svg
+            image_path: assets/icon/kidneys_dataset_icon.svg
             tags:
               - key: NODULE
                 name: Nodule
@@ -476,14 +476,14 @@ def test_sync_with_changed_dataset_and_reused_task(prepare_environment: Any) -> 
     """)
     script.sync_configuration(configuration)
 
-    # Check if Scan Categories were synchronized properly
-    scan_categories = ScanCategoriesRepository.get_all_categories(include_disabled=True)
-    assert len(scan_categories) == 2
-    kidneys = ScanCategoriesRepository.get_category_by_key('KIDNEYS')
+    # Check if Datasets were synchronized properly
+    datasets = DatasetsRepository.get_all_datasets(include_disabled=True)
+    assert len(datasets) == 2
+    kidneys = DatasetsRepository.get_dataset_by_key('KIDNEYS')
     assert kidneys.name == 'Kidneys'
     assert kidneys.disabled
     assert {task.key for task in kidneys.tasks} == set()
-    lungs = ScanCategoriesRepository.get_category_by_key('LUNGS')
+    lungs = DatasetsRepository.get_dataset_by_key('LUNGS')
     assert lungs.name == 'Lungs'
     assert not lungs.disabled
     assert {task.key for task in lungs.tasks} == {'FIND_NODULES'}

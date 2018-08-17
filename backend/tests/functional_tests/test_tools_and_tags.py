@@ -6,7 +6,7 @@ from flask import json
 
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
     label_tags as LabelTagsRepository,
     tasks as TasksRepository,
 )
@@ -21,12 +21,12 @@ def test_add_label_non_existing_tag(prepare_environment: Any) -> None:
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
@@ -60,12 +60,12 @@ def test_add_label_non_supported_tool(prepare_environment: Any) -> None:
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
@@ -100,12 +100,12 @@ def test_add_label_missing_tag(prepare_environment: Any) -> None:
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
@@ -139,12 +139,12 @@ def test_add_label_missing_tool(prepare_environment: Any) -> None:
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
@@ -178,12 +178,12 @@ def test_add_label_wrong_tool_for_tag(prepare_environment: Any) -> None:
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 1. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201

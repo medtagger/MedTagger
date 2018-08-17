@@ -11,7 +11,7 @@ from PIL import Image
 from medtagger.database.models import SliceOrientation
 from medtagger.repositories import (
     slices as SlicesRepository,
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
 )
 
 from tests.functional_tests import get_api_client, get_headers
@@ -25,10 +25,10 @@ def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)
@@ -79,10 +79,10 @@ def test_scan_upload_with_retrying(fixture_problems_with_storage: Any, prepare_e
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)

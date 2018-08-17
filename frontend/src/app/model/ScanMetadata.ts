@@ -1,4 +1,6 @@
-export class ScanCategory {
+import {LabelTag} from './labels/LabelTag';
+
+export class Dataset {
     key: string;
     name: string;
 

@@ -5,10 +5,10 @@ from typing import Dict
 import yaml
 from sqlalchemy.exc import IntegrityError
 
-from medtagger.database.models import ScanCategory, Task
+from medtagger.database.models import Task
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
     tasks as TasksRepository,
     label_tags as LabelTagsRepository,
 )
@@ -46,7 +46,7 @@ def _sync_datasets(configuration: Dict) -> None:
     """
     datasets = configuration.get('datasets', []) or []
     configuration_datasets_keys = {dataset['key'] for dataset in datasets}
-    database_datasets_keys = {dataset.key for dataset in ScanCategory.query.all()}
+    database_datasets_keys = {dataset.key for dataset in DatasetsRepository.get_all_datasets(include_disabled=True)}
 
     datasets_to_add = configuration_datasets_keys - database_datasets_keys
     datasets_to_disable = database_datasets_keys - configuration_datasets_keys
@@ -54,17 +54,17 @@ def _sync_datasets(configuration: Dict) -> None:
 
     for dataset_key in datasets_to_add:
         dataset = next(dataset for dataset in datasets if dataset['key'] == dataset_key)
-        ScanCategoriesRepository.add_new_category(dataset['key'], dataset['name'])
+        DatasetsRepository.add_new_dataset(dataset['key'], dataset['name'])
         logger.info('New DataSet added: %s', dataset['key'])
 
     for dataset_key in datasets_to_enable:
         dataset = next(dataset for dataset in datasets if dataset['key'] == dataset_key)
-        ScanCategoriesRepository.enable(dataset['key'])
-        ScanCategoriesRepository.update(dataset['key'], dataset['name'])
+        DatasetsRepository.enable(dataset['key'])
+        DatasetsRepository.update(dataset['key'], dataset['name'])
         logger.info('DataSet enabled: %s', dataset['key'])
 
     for dataset_key in datasets_to_disable:
-        ScanCategoriesRepository.disable(dataset_key)
+        DatasetsRepository.disable(dataset_key)
         logger.info('DataSet disabled: %s', dataset_key)
 
 
@@ -76,7 +76,7 @@ def _sync_tasks(configuration: Dict) -> None:
     tasks:
       - key: KIDNEYS_SEGMENTATION
         name: Kidneys segmentation
-        image_path: assets/icon/kidneys_category_icon.svg
+        image_path: assets/icon/kidneys_dataset_icon.svg
         tags:
           - key: LEFT_KIDNEY
             name: Left Kidney

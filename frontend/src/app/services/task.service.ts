@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {Task} from '../model/Task';
 import {HttpClient} from '@angular/common/http';
-import {LabelTag} from '../model/LabelTag';
+import {LabelTag} from '../model/labels/LabelTag';
 
 export interface TaskResponse {
     task_id: number;
@@ -10,7 +10,7 @@ export interface TaskResponse {
     name: string;
     image_path: string;
     tags: Array<LabelTagResponse>;
-    categories: Array<string>;
+    datasets: Array<string>;
 }
 
 interface LabelTagResponse {

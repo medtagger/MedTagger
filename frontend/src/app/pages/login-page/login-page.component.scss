@@ -1,163 +1,159 @@
 @import "../../../styles";
 
-header {
-    height: 100vh;
+.header {
+    @include media-breakpoint-up(lg) {
+        @include fixed(top 0 left 0);
+    }
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    height: 100vh;
     &:before {
         @include absolute(top 0);
         @include size(100%);
+        z-index: -2;
         display: block;
         background-size: cover;
         background: white url("../../../assets/img/login_pic.jpg") no-repeat center;
         content: " ";
-        z-index: -2;
     }
     &:after {
         @include absolute(top 0 left 0);
         @include size(100%);
+        z-index: -1;
         display: block;
         background: rgba(mat-color($primary, 800), 0.8);
         content: " ";
-        z-index: -1;
     }
-    h3 {
-        color: $white-medium-emphasis;
-        margin-top: 3em;
-        font-weight: lighter;
-        max-width: 15em;
+    &-desc {
         @include media-breakpoint-only(lg) {
             max-width: 10em;
+        }
+        margin-top: 3em;
+        max-width: 15em;
+        color: $white-medium-emphasis;
+        font-weight: lighter;
+
+    }
+    &-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        img {
+            @include fluid-type(576px, 1200px, 33.184px, 50.512px);
+            display: inline-block;
+            margin: 0 .5em 0 0;
+            height: 2em;
+        }
+        h1 {
+            margin: .5em 0 0 0;
+            color: $white-high-emphasis;
+            font-weight: bold;
         }
     }
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    img {
-        display: inline-block;
-        margin: 0 .5em 0 0;
-        height: 2em;
-        @include fluid-type(576px, 1200px, 33.184px, 50.512px);
+.action {
+    @include media-breakpoint-only(lg) {
+        padding: 1.5em 5em;
     }
-    h1 {
-        display: inline-block;
-        color: $white-high-emphasis;
-        font-weight: bold;
-        margin: .5em 0 0 0;
-    }
-}
-
-.login {
-    max-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 3em 5em;
-    @include media-breakpoint-only(lg) {
-        padding: 1.5em 5em;
-    }
-}
-
-.buttons-pill {
-    margin: 0 0 5em 0;
-    display: flex;
-    align-items: center;
-    h4 {
+    &-buttons {
+        margin: 0 0 5em 0;
         display: flex;
         align-items: center;
-        justify-content: center;
-        height: 2em;
-        width: 7em;
-        background: $black-8-opacity;
-        text-transform: uppercase;
-        cursor: pointer;
-        &:first-child {
-            border-radius: 50px 0 0 50px;
-        }
-        &:last-child {
-            border-radius: 0 50px 50px 0;
-        }
-        a {
-            color: $black-disabled;
-            @include transition(color .2s ease-out);
-            &:hover, &:active, &:focus {
-                color: $black-medium-emphasis;
-                text-decoration: none;
+        > * {
+            @include size(7em, 2em);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: $black-8-opacity;
+            text-transform: uppercase;
+            cursor: pointer;
+            &:first-child {
+                border-radius: 50px 0 0 50px;
             }
-        }
-        &.active {
-            background: mat-color($accent);
-            @include transition(background .2s ease-out);
+            &:last-child {
+                border-radius: 0 50px 50px 0;
+            }
             a {
-                color: $white-high-emphasis;
+                @include transition(color .2s ease-out);
+                color: $black-disabled;
+                &:hover, &:active, &:focus {
+                    color: $black-medium-emphasis;
+                    text-decoration: none;
+                }
             }
-            &:hover, &:active, &:focus {
-                background: mat-color($accent, 600);
+            &.active {
+                @include transition(background .2s ease-out);
+                background: mat-color($accent);
+                a {
+                    color: $white-high-emphasis;
+                }
+                &:hover, &:active, &:focus {
+                    background: mat-color($accent, 600);
+                }
             }
         }
     }
-}
+    &-content {
+        @include media-breakpoint-up(lg) {
+            width: 60%;
+        }
+    }
+    &-welcoming {
+        margin: 2em 0;
+        &__header {
+            font-weight: bold;
+        }
+        &__description {
+            color: $black-medium-emphasis;
+            font-weight: lighter;
+        }
+    }
 
-main {
-    @include media-breakpoint-up(lg) {
-        max-width: 80%;
-    }
-    @include media-breakpoint-up(md) {
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-    h3 {
-        font-weight: bold;
-    }
-    h4 {
-        color: $black-medium-emphasis;
-        font-weight: lighter;
-    }
-    form {
-        margin: 2em 0 0 0;
+    &-form {
+        @include remove-autofill;
         @include media-breakpoint-only(lg) {
             margin-bottom: 0;
         }
         display: flex;
         flex-direction: column;
-        @include remove-autofill;
+        margin: 2em 0;
         mat-form-field {
             margin-bottom: 1.2em;
+            cursor: pointer;
+        }
+        &__submit {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            font-size: 1.5em;
+            text-align: left;
+            button {
+                @include mat-elevation(2);
+                @include mat-elevation-transition;
+                @include media-breakpoint-up(md) {
+                    width: 10em;
+                }
+                height: 1.8em;
+                width: 100%;
+                font-size: 1em;
+                text-transform: uppercase;
+                border-radius: 5px;
+                &:hover {
+                    @include mat-elevation(5);
+                }
+            }
             mat-icon {
-                cursor: pointer;
-                z-index: 3;
+                margin-left: 0.5em;
+                font-size: 1.2em;
             }
         }
-    }
-}
-
-.submit {
-    display: flex;
-    align-items: center;
-    font-size: 1.5em;
-    text-align: center;
-    margin: 0 .5em .5em .5em;
-    button {
-        font-size: 1em;
-        text-transform: uppercase;
-        border-radius: 5px;
-        width: 100%;
-        @include media-breakpoint-up(md) {
-            width: 10em;
-        }
-        @include mat-elevation(2);
-        @include mat-elevation-transition;
-        &:hover {
-            @include mat-elevation(5);
-        }
-    }
-    mat-icon {
-        font-size: 1.2em;
     }
 }

@@ -1,4 +1,4 @@
-import {ROISelection2D} from '../../model/ROISelection2D';
+import {ROISelection2D} from '../../model/selections/ROISelection2D';
 import {Selector} from './Selector';
 import {RectROISelector} from './RectROISelector';
 

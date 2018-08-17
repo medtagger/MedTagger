@@ -4,7 +4,7 @@ from typing import Any
 
 from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
 from medtagger.repositories import (
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
     label_tags as LabelTagsRepository,
     tasks as TasksRepository,
 )
@@ -21,23 +21,23 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
 
-    # Step 2. Get all categories
-    response = api_client.get('/api/v1/scans/categories', headers=get_headers(token=user_token))
+    # Step 2. Get all datasets
+    response = api_client.get('/api/v1/scans/datasets', headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, list)
-    category = json_response[0]
-    category_key = category['key']
-    task_key = category['tasks'][0]['key']
-    assert isinstance(category_key, str)
-    assert len(category_key) > 1
+    dataset = json_response[0]
+    dataset_key = dataset['key']
+    task_key = dataset['tasks'][0]['key']
+    assert isinstance(dataset_key, str)
+    assert len(dataset_key) > 1
 
     # Step 3. Add Scan to the system
-    payload = {'category': category_key, 'number_of_slices': 1}
+    payload = {'dataset': dataset_key, 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201

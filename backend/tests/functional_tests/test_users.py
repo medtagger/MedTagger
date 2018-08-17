@@ -6,7 +6,7 @@ from medtagger.api.auth.business import create_user
 from medtagger.api.users.business import set_user_role
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
     label_tags as LabelTagsRepository,
     tasks as TasksRepository,
 )
@@ -116,7 +116,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     api_client = get_api_client()
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('LUNGS', 'Lungs')
+    DatasetsRepository.add_new_dataset('LUNGS', 'Lungs')
     task = TasksRepository.add_task('FIND_NODULES', 'Find Nodules', 'path/to/image', ['LUNGS'], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
     admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
@@ -131,7 +131,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     assert response.status_code == 200
 
     # Step 3. Add Scan to the system
-    payload = {'category': 'LUNGS', 'number_of_slices': 1}
+    payload = {'dataset': 'LUNGS', 'number_of_slices': 1}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=admin_user_token, json=True))
     assert response.status_code == 201

@@ -6,7 +6,7 @@ from medtagger.database.models import Survey, SurveySingleChoiceQuestion
 from medtagger.types import SurveyElementKey
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
     label_tags as LabelTagsRepository,
     tasks as TasksRepository,
 )
@@ -21,7 +21,7 @@ def test_adding_new_survey(prepare_environment: Any) -> None:
     user_token = get_token_for_logged_in_user('volunteer')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     label_tag = LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
 

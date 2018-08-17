@@ -5,7 +5,7 @@ from typing import Any
 from medtagger.storage.models import BrushLabelElement
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
     label_tags as LabelTagsRepository,
     tasks as TasksRepository,
 )
@@ -20,12 +20,12 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.BRUSH], task.id)
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
@@ -75,12 +75,12 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.POINT], task.id)
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
@@ -126,12 +126,12 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.CHAIN], task.id)
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
@@ -189,12 +189,12 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
     user_token = get_token_for_logged_in_user('admin')
 
     # Step 1. Prepare a structure for the test
-    ScanCategoriesRepository.add_new_category('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.CHAIN], task.id)
 
     # Step 2. Add Scan to the system
-    payload = {'category': 'KIDNEYS', 'number_of_slices': 3}
+    payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
     response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201

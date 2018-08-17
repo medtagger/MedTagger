@@ -31,10 +31,6 @@ export class PointSelection extends SliceSelection {
         this._positionY = y;
     }
 
-    public getCoordinates() {
-        return {x: this._positionX, y: this._positionY, z: this.sliceIndex};
-    }
-
     public toJSON() {
         return {
             'slice_index': this.sliceIndex,

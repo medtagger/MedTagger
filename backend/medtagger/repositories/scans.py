@@ -4,7 +4,7 @@ from typing import Optional, List
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
-from medtagger.database.models import ScanCategory, Scan, Slice, User, Label, Task, scan_categories_tasks
+from medtagger.database.models import Dataset, Scan, Slice, User, Label, Task, datasets_tasks
 from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.types import ScanID
 
@@ -28,7 +28,7 @@ def get_random_scan(task: Task = None, user: User = None) -> Scan:
     """
     query = Scan.query
     if task:
-        query = query.join(ScanCategory).join(scan_categories_tasks).join(Task)
+        query = query.join(Dataset).join(datasets_tasks).join(Task)
         query = query.filter(Task.key == task.key)
     if user:
         labelled_scans = Label.query.filter(Label.owner == user).all()
@@ -45,26 +45,18 @@ def delete_scan_by_id(scan_id: ScanID) -> None:
         session.query(Scan).filter(Scan.id == scan_id).delete()
 
 
-def add_new_scan(category: ScanCategory, number_of_slices: int, user: Optional[User]) -> Scan:
+def add_new_scan(dataset: Dataset, number_of_slices: int, user: Optional[User]) -> Scan:
     """Add new Scan to the database.
 
-    :param category: Scan's Category object
+    :param dataset: Dataset object
     :param number_of_slices: number of Slices that will be uploaded
     :param user: User that uploaded scan
     :return: Scan object
     """
     with db_session() as session:
-        scan = Scan(category, number_of_slices, user)
+        scan = Scan(dataset, number_of_slices, user)
         session.add(scan)
     return scan
-
-
-def reduce_number_of_declared_slices(scan_id: ScanID) -> None:
-    """Decrease number of declared Slices by one."""
-    with db_session() as session:
-        query = session.query(Scan)
-        query = query.filter(Scan.id == scan_id)
-        query.update({"declared_number_of_slices": (Scan.declared_number_of_slices - 1)})
 
 
 def try_to_mark_scan_as_stored(scan_id: ScanID) -> bool:
