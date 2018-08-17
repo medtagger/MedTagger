@@ -59,14 +59,6 @@ def add_new_scan(dataset: Dataset, number_of_slices: int, user: Optional[User]) 
     return scan
 
 
-def reduce_number_of_declared_slices(scan_id: ScanID) -> None:
-    """Decrease number of declared Slices by one."""
-    with db_session() as session:
-        query = session.query(Scan)
-        query = query.filter(Scan.id == scan_id)
-        query.update({"declared_number_of_slices": (Scan.declared_number_of_slices - 1)})
-
-
 def try_to_mark_scan_as_stored(scan_id: ScanID) -> bool:
     """Mark Scan as STORED only if all Slices were STORED.
 
