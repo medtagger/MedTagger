@@ -20,3 +20,4 @@ retrying==1.3.3
 psycopg2-binary==2.7.5
 scipy==1.1.0
 jsonschema==2.6.0
+pyyaml==3.13

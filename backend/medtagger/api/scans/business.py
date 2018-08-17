@@ -8,7 +8,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
-from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException, InternalErrorException
+from medtagger.exceptions import InternalErrorException
+from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
 from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool

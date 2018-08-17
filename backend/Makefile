@@ -4,14 +4,17 @@ MAIN_MODULE = medtagger
 SCRIPTS_DIRECTORY = scripts
 
 # Tests configuration
+ifdef TESTS
+    TESTS_TO_RUN = -k $(TESTS)
+else
+    TESTS_TO_RUN =
+endif
 COVERAGE_LIMIT = 0
 MAX_CYCLOMATIC_COMPLEXITY = 5
 UNIT_TESTS_MODULE = tests/unit_tests
-RUN_UNIT_TEST = $(UNIT_TESTS_MODULE)
 FUNCTIONAL_TESTS_MODULE = tests/functional_tests
 FUNCTIONAL_TESTS_DOCKER_COMPOSE = ../.travis/backend_functional_tests_docker-compose.yml
-RUN_FUNCTIONAL_TEST = $(FUNCTIONAL_TESTS_MODULE)
-PYTEST_SLOWEST_TESTS=0
+PYTEST_SLOWEST_TESTS=30
 
 # Third party configuration files
 PYLINT_CONFIG_FILE = .pylintrc
@@ -91,7 +94,7 @@ test_mypy:
 	mypy --ignore-missing-imports $(MAIN_MODULE) $(UNIT_TESTS_MODULE) $(FUNCTIONAL_TESTS_MODULE) $(SCRIPTS_DIRECTORY)
 
 unit_tests:
-	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) --durations=$(PYTEST_SLOWEST_TESTS) $(RUN_UNIT_TEST)
+	. $(UNIT_TESTS_MODULE)/configuration.sh && pytest --cov=$(MAIN_MODULE) --cov-fail-under=$(COVERAGE_LIMIT) --durations=$(PYTEST_SLOWEST_TESTS) $(UNIT_TESTS_MODULE) $(TESTS_TO_RUN)
 
 functional_tests:
 	make functional_tests__prepare_environment
@@ -109,7 +112,7 @@ functional_tests__prepare_environment:
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic upgrade head
 
 functional_tests__run:
-	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && pytest --durations=$(PYTEST_SLOWEST_TESTS) $(RUN_FUNCTIONAL_TEST)
+	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && pytest --durations=$(PYTEST_SLOWEST_TESTS) $(FUNCTIONAL_TESTS_MODULE) $(TESTS_TO_RUN)
 	
 functional_tests__delete_environment:
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic downgrade base
