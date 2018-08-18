@@ -121,6 +121,11 @@ Temporary Items
 
 # Tools
 .vagrant/
+.pytest_cache/
+venv/
+
+# MedTagger
+.medtagger.yml
 
 # Others
 *.log

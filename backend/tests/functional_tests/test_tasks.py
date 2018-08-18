@@ -2,6 +2,8 @@
 import json
 from typing import Any
 
+from medtagger.repositories import datasets as DatasetsRepository
+
 from tests.functional_tests import get_api_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
@@ -11,6 +13,11 @@ def test_add_task(prepare_environment: Any) -> None:
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
 
+    # Step 1. Prepare a structure for the test
+    DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
+    DatasetsRepository.add_new_dataset('LUNGS', 'Lungs')
+
+    # Step 2. Add new Task through the REST API
     payload = {
         'key': 'MARK_NODULES',
         'name': 'Mark nodules',
@@ -36,6 +43,7 @@ def test_add_task(prepare_environment: Any) -> None:
     assert json_response['image_path'] == 'assets/icon/my_icon.svg'
     assert len(json_response['tags']) == 2
 
+    # Step 3. Check for available Datasets through the REST API
     response = api_client.get('/api/v1/scans/datasets', headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)
     datasets = [dataset for dataset in json_response

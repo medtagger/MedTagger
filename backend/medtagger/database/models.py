@@ -103,6 +103,7 @@ class Dataset(Base):
     id: int = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
     tasks: List['Task'] = relationship('Task', back_populates='datasets', secondary=datasets_tasks)
 
@@ -128,11 +129,12 @@ class Task(Base):
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
     image_path: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
     datasets: List[Dataset] = relationship('Dataset', back_populates='tasks',
                                            secondary=datasets_tasks)
 
-    available_tags: List['LabelTag'] = relationship("LabelTag", back_populates="task")
+    _tags: List['LabelTag'] = relationship("LabelTag", back_populates="task")
 
     def __init__(self, key: str, name: str, image_path: str) -> None:
         """Initialize Task.
@@ -148,6 +150,16 @@ class Task(Base):
     def __repr__(self) -> str:
         """Return string representation for Task."""
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
+
+    @property
+    def available_tags(self) -> List['LabelTag']:
+        """Return Tags that are enabled for this Task."""
+        return [tag for tag in self._tags if not tag.disabled]
+
+    @available_tags.setter
+    def available_tags(self, new_tags: List['LabelTag']) -> None:
+        """Set new Label Tags for this Task."""
+        self._tags = new_tags
 
 
 class Scan(Base):
@@ -358,9 +370,10 @@ class LabelTag(Base):
     id: LabelTagID = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
     task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
-    task: Task = relationship('Task', back_populates="available_tags")
+    task: Task = relationship('Task', back_populates="_tags")
 
     tools: List[LabelTool] = Column(ArrayOfEnum(Enum(LabelTool, name='label_tool', create_constraint=False)))
     actions: List['Action'] = relationship('Action', back_populates='label_tag')

@@ -8,7 +8,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
-from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException, InternalErrorException
+from medtagger.exceptions import InternalErrorException
+from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
 from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
@@ -249,7 +250,7 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     """Add new Slice for given Scan.
 
     :param scan_id: ID of a Scan for which it should add new slice
-    :param image: bytes representing Dicom image
+    :param image: bytes representing DICOM image
     :return: Slice object
     """
     scan = ScansRepository.get_scan_by_id(scan_id)
@@ -257,7 +258,7 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     try:
         SlicesRepository.store_original_image(_slice.id, image)
     except WriteTimeout:
-        SlicesRepository.delete_slice_by_id(_slice.id)
+        SlicesRepository.delete_slice(_slice)
         raise InternalErrorException('Timeout during saving original image to the Storage.')
     parse_dicom_and_update_slice.delay(_slice.id)
     return _slice

@@ -42,10 +42,10 @@ export class ValidationPageComponent implements OnInit {
             this.scanViewer.hookUpSliceObserver(ValidationPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
                 if (isObserverHooked) {
                     this.scanViewer.observableSliceRequest.subscribe((request: SliceRequest) => {
-                        // TODO: Why is it copied & pasted here? We shoul unify this ASAP!
+                        // TODO: Why is it copied & pasted here? We should unify this ASAP!
                         const reversed = request.reversed;
                         let sliceRequest = request.slice;
-                        console.log('ValiadionPage | observable sliceRequest: ', sliceRequest, ' reversed: ', reversed);
+                        console.log('ValidationPage | observable sliceRequest: ', sliceRequest, ' reversed: ', reversed);
                         let count = ValidationPageComponent.SLICE_BATCH_SIZE;
                         if (reversed === false && sliceRequest + count > this.scan.numberOfSlices) {
                             count = this.scan.numberOfSlices - sliceRequest;

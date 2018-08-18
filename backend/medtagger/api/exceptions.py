@@ -1,7 +1,8 @@
 """Exceptions used across whole API."""
+from medtagger.exceptions import MedTaggerException
 
 
-class BaseHTTPException(Exception):
+class BaseHTTPException(MedTaggerException):
     """Base class for all HTTP Exceptions."""
 
     pass
@@ -27,11 +28,5 @@ class InvalidArgumentsException(BaseHTTPException):
 
 class AccessForbiddenException(BaseHTTPException):
     """Exception designed to use while the user does not have a privilege to perform action."""
-
-    pass
-
-
-class InternalErrorException(BaseHTTPException):
-    """Exception designed to use to indicate internal errors (like DB/Storage error)."""
 
     pass
