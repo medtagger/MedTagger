@@ -1,4 +1,5 @@
 import {SliceSelection} from './SliceSelection';
+import {BinaryConverter} from '../../utils/BinaryConverter';
 
 export class BrushSelection extends SliceSelection {
     _selectionLayer: HTMLImageElement;
@@ -41,8 +42,8 @@ export class BrushSelection extends SliceSelection {
     }
 
     getAdditionalData(): Object {
-        let additionalData: Object = {};
-        additionalData[this.getId().toString()] = SliceSelection.base64toBlob(this._selectionLayer.src);
+        const additionalData: Object = {};
+        additionalData[this.getId().toString()] = BinaryConverter.base64toBlob(this._selectionLayer.src);
         return additionalData;
     }
 }

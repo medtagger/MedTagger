@@ -62,8 +62,8 @@ export class ScanService {
         form.append('label', JSON.stringify(payload));
 
         const additionalData = selection.getAdditionalData();
-        for (let key in additionalData) {
-            let value = additionalData[key];
+        for (const key of Object.keys(additionalData)) {
+            const value = additionalData[key];
             form.append(key, value, key);
         }
 
