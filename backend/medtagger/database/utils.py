@@ -5,7 +5,7 @@ from typing import Any
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ARRAY
 
-from medtagger.api.exceptions import InternalErrorException
+from medtagger.exceptions import InternalErrorException
 
 
 class ArrayOfEnum(ARRAY):  # pylint: disable=too-many-ancestors

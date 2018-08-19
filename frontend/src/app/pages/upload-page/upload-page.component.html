@@ -1,26 +1,26 @@
 <mat-horizontal-stepper [linear]="true" #stepper>
 
-    <!-- Select Category mode -->
-    <mat-step [stepControl]="chooseCategoryFormGroup">
-        <form [formGroup]="chooseCategoryFormGroup">
-            <ng-template matStepLabel>Select Category</ng-template>
+    <!-- Select Dataset mode -->
+    <mat-step [stepControl]="chooseDatasetFormGroup">
+        <form [formGroup]="chooseDatasetFormGroup">
+            <ng-template matStepLabel>Select Dataset</ng-template>
             <div class="middle-screen-width">
                 <mat-card>
                     <mat-card-header>
-                        <mat-card-title>Select Category</mat-card-title>
+                        <mat-card-title>Select Dataset</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
                         <mat-form-field>
-                            <mat-select data-cy="datasets" placeholder="Scan category" formControlName="category" required>
-                                <mat-option *ngFor="let availableCategory of availableCategories"
-                                            [value]="availableCategory.key">
-                                    {{availableCategory.name}}
+                            <mat-select placeholder="Dataset" formControlName="dataset" required data-cy="datasets">
+                                <mat-option *ngFor="let availableDataset of availableDatasets"
+                                            [value]="availableDataset.key">
+                                    {{availableDataset.name}}
                                 </mat-option>
                             </mat-select>
                         </mat-form-field>
                     </mat-card-content>
                     <mat-card-actions>
-                        <button data-cy="datasets-submit" class="pull-right" mat-raised-button matStepperNext color="primary">Select</button>
+                        <button class="pull-right" mat-raised-button matStepperNext color="primary" data-cy="datasets-submit">Select</button>
                         <div class="clearfix"></div>
                     </mat-card-actions>
                 </mat-card>
@@ -42,8 +42,8 @@
                         <p>Select this option if you want to upload a single 3D Scan.</p>
                     </mat-card-content>
                     <mat-card-actions>
-                        <button data-cy="single-scan" class="pull-right" mat-raised-button color="primary"
-                                (click)="selectUploadMode(UploadMode.SINGLE_SCAN)">Select
+                        <button class="pull-right" mat-raised-button color="primary"
+                                (click)="selectUploadMode(UploadMode.SINGLE_SCAN)" data-cy="single-scan">Select
                         </button>
                         <div class="clearfix"></div>
                     </mat-card-actions>
@@ -105,8 +105,8 @@
                         <mat-card-actions>
                             <app-upload-scans-selector #uploadSingleScanSelector (onFileSelect)="chooseFiles($event)"
                                                    [multipleScans]="false" style="float: left;"></app-upload-scans-selector>
-                            <button data-cy="single-scan-upload" mat-raised-button color="primary" (click)="uploadFiles()"
-                                    *ngIf="totalNumberOfSlices != 0" style="float: right;">
+                            <button mat-raised-button color="primary" (click)="uploadFiles()"
+                                    *ngIf="totalNumberOfSlices != 0" style="float: right;" data-cy="single-scan-upload">
                                 <mat-icon>file_upload</mat-icon>
                                 Upload Scan!
                             </button>

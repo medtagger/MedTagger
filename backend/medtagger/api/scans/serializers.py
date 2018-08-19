@@ -6,7 +6,7 @@ from medtagger.api.tasks.serializers import out__task
 from medtagger.definitions import ScanStatus, LabelVerificationStatus
 
 in__new_scan = api.model('New Scan model', {
-    'category': fields.String(description='Scan\'s category', required=True),
+    'dataset': fields.String(description='Dataset', required=True),
     'number_of_slices': fields.Integer(description='Number of Slices that will be uploaded', required=True),
 })
 
@@ -93,12 +93,12 @@ in__label_model = api.model('Label model', {
 in__label = api.parser()
 in__label.add_argument('label', type=in__label_model, help='Label model object', location='form', required=True)
 
-in__scan_category = api.model('New Scan Category model', {
+in__dataset = api.model('New Dataset model', {
     'key': fields.String(),
     'name': fields.String(),
 })
 
-out__scan_category = api.model('Scan Category model', {
+out__dataset = api.model('Dataset model', {
     'key': fields.String(),
     'name': fields.String(),
     'tasks': fields.List(fields.Nested(out__task)),

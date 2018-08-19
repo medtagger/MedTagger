@@ -11,7 +11,7 @@ from medtagger.repositories import (
     slices as SlicesRepository,
     labels as LabelsRepository,
     label_tags as LabelTagsRepository,
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
 )
 
 BACKUP_DIRECTORY = 'medtagger_backup/'
@@ -61,18 +61,18 @@ with open(ROLES_AND_USERS_FILE, 'w') as json_file:
 
 # Backup all Scans and its Labels with DICOM files
 _scans = {
-    'scan_categories': [],
+    'datasets': [],
     'label_tags': [],
     'scans': [],
 }  # type: Dict[str, List[Dict]]
 
-print('\nFetching Scan Categories...')
-for scan_category in ScanCategoriesRepository.get_all_categories():
-    print('Saving Scan Category: {}'.format(scan_category.key))
-    _scans['scan_categories'].append({
-        'id': scan_category.id,
-        'key': scan_category.key,
-        'name': scan_category.name,
+print('\nFetching Datasets...')
+for dataset in DatasetsRepository.get_all_datasets():
+    print('Saving Dataset: {}'.format(dataset.key))
+    _scans['datasets'].append({
+        'id': dataset.id,
+        'key': dataset.key,
+        'name': dataset.name,
     })
 print('\nFetching Label Tags...')
 for label_tag in LabelTagsRepository.get_all_tags():
@@ -93,7 +93,7 @@ for scan in ScansRepository.get_all_scans():
         'id': scan.id,
         'converted': scan.converted,
         'declared_number_of_slices': scan.declared_number_of_slices,
-        'category': scan.category.key,
+        'dataset': scan.dataset.key,
         'owner_id': scan.owner_id,
         'slices': [{
             'id': scan_slice.id,

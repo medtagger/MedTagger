@@ -1,14 +1,14 @@
 <mat-horizontal-stepper [linear]="true" #stepper>
     <mat-step [stepControl]="formGroup">
-        <ng-template matStepLabel>Choose category</ng-template>
+        <ng-template matStepLabel>Choose dataset</ng-template>
         <section class="step-content">
             <video loop #firstStepVideo>
                 <source src="assets/video/marker_step1.mp4" type="video/mp4">
             </video>
             <mat-card>
-                <mat-card-title>Choose category</mat-card-title>
+                <mat-card-title>Choose dataset</mat-card-title>
                 <mat-card-subtitle>Step 1</mat-card-subtitle>
-                <p>First, choose category of the data you want to label. After that you will be taken to marker
+                <p>First, choose dataset of the data you want to label. After that you will be taken to marker
                     page.</p>
                 <button data-cy="next1" class="nextPage" mat-raised-button matStepperNext color="primary">Next
                     <mat-icon>navigate_next</mat-icon>
