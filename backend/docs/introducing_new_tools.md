@@ -1,19 +1,23 @@
-Introducing new tools
-------------------------------------
+Introducing new Tools
+---------------------
 
-Here you can find every information that will be helpful while introducing new type of tools to backend. This tutorial assumes that you know how to run MedTagger. If not, go [here](development_setup_native.md) to learn how to run it natively, or [here](development_in_vagrant.md) to learn how to run it in Vagrant.
-
-Adding new tool to MedTagger requires making changes both in backend and in frontend. To see how to add your tool on the frontend side proceed [here](). 
+Here you can find details that will be helpful while introducing new type of Tools to backend. This tutorial
+assumes that you know how to run MedTagger. If not, go [here](development_setup_native.md) to learn how to run it 
+natively, or [here](development_in_vagrant.md) to learn how to run it in Vagrant. 
 
 ### Step 1. Add tool to the definitions
 
- Add your new tool to the `medtagger/definitions.py`. The `LabelTool` enum defines all tools supported by MedTagger.
+Add your new Tool to the `medtagger/definitions.py` file. The `LabelTool` enum defines all Tools supported 
+by MedTagger.
 
 ### Step 2. Create tool database model
 
-To enable support for various labels types we have introduced a concept of `LabelElement` which can be seen in `medtagger/database/models.py/`. It represents a high level LabelElement after which more specific types of LabelElement can inherit from. You can read more [here](http://docs.sqlalchemy.org/en/latest/orm/inheritance.html)
+To enable support for various Label types we have introduced a concept of `LabelElement` which can be seen in 
+`medtagger/database/models.py`. It provides higher level of abstraction for Label's result made with given Tool.
+You can read more [here](http://docs.sqlalchemy.org/en/latest/orm/inheritance.html)
 
-As you can see from the `LabelElement` our `tool` column serves as the discriminator, which indicates the type of represented object:
+As you can see in the `LabelElement`, our `tool` column serves as the discriminator, which indicates the type
+of represented object:
 
 ```python
 __mapper_args__ = {
@@ -40,29 +44,38 @@ class NewToolsLabelElement(LabelElement):
     # Your NewToolsLabelElement should also have __init__ and __repr__ methods.
 ```
 
-### Step 3. Performing alembic migration
+### Step 3. Preparing alembic migration
 
-After introducing new model to our database we need to update it. Please refer to [this](changing_database_models.md) tutorial to learn how to do that.
+After introducing new model to our database we need to update its structure. Please refer to 
+[this](changing_database_models.md) tutorial to learn how to do that.
 
-### Step 4. Methods for adding new label
+### Step 4. Functions for adding new Label
 
 #### Step 4.1 Repository
 
-Create a method in `medtagger/repositories/labels.py` that will create a new `db_session` and add your NewToolLabelElement. Please refer to other examples in the same file.
+Create a function in `medtagger/repositories/labels.py` that will create new 'NewToolLabelElement' using
+`db_session`. Please refer to other examples in the same file.
 
 #### Step 4.2 Business
 
-Create a method in `medtagger/api/scans/business.py` that will call method you have created in the last step. Please refer to other examples in the same file.
+Create function in `medtagger/api/scans/business.py` that will call function you have created in the last 
+step. Please refer to other examples in the same file.
 
-Now search for `add_label_element` method in the same file. As you can see this method handless adding new label elements by the tool that the label was made with. Please add your tool and the method that will be responsible for creating such label.
+Now search for `add_label_element` function in the same file. As you can see this function handles adding 
+new Label Elements by the Tool that the Label was made with. Please add your tool and the method that will 
+be responsible for creating such Label.
 
-If your tool requires some additional validation. Please write the validation method and add it to `validate_label_payload` in `medtagger/api/scans/business.py`.
+If your Tool requires some additional validation, please write the validation function and add it to 
+`validate_label_payload` in `medtagger/api/scans/business.py`.
 
 #### Step 4.3 REST Service
 
-As you can see in `medtagger/api/scans/service_rest.py` we do already have endpoint that adds new label for given scan. What is now important is to define a schema that will ensure that whatever JSON representation of a label made with your tool is correct.
+As you can see in `medtagger/api/scans/service_rest.py` we do already have endpoint that adds new Label for 
+given scan. It is important to define a schema that will ensure that whatever JSON representation 
+of a Label made with your Tool is, it is correct.
 
-To define a schema proceed to `medtagger/api/scans/serializers.py`. As you can see we have defined a schema for every `LabelElement` and we are actually telling that our new `LabelElement` can be one of the following types:
+To define a schema proceed to `medtagger/api/scans/serializers.py`. As you can see, we have defined a schema 
+for every `LabelElement`:
 
 ```python
 elements_schema = {
@@ -77,7 +90,8 @@ elements_schema = {
         ],
     },
 ```
-Below is and example of one of the schemas for label made with rectangle tool:
+
+Below is an example of one of the schemas for Label made with Rectangle Tool:
 
 ```python
 'rectangular_label_element_schema': {
@@ -94,36 +108,40 @@ Below is and example of one of the schemas for label made with rectangle tool:
     'additionalProperties': False,
 },
 ```
-Your job would be now to:
+
+Now you need to:
 
 1. Create your own definition of the schema,
 2. Write down every property that your `new_tool_label_element` should have,
 3. Provide additional information about properties (type, range etc.),
-4. Make sure to define which of the properties are required,
+4. Make sure to define which of your properties are required,
 5. Add your new definition to the `oneOf` section of the `elements_schema`.
 
-If you want more info about how to create such schemas, visit [this](https://json-schema.org/understanding-json-schema/index.html) page
+If you want more info about how to create such schemas, visit 
+[this](https://json-schema.org/understanding-json-schema/index.html) page.
 
 ### Step 5. Tests
 
-To make sure that all of this actually works, we need to write some tests! Proceed to `tests/functional_tests/test_adding_new_label.py`. This file holds tests for creating label for every tool that is supported by MedTagger. As you can see all of the tests have following steps:
+To make sure that all of this actually works, we need to write some tests! Go to the
+`tests/functional_tests/test_adding_new_label.py` which contains all tests for creating Label with every Tool 
+that is supported by MedTagger. As you can see all of the tests have following steps:
 
 1. Add Scan to the system,
 2. Label it with a given tool,
 3. Fetch details for the label.
 
-Add any number of tests that you think is necessary for your tool.
+Add any number of tests that you think is necessary for your Tool.
 
 Run the following command from `backend` directory to run MedTagger's functional tests:
 ```bash
 $ make functional_tests
 ```
 
-Remember to make sure that your code passes linter tests. To do the testing, please run the following command from the `backend` directory: 
+Remember to make sure that your code passes linter tests! Run the following command from the `backend` directory: 
 ```bash
 $ make tests    
 ```
 
-If you want to know more about MedTagger's tests, go [here](testing.md)
+If you want to know more about MedTagger's tests, go [here](testing.md).
 
-If all of your tests passes ,you are all done! You have succesfully added a new tool to MedTagger.
+If all of your tests pass, you are all done! You have succesfully added a new Tool to MedTagger.
