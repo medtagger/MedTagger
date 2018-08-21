@@ -6,11 +6,11 @@ tasks:
         - name: Left Kidney
           key: LEFT_KIDNEY
           tools:
-              - CHAIN
+              - RECTANGLE
         - name: Right Kidney
           key: RIGHT_KIDNEY
           tools:
-              - CHAIN
+              - RECTANGLE
 
   - name: Find nodules
     key: FIND_NODULES

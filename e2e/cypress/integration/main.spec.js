@@ -69,7 +69,7 @@ function goToLabeling(task) {
     cy.get('[data-cy=next3]').click();
     cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
     cy.get('[data-cy=next4]').click();
-    cy.get(`[data-cy=task]:nth-child(${task})`).click({force: true}); // clicking on svg has bug, https://github.com/cypress-io/cypress/issues/2245
+    cy.get(`[data-cy=task]:contains(${task})`).click({force: true}); // clicking on svg has bug, https://github.com/cypress-io/cypress/issues/2245
 }
 
 describe('Basic flow', () => {
@@ -101,22 +101,23 @@ describe('Basic flow', () => {
         uploadScans('Kidneys', 1);
     });
 
-    it('Rectangle selector', () => {
+    it.only('Rectangle selector', () => {
         loginAsAdmin();
         uploadScans('Kidneys', 11);
-        goToLabeling(1);
+        goToLabeling('Kidneys segmentation');
         matSelect('[data-cy=tags]', 'Left Kidney');
         cy.get('[data-cy=rectangle-tool]').click({force: true});
         cy.get('canvas').trigger('mousedown', 200, 200);
-        cy.get('canvas').trigger('mouseup', 300, 300);
+        cy.get('canvas').trigger('mousemove', 300, 300);
+        cy.get('canvas').trigger('mouseup');
         cy.get('[data-cy=send-label]').click();
     });
 
     it('Chain selector', () => {
         loginAsAdmin();
-        uploadScans('Kidneys', 11);
-        goToLabeling(1);
-        matSelect('[data-cy=tags]', 'Left Kidney');
+        uploadScans('Heart', 11);
+        goToLabeling('Find narrowings');
+        matSelect('[data-cy=tags]', 'Narrowing (lenghtwise)');
         cy.get('[data-cy=chain-tool]').click({force: true});
         cy.get('canvas').click(100, 100);
         cy.get('canvas').click(200, 100);
