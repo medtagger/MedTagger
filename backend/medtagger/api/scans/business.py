@@ -8,16 +8,17 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
-from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException, InternalErrorException
+from medtagger.exceptions import InternalErrorException
+from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
-from medtagger.database.models import ScanCategory, Scan, Slice, Label, LabelTag, SliceOrientation
+from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
     labels as LabelsRepository,
     label_tags as LabelTagsRepository,
     slices as SlicesRepository,
     scans as ScansRepository,
-    scan_categories as ScanCategoriesRepository,
+    datasets as DatasetsRepository,
     tasks as TasksRepository,
 )
 from medtagger.workers.storage import parse_dicom_and_update_slice
@@ -28,47 +29,47 @@ logger = logging.getLogger(__name__)
 LabelElementHandler = Callable[[Dict[str, Any], LabelID, Dict[str, bytes]], None]
 
 
-def get_available_scan_categories() -> List[ScanCategory]:
-    """Fetch list of all available Scan Categories.
+def get_available_datasets() -> List[Dataset]:
+    """Fetch list of all available Datasets.
 
-    :return: list of Scan Categories
+    :return: list of Datasets
     """
-    return ScanCategoriesRepository.get_all_categories()
+    return DatasetsRepository.get_all_datasets()
 
 
-def scan_category_is_valid(category_key: str) -> bool:
-    """Check if Scan Category for such key exists.
+def dataset_is_valid(dataset_key: str) -> bool:
+    """Check if Dataset for such key exists.
 
-    :param category_key: key representing Scan Category
-    :return: boolean information if Scan Category key is valid
+    :param dataset_key: key representing Dataset
+    :return: boolean information if Dataset key is valid
     """
     try:
-        ScanCategoriesRepository.get_category_by_key(category_key)
+        DatasetsRepository.get_dataset_by_key(dataset_key)
         return True
     except NoResultFound:
         return False
 
 
-def create_scan_category(key: str, name: str) -> ScanCategory:
-    """Create new Scan ScanCategory.
+def create_dataset(key: str, name: str) -> Dataset:
+    """Create new Dataset.
 
-    :param key: unique key representing Scan Category
-    :param name: name which describes this Category
-    :return: Scan Category object
+    :param key: unique key representing Dataset
+    :param name: name which describes this Dataset
+    :return: Dataset object
     """
-    return ScanCategoriesRepository.add_new_category(key, name)
+    return DatasetsRepository.add_new_dataset(key, name)
 
 
-def create_empty_scan(category_key: str, declared_number_of_slices: int) -> Scan:
+def create_empty_scan(dataset_key: str, declared_number_of_slices: int) -> Scan:
     """Create new empty scan.
 
-    :param category_key: string with category key
+    :param dataset_key: string with dataset key
     :param declared_number_of_slices: number of Slices that will be uploaded
     :return: Newly created Scan object
     """
     user = get_current_user()
-    category = ScanCategoriesRepository.get_category_by_key(category_key)
-    return ScansRepository.add_new_scan(category, declared_number_of_slices, user)
+    dataset = DatasetsRepository.get_dataset_by_key(dataset_key)
+    return ScansRepository.add_new_scan(dataset, declared_number_of_slices, user)
 
 
 def get_random_scan(task_key: str) -> Scan:
@@ -109,8 +110,8 @@ def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> Non
     :param elements: List of JSONs describing elements for a single label
     :param files: mapping of uploaded files (name and content)
     """
-    _validate_files(files)
     _validate_label_elements(elements, files)
+    _validate_files(files)
     _validate_tool(elements)
 
 
@@ -249,7 +250,7 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     """Add new Slice for given Scan.
 
     :param scan_id: ID of a Scan for which it should add new slice
-    :param image: bytes representing Dicom image
+    :param image: bytes representing DICOM image
     :return: Slice object
     """
     scan = ScansRepository.get_scan_by_id(scan_id)
@@ -257,7 +258,7 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     try:
         SlicesRepository.store_original_image(_slice.id, image)
     except WriteTimeout:
-        SlicesRepository.delete_slice_by_id(_slice.id)
+        SlicesRepository.delete_slice(_slice)
         raise InternalErrorException('Timeout during saving original image to the Storage.')
     parse_dicom_and_update_slice.delay(_slice.id)
     return _slice

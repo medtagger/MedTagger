@@ -2,7 +2,7 @@ import {throwError as observableThrowError, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 
-import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
+import {Dataset, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
@@ -15,6 +15,7 @@ import {from} from 'rxjs/internal/observable/from';
 import {defer} from 'rxjs/internal/observable/defer';
 import {Task} from '../model/Task';
 import {TaskResponse} from './task.service';
+import {isUndefined} from 'util';
 
 interface ScanResponse {
     scan_id: string;
@@ -24,7 +25,7 @@ interface ScanResponse {
     height: number;
 }
 
-interface AvailableCategoryResponse {
+interface AvailableDatasetResponse {
     key: string;
     name: string;
     tasks: Array<TaskResponse>;
@@ -57,8 +58,16 @@ export class ScanService {
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
         payload['comment'] = comment;
+
         const form = new FormData();
         form.append('label', JSON.stringify(payload));
+
+        const additionalData = selection.getAdditionalData();
+        for (const key of Object.keys(additionalData)) {
+            const value = additionalData[key];
+            form.append(key, value, key);
+        }
+
         return new Promise((resolve, reject) => {
             this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label`, form).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
@@ -71,6 +80,9 @@ export class ScanService {
     }
 
     public getRandomScan(taskKey: string): Promise<ScanMetadata> {
+        if (isUndefined(taskKey)) {
+            return Promise.reject('ScanService | getRandomScan | error: Task key is undefined!');
+        }
         return new Promise((resolve, reject) => {
             let params = new HttpParams();
             params = params.set('task', taskKey);
@@ -120,10 +132,10 @@ export class ScanService {
         this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count, reversed: reversed});
     }
 
-    createNewScan(category: string, numberOfSlices: number) {
+    createNewScan(dataset: string, numberOfSlices: number) {
         return new Promise((resolve, reject) => {
             const payload = {
-                category: category,
+                dataset: dataset,
                 number_of_slices: numberOfSlices,
             };
             let retryAttempt = 0;

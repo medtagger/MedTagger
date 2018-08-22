@@ -8,7 +8,7 @@ import {Selection3D} from '../../model/selections/Selection3D';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {SliceRequest} from '../../model/SliceRequest';
 import {DialogService} from '../../services/dialog.service';
-import {Location} from '@angular/common';
+import {Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/labels/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
@@ -40,6 +40,7 @@ export class MarkerPageComponent implements OnInit {
 
     scan: ScanMetadata;
     task: Task;
+    taskKey: string;
     lastSliceID = 0;
     startTime: Date;
     selectors: Map<string, Selector<any>>;
@@ -47,11 +48,12 @@ export class MarkerPageComponent implements OnInit {
     selectorActions: Array<SelectorAction> = [];
     labelComment: string;
     isInitialSliceLoad: boolean;
+    chooseTaskPageUrl = '/labelling/choose-task';
 
     ActionType = SelectorActionType;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private location: Location, private snackBar: MatSnackBar, private taskService: TaskService) {
+                private router: Router, private snackBar: MatSnackBar, private taskService: TaskService) {
         console.log('MarkerPage constructor', this.marker);
         this.labelComment = '';
         this.isInitialSliceLoad = true;
@@ -60,23 +62,33 @@ export class MarkerPageComponent implements OnInit {
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
 
-        this.task = this.taskService.getCurrentTask();
+        this.route.queryParamMap.subscribe(params => {
+            this.taskKey = params.get('task') || undefined;
+        });
 
-        if (!this.task) {
-            this.dialogService
-                .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
-                .afterClosed()
-                .subscribe(() => {
-                    this.location.back();
-                });
-        } else if (this.task.tags.length === 0) {
-            this.dialogService
-                .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
-                .afterClosed()
-                .subscribe(() => {
-                    this.location.back();
-                });
-        }
+        this.taskService.getTask(this.taskKey).then(
+            (task: Task) => {
+                this.task = task;
+
+                if (this.task.tags.length === 0) {
+                    this.dialogService
+                        .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
+                        .afterClosed()
+                        .subscribe(() => {
+                            this.router.navigateByUrl(this.chooseTaskPageUrl);
+                        });
+                }
+            },
+            (errorResponse: Error) => {
+                if (!this.task) {
+                    this.dialogService
+                        .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
+                        .afterClosed()
+                        .subscribe(() => {
+                            this.router.navigateByUrl(this.chooseTaskPageUrl);
+                        });
+                }
+            });
 
         this.taskTags = new FormControl('', [Validators.required]);
 
@@ -144,7 +156,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.scanService.getRandomScan(this.task.key).then(
+        this.scanService.getRandomScan(this.taskKey).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
@@ -160,10 +172,10 @@ export class MarkerPageComponent implements OnInit {
                 this.marker.setDownloadScanInProgress(false);
                 this.marker.setDownloadSlicesInProgress(false);
                 this.dialogService
-                    .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this category!', 'Go back')
+                    .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this dataset!', 'Go back')
                     .afterClosed()
                     .subscribe(() => {
-                        this.location.back();
+                        this.router.navigateByUrl(this.chooseTaskPageUrl);
                     });
             });
     }

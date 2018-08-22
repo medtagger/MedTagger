@@ -17,7 +17,7 @@ def create_user(email: str, password: str, first_name: str, last_name: str) -> i
     """
     user = UsersRepository.get_user_by_email(email)
     if user:
-        raise InvalidArgumentsException('User with this email already exist')
+        raise InvalidArgumentsException('User with this email already exists')
     password_hash = hash_password(password)
     new_user = User(email, password_hash, first_name, last_name)
     role = RolesRepository.get_role_with_name('volunteer')

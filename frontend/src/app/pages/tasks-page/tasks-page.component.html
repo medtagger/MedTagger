@@ -1,6 +1,6 @@
 <div class="tasks">
     <div class="button-row" *ngIf="downloadingTasksInProgress">
-         <mat-progress-spinner id="categoriesSpinner" [diameter]="150" [strokeWidth]="15" mode="indeterminate" color="accent"></mat-progress-spinner>
+         <mat-progress-spinner id="datasetsSpinner" [diameter]="150" [strokeWidth]="15" mode="indeterminate" color="accent"></mat-progress-spinner>
     </div>
     <div class="button-row" *ngIf="!downloadingTasksInProgress && tasks?.length == 0">
       <div class="title-row">
@@ -9,7 +9,7 @@
        <button mat-button id="back-button" color="accent" routerLink="/home">Go back</button>
     </div>
     <div class="button-row" *ngIf="!downloadingTasksInProgress && tasks?.length > 0">
-        <button mat-fab *ngFor="let task of tasks" routerLink="/labelling" (click)="setCurrentTask(task)">
+        <button mat-fab *ngFor="let task of tasks" routerLink="/labelling" [queryParams]="{task: task.key}">
             <mat-icon svgIcon="{{task.key}}"></mat-icon>
             <div>{{task.name}}</div>
         </button>

@@ -19,4 +19,7 @@ export abstract class SliceSelection {
     }
 
     public abstract toJSON(): Object;
+    public getAdditionalData(): Object {
+        return {};
+    }
 }
