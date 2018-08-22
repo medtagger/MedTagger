@@ -1,4 +1,5 @@
 import {SliceSelection} from './SliceSelection';
+import {BinaryConverter} from '../../utils/BinaryConverter';
 
 export class BrushSelection extends SliceSelection {
     _selectionLayer: HTMLImageElement;
@@ -18,6 +19,7 @@ export class BrushSelection extends SliceSelection {
 
         this.sliceIndex = depth;
         this.label_tag = tag;
+        this.label_tool = 'BRUSH';
     }
 
     public getSelectionLayer(): Promise<HTMLImageElement | Error> {
@@ -32,10 +34,16 @@ export class BrushSelection extends SliceSelection {
         return {
             'width': 1,
             'height': 1,
-            'image_key': this._selectionLayer.src,
+            'image_key': this.getId().toString(),
             'slice_index': this.sliceIndex,
             'tag': this.label_tag,
             'tool': this.label_tool
         };
+    }
+
+    getAdditionalData(): Object {
+        const additionalData: Object = {};
+        additionalData[this.getId().toString()] = BinaryConverter.base64toBlob(this._selectionLayer.src);
+        return additionalData;
     }
 }

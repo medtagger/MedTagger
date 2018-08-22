@@ -110,8 +110,8 @@ def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> Non
     :param elements: List of JSONs describing elements for a single label
     :param files: mapping of uploaded files (name and content)
     """
-    _validate_files(files)
     _validate_label_elements(elements, files)
+    _validate_files(files)
     _validate_tool(elements)
 
 
