@@ -27,14 +27,14 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.singleSelectionPerSlice = true;
 
         this.actions = [
-            new SelectorAction(BrushMode.ERASER, () => !!this.lastTagDrawings[this.getSelectingContext()], () => {
-                this.changeSelectorMode(BrushMode.ERASER);
-                this.deactivateOtherActions(BrushMode.ERASER);
-            }, SelectorActionType.BUTTON, false),
             new SelectorAction(BrushMode.BRUSH, () => true, () => {
                 this.changeSelectorMode(BrushMode.BRUSH);
                 this.deactivateOtherActions(BrushMode.BRUSH);
-            }, SelectorActionType.BUTTON, true)
+            }, SelectorActionType.BUTTON, true),
+            new SelectorAction(BrushMode.ERASER, () => !!this.lastTagDrawings[this.getSelectingContext()], () => {
+                this.changeSelectorMode(BrushMode.ERASER);
+                this.deactivateOtherActions(BrushMode.ERASER);
+            }, SelectorActionType.BUTTON, false)
         ];
         console.log('BrushSelector created!');
     }
@@ -78,6 +78,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     public changeSelectorMode(newMode: BrushMode): void {
         this.mode = newMode;
+        this.deactivateOtherActions(newMode);
     }
 
     drawSelection(selection: BrushSelection, color: string): any {
@@ -186,30 +187,67 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             const selectionImageURL: string = this.canvas.toDataURL();
             this.selectedArea = new BrushSelection(selectionImageURL, this.currentSlice, this.currentTag.name);
 
-            this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
-                this.lastTagDrawings[this.getSelectingContext()] = image;
+            const isSelectionErased = this.isCanvasBlank();
 
-                const currentSliceSelections = this.selections.get(this.currentSlice);
+            const selectionLabelId = this.manageCurrentSelections(isSelectionErased);
 
-                if (currentSliceSelections) {
-                    const labelTagSelectionIndex: number = currentSliceSelections.findIndex(
-                        (selection: BrushSelection) => selection.label_tag === this.currentTag.name
-                    );
+            // remove selection when it is completely erased
+            if (isSelectionErased) {
+                return this.finalizeSelectionRemoval(selectionLabelId);
+            }
 
-                    if (labelTagSelectionIndex > -1) {
-                        currentSliceSelections[labelTagSelectionIndex] = this.selectedArea;
-                    } else {
-                        currentSliceSelections.push(this.selectedArea);
-                    }
+            return this.finalizeNewSelection(selectionLabelId);
+        }
+    }
+
+    private manageCurrentSelections(isSelectionErased: boolean): number {
+        const currentSliceSelections = this.selections.get(this.currentSlice);
+
+        let selectionLabelId: number;
+        if (currentSliceSelections) {
+            const labelTagSelectionIndex: number = currentSliceSelections.findIndex(
+                (selection: BrushSelection) => selection.label_tag === this.currentTag.name
+            );
+
+            if (labelTagSelectionIndex > -1) {
+                selectionLabelId = currentSliceSelections[labelTagSelectionIndex].getId();
+
+                if (isSelectionErased) {
+                    currentSliceSelections.splice(labelTagSelectionIndex);
                 } else {
-                    this.selections.set(this.currentSlice, [this.selectedArea]);
+                    currentSliceSelections[labelTagSelectionIndex] = this.selectedArea;
                 }
 
-                this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
-                this.selectedArea = undefined;
-                this.requestRedraw();
-            });
+            } else {
+                currentSliceSelections.push(this.selectedArea);
+            }
+        } else {
+            this.selections.set(this.currentSlice, [this.selectedArea]);
+            selectionLabelId = this.selectedArea.getId();
         }
+
+        return selectionLabelId;
+    }
+
+    private finalizeSelectionRemoval(labelToDeleteId: number): void {
+        console.log('BrushSelector | inUp | blank selection, removing label...');
+        this.stateChange.emit(new SelectionStateMessage(labelToDeleteId, this.selectedArea.sliceIndex, true));
+
+        this.lastTagDrawings[this.getSelectingContext()] = undefined;
+        this.selectedArea = undefined;
+        this.requestRedraw();
+
+        this.changeSelectorMode(BrushMode.BRUSH);
+    }
+
+    private finalizeNewSelection(labelToUpdateId: number): void {
+        this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
+            this.lastTagDrawings[this.getSelectingContext()] = image;
+
+            this.stateChange.emit(new SelectionStateMessage(labelToUpdateId, this.selectedArea.sliceIndex, false));
+            this.selectedArea = undefined;
+            this.requestRedraw();
+        });
     }
 
     public updateCurrentSlice(currentSliceId: number): any {
@@ -225,6 +263,15 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     // To differentiate selections by tags and slices
     private getSelectingContext(): string {
         return this.currentTag.name + this.currentSlice;
+    }
+
+    // Checking if canvas is blank without iterating through pixels of canvas
+    private isCanvasBlank(): boolean {
+        const blankCanvas: HTMLCanvasElement = document.createElement('canvas');
+        blankCanvas.width = this.canvas.width;
+        blankCanvas.height = this.canvas.height;
+
+        return this.canvas.toDataURL() === blankCanvas.toDataURL();
     }
 
     getSelectorName(): string {
