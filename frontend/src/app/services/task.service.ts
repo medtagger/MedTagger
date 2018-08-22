@@ -11,7 +11,7 @@ export interface TaskResponse {
     name: string;
     image_path: string;
     tags: Array<LabelTagResponse>;
-    categories: Array<string>;
+    datasets: Array<string>;
 }
 
 interface LabelTagResponse {

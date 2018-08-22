@@ -32,44 +32,44 @@ class Scans(Resource):
     def post() -> Any:
         """Create empty scan."""
         payload = request.json
-        category_key = payload['category']
+        dataset_key = payload['dataset']
         number_of_slices = payload['number_of_slices']
-        if not business.scan_category_is_valid(category_key):
-            raise InvalidArgumentsException('Category "{}" is not available.'.format(category_key))
+        if not business.dataset_is_valid(dataset_key):
+            raise InvalidArgumentsException('Dataset "{}" is not available.'.format(dataset_key))
 
-        scan = business.create_empty_scan(category_key, number_of_slices)
+        scan = business.create_empty_scan(dataset_key, number_of_slices)
         return scan, 201
 
 
-@scans_ns.route('/categories')
-class ScanCategories(Resource):
-    """Endpoint that manages categories."""
+@scans_ns.route('/datasets')
+class Datasets(Resource):
+    """Endpoint that manages datasets."""
 
     @staticmethod
     @login_required
-    @scans_ns.marshal_with(serializers.out__scan_category)
+    @scans_ns.marshal_with(serializers.out__dataset)
     @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Returns all available scan categories.')
+    @scans_ns.doc(description='Returns all available Datasets.')
     @scans_ns.doc(responses={200: 'Success'})
     def get() -> Any:
-        """Return all available scan categories."""
-        return business.get_available_scan_categories()
+        """Return all available datasets."""
+        return business.get_available_datasets()
 
     @staticmethod
     @login_required
     @role_required('doctor', 'admin')
-    @scans_ns.expect(serializers.in__scan_category)
-    @scans_ns.marshal_with(serializers.out__scan_category)
+    @scans_ns.expect(serializers.in__dataset)
+    @scans_ns.marshal_with(serializers.out__dataset)
     @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Create new Scan Category.')
+    @scans_ns.doc(description='Create new Dataset.')
     @scans_ns.doc(responses={201: 'Success'})
     def post() -> Any:
-        """Create Scan Category."""
+        """Create Dataset."""
         payload = request.json
         key = payload['key']
         name = payload['name']
 
-        return business.create_scan_category(key, name), 201
+        return business.create_dataset(key, name), 201
 
 
 @scans_ns.route('/random')

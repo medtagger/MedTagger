@@ -170,7 +170,7 @@ export class MarkerPageComponent implements OnInit {
                 this.marker.setDownloadScanInProgress(false);
                 this.marker.setDownloadSlicesInProgress(false);
                 this.dialogService
-                    .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this category!', 'Go back')
+                    .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this dataset!', 'Go back')
                     .afterClosed()
                     .subscribe(() => {
                         this.router.navigateByUrl(this.chooseTaskPageUrl);

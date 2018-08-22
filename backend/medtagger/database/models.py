@@ -91,48 +91,50 @@ class UserSettings(Base):
         self.skip_tutorial = False
 
 
-scan_categories_tasks = Table('ScanCategories_Tasks', Base.metadata,
-                              Column('scan_category_id', Integer, ForeignKey('ScanCategories.id'), nullable=False),
-                              Column('task_id', Integer, ForeignKey('Tasks.id'), nullable=False))
+datasets_tasks = Table('Datasets_Tasks', Base.metadata,
+                       Column('dataset_id', Integer, ForeignKey('Datasets.id'), nullable=False),
+                       Column('task_id', Integer, ForeignKey('Tasks.id'), nullable=False))
 
 
-class ScanCategory(Base):
-    """Definition of a Scan Category."""
+class Dataset(Base):
+    """Definition of a Dataset."""
 
-    __tablename__ = 'ScanCategories'
+    __tablename__ = 'Datasets'
     id: int = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
-    tasks: List['Task'] = relationship('Task', back_populates='scan_categories', secondary=scan_categories_tasks)
+    tasks: List['Task'] = relationship('Task', back_populates='datasets', secondary=datasets_tasks)
 
     def __init__(self, key: str, name: str) -> None:
-        """Initialize Scan Category.
+        """Initialize Dataset.
 
-        :param key: unique key representing Scan Category
-        :param name: name which describes this Category
+        :param key: unique key representing Dataset
+        :param name: name which describes this Dataset
         """
         self.key = key
         self.name = name
 
     def __repr__(self) -> str:
-        """Return string representation for Scan Category."""
+        """Return string representation for Dataset."""
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
 
 
 class Task(Base):
-    """Describe what user should mark on Scans in given Categories."""
+    """Describe what user should mark on Scans in given Datasets."""
 
     __tablename__ = 'Tasks'
     id: TaskID = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
     image_path: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
-    scan_categories: List[ScanCategory] = relationship('ScanCategory', back_populates='tasks',
-                                                       secondary=scan_categories_tasks)
+    datasets: List[Dataset] = relationship('Dataset', back_populates='tasks',
+                                           secondary=datasets_tasks)
 
-    available_tags: List['LabelTag'] = relationship("LabelTag", back_populates="task")
+    _tags: List['LabelTag'] = relationship("LabelTag", back_populates="task")
 
     def __init__(self, key: str, name: str, image_path: str) -> None:
         """Initialize Task.
@@ -149,6 +151,16 @@ class Task(Base):
         """Return string representation for Task."""
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
 
+    @property
+    def available_tags(self) -> List['LabelTag']:
+        """Return Tags that are enabled for this Task."""
+        return [tag for tag in self._tags if not tag.disabled]
+
+    @available_tags.setter
+    def available_tags(self, new_tags: List['LabelTag']) -> None:
+        """Set new Label Tags for this Task."""
+        self._tags = new_tags
+
 
 class Scan(Base):
     """Definition of a Scan."""
@@ -159,8 +171,8 @@ class Scan(Base):
     declared_number_of_slices: int = Column(Integer, nullable=False)
     skip_count: int = Column(Integer, nullable=False, default=0)
 
-    category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
-    category: ScanCategory = relationship('ScanCategory')
+    dataset_id: int = Column(Integer, ForeignKey('Datasets.id'))
+    dataset: Dataset = relationship('Dataset')
 
     owner_id: Optional[int] = Column(Integer, ForeignKey('Users.id'))
     owner: Optional[User] = relationship('User', back_populates='scans')
@@ -168,21 +180,21 @@ class Scan(Base):
     slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
     labels: List['Label'] = relationship('Label', back_populates='scan')
 
-    def __init__(self, category: ScanCategory, declared_number_of_slices: int, user: Optional[User]) -> None:
+    def __init__(self, dataset: Dataset, declared_number_of_slices: int, user: Optional[User]) -> None:
         """Initialize Scan.
 
-        :param category: Scan's category
+        :param dataset: Dataset
         :param declared_number_of_slices: number of Slices that will be uploaded later
         :param user: User that uploaded scan
         """
         self.id = ScanID(str(uuid.uuid4()))
-        self.category = category
+        self.dataset = dataset
         self.declared_number_of_slices = declared_number_of_slices
         self.owner_id = user.id if user else None
 
     def __repr__(self) -> str:
         """Return string representation for Scan."""
-        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.dataset.key, self.owner)
 
     @property
     def width(self) -> Optional[int]:
@@ -358,9 +370,10 @@ class LabelTag(Base):
     id: LabelTagID = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
     task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
-    task: Task = relationship('Task', back_populates="available_tags")
+    task: Task = relationship('Task', back_populates="_tags")
 
     tools: List[LabelTool] = Column(ArrayOfEnum(Enum(LabelTool, name='label_tool', create_constraint=False)))
     actions: List['Action'] = relationship('Action', back_populates='label_tag')
@@ -615,7 +628,7 @@ class Action(Base):
     def __init__(self, name: str) -> None:
         """Initialize Action.
 
-        :param name: name that should identify such actions for given Scan Category
+        :param name: name that should identify such actions for given Dataset
         """
         self.name = name
 
@@ -641,7 +654,7 @@ class Survey(Action):
     def __init__(self, name: str, initial_element_key: SurveyElementKey) -> None:
         """Initialize Action.
 
-        :param name: name that should identify such actions for given Scan Category
+        :param name: name that should identify such actions for given Dataset
         :param initial_element_key: key for an element that is initial for whole Survey
         """
         super(Survey, self).__init__(name)
