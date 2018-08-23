@@ -145,7 +145,7 @@ describe('Basic flow', () => {
         cy.get('[data-cy=no-labels-added]');
     });
 
-    it.only('Brush selector', () => {
+    it('Brush selector', () => {
         loginAsAdmin();
         uploadScans('Heart', 11);
         goToLabeling('Find narrowings in vains');
