@@ -12,7 +12,7 @@
     <div class="col-sm-12 col-lg-8 action">
         <div class="action-buttons">
             <h4 [ngClass]="{active: loginPageMode == LoginPageMode.LOG_IN}" (click)="changePageMode(LoginPageMode.LOG_IN)">
-                <a routerLink="/login" data-cy="login-toggle>Sign in</a>
+                <a routerLink="/login" data-cy="login-toggle">Sign in</a>
             </h4>
             <h4 [ngClass]="{active: loginPageMode == LoginPageMode.REGISTER}" (click)="changePageMode(LoginPageMode.REGISTER)">
                 <a routerLink="/login">Sign up</a>
@@ -34,7 +34,7 @@
                         <mat-label>Password</mat-label>
                         <input matInput type="{{loginPasswordVisible && 'text' || 'password'}}"
                                placeholder="Insert your password."
-                               id="password" formControlName="password" required >
+                               id="password" formControlName="password" required data-cy="login-password">
                         <mat-error *ngIf="loginForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
                         <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                     </mat-form-field>

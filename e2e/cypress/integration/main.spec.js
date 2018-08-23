@@ -101,7 +101,7 @@ describe('Basic flow', () => {
         uploadScans('Kidneys', 1);
     });
 
-    it.only('Rectangle selector', () => {
+    it('Rectangle selector', () => {
         loginAsAdmin();
         uploadScans('Kidneys', 11);
         goToLabeling('Kidneys segmentation');
@@ -111,6 +111,20 @@ describe('Basic flow', () => {
         cy.get('canvas').trigger('mousemove', 300, 300);
         cy.get('canvas').trigger('mouseup');
         cy.get('[data-cy=send-label]').click();
+        cy.get('[data-cy=no-labels-added]');
+    });
+
+    it('Point selector', () => {
+        loginAsAdmin();
+        uploadScans('Lungs', 11);
+        goToLabeling('Find middle of the Spine');
+        matSelect('[data-cy=tags]', 'Middle of the Spine');
+        cy.get('[data-cy=point-tool]').click({force: true});
+        cy.get('canvas').click(100, 100);
+        cy.get('canvas').click(200, 100);
+        cy.get('canvas').click(200, 200);
+        cy.get('[data-cy=send-label]').click();
+        cy.get('[data-cy=no-labels-added]');
     });
 
     it('Chain selector', () => {
@@ -128,5 +142,22 @@ describe('Basic flow', () => {
         cy.get('canvas').click(300, 200);
         cy.get('.action-buttons button:contains(Loop)').click();
         cy.get('[data-cy=send-label]').click();
+        cy.get('[data-cy=no-labels-added]');
+    });
+
+    it.only('Brush selector', () => {
+        loginAsAdmin();
+        uploadScans('Heart', 11);
+        goToLabeling('Find narrowings in vains');
+        matSelect('[data-cy=tags]', 'Narrowing (region)');
+        cy.get('[data-cy=brush-tool]').click({force: true});
+        cy.get('canvas').trigger('mousedown', 200, 200);
+        cy.get('canvas').trigger('mousemove', 220, 200);
+        cy.get('canvas').trigger('mousemove', 240, 200);
+        cy.get('canvas').trigger('mousemove', 240, 250);
+        cy.get('canvas').trigger('mousemove', 300, 250);
+        cy.get('canvas').trigger('mouseup');
+        cy.get('[data-cy=send-label]').click();
+        cy.get('[data-cy=no-labels-added]');
     });
 });
