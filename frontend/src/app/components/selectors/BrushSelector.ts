@@ -31,7 +31,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
                 this.changeSelectorMode(BrushMode.BRUSH);
                 this.deactivateOtherActions(BrushMode.BRUSH);
             }, SelectorActionType.BUTTON, true),
-            new SelectorAction(BrushMode.ERASER, () => !!this.lastTagDrawings[this.getSelectingContext()], () => {
+            new SelectorAction(BrushMode.ERASER, () => !!this.lastTagDrawings[this.getCurrentSelectingContext()], () => {
                 this.changeSelectorMode(BrushMode.ERASER);
                 this.deactivateOtherActions(BrushMode.ERASER);
             }, SelectorActionType.BUTTON, false)
@@ -142,7 +142,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         // starting new brush selection needs temporary canvas clear
         this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
 
-        const lastDrawing = this.lastTagDrawings[this.getSelectingContext()];
+        const lastDrawing = this.lastTagDrawings[this.getCurrentSelectingContext()];
 
         if (!!lastDrawing) {
             this.canvasCtx.drawImage(lastDrawing, 0, 0,
@@ -238,7 +238,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         console.log('BrushSelector | inUp | blank selection, removing label...');
         this.stateChange.emit(new SelectionStateMessage(labelToDeleteId, this.selectedArea.sliceIndex, true));
 
-        this.lastTagDrawings[this.getSelectingContext()] = undefined;
+        this.clearSliceDrawingCacheOf(labelToDeleteId);
         this.selectedArea = undefined;
         this.requestRedraw();
 
@@ -247,7 +247,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     private finalizeNewSelection(): void {
         this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
-            this.lastTagDrawings[this.getSelectingContext()] = image;
+            this.lastTagDrawings[this.getCurrentSelectingContext()] = image;
 
             this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
             this.selectedArea = undefined;
@@ -258,16 +258,42 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     public updateCurrentSlice(currentSliceId: number): any {
         super.updateCurrentSlice(currentSliceId);
 
-        // Changing mode to avoid situation when we are in eraser mode on slice that lacks brush selection
-        if (this.mode === BrushMode.ERASER && !this.lastTagDrawings[this.getSelectingContext()]) {
+        this.returnToBrushModeIfNeeded();
+    }
+
+    // Changing mode to avoid situation when we are in eraser mode on slice that lacks brush selection
+    private returnToBrushModeIfNeeded(): void {
+        const hasDrawing: boolean = this.lastTagDrawings[this.getCurrentSelectingContext()] !== undefined;
+        if (this.mode === BrushMode.ERASER && !hasDrawing) {
             this.changeSelectorMode(BrushMode.BRUSH);
-            this.deactivateOtherActions(BrushMode.BRUSH);
         }
     }
 
     // To differentiate selections by tags and slices
-    private getSelectingContext(): string {
-        return this.currentTag.key + this.currentSlice;
+    private getCurrentSelectingContext(): string {
+        if (this.currentTag && this.currentSlice) {
+            console.log('Context: ', this.currentTag.key + this.currentSlice);
+            return this.currentTag.key + this.currentSlice;
+        } else {
+            return '';
+        }
+    }
+
+    public removeSelection(selectionId: number): boolean {
+        this.clearSliceDrawingCacheOf(selectionId);
+        this.changeSelectorMode(BrushMode.BRUSH);
+        this.returnToBrushModeIfNeeded();
+
+        return super.removeSelection(selectionId);
+    }
+
+    private clearSliceDrawingCacheOf(selectionId: number): void {
+        const selectionToDelete = this.getSelections().find(selection => selection.getId() === selectionId);
+        if (!!selectionToDelete) {
+            this.lastTagDrawings[selectionToDelete.label_tag + selectionToDelete.sliceIndex] = undefined;
+        } else {
+            console.warn('BrushSelector | clearSliceDrawingCacheOf | no selection to delete!');
+        }
     }
 
     // Checking if canvas is blank without iterating through pixels of canvas
