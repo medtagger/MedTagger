@@ -183,50 +183,55 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             this.mouseDrag = false;
             this.canvasCtx.closePath();
 
-            // when canvas is cleared, we have only our brush selection in canvas
+            // Get all brush selections on current slice
+            const currentSliceSelections = this.selections.get(this.currentSlice);
+
+            // Existing Brush selection index on current slice for given tag
+            const existingSelectionIndex: number = this.getExistingSelectionIndex(currentSliceSelections);
+
+            const selectionLabelId: number = existingSelectionIndex > -1
+                ? currentSliceSelections[existingSelectionIndex].getId() // Modified selection will still use the same id
+                : undefined; // New selection (for tag or at all), this will leave new generated id for new selection
+
+            // When canvas is cleared, we have only our brush selection in canvas
             const selectionImageURL: string = this.canvas.toDataURL();
-            this.selectedArea = new BrushSelection(selectionImageURL, this.currentSlice, this.currentTag.key);
 
-            const isSelectionErased = this.isCanvasBlank();
+            console.log('BrushSelector | onUp | SelectionLabelId: ', selectionLabelId);
+            this.selectedArea = new BrushSelection(selectionImageURL, this.currentSlice, this.currentTag.key, selectionLabelId);
 
-            const selectionLabelId = this.manageCurrentSelections(isSelectionErased);
+            const isSelectionErased: boolean = this.isCanvasBlank();
 
-            // remove selection when it is completely erased
+            // Note that currentSliceSelections is reference to this.selections
+            if (currentSliceSelections && currentSliceSelections.length > 0) {
+                if (isSelectionErased) {
+                    // Remove selection when it is completely erased
+                    currentSliceSelections.splice(existingSelectionIndex);
+                } else {
+                    // Update current selection by referencing new Selection object
+                    currentSliceSelections[existingSelectionIndex] = this.selectedArea;
+                }
+            } else {
+                // Without other brush selections we can simply set new selection for current slice
+                this.selections.set(this.currentSlice, [this.selectedArea]);
+            }
+
             if (isSelectionErased) {
                 return this.finalizeSelectionRemoval(selectionLabelId);
             }
 
-            return this.finalizeNewSelection(selectionLabelId);
+            return this.finalizeNewSelection();
         }
     }
 
-    private manageCurrentSelections(isSelectionErased: boolean): number {
-        const currentSliceSelections = this.selections.get(this.currentSlice);
-
-        let selectionLabelId: number;
+    private getExistingSelectionIndex(currentSliceSelections: Array<BrushSelection>): number {
         if (currentSliceSelections) {
-            const labelTagSelectionIndex: number = currentSliceSelections.findIndex(
+            return currentSliceSelections.findIndex(
                 (selection: BrushSelection) => selection.label_tag === this.currentTag.key
             );
-
-            if (labelTagSelectionIndex > -1) {
-                selectionLabelId = currentSliceSelections[labelTagSelectionIndex].getId();
-
-                if (isSelectionErased) {
-                    currentSliceSelections.splice(labelTagSelectionIndex);
-                } else {
-                    currentSliceSelections[labelTagSelectionIndex] = this.selectedArea;
-                }
-
-            } else {
-                currentSliceSelections.push(this.selectedArea);
-            }
-        } else {
-            this.selections.set(this.currentSlice, [this.selectedArea]);
-            selectionLabelId = this.selectedArea.getId();
         }
 
-        return selectionLabelId;
+        // First selection for that tag (or at all) for current slice
+        return -1;
     }
 
     private finalizeSelectionRemoval(labelToDeleteId: number): void {
@@ -240,11 +245,11 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.changeSelectorMode(BrushMode.BRUSH);
     }
 
-    private finalizeNewSelection(labelToUpdateId: number): void {
+    private finalizeNewSelection(): void {
         this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
             this.lastTagDrawings[this.getSelectingContext()] = image;
 
-            this.stateChange.emit(new SelectionStateMessage(labelToUpdateId, this.selectedArea.sliceIndex, false));
+            this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
             this.selectedArea = undefined;
             this.requestRedraw();
         });
