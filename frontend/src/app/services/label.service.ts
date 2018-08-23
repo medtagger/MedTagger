@@ -36,6 +36,22 @@ export class LabelService {
         });
     }
 
+    getLabelByID(labelID: string, selectionConverter: (selections: any) => Array<SliceSelection>): Promise<Label> {
+        return new Promise((resolve, reject) => {
+            this.http.get<RandomLabelResponse>(environment.API_URL + '/labels/' + labelID).toPromise().then(
+                response => {
+                    console.log('LabelsService | getLabelByID | response: ', response);
+                    resolve(new Label(response.label_id, response.scan_id, response.status,
+                                      selectionConverter(response.selections), response.labeling_time, response.comment));
+                },
+                error => {
+                    console.log('LabelsService | getLabelByID | error: ', error);
+                    reject(error);
+                }
+            );
+        });
+    }
+
     changeStatus(labelId: string, status: string) {
         return new Promise((resolve, reject) => {
             const payload = {'status': status};

@@ -78,13 +78,19 @@ def get_random_scan(task_key: str) -> Scan:
     :param task_key: unique key identifying task
     :return: Scan Metadata object
     """
-    user = get_current_user()
     task = TasksRepository.get_task_by_key(task_key)
     if not task:
         raise InvalidArgumentsException('Task key {} is invalid!'.format(task_key))
+
+    user = get_current_user()
     scan = ScansRepository.get_random_scan(task, user)
     if not scan:
         raise NotFoundException('Could not find any Scan for this task!')
+
+    predefined_label = LabelsRepository.get_predefined_label_for_scan_in_task(scan, task)
+    if predefined_label:
+        scan.predefined_label_id = predefined_label.id
+
     return scan
 
 
@@ -148,7 +154,8 @@ def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> N
 
 
 def add_label(scan_id: ScanID, task_key: str, elements: List[Dict],   # pylint: disable-msg=too-many-arguments
-              files: Dict[str, bytes], labeling_time: LabelingTime, comment: str = None) -> Label:
+              files: Dict[str, bytes], labeling_time: LabelingTime, comment: str = None,
+              predefined: bool = False) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
@@ -157,11 +164,12 @@ def add_label(scan_id: ScanID, task_key: str, elements: List[Dict],   # pylint: 
     :param files: mapping of uploaded files (name and content)
     :param labeling_time: time in seconds that user spent on labeling
     :param comment: (optional) comment describing a label
+    :param predefined: (optional) mark such Label as predefined to show on Labeling Page
     :return: Label object
     """
     user = get_current_user()
     try:
-        label = LabelsRepository.add_new_label(scan_id, task_key, user, labeling_time, comment)
+        label = LabelsRepository.add_new_label(scan_id, task_key, user, labeling_time, comment, predefined)
     except IntegrityError:
         raise NotFoundException('Could not find Scan for that id!')
     for element in elements:

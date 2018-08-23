@@ -23,12 +23,13 @@ import {isUndefined} from 'util';
 import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
 import {Selection3D} from '../../model/selections/Selection3D';
+import {LabelService} from "../../services/label.service";
 
 
 @Component({
     selector: 'app-marker-page',
     templateUrl: './marker-page.component.html',
-    providers: [ScanService],
+    providers: [ScanService, LabelService],
     styleUrls: ['./marker-page.component.scss']
 })
 export class MarkerPageComponent implements OnInit {
@@ -52,7 +53,8 @@ export class MarkerPageComponent implements OnInit {
     chooseTaskPageUrl = '/labelling/choose-task';
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private router: Router, private snackBar: MatSnackBar, private taskService: TaskService) {
+                private router: Router, private snackBar: MatSnackBar, private taskService: TaskService,
+                private labelService: LabelService) {
         console.log('MarkerPage constructor', this.marker);
         this.labelComment = '';
         this.isInitialSliceLoad = true;
@@ -152,12 +154,25 @@ export class MarkerPageComponent implements OnInit {
         });
     }
 
+    private selectionsConverter(selections: any): Array<ROISelection2D> {
+        const roiSelections: Array<ROISelection2D> = [];
+        selections.forEach((selection: any) => {
+            roiSelections.push(new ROISelection2D(selection.x, selection.y, selection.slice_index, selection.width, selection.height));
+        });
+        return roiSelections;
+    }
+
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
         this.scanService.getRandomScan(this.taskKey).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
+                if (this.scan.predefinedLabelID) {
+                    this.labelService.getLabelByID(this.scan.predefinedLabelID, this.selectionsConverter).then(function(label) {
+                        console.log(label);
+                    });
+                }
 
                 const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;

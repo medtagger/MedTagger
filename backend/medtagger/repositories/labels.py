@@ -1,11 +1,11 @@
 """Module responsible for definition of LabelsRepository."""
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy.sql.expression import func
 
 from medtagger.database import db_session
 from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement, BrushLabelElement, \
-    PointLabelElement, ChainLabelElement, ChainLabelElementPoint, Task
+    PointLabelElement, ChainLabelElement, ChainLabelElementPoint, Task, Scan
 from medtagger.definitions import LabelVerificationStatus
 from medtagger.storage.models import BrushLabelElement as BrushLabelElementStorage
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime, Point
@@ -34,11 +34,34 @@ def get_random_label(status: LabelVerificationStatus = None) -> Label:
     return query.first()
 
 
+def get_predefined_label_for_scan_in_task(scan: Scan, task: Task) -> Optional[Label]:
+    """Return Predefined Label for Scan in Task.
+
+    :param scan: Scan for which Predefined Label should be returned
+    :param task: Task for which context it should be used
+    :return: (optional) Label object
+    """
+    query = Label.query
+    query = query.filter(Label.predefined)
+    query = query.filter(Label.scan == scan)
+    query = query.filter(Label.task == task)
+    return query.first()
+
+
 def add_new_label(scan_id: ScanID, task_key: str, user: User, labeling_time: LabelingTime,
-                  comment: str = None) -> Label:
-    """Add new Label for given Scan."""
+                  comment: str = None, predefined: bool = False) -> Label:
+    """Add new Label for given Scan.
+
+    :param scan_id: Scan ID for which Label has been created
+    :param task_key: Task Key for which Label has been created
+    :param user: User object that created this Label
+    :param labeling_time: time needed to create this Label on Labeling Page
+    :param comment: (optional) comment for this Label
+    :param predefined: (optional) mark this Label as predefined
+    :return: Label object
+    """
     with db_session() as session:
-        label = Label(user, labeling_time, comment)
+        label = Label(user, labeling_time, comment, predefined)
         label.scan_id = scan_id
         label.task = Task.query.filter(Task.key == task_key).one()
         session.add(label)

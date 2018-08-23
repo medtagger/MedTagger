@@ -16,12 +16,15 @@ export class ScanMetadata {
     numberOfSlices: number;
     width: number;
     height: number;
+    predefinedLabelID: string;
 
-    constructor(scanId: string, status: string, numberOfSlices: number, width: number, height: number) {
+    constructor(scanId: string, status: string, numberOfSlices: number, width: number, height: number,
+                predefinedLabelID: string) {
         this.scanId = scanId;
         this.status = status;
         this.numberOfSlices = numberOfSlices;
         this.width = width;
         this.height = height;
+        this.predefinedLabelID = predefinedLabelID;
     }
 }

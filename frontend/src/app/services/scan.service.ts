@@ -23,6 +23,7 @@ interface ScanResponse {
     number_of_slices: number;
     width: number;
     height: number;
+    predefined_label_id: string;
 }
 
 interface AvailableDatasetResponse {
@@ -91,7 +92,7 @@ export class ScanService {
                     (response: ScanResponse) => {
                         console.log('ScanService | getRandomScan | response: ', response);
                         resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices,
-                            response.width, response.height));
+                            response.width, response.height, response.predefined_label_id));
                     },
                     (error: Error) => {
                         console.log('ScanService | getRandomScan | error: ', error);
@@ -109,7 +110,7 @@ export class ScanService {
                 (response: ScanResponse) => {
                     console.log('ScanService | getScanForScanId | response: ', response);
                     resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices,
-                        response.width, response.height));
+                        response.width, response.height, undefined));
                 },
                 (error: Error) => {
                     console.log('ScanService | getScanForScanId | error: ', error);

@@ -11,7 +11,7 @@ from medtagger.types import ScanID
 from medtagger.api import api
 from medtagger.api.exceptions import InvalidArgumentsException
 from medtagger.api.scans import business, serializers
-from medtagger.api.security import login_required, role_required
+from medtagger.api.security import login_required, role_required, require_one_of_roles
 from medtagger.api.scans.serializers import elements_schema
 
 scans_ns = api.namespace('scans', 'Methods related with scans')
@@ -79,7 +79,7 @@ class Random(Resource):
     @staticmethod
     @login_required
     @scans_ns.expect(serializers.args__random_scan)
-    @scans_ns.marshal_with(serializers.out__scan)
+    @scans_ns.marshal_with(serializers.out__random_scan)
     @scans_ns.doc(security='token')
     @scans_ns.doc(description='Returns random scan from task.')
     @scans_ns.doc(responses={200: 'Success', 400: 'Invalid arguments', 404: 'No Scans available'})
@@ -121,6 +121,10 @@ class Label(Resource):
                                "labeling_time": 0.1};type=application/json"
                      http://localhost:51000/api/v1/scans/c5102707-cb36-4869-8041-f00421c03fa1/MARK_KIDNEYS/label
         """
+        predefined = request.args.get('predefined', False)
+        if predefined:
+            require_one_of_roles({'doctor', 'admin'})
+
         files = {name: file_data.read() for name, file_data in request.files.items()}
         label = json.loads(request.form['label'])
         elements = label['elements']
@@ -136,7 +140,7 @@ class Label(Resource):
 
         labeling_time = label['labeling_time']
         comment = label.get('comment')
-        label = business.add_label(scan_id, task_key, elements, files, labeling_time, comment)
+        label = business.add_label(scan_id, task_key, elements, files, labeling_time, comment, predefined)
         return label, 201
 
 
