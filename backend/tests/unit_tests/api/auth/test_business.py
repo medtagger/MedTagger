@@ -51,7 +51,7 @@ def test_create_user_user_exists(mocker: Any, get_user_by_email_success_fixture:
 
     with pytest.raises(InvalidArgumentsException) as exception:
         create_user(email, password, first_name, last_name)
-    assert str(exception.value) == 'User with this email already exist'
+    assert str(exception.value) == 'User with this email already exists'
 
 
 def test_create_user_missing_role(mocker: Any, get_user_by_email_failure_fixture: Any, get_role_fixture: Any) -> None:

@@ -150,8 +150,13 @@
                     @include mat-elevation(5);
                 }
             }
+        }
+        &__error {
+            width: 100%;
+            display: flex;
+            text-align: left;
+            margin-top: 1.5em;
             mat-icon {
-                margin-left: 0.5em;
                 font-size: 1.2em;
             }
         }

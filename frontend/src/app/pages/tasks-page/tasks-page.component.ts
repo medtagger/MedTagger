@@ -3,7 +3,6 @@ import {MatSnackBar, MatIconRegistry} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
 
 import {TaskService} from '../../services/task.service';
-import {Task} from '../../model/Task';
 
 @Component({
     selector: 'app-tasks-page',
@@ -32,9 +31,5 @@ export class TasksPageComponent implements OnInit {
                 duration: 5000,
             });
         });
-    }
-
-    public setCurrentTask(task: Task) {
-        this.taskService.setCurrentTask(task);
     }
 }
