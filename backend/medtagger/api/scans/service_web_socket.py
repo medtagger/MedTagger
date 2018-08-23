@@ -27,9 +27,9 @@ class Slices(Namespace):
 
         orientation = SliceOrientation[orientation]
         slices = list(business.get_slices_for_scan(scan_id, begin, count, orientation=orientation))
-        slices_to_send = list(reversed(slices)) if reversed_order else slices
-        last_in_batch = begin if reversed_order else begin + len(slices_to_send) - 1
-        for index, (_slice, image) in enumerate(slices_to_send):
+        slices_to_send = reversed(list(enumerate(slices))) if reversed_order else enumerate(slices)
+        last_in_batch = begin if reversed_order else begin + len(slices) - 1
+        for index, (_slice, image) in slices_to_send:
             emit('slice', {
                 'scan_id': scan_id,
                 'index': begin + index,
