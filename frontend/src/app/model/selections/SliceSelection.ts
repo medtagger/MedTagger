@@ -18,6 +18,10 @@ export abstract class SliceSelection {
         return this.id;
     }
 
+    protected setId(newId: number): void {
+        this.id = newId;
+    }
+
     public abstract toJSON(): Object;
     public getAdditionalData(): Object {
         return {};
