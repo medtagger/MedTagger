@@ -177,8 +177,8 @@ class Scan(Base):
     owner_id: Optional[int] = Column(Integer, ForeignKey('Users.id'))
     owner: Optional[User] = relationship('User', back_populates='scans')
 
-    slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
-    labels: List['Label'] = relationship('Label', back_populates='scan')
+    slices: List['Slice'] = relationship('Slice', back_populates='scan', cascade='delete', order_by=lambda: Slice.location)
+    labels: List['Label'] = relationship('Label', back_populates='scan', cascade='delete')
 
     def __init__(self, dataset: Dataset, declared_number_of_slices: int, user: Optional[User]) -> None:
         """Initialize Scan.
@@ -326,7 +326,7 @@ class Label(Base):
 
     labeling_time: LabelingTime = Column(Float, nullable=True)
 
-    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label')
+    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label', cascade='delete')
 
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
     owner: User = relationship('User', back_populates='labels')
