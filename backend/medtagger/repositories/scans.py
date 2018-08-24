@@ -31,9 +31,12 @@ def get_random_scan(task: Task = None, user: User = None) -> Scan:
         query = query.join(Dataset).join(datasets_tasks).join(Task)
         query = query.filter(Task.key == task.key)
     if user:
-        labelled_scans = Label.query.filter(Label.owner == user).all()
-        labelled_scans_ids = [label.scan_id for label in labelled_scans]
-        query = query.filter(~Scan.id.in_(labelled_scans_ids))  # type: ignore  # "ScanID" has no attribute "in_"
+        labelled_scans_ids = Label.query.with_entities(Label.scan_id)
+        labelled_scans_ids = labelled_scans_ids.filter(Label.owner == user)
+        if task:
+            labelled_scans_ids = labelled_scans_ids.filter(Label.task == task)
+        labelled_scans_ids = labelled_scans_ids.filter(~Label.predefined)
+        query = query.filter(~Scan.id.in_(labelled_scans_ids.subquery()))  # type: ignore  # "ScanID" doesn't have "in_"
     query = query.filter(Scan.status == ScanStatus.AVAILABLE)
     query = query.order_by(func.random())
     return query.first()

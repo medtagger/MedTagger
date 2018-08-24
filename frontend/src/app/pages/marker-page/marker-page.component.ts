@@ -24,6 +24,8 @@ import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
 import {Selection3D} from '../../model/selections/Selection3D';
 import {LabelService} from "../../services/label.service";
+import {SliceSelection} from "../../model/selections/SliceSelection";
+import {Label} from "../../model/labels/Label";
 
 
 @Component({
@@ -154,14 +156,6 @@ export class MarkerPageComponent implements OnInit {
         });
     }
 
-    private selectionsConverter(selections: any): Array<ROISelection2D> {
-        const roiSelections: Array<ROISelection2D> = [];
-        selections.forEach((selection: any) => {
-            roiSelections.push(new ROISelection2D(selection.x, selection.y, selection.slice_index, selection.width, selection.height));
-        });
-        return roiSelections;
-    }
-
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
         this.scanService.getRandomScan(this.taskKey).then(
@@ -169,8 +163,9 @@ export class MarkerPageComponent implements OnInit {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
                 if (this.scan.predefinedLabelID) {
-                    this.labelService.getLabelByID(this.scan.predefinedLabelID, this.selectionsConverter).then(function(label) {
-                        console.log(label);
+                    // TODO: Task could have been loaded asynchronously
+                    this.labelService.getLabelByID(this.scan.predefinedLabelID, this.task).then((label: Label) => {
+                        this.marker.setLabel(label);
                     });
                 }
 

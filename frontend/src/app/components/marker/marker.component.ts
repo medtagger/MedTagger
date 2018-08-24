@@ -13,6 +13,8 @@ import {Subscription} from 'rxjs/Subscription';
 import {isUndefined} from 'util';
 import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/labels/LabelTag';
+import {Label} from "../../model/labels/Label";
+import {LabelSelection} from "../../model/labels/LabelSelection";
 
 @Component({
     selector: 'app-marker-component',
@@ -164,13 +166,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                     } else {
                         console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
                             selection.selectionId);
-                        const selectorName: string = this.currentSelector.getSelectorName();
-                        if (this.currentSelector.isSingleSelectionPerSlice()) {
+                        if (!isUndefined(this.currentSelector) && this.currentSelector.isSingleSelectionPerSlice()) {
                             this.labelExplorer.replaceExistingLabel(selection.selectionId, selection.sliceId,
-                                this.currentTag, selectorName);
+                                selection.labelTag, selection.selectorName);
                         } else {
-                            this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTag,
-                                selectorName);
+                            this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, selection.labelTag,
+                                selection.selectorName);
                         }
                     }
                 }
@@ -225,6 +226,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.initCanvasSelectionTool();
 
+    }
+
+    public setLabel(label: Label): void {
+        label.labelSelections.forEach( (selection: SliceSelection) => {
+            this.selectorsByName.get(selection.label_tool).addSelection(selection);
+        });
     }
 
     private afterImageLoad(): void {

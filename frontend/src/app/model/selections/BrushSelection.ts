@@ -1,11 +1,12 @@
 import {SliceSelection} from './SliceSelection';
 import {BinaryConverter} from '../../utils/BinaryConverter';
+import {LabelTag} from "../labels/LabelTag";
 
 export class BrushSelection extends SliceSelection {
     _selectionLayer: HTMLImageElement;
     isReady: Promise<void>;
 
-    constructor(selectionLayer: string, depth: number, tag: string) {
+    constructor(selectionLayer: string, depth: number, tag: LabelTag) {
         super();
         this._selectionLayer = new Image();
 
@@ -36,7 +37,7 @@ export class BrushSelection extends SliceSelection {
             'height': 1,
             'image_key': this.getId().toString(),
             'slice_index': this.sliceIndex,
-            'tag': this.label_tag,
+            'tag': this.label_tag.key,
             'tool': this.label_tool
         };
     }

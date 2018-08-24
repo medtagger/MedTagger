@@ -72,16 +72,9 @@ export class ValidationPageComponent implements OnInit {
         });
     }
 
-    private rect2DROIConverter(selections: any): Array<ROISelection2D> {
-        const roiSelections: Array<ROISelection2D> = [];
-        selections.forEach((selection: any) => {
-            roiSelections.push(new ROISelection2D(selection.x, selection.y, selection.slice_index, selection.width, selection.height));
-        });
-        return roiSelections;
-    }
-
     private requestSlicesWithLabel(): void {
-        this.labelService.getRandomLabel(this.rect2DROIConverter).then((label: Label) => {
+        // TODO: Make this fucking validation page compatible with marker page! For fucks sake...
+        this.labelService.getRandomLabel(undefined).then((label: Label) => {
             this.label = label;
             this.scanViewer.setArchivedSelections(this.label.labelSelections);
 

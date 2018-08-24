@@ -126,7 +126,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
             // when canvas is cleared, we have only our brush selection in canvas
             const selectionImageURL: string = this.canvas.toDataURL();
-            this.selectedArea = new BrushSelection(selectionImageURL, this.currentSlice, this.currentTag.key);
+            this.selectedArea = new BrushSelection(selectionImageURL, this.currentSlice, this.currentTag);
 
             this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
                 this.lastTagDrawings[this.getSelectingContext()] = image;
@@ -135,7 +135,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
                 if (currentSliceSelections) {
                     const labelTagSelectionIndex: number = currentSliceSelections.findIndex(
-                        (selection: BrushSelection) => selection.label_tag === this.currentTag.key
+                        (selection: BrushSelection) => selection.label_tag === this.currentTag
                     );
 
                     if (labelTagSelectionIndex > -1) {
@@ -147,7 +147,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
                     this.selections.set(this.currentSlice, [this.selectedArea]);
                 }
 
-                this.stateChange.emit(new SelectionStateMessage(this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
+                this.stateChange.emit(new SelectionStateMessage(this.getSelectorName(), this.currentTag, this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
                 this.selectedArea = undefined;
                 this.requestRedraw();
             });

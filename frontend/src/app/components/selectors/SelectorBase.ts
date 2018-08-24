@@ -87,7 +87,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         this.stateChange = new EventEmitter<SelectionStateMessage>();
     }
 
-    protected addSelection(selection: CustomSliceSelection): void {
+    public addSelection(selection: CustomSliceSelection): void {
         console.log('Selector | addCurrentSelection');
         if (this.isOnlyOneSelectionPerSlice()) {
             this.removeSelectionsOnCurrentSlice();
@@ -100,7 +100,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
                 this.selections.set(this.currentSlice, [selection]);
             }
         }
-        this.stateChange.emit(new SelectionStateMessage(selection.getId(), selection.sliceIndex, false));
+        this.stateChange.emit(new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(), selection.sliceIndex, false));
     }
 
     public updateCurrentSlice(currentSliceId: number): void {
@@ -140,7 +140,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         const selectionsOnCurrentSlice = this.selections.get(this.currentSlice);
         if (selectionsOnCurrentSlice) {
             selectionsOnCurrentSlice.forEach((selection) => this.stateChange.emit(
-                new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
+                new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(), selection.sliceIndex, true)));
             this.selections.delete(this.currentSlice);
         }
 
@@ -151,7 +151,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         const selectionsOnSlice = this.selections.get(sliceId);
         if (selectionsOnSlice) {
             selectionsOnSlice.forEach((selection) => this.stateChange.emit(
-                new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
+                new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(), selection.sliceIndex, true)));
             this.selections.delete(sliceId);
         }
 
@@ -162,7 +162,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
 
     public clearSelections() {
         this.getSelections().forEach((selection) => this.stateChange.emit(
-            new SelectionStateMessage(selection.getId(), selection.sliceIndex, true)));
+            new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(), selection.sliceIndex, true)));
         this.selections.clear();
     }
 
