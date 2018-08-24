@@ -1,13 +1,13 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {LabelService} from '../../services/label.service';
-import {Label} from '../../model/Label';
+import {Label} from '../../model/labels/Label';
 import {ScanService} from '../../services/scan.service';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {SliceRequest} from '../../model/SliceRequest';
 import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
-import {ROISelection2D} from '../../model/ROISelection2D';
+import {ROISelection2D} from '../../model/selections/ROISelection2D';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 
@@ -42,10 +42,10 @@ export class ValidationPageComponent implements OnInit {
             this.scanViewer.hookUpSliceObserver(ValidationPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
                 if (isObserverHooked) {
                     this.scanViewer.observableSliceRequest.subscribe((request: SliceRequest) => {
-                        // TODO: Why is it copied & pasted here? We shoul unify this ASAP!
+                        // TODO: Why is it copied & pasted here? We should unify this ASAP!
                         const reversed = request.reversed;
                         let sliceRequest = request.slice;
-                        console.log('ValiadionPage | observable sliceRequest: ', sliceRequest, ' reversed: ', reversed);
+                        console.log('ValidationPage | observable sliceRequest: ', sliceRequest, ' reversed: ', reversed);
                         let count = ValidationPageComponent.SLICE_BATCH_SIZE;
                         if (reversed === false && sliceRequest + count > this.scan.numberOfSlices) {
                             count = this.scan.numberOfSlices - sliceRequest;

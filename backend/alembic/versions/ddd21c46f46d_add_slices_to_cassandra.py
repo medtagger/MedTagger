@@ -17,22 +17,22 @@ session = create_session()
 
 
 def upgrade():
-    # Create keyspace
+    # Create key space
     session.execute("""
-        CREATE KEYSPACE medtagger
+        CREATE KEYSPACE IF NOT EXISTS medtagger
         WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '3' }
     """)
 
     # Create all tables
     session.set_keyspace('medtagger')
     session.execute("""
-        CREATE TABLE original_slices (
+        CREATE TABLE IF NOT EXISTS original_slices (
             id text PRIMARY KEY,
             image blob
         )
     """)
     session.execute("""
-        CREATE TABLE processed_slices (
+        CREATE TABLE IF NOT EXISTS processed_slices (
             id text PRIMARY KEY,
             image blob
         )

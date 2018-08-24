@@ -7,7 +7,7 @@ const MEDTAGGER_INSTANCE_REST_URL = process.argv[3];
 const MEDTAGGER_INSTANCE_WEBSOCKET_URL = process.argv[4];
 const MEDTAGGER_USER = process.argv[5];
 const MEDTAGGER_PASSWORD = process.argv[6];
-const SCAN_CATEGORY = process.argv[7];
+const DATASET = process.argv[7];
 const SCAN_BEGIN = parseInt(process.argv[8]);
 const SCAN_COUNT = parseInt(process.argv[9]);
 const STICKY_SESSION = parseInt(process.argv[10]);
@@ -61,7 +61,7 @@ function getCookieForWebSocketStickness(handler) {
 
 function getRandomScan(handler) {
     request.get({
-        url: MEDTAGGER_INSTANCE_REST_URL + '/api/v1/scans/random?category=' + SCAN_CATEGORY,
+        url: MEDTAGGER_INSTANCE_REST_URL + '/api/v1/scans/random?dataset=' + DATASET,
         headers: { 'Authorization': 'Bearer ' + authToken },
         json: true
     }, (err, res, body) => {

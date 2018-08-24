@@ -41,7 +41,21 @@ class Tasks(Resource):
         key = payload['key']
         name = payload['name']
         image_path = payload['image_path']
-        categories_keys = payload['categories_keys']
+        datasets_keys = payload['datasets_keys']
         tags = [LabelTag(tag['key'], tag['name'], tag['tools']) for tag in payload['tags']]
+        return business.create_task(key, name, image_path, datasets_keys, tags), 201
 
-        return business.create_task(key, name, image_path, categories_keys, tags), 201
+
+@tasks_ns.route('/<string:task_key>')
+class Task(Resource):
+    """Endpoint that manages single task."""
+
+    @staticmethod
+    @login_required
+    @tasks_ns.marshal_with(serializers.out__task)
+    @tasks_ns.doc(security='token')
+    @tasks_ns.doc(description='Get task for given key.')
+    @tasks_ns.doc(responses={200: 'Success', 404: 'Could not find task'})
+    def get(task_key: str) -> Any:
+        """Return task for given key."""
+        return business.get_task_for_key(task_key)

@@ -49,7 +49,7 @@ def upgrade():
     # Create table in Cassandra
     session.set_keyspace('medtagger')
     session.execute("""
-        CREATE TABLE brush_label_elements (
+        CREATE TABLE IF NOT EXISTS brush_label_elements (
             id text PRIMARY KEY,
             image blob
         )

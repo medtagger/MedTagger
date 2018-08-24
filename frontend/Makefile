@@ -4,9 +4,9 @@ define DYNAMIC_ENVIRONMENT_CONTENT
 // WARNING! This file was dynamically created during build time!
 export const environment = {
     production: true,
-    API_URL: window.location.origin + '$(MEDTAGGER__HOST_ON_SUBDIRECTORY)api/v1',
+    API_URL: window.location.origin + '$(MEDTAGGER__HOST_ON_SUBDIRECTORY)/api/v1',
     WEBSOCKET_URL: window.location.origin,
-    WEBSOCKET_PATH: '$(MEDTAGGER__HOST_ON_SUBDIRECTORY)socket.io'
+    WEBSOCKET_PATH: '$(MEDTAGGER__HOST_ON_SUBDIRECTORY)/socket.io'
 };
 endef
 

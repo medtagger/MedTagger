@@ -26,10 +26,16 @@ def get_slices_by_scan_id(scan_id: ScanID, orientation: SliceOrientation = Slice
     return slices
 
 
-def delete_slice_by_id(slice_id: SliceID) -> None:
+def delete_slice(_slice: Slice) -> None:
     """Remove Slice from SQL database and Storage."""
+    slice_id = _slice.id
+    scan_id = _slice.scan_id
+
     with db_session() as session:
+        query = session.query(Scan).filter(Scan.id == scan_id)
+        query.update({'declared_number_of_slices': Scan.declared_number_of_slices - 1})
         session.query(Slice).filter(Slice.id == slice_id).delete()
+
     OriginalSlice.filter(id=slice_id).delete()
     ProcessedSlice.filter(id=slice_id).delete()
 

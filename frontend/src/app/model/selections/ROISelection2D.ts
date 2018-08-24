@@ -35,10 +35,6 @@ export class ROISelection2D extends SliceSelection {
         return this._height;
     }
 
-    public getCoordinates() {
-        return {x: this._positionX, y: this._positionY, z: this.sliceIndex};
-    }
-
     public updateWidth(newWidth: number): void {
         this._width = newWidth;
     }

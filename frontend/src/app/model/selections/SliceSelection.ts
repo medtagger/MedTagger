@@ -18,7 +18,12 @@ export abstract class SliceSelection {
         return this.id;
     }
 
-    public abstract getCoordinates();
+    protected setId(newId: number): void {
+        this.id = newId;
+    }
 
     public abstract toJSON(): Object;
+    public getAdditionalData(): Object {
+        return {};
+    }
 }

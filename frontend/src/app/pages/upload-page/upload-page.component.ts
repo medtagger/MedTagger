@@ -4,7 +4,7 @@ import {FormBuilder, FormGroup, FormControl, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
 
 import {ScanService} from '../../services/scan.service';
-import {CategoryService} from '../../services/category.service';
+import {DatasetService} from '../../services/dataset.service';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {
     UploadScansSelectorComponent,
@@ -32,7 +32,7 @@ enum UploadingScanStatus {
 }
 
 enum UploadStep {
-    SELECT_CATEGORY,
+    SELECT_DATASET,
     SELECT_UPLOAD_MODE,
     SELECT_SCAN,
     UPLOADING,
@@ -103,16 +103,16 @@ export class UploadPageComponent implements OnInit {
     UploadingScanStatus = UploadingScanStatus;
 
     uploadMode: UploadMode = UploadMode.SINGLE_SCAN;
-    category: string;
-    availableCategories = [];
+    dataset: string;
+    availableDatasets = [];
 
     chooseModeFormGroup: FormGroup;
     chooseFilesFormGroup: FormGroup;
     sendingFilesFormGroup: FormGroup;
     uploadCompletedFormGroup: FormGroup;
-    chooseCategoryFormGroup: FormGroup;
+    chooseDatasetFormGroup: FormGroup;
 
-    constructor(private scanService: ScanService, private categoryService: CategoryService, private formBuilder: FormBuilder) {
+    constructor(private scanService: ScanService, private datasetService: DatasetService, private formBuilder: FormBuilder) {
     }
 
     ngOnInit() {
@@ -126,11 +126,11 @@ export class UploadPageComponent implements OnInit {
             'filesSent': new FormControl(null, [Validators.required]),
         });
         this.uploadCompletedFormGroup = this.formBuilder.group({});
-        this.chooseCategoryFormGroup = this.formBuilder.group({
-            'category': new FormControl(this.category, [Validators.required]),
+        this.chooseDatasetFormGroup = this.formBuilder.group({
+            'dataset': new FormControl(this.dataset, [Validators.required]),
         });
-        this.categoryService.getAvailableCategories().then((availableCategories) => {
-            this.availableCategories = availableCategories;
+        this.datasetService.getAvailableDatasets().then((availableDatasets) => {
+            this.availableDatasets = availableDatasets;
         });
     }
 
@@ -249,10 +249,10 @@ export class UploadPageComponent implements OnInit {
     }
 
     private uploadSingleScan(uploadingScan: UploadingScan): Promise<Observable<any | never>> {
-        const category = this.chooseCategoryFormGroup.get('category').value;
+        const dataset = this.chooseDatasetFormGroup.get('dataset').value;
         const numberOfSlices = uploadingScan.scan.files.length;
 
-        return this.scanService.createNewScan(category, numberOfSlices).then((scanId: string) => {
+        return this.scanService.createNewScan(dataset, numberOfSlices).then((scanId: string) => {
                 console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
                 uploadingScan.id = scanId;
                 return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
@@ -267,7 +267,7 @@ export class UploadPageComponent implements OnInit {
     }
 
     public restart(): void {
-        this.resetFormGroup(this.chooseCategoryFormGroup);
+        this.resetFormGroup(this.chooseDatasetFormGroup);
         this.resetFormGroup(this.chooseModeFormGroup);
         this.resetFormGroup(this.chooseFilesFormGroup);
         this.resetFormGroup(this.sendingFilesFormGroup);
