@@ -10,7 +10,6 @@ import {LabelListItem} from '../../model/labels/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from '../selectors/Selector';
 import {Subscription} from 'rxjs/Subscription';
-import {LabelTag} from '../../model/LabelTag';
 import {isUndefined} from 'util';
 import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/labels/LabelTag';
