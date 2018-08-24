@@ -188,6 +188,7 @@ export class MarkerPageComponent implements OnInit {
     public nextScan(): void {
         this.marker.setDownloadScanInProgress(true);
         this.marker.prepareForNewScan();
+        this.labelComment = '';
         this.requestScan();
     }
 
