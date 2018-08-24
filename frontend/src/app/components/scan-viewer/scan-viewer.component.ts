@@ -72,6 +72,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     ngAfterViewInit() {
         console.log('ScanViewer | ngAfterViewInit');
         this.sliderFocus();
+        SliceSelection.resetIdCounter();
     }
 
     public sliderFocus() {
