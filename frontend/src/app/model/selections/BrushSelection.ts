@@ -1,6 +1,7 @@
 import {SliceSelection} from './SliceSelection';
 import {BinaryConverter} from '../../utils/BinaryConverter';
 import {LabelTag} from "../labels/LabelTag";
+import {isUndefined} from "util";
 
 export class BrushSelection extends SliceSelection {
     _selectionLayer: HTMLImageElement;
@@ -14,7 +15,9 @@ export class BrushSelection extends SliceSelection {
             this._selectionLayer.onload = () => resolve();
             this._selectionLayer.onerror = () => reject();
 
-            this._selectionLayer.src = selectionLayer;
+            if (!isUndefined(selectionLayer)) {
+                this._selectionLayer.src = selectionLayer;
+            }
         });
 
 

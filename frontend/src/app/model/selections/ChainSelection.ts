@@ -7,9 +7,10 @@ export class ChainSelection extends SliceSelection {
     points: Array<Point>;
     loop = false;
 
-    constructor(points: Array<Point>, depth: number, tag: LabelTag) {
+    constructor(points: Array<Point>, loop: boolean, depth: number, tag: LabelTag) {
         super();
         this.points = points;
+        this.loop = loop;
         this.sliceIndex = depth;
         this.label_tag = tag;
         this.label_tool = 'CHAIN';

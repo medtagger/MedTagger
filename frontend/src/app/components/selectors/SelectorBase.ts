@@ -91,13 +91,13 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         console.log('Selector | addCurrentSelection');
         if (this.isOnlyOneSelectionPerSlice()) {
             this.removeSelectionsOnCurrentSlice();
-            this.selections.set(this.currentSlice, [selection]);
+            this.selections.set(selection.sliceIndex, [selection]);
         } else {
-            const currentSliceSelections = this.selections.get(this.currentSlice);
+            const currentSliceSelections = this.selections.get(selection.sliceIndex);
             if (currentSliceSelections) {
                 currentSliceSelections.push(selection);
             } else {
-                this.selections.set(this.currentSlice, [selection]);
+                this.selections.set(selection.sliceIndex, [selection]);
             }
         }
         this.stateChange.emit(new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(), selection.sliceIndex, false));

@@ -7,6 +7,10 @@ import {SliceSelection} from '../model/selections/SliceSelection';
 import {LabelTag} from "../model/labels/LabelTag";
 import {ROISelection2D} from "../model/selections/ROISelection2D";
 import {Task} from "../model/Task";
+import {PointSelection} from "../model/selections/PointSelection";
+import {ChainSelection} from "../model/selections/ChainSelection";
+import {Point} from "../model/Point";
+import {BrushSelection} from "../model/selections/BrushSelection";
 
 interface RandomLabelResponse {
     label_id: string;
@@ -35,9 +39,27 @@ export class LabelService {
     private convertElements(rawElements: any, task: Task): Array<SliceSelection> {
         const elements: Array<SliceSelection> = [];
         rawElements.forEach((element: any) => {
-            if (element.tool === 'RECTANGLE') {
-                const labelTag = this.getLabelTagByKey(element.tag, task);
-                elements.push(new ROISelection2D(element.x, element.y, element.slice_index, labelTag, element.width, element.height));
+            const labelTag = this.getLabelTagByKey(element.tag, task);
+            switch (element.tool) {
+                case 'RECTANGLE':
+                    elements.push(new ROISelection2D(element.x, element.y, element.slice_index, labelTag, element.width, element.height));
+                    break;
+                case 'POINT':
+                    elements.push(new PointSelection(element.x, element.y, element.slice_index, labelTag));
+                    break;
+                case 'CHAIN':
+                    const points: Array<Point> = [];
+                    element.points.forEach((point) => {
+                        points.push(new Point(point.x, point.y));
+                    });
+                    elements.push(new ChainSelection(points, element.loop, element.slice_index, labelTag));
+                    break;
+                case 'BRUSH':
+                    // Image for Brush will be loaded dynamically together with Slice Images
+                    elements.push(new BrushSelection(undefined, element.slice_index, labelTag));
+                    break;
+                default:
+                    console.error('LabelsService | convertElements | Unsupported Tool: ', element.tool);
             }
         });
         return elements;
