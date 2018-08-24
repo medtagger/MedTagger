@@ -42,12 +42,18 @@ def upgrade():
     op.create_foreign_key('fk_Labels_scan_id_Scans', 'Labels', 'Scans', ['scan_id'], ['id'], ondelete='CASCADE')
     op.create_foreign_key('fk_LabelElements_label_id_Labels', 'LabelElements', 'Labels', ['label_id'], ['id'], ondelete='CASCADE')
     
-    op.create_foreign_key('fk_RectangularLabelElements_id_LabelElements', 'RectangularLabelElements', 'LabelElements', ['id'], ['id'], ondelete='CASCADE')
-    op.create_foreign_key('fk_PointLabelElements_id_LabelElements', 'PointLabelElements', 'LabelElements', ['id'], ['id'], ondelete='CASCADE')
-    op.create_foreign_key('fk_ChainLabelElements_id_LabelElements', 'ChainLabelElements', 'LabelElements', ['id'], ['id'], ondelete='CASCADE')
-    op.create_foreign_key('fk_ChainLabelElementPoints_label_element_id_LabelElements', 'ChainLabelElementPoints', 'LabelElements', ['label_element_id'], ['id'], ondelete='CASCADE')
-    op.create_foreign_key('fk_BrushLabelElements_id_LabelElements', 'BrushLabelElements', 'LabelElements', ['id'], ['id'], ondelete='CASCADE')
-    
+    op.create_foreign_key(
+        'fk_RectangularLabelElements_id_LabelElements', 'RectangularLabelElements', 'LabelElements', ['id'], ['id'], ondelete='CASCADE')
+    op.create_foreign_key(
+        'fk_PointLabelElements_id_LabelElements', 'PointLabelElements', 'LabelElements', ['id'], ['id'], ondelete='CASCADE')
+    op.create_foreign_key(
+        'fk_ChainLabelElements_id_LabelElements', 'ChainLabelElements', 'LabelElements', ['id'], ['id'], ondelete='CASCADE')
+    op.create_foreign_key(
+        'fk_ChainLabelElementPoints_label_element_id_LabelElements', 'ChainLabelElementPoints', 'LabelElements', ['label_element_id'], ['id'], ondelete='CASCADE')
+    op.create_foreign_key(
+        'fk_BrushLabelElements_id_LabelElements', 'BrushLabelElements', 'LabelElements', ['id'], ['id'], ondelete='CASCADE')
+    # TODO: PK for LabelElements is LabelSelections
+    # TODO: PK for PointLabelElement is PointLabelElement
 
 def downgrade():
     op.drop_constraint('fk_Slices_scan_id_Scans', 'Slices')
@@ -64,8 +70,13 @@ def downgrade():
     op.create_foreign_key('fk_Labels_scan_id_Scans', 'Labels', 'Scans', ['scan_id'], ['id'])
     op.create_foreign_key('fk_LabelSelections_label_id_Labels', 'LabelElements', 'Labels', ['label_id'], ['id'])
     
-    op.create_foreign_key('fk_RectangularLabelElements_id_LabelElements', 'RectangularLabelElements', 'LabelElements', ['id'], ['id'])
-    op.create_foreign_key('fk_PointLabelElement_id_LabelElements', 'PointLabelElements', 'LabelElements', ['id'], ['id'])
-    op.create_foreign_key('fk_ChainLabelElements_id_LabelElements', 'ChainLabelElements', 'LabelElements', ['id'], ['id'])
-    op.create_foreign_key('fk_ChainLabelElementPoints_label_element_id_LabelElements', 'ChainLabelElementPoints', 'LabelElements', ['label_element_id'], ['id'])
-    op.create_foreign_key('fk_BrushLabelElements_id_LabelElements', 'BrushLabelElements', 'LabelElements', ['id'], ['id'])
+    op.create_foreign_key(
+        'fk_RectangularLabelElements_id_LabelElements', 'RectangularLabelElements', 'LabelElements', ['id'], ['id'])
+    op.create_foreign_key(
+        'fk_PointLabelElement_id_LabelElements', 'PointLabelElements', 'LabelElements', ['id'], ['id'])
+    op.create_foreign_key(
+        'fk_ChainLabelElements_id_LabelElements', 'ChainLabelElements', 'LabelElements', ['id'], ['id'])
+    op.create_foreign_key(
+        'fk_ChainLabelElementPoints_label_element_id_LabelElements', 'ChainLabelElementPoints', 'LabelElements', ['label_element_id'], ['id'])
+    op.create_foreign_key(
+        'fk_BrushLabelElements_id_LabelElements', 'BrushLabelElements', 'LabelElements', ['id'], ['id'])
