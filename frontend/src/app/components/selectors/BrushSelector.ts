@@ -279,11 +279,11 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         return this.canvas.toDataURL() === blankCanvas.toDataURL();
     }
 
-    public getSelectorName(): string {
-        return 'BRUSH';
-    }
-
     public canUseMouseWheel(): boolean {
         return !this.mouseDrag;
+    }
+
+    public getSelectorName(): string {
+        return 'BRUSH';
     }
 }

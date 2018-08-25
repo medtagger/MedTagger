@@ -88,11 +88,11 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
         return false;
     }
 
-    public getSelectorName(): string {
-        return 'RECTANGLE';
-    }
-
     public canUseMouseWheel(): boolean {
         return !this.selectedArea;
+    }
+
+    public getSelectorName(): string {
+        return 'RECTANGLE';
     }
 }
