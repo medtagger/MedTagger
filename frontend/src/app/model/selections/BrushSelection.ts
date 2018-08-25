@@ -7,7 +7,7 @@ export class BrushSelection extends SliceSelection {
     _selectionLayer: HTMLImageElement;
     isReady: Promise<void>;
 
-    constructor(selectionLayer: string, depth: number, tag: LabelTag) {
+    constructor(selectionLayer: string, depth: number, tag: LabelTag, id?: number) {
         super();
         this._selectionLayer = new Image();
 
@@ -24,6 +24,10 @@ export class BrushSelection extends SliceSelection {
         this.sliceIndex = depth;
         this.label_tag = tag;
         this.label_tool = 'BRUSH';
+
+        if (id) {
+            this.setId(id);
+        }
     }
 
     public getSelectionLayer(): Promise<HTMLImageElement | Error> {

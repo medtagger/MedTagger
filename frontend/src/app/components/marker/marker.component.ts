@@ -272,6 +272,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         };
 
         this.canvas.onwheel = (wheelEvent: WheelEvent) => {
+            if (this.currentSelector && !this.currentSelector.canUseMouseWheel()) {
+                return;
+            }
+
             const sliderValue = wheelEvent.deltaY > 0 ? this.slider.value - 1 : this.slider.value + 1;
 
             if (sliderValue >= this.slider.min && sliderValue <= this.slider.max) {
