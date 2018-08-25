@@ -177,6 +177,11 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     onMouseUp(event: MouseEvent): void {
         if (this.mouseDrag) {
             console.log('BrushSelector | onUp | event: ', event);
+            const x = (event.clientX) - this.canvasPosition.left;
+            const y = (event.clientY) - this.canvasPosition.top;
+
+            this.canvasCtx.lineTo(x, y);
+            this.canvasCtx.stroke();
 
             this.canvasCtx.globalCompositeOperation = this.getStyle().SAVING_COMPOSITE_OPERATION;
 
