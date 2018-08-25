@@ -8,6 +8,7 @@ from medtagger.database.models import SliceOrientation
 from medtagger.types import ScanID
 from medtagger.api.exceptions import InvalidArgumentsException
 from medtagger.api.scans import business
+from medtagger.repositories import tasks as TasksRepository
 
 
 class Slices(Namespace):
@@ -19,6 +20,7 @@ class Slices(Namespace):
         """Handle slices request triggered  by `request_slices` event."""
         assert request.get('scan_id'), 'ScanID is required!'
         scan_id = ScanID(str(request['scan_id']))
+        task_key = str(request['task_key'])
         begin = max(0, request.get('begin', 0))
         count = request.get('count', 1)
         reversed_order = request.get('reversed', False)
@@ -36,6 +38,20 @@ class Slices(Namespace):
                 'last_in_batch': last_in_batch,
                 'image': image,
             })
+
+        # Predefined Labels makes sense only for Z axis for now
+        if orientation == SliceOrientation.Z:
+            task = TasksRepository.get_task_by_key(task_key)
+            label_elements = list(business.get_predefined_brush_label_elements(scan_id, task.id, begin, count))
+            label_elements_to_send = reversed(list(enumerate(label_elements))) if reversed_order else \
+                enumerate(label_elements)
+            for index, (label_element, image) in label_elements_to_send:
+                emit('brush_labels', {
+                    'scan_id': scan_id,
+                    'tag_key': label_element.tag.key,
+                    'index': label_element.slice_index,
+                    'image': image,
+                })
 
     def _raise_on_invalid_request_slices(self, count: int, orientation: str) -> None:
         """Validate incoming request and raise an exception if there are issues with given arguments.

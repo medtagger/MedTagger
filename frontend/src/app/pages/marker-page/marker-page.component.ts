@@ -24,6 +24,7 @@ import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
 import {LabelService} from "../../services/label.service";
 import {Label} from "../../model/labels/Label";
+import {PredefinedBrushLabelElement} from "../../model/PredefinedBrushLabelElement";
 
 
 @Component({
@@ -128,6 +129,11 @@ export class MarkerPageComponent implements OnInit {
             }
         });
 
+        this.scanService.predefinedBrushLabelElementsObservable().subscribe((labelElement: PredefinedBrushLabelElement) => {
+            console.log('MarkerPage | ngOnInit | predefinedBrushLabelElementsObservable: ', labelElement);
+            this.marker.updatePredefinedBrushLabelElement(labelElement);
+        });
+
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
             if (isObserverHooked) {
                 this.marker.observableSliceRequest.subscribe((request: SliceRequest) => {
@@ -149,7 +155,7 @@ export class MarkerPageComponent implements OnInit {
                         return;
                     }
                     if (this.marker.downloadingSlicesInProgress === false) {
-                        this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
+                        this.scanService.requestSlices(this.scan.scanId, this.taskKey, sliceRequest, count, reversed);
                         this.marker.setDownloadSlicesInProgress(true);
                     }
                 });
@@ -174,7 +180,7 @@ export class MarkerPageComponent implements OnInit {
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
                 this.startMeasuringLabelingTime();
                 this.isInitialSliceLoad = true;
-                this.scanService.requestSlices(scan.scanId, begin, count, false);
+                this.scanService.requestSlices(this.scan.scanId, this.taskKey, begin, count, false);
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);

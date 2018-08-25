@@ -48,6 +48,26 @@ def get_predefined_label_for_scan_in_task(scan: Scan, task: Task) -> Optional[La
     return query.first()
 
 
+def get_predefined_brush_label_elements(scan_id: ScanID, task_id: int,
+                                        begin: int, count: int) -> List[BrushLabelElement]:
+    """Fetch Predefined Brush Label Elements for given Scan and Task.
+
+    :param scan_id: ID of a given Scan
+    :param task_id: ID of a given Task
+    :param begin: first Slice index
+    :param count: number of Slices for which Label Elements will be returned
+    :return: list of Brush Label Elements
+    """
+    query = BrushLabelElement.query
+    query = query.join(Label)
+    query = query.filter(Label.predefined)
+    query = query.filter(Label.scan_id == scan_id)
+    query = query.filter(Label.task_id == task_id)
+    query = query.filter(BrushLabelElement.slice_index >= begin)
+    query = query.filter(BrushLabelElement.slice_index < begin + count)
+    return query.all()
+
+
 def add_new_label(scan_id: ScanID, task_key: str, user: User, labeling_time: LabelingTime,
                   comment: str = None, predefined: bool = False) -> Label:
     """Add new Label for given Scan.

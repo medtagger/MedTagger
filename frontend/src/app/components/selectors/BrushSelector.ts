@@ -266,6 +266,14 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.returnToBrushModeIfNeeded();
     }
 
+    public updateBrushSelection(sliceIndex: number, tag_key: string, source: string): void {
+        this.getSelections().forEach((selection: BrushSelection) => {
+            if (selection.sliceIndex === sliceIndex && selection.label_tag.key === tag_key) {
+                selection._selectionLayer.src = source;
+            }
+        });
+    }
+
     // Changing mode to avoid situation when we are in eraser mode on slice that lacks brush selection
     private returnToBrushModeIfNeeded(): void {
         const hasDrawing: boolean = this.lastTagDrawings[this.getCurrentSelectingContext()] !== undefined;

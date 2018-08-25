@@ -15,6 +15,8 @@ import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/labels/LabelTag';
 import {Label} from "../../model/labels/Label";
 import {LabelSelection} from "../../model/labels/LabelSelection";
+import {PredefinedBrushLabelElement} from "../../model/PredefinedBrushLabelElement";
+import {BrushSelector} from "../selectors/BrushSelector";
 
 @Component({
     selector: 'app-marker-component',
@@ -232,6 +234,11 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         label.labelSelections.forEach( (selection: SliceSelection) => {
             this.selectorsByName.get(selection.label_tool).addSelection(selection);
         });
+    }
+
+    public updatePredefinedBrushLabelElement(labelElement: PredefinedBrushLabelElement): void {
+        const selector: BrushSelector = this.selectorsByName.get('BRUSH') as BrushSelector;
+        selector.updateBrushSelection(labelElement.index, labelElement.tag_key, labelElement.source);
     }
 
     private afterImageLoad(): void {

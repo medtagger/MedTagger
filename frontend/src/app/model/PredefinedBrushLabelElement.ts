@@ -1,15 +1,15 @@
 import {BinaryConverter} from "../utils/BinaryConverter";
 
-export class MarkerSlice {
-    private readonly _id: number;
+export class PredefinedBrushLabelElement {
+    private readonly _scan_id: string;
+    private readonly _tag_key: string;
     private readonly _index: number;
-    private readonly _lastInBatch: number;
     private readonly _source: string;
 
-    constructor(id: string, index: number, lastInBatch: number, source: ArrayBuffer | string) {
-        this._id = +id;
+    constructor(scan_id: string, tag_key: string, index: number, source: ArrayBuffer | string) {
+        this._scan_id = scan_id;
+        this._tag_key = tag_key;
         this._index = index;
-        this._lastInBatch = lastInBatch;
         if (source instanceof ArrayBuffer) {
             this._source = BinaryConverter.byteToBase64(source);
         } else if (typeof String) {
@@ -19,8 +19,12 @@ export class MarkerSlice {
         }
     }
 
-    public get id() {
-        return this._id;
+    public get scan_id() {
+        return this._scan_id;
+    }
+
+    public get tag_key() {
+        return this._tag_key;
     }
 
     public get index() {
@@ -29,9 +33,5 @@ export class MarkerSlice {
 
     public get source() {
         return this._source;
-    }
-
-    public isLastInBatch(): boolean {
-        return this._index === this._lastInBatch;
     }
 }

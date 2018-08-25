@@ -8,4 +8,13 @@ export class BinaryConverter {
         }
         return new Blob([buffer], {type: dataType});
     }
+
+    public static byteToBase64(byteImage: ArrayBuffer): string {
+        const bytes = new Uint8Array(byteImage);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return 'data:image/png;base64,' + btoa(binary);
+    }
 }

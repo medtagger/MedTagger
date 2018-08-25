@@ -11,7 +11,7 @@ from PIL import Image
 from medtagger.exceptions import InternalErrorException
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
-from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation
+from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation, BrushLabelElement
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
     labels as LabelsRepository,
@@ -21,6 +21,7 @@ from medtagger.repositories import (
     datasets as DatasetsRepository,
     tasks as TasksRepository,
 )
+from medtagger.storage.models import BrushLabelElement as StorageBrushLabelElement
 from medtagger.workers.storage import parse_dicom_and_update_slice
 from medtagger.api.utils import get_current_user
 
@@ -96,18 +97,34 @@ def get_random_scan(task_key: str) -> Scan:
 
 def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
                         orientation: SliceOrientation = SliceOrientation.Z) -> Iterable[Tuple[Slice, bytes]]:
-    """Fetch multiple slices for given scan.
+    """Fetch multiple slices for given Scan.
 
-    :param scan_id: ID of a given scan
-    :param begin: first slice index (included)
-    :param count: number of slices that will be returned
+    :param scan_id: ID of a given Scan
+    :param begin: first Slice index (included)
+    :param count: number of Slices that will be returned
     :param orientation: orientation for Slices (by default set to Z axis)
-    :return: generator for Slices
+    :return: generator for Slices and its images
     """
     slices = SlicesRepository.get_slices_by_scan_id(scan_id, orientation=orientation)
     for _slice in slices[begin:begin + count]:
         image = SlicesRepository.get_slice_converted_image(_slice.id)
         yield _slice, image
+
+
+def get_predefined_brush_label_elements(scan_id: ScanID, task_id: int,
+                                        begin: int, count: int) -> Iterable[Tuple[BrushLabelElement, bytes]]:
+    """Fetch Predefined Brush Label Elements for given Scan and Task.
+
+    :param scan_id: ID of a given Scan
+    :param task_id: ID of a given Task
+    :param begin: first Slice index
+    :param count: number of Slices for which Label Elements will be returned
+    :return: generator for Brush Label Elements and its images
+    """
+    label_elements = LabelsRepository.get_predefined_brush_label_elements(scan_id, task_id, begin, count)
+    for label_element in label_elements:
+        storage_brush_label_element = StorageBrushLabelElement.get(id=label_element.id)
+        yield label_element, storage_brush_label_element.image
 
 
 def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> None:

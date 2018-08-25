@@ -16,6 +16,7 @@ import {defer} from 'rxjs/internal/observable/defer';
 import {Task} from '../model/Task';
 import {TaskResponse} from './task.service';
 import {isUndefined} from 'util';
+import {PredefinedBrushLabelElement} from "../model/PredefinedBrushLabelElement";
 
 interface ScanResponse {
     scan_id: string;
@@ -129,9 +130,23 @@ export class ScanService {
         );
     }
 
-    requestSlices(scanId: string, begin: number, count: number, reversed: boolean) {
+    predefinedBrushLabelElementsObservable(): Observable<PredefinedBrushLabelElement> {
+        return this.websocket.fromEvent<any>('brush_labels').pipe(
+            map((label: { scan_id: string, tag_key: string, index: number, image: ArrayBuffer }) => {
+                return new PredefinedBrushLabelElement(label.scan_id, label.tag_key, label.index, label.image);
+            })
+        );
+    }
+
+    requestSlices(scanId: string, taskKey: string, begin: number, count: number, reversed: boolean) {
         console.log('ScanService | requestSlices | begin:', begin);
-        this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count, reversed: reversed});
+        this.websocket.emit('request_slices', {
+            scan_id: scanId,
+            task_key: taskKey,
+            begin: begin,
+            count: count,
+            reversed: reversed,
+        });
     }
 
     createNewScan(dataset: string, numberOfSlices: number) {
