@@ -236,5 +236,9 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     public deselect(): void {
         // pass
     }
+
+    public canUseMouseWheel(): boolean {
+        return true;
+    }
 }
 
