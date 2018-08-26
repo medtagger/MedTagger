@@ -1,7 +1,7 @@
 import {Selector} from './Selector';
 import {SelectorBase} from './SelectorBase';
 import {Point} from '../../model/Point';
-import {SelectorAction} from '../../model/SelectorAction';
+import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
 import {ChainSelection} from '../../model/selections/ChainSelection';
 
 export class ChainSelector extends SelectorBase<ChainSelection> implements Selector<ChainSelection> {
@@ -27,10 +27,10 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         return [
             new SelectorAction('Stop', () => this.selectingInProgress, () => {
                 this.completeSelection(false);
-            }),
+            }, SelectorActionType.BUTTON),
             new SelectorAction('Loop', () => this.selectingInProgress && this.selectedArea.points.length > 2, () => {
                 this.completeSelection(true);
-            })
+            }, SelectorActionType.BUTTON)
         ];
     }
 
@@ -152,6 +152,10 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
 
     public deselect(): void {
         this.completeSelection(false);
+    }
+
+    public canUseMouseWheel(): boolean {
+        return !this.selectingInProgress;
     }
 
     public getSelectorName(): string {

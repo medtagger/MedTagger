@@ -34,11 +34,11 @@ Documentation for the MedTagger can be found [here](/docs).
 
 ## What are we doing now?
 
- - [ ] Labeling using multiple tools
+ - [x] Labeling using multiple tools
    - [x] Rectangle
    - [x] Points
    - [x] Connected Points
-   - [ ] Brush
+   - [x] Brush
  - [ ] Zoom for labeling small objects
  - [ ] Surveys as additional actions for provided labels
  - [ ] Validation mechanism

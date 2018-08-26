@@ -1,10 +1,10 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-
 import {ScanService} from '../../services/scan.service';
 import {MarkerComponent} from '../../components/marker/marker.component';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
+import {Selection3D} from '../../model/selections/Selection3D';
 import {RectROISelector} from '../../components/selectors/RectROISelector';
 import {SliceRequest} from '../../model/SliceRequest';
 import {DialogService} from '../../services/dialog.service';
@@ -15,14 +15,13 @@ import {LabelExplorerComponent} from '../../components/label-explorer/label-expl
 import {Selector} from '../../components/selectors/Selector';
 import {PointSelector} from '../../components/selectors/PointSelector';
 import {BrushSelector} from '../../components/selectors/BrushSelector';
-import {ChainSelector} from '../../components/selectors/ChainSelector';
-import {SelectorAction} from '../../model/SelectorAction';
 import {FormControl, Validators} from '@angular/forms';
-import {TaskService} from '../../services/task.service';
 import {isUndefined} from 'util';
+import {ChainSelector} from '../../components/selectors/ChainSelector';
+import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
+import {TaskService} from '../../services/task.service';
 import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
-import {Selection3D} from '../../model/selections/Selection3D';
 
 
 @Component({
@@ -50,6 +49,8 @@ export class MarkerPageComponent implements OnInit {
     labelComment: string;
     isInitialSliceLoad: boolean;
     chooseTaskPageUrl = '/labelling/choose-task';
+
+    ActionType = SelectorActionType;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private router: Router, private snackBar: MatSnackBar, private taskService: TaskService) {
@@ -91,11 +92,12 @@ export class MarkerPageComponent implements OnInit {
 
         this.taskTags = new FormControl('', [Validators.required]);
 
+        // Brush selector should be first on the list to avoid canvas shenanigans
         this.selectors = new Map<string, Selector<any>>([
+            ['BRUSH', new BrushSelector(this.marker.getCanvas())],
             ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
             ['POINT', new PointSelector(this.marker.getCanvas())],
-            ['CHAIN', new ChainSelector(this.marker.getCanvas())],
-            ['BRUSH', new BrushSelector(this.marker.getCanvas())]
+            ['CHAIN', new ChainSelector(this.marker.getCanvas())]
         ]);
 
         this.marker.setSelectors(Array.from(this.selectors.values()));
@@ -186,6 +188,7 @@ export class MarkerPageComponent implements OnInit {
     public nextScan(): void {
         this.marker.setDownloadScanInProgress(true);
         this.marker.prepareForNewScan();
+        this.labelComment = '';
         this.requestScan();
     }
 
