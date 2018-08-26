@@ -154,6 +154,10 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         this.completeSelection(false);
     }
 
+    public canUseMouseWheel(): boolean {
+        return !this.selectingInProgress;
+    }
+
     public getSelectorName(): string {
         return 'CHAIN';
     }
