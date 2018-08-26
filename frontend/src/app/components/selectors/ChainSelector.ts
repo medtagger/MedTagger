@@ -7,7 +7,6 @@ import {ChainSelection} from '../../model/selections/ChainSelection';
 export class ChainSelector extends SelectorBase<ChainSelection> implements Selector<ChainSelection> {
 
     private selectedAreaPointIndex = -1;
-    private selectingInProgress = false;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -25,10 +24,10 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
 
     public getActions(): Array<SelectorAction> {
         return [
-            new SelectorAction('Stop', () => this.selectingInProgress, () => {
+            new SelectorAction('Stop', () => !this.isMovingPoint() && !!this.selectedArea, () => {
                 this.completeSelection(false);
             }, SelectorActionType.BUTTON),
-            new SelectorAction('Loop', () => this.selectingInProgress && this.selectedArea.points.length > 2, () => {
+            new SelectorAction('Loop', () => !this.isMovingPoint() && !!this.selectedArea && this.selectedArea.points.length > 2, () => {
                 this.completeSelection(true);
             }, SelectorActionType.BUTTON)
         ];
@@ -90,7 +89,6 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
             this.addSelection(this.selectedArea);
         }
         this.selectedArea = undefined;
-        this.selectingInProgress = undefined;
         this.requestRedraw();
     }
 
@@ -99,7 +97,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
 
-        if (this.selectingInProgress) {
+        if (this.selectedArea) {
             const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
             const point = new Point(normalizedPoint.x, normalizedPoint.y);
             this.selectedArea.points.push(point);
@@ -124,14 +122,13 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
                 const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
                 const point = new Point(normalizedPoint.x, normalizedPoint.y);
                 this.selectedArea = new ChainSelection([point], this.currentSlice, this.currentTag.key);
-                this.selectingInProgress = true;
                 this.requestRedraw();
             }
         }
     }
 
     public onMouseMove(event: MouseEvent): void {
-        if (this.selectedArea && !this.selectingInProgress) {
+        if (this.selectedArea && this.isMovingPoint()) {
             console.log('ChainSelector | updateSelection | event: ', event);
 
             const newX = event.clientX - this.canvasPosition.left;
@@ -145,20 +142,25 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
     }
 
     public onMouseUp(event: MouseEvent): void {
-        if (!this.selectingInProgress) {
+        if (this.isMovingPoint()) {
             this.selectedArea = undefined;
+            this.selectedAreaPointIndex = -1;
         }
     }
 
-    public deselect(): void {
-        this.completeSelection(false);
-    }
-
     public canUseMouseWheel(): boolean {
-        return !this.selectingInProgress;
+        return !this.selectedArea;
     }
 
     public getSelectorName(): string {
         return 'CHAIN';
+    }
+
+    public canSendScan(): boolean {
+        return !this.selectedArea || this.isMovingPoint();
+    }
+
+    private isMovingPoint(): boolean {
+        return this.selectedAreaPointIndex !== -1;
     }
 }

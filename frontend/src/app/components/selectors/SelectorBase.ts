@@ -233,11 +233,11 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         this.redrawRequestEmitter.emit();
     }
 
-    public deselect(): void {
-        // pass
+    public canUseMouseWheel(): boolean {
+        return true;
     }
 
-    public canUseMouseWheel(): boolean {
+    public canSendScan(): boolean {
         return true;
     }
 }

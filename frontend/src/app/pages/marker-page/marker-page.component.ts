@@ -288,4 +288,8 @@ export class MarkerPageComponent implements OnInit {
                 this.marker.setFocusable(true);
         });
     }
+
+    public canSendScan(): boolean {
+        return !this.marker.getCurrentSelector() || this.marker.getCurrentSelector().canSendScan();
+    }
 }
