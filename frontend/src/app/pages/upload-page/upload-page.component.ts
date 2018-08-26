@@ -91,6 +91,7 @@ export class UploadPageComponent implements OnInit {
     uploadingAndProcessingScans: Array<UploadingScan> = [];
     availableScans: Array<UploadingScan> = [];
     errorScans: Array<UploadingScan> = [];
+    hasPredefinedLabels: boolean = false;
 
     incompatibleFiles: IncompatibleFile[] = [];
 
@@ -136,6 +137,9 @@ export class UploadPageComponent implements OnInit {
 
     public chooseFiles(userFiles: UserFiles): void {
         this.scans = userFiles.scans;
+        this.hasPredefinedLabels = !!this.scans.find((scan: SelectedScan) => {
+            return !!scan.predefinedLabel;
+        });
         this.totalNumberOfSlices = userFiles.numberOfSlices;
         this.incompatibleFiles = userFiles.incompatibleFiles;
     }
@@ -253,13 +257,16 @@ export class UploadPageComponent implements OnInit {
         const numberOfSlices = uploadingScan.scan.files.length;
 
         return this.scanService.createNewScan(dataset, numberOfSlices).then((scanId: string) => {
-                console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
-                uploadingScan.id = scanId;
-                return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
-            },
-            () => {
-                return throwError({error: 'Could not create Scan.'});
-            });
+            console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
+            uploadingScan.id = scanId;
+            if (!!uploadingScan.scan.predefinedLabel) {
+                this.scanService.sendPredefinedLabel(scanId, uploadingScan.scan.taskKey, uploadingScan.scan.predefinedLabel);
+            }
+            return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
+        },
+        () => {
+            return throwError({error: 'Could not create Scan.'});
+        });
     }
 
     private resetFormGroup(formGroup: FormGroup): void {

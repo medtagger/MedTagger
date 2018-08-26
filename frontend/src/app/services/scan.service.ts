@@ -82,6 +82,27 @@ export class ScanService {
         });
     }
 
+    public sendPredefinedLabel(scanId: string, taskKey: string, label: Object): Promise<Response> {
+        const form = new FormData();
+        form.append('label', JSON.stringify(label));
+
+        // const additionalData = selection.getAdditionalData();
+        // for (const key of Object.keys(additionalData)) {
+        //     const value = additionalData[key];
+        //     form.append(key, value, key);
+        // }
+
+        return new Promise((resolve, reject) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label?predefined=true`, form).toPromise().then((response: Response) => {
+                console.log('ScanService | sendPredefinedLabel | response: ', response);
+                resolve(response);
+            }).catch((error: Response) => {
+                console.log('ScanService | sendPredefinedLabel | error: ', error);
+                reject(error);
+            });
+        });
+    }
+
     public getRandomScan(taskKey: string): Promise<ScanMetadata> {
         if (isUndefined(taskKey)) {
             return Promise.reject('ScanService | getRandomScan | error: Task key is undefined!');

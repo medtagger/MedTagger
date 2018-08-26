@@ -3,8 +3,29 @@ import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@an
 const FILE_SIZE_LIMIT = 5;  // MB
 
 export class SelectedScan {
-    directory = '';
+    directory: string = '';
     files: File[] = [];
+    taskKey: string = '';
+    predefinedLabel: Object = undefined;
+
+    public setPredefinedLabel(file: File): Promise<void> {
+        return new Promise(((resolve, reject) => {
+            const fileReader: FileReader = new FileReader();
+            fileReader.onloadend = (e: ProgressEvent) => {
+                try {
+                    // TODO: Check if fileName does not contain full path to the file on multiple Scans upload!
+                    this.taskKey = file.name.split('.json')[0];
+                    const fileContent: string = String.fromCharCode.apply(null, new Uint8Array(fileReader.result));
+                    this.predefinedLabel = JSON.parse(fileContent);
+                    resolve();
+                } catch (ex) {
+                    console.error('Invalid JSON file!', ex);
+                    reject();
+                }
+            };
+            fileReader.readAsArrayBuffer(file);
+        }));
+    }
 }
 
 export class IncompatibleFile {
@@ -44,11 +65,11 @@ export class UploadScansSelectorComponent {
     public totalNumberOfSlices = 0;
     public incompatibleFiles: IncompatibleFile[] = [];
 
-    // https://en.wikipedia.org/wiki/List_of_file_signatures -> dicom format
+    // https://en.wikipedia.org/wiki/List_of_file_signatures -> DICOM format
     private DICOM_BYTE_SIGNATURE = '4449434D';
     private DICOM_BYTE_SIGNATURE_OFFSET = 128;
 
-    private async isCompatibleSliceFile(sliceFile: File): Promise<boolean> {
+    private async isCompatibleSliceFile(sliceFile: File, scan: SelectedScan): Promise<[boolean, SelectedScan]> {
         let isCompatible = null;
 
         // Skip all files that are not DICOMs
@@ -69,7 +90,7 @@ export class UploadScansSelectorComponent {
             isCompatible = false;
         });
 
-        return isCompatible;
+        return [isCompatible, scan];
     }
 
     private async isFileDicom(sliceFile: File): Promise<any> {
@@ -93,7 +114,7 @@ export class UploadScansSelectorComponent {
                     if (fileSignature === this.DICOM_BYTE_SIGNATURE) {
                         resolve();
                     } else {
-                        reject(new Error('Non dicom file!'));
+                        reject(new Error('Not a DICOM file!'));
                     }
                 };
                 const blob = sliceFile.slice(this.DICOM_BYTE_SIGNATURE_OFFSET, this.DICOM_BYTE_SIGNATURE_OFFSET + 4);
@@ -121,67 +142,67 @@ export class UploadScansSelectorComponent {
     }
 
     private prepareSingleScan(): Promise<void> {
-        const slicePromises: Array<Promise<any>> = [];
+        const promises: Array<Promise<any>> = [];
         const singleScan = new SelectedScan();
+
+        // As we cannot fetch these files' directory, we've got to display something on the UI
+        singleScan.directory = 'Single 3D Scan (' + this.totalNumberOfSlices + ' DICOMs)';
+        this.scans.push(singleScan);
+
         for (const sliceFile of this.userSelectedFiles) {
+            // User can upload a JSON file which will represent Predefined Label
+            if (sliceFile.name.endsWith('.json') && sliceFile.type === 'application/json') {
+                promises.push(singleScan.setPredefinedLabel(sliceFile));
+                continue;
+            }
+
             // Check file compatibility and add it to the list of incompatible files
-            slicePromises.push(this.isCompatibleSliceFile(sliceFile).then((isCompatible: boolean) => {
+            promises.push(this.isCompatibleSliceFile(sliceFile, singleScan).then((result: [boolean, SelectedScan]) => {
+                const isCompatible: boolean = result[0];
+                const scanForThisSlice: SelectedScan = result[1];
                 if (isCompatible) {
                     this.totalNumberOfSlices += 1;
-                    singleScan.files.push(sliceFile);
+                    scanForThisSlice.files.push(sliceFile);
                 }
             }));
         }
 
-        // As we cannot fetch these files' directory, we've got to display something on the UI
-        return Promise.all(slicePromises)
-            .then(() => {
-                singleScan.directory = 'Single 3D Scan (' + this.totalNumberOfSlices + ' DICOMs)';
-                this.scans.push(singleScan);
-            });
+        return Promise.all(promises).then(() => {});
     }
 
     private prepareMultipleScans(): Promise<void> {
-        const slicePromises: Array<Promise<any>> = [];
-        let lastScanDirectory: String;
-
-        // User selected multiple scans for upload, so let's group them into the Scans
-        let currentScan;
+        const promises: Array<Promise<any>> = [];
 
         for (const sliceFile of this.userSelectedFiles) {
+            const slicePath = sliceFile.webkitRelativePath;
+            const currentScanDirectory = slicePath.split('/').slice(0, -1).join('/');
+            let scanForThisSlice = this.scans.find((scan: SelectedScan) => {
+                return scan.directory === currentScanDirectory;
+            });
+            if (!scanForThisSlice) {
+                scanForThisSlice = new SelectedScan();
+                scanForThisSlice.directory = currentScanDirectory;
+                this.scans.splice(0, 0, scanForThisSlice);
+            }
+
+            // User can upload a JSON file which will represent Predefined Label
+            if (sliceFile.name === 'label.json' && sliceFile.type === 'application/json') {
+                promises.push(scanForThisSlice.setPredefinedLabel(sliceFile));
+                continue;
+            }
+
             // Check file compatibility and add it to the list of incompatible files
-            slicePromises.push(this.isCompatibleSliceFile(sliceFile).then((isCompatible: boolean) => {
+            promises.push(this.isCompatibleSliceFile(sliceFile, scanForThisSlice).then((result: [boolean, SelectedScan]) => {
+                const isCompatible: boolean = result[0];
+                const scanForThisSlice: SelectedScan = result[1];
                 if (isCompatible) {
-                    // Slices that are in the same directory as others (previous ones) are considered as a single Scan
-                    const slicePath = sliceFile.webkitRelativePath;
-                    const currentScanDirectory = slicePath.split('/').slice(0, -1).join('/');
-                    if (currentScanDirectory !== lastScanDirectory) {
-                        // If this is not the first iteration of the whole loop over files -> save current Scan
-                        if (!!lastScanDirectory) {
-                            this.scans.push(currentScan);
-                        }
-
-                        // If we found Slice from new directory - we consider this as another Scan
-                        currentScan = new SelectedScan();
-                        currentScan.directory = currentScanDirectory;
-                        currentScan.files = [];
-                        lastScanDirectory = currentScanDirectory;
-                    }
-
-                    // Store given Slice to the Scan which is defined as current Scan Directory
                     this.totalNumberOfSlices += 1;
-                    currentScan.files.push(sliceFile);
+                    scanForThisSlice.files.push(sliceFile);
                 }
             }));
         }
 
-        return Promise.all(slicePromises)
-            .then(() => {
-                // Don't forget about current scan!
-                if (!!currentScan) {
-                    this.scans.push(currentScan);
-                }
-            });
+        return Promise.all(promises).then(() => {});
     }
 
     public onNativeInputFileSelect($event): void {

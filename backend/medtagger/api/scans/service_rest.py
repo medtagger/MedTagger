@@ -121,7 +121,7 @@ class Label(Resource):
                                "labeling_time": 0.1};type=application/json"
                      http://localhost:51000/api/v1/scans/c5102707-cb36-4869-8041-f00421c03fa1/MARK_KIDNEYS/label
         """
-        predefined = request.args.get('predefined', False)
+        predefined = (request.args.get('predefined', 'false') == 'true')
         if predefined:
             require_one_of_roles({'doctor', 'admin'})
 

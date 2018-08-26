@@ -86,6 +86,21 @@
                             <p>Go to the directory containing CT Scan and select all DICOM files (*.dcm).</p>
                             <p><strong>Single file size limit:</strong> 5 MB</p>
 
+                            <!-- Tip about Predefined Labels -->
+                            <section class="box-message info-message" *ngIf="!hasPredefinedLabels">
+                                <mat-icon>info</mat-icon>
+                                <p>
+                                    <strong>Tip!</strong> You can also specify Predefined Label which will be shown initially
+                                    on the Labeling Page. To do so, place "TASK_KEY.json" file together with your DICOM files.
+                                </p>
+                            </section>
+                            <section class="box-message info-message" *ngIf="hasPredefinedLabels">
+                                <mat-icon>info</mat-icon>
+                                <p>
+                                    MedTagger will set a <strong>Predefined Labels</strong> for this Scan.
+                                </p>
+                            </section>
+
                             <!-- Warning about incompatible Files -->
                             <section class="box-message warning-message" *ngIf="incompatibleFiles.length">
                                 <mat-icon>warning</mat-icon>
@@ -132,6 +147,21 @@
                         <mat-card-content>
                             <p>Select <strong>parent directory</strong> that contains subdirectories with CT Scans.</p>
                             <p><strong>Single file size limit:</strong> 5 MB</p>
+
+                            <!-- Tip about Predefined Labels -->
+                            <section class="box-message info-message" *ngIf="!hasPredefinedLabels">
+                                <mat-icon>info</mat-icon>
+                                <p>
+                                    <strong>Tip!</strong> You can also specify Predefined Label which will be shown initially
+                                    on the Labeling Page. To do so, place "TASK_KEY.json" file together with your DICOM files.
+                                </p>
+                            </section>
+                            <section class="box-message info-message" *ngIf="hasPredefinedLabels">
+                                <mat-icon>info</mat-icon>
+                                <p>
+                                    MedTagger will set a <strong>Predefined Labels</strong> for your Scans.
+                                </p>
+                            </section>
 
                             <!-- Warning about incompatible Files -->
                             <section class="box-message warning-message" *ngIf="incompatibleFiles.length">
