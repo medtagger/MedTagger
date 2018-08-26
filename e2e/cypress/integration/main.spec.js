@@ -76,7 +76,7 @@ describe('Basic flow', () => {
     it('Brush selector', () => {
         loginAsAdmin();
         uploadScans('Heart', 11);
-        goToLabeling('Find narrowings in vains');
+        goToLabeling('Find narrowings in veins');
         matSelect('[data-cy=tags]', 'Narrowing (region)');
         cy.get('[data-cy=brush-tool]').click({force: true});
         cy.get('canvas').trigger('mousedown', 200, 200);
