@@ -3,7 +3,7 @@
         <div class="tags">
             <h3>Available Tags</h3>
             <mat-form-field>
-                <mat-select placeholder="Current Tag" [formControl]="taskTags">
+                <mat-select placeholder="Current Tag" [formControl]="taskTags" data-cy="tags">
                     <mat-option *ngFor="let tag of (task ? task.tags : [])" [value]="tag" (click)="setTag(tag)">
                         {{ tag.name }}
                     </mat-option>
@@ -15,19 +15,23 @@
             <h3>Available Tools</h3>
             <div class="buttons">
                 <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('RECTANGLE')}"
-                        [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')" (click)="setSelector('RECTANGLE')">
+                        [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')" (click)="setSelector('RECTANGLE')"
+                        data-cy="rectangle-tool">
                     <mat-icon [svgIcon]="getToolIconName('RECTANGLE')"></mat-icon>
                 </button>
                 <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('BRUSH')}"
-                        [disabled]="!isToolSupportedByCurrentTag('BRUSH')" (click)="setSelector('BRUSH')">
+                        [disabled]="!isToolSupportedByCurrentTag('BRUSH')" (click)="setSelector('BRUSH')"
+                        data-cy="brush-tool">
                     <mat-icon [svgIcon]="getToolIconName('BRUSH')"></mat-icon>
                 </button>
                 <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('POINT')}"
-                        [disabled]="!isToolSupportedByCurrentTag('POINT')" (click)="setSelector('POINT')">
+                        [disabled]="!isToolSupportedByCurrentTag('POINT')" (click)="setSelector('POINT')"
+                        data-cy="point-tool">
                     <mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon>
                 </button>
                 <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('CHAIN')}"
-                        [disabled]="!isToolSupportedByCurrentTag('CHAIN')" (click)="setSelector('CHAIN')">
+                        [disabled]="!isToolSupportedByCurrentTag('CHAIN')" (click)="setSelector('CHAIN')"
+                        data-cy="chain-tool">
                     <mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon>
                 </button>
                 <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('ZOOM_IN')}" disabled>
@@ -67,7 +71,7 @@
                     Skip scan
                 </button>
                 <button mat-raised-button color="accent" (click)="sendCompleteLabel()"
-                        *ngIf="this.labelExplorer.getLabelsLength() > 0">
+                        *ngIf="this.labelExplorer.getLabelsLength() > 0" data-cy="send-label">
                     Send label
                 </button>
                 <button mat-raised-button color="accent" (click)="sendEmptyLabel()"
