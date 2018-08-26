@@ -21,7 +21,7 @@ tasks:
           tools:
               - BRUSH
 
-  - name: Find narrowings in vains
+  - name: Find narrowings in veins
     key: FIND_NARROWINGS
     image_path: assets/icon/heart_dataset_icon.svg
     tags:
