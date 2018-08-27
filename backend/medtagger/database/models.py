@@ -3,7 +3,7 @@
 import uuid
 from typing import List, Dict, cast, Optional, Any
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
@@ -11,6 +11,7 @@ from medtagger.database.utils import ArrayOfEnum
 from medtagger.database import Base, db_session
 from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
     LabelElementStatus, LabelTool
+from medtagger.storage.models import BrushLabelElement, OriginalSlice, ProcessedSlice
 from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime, LabelTagID, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
     ActionResponseID, SurveyResponseID, PointID, TaskID
@@ -309,6 +310,14 @@ class Slice(Base):
         return self
 
 
+@event.listens_for(Slice, 'before_delete')
+def delete_original_and_processed_slice_from_storage(mapper, connection, target):
+    original_slice = OriginalSlice.get(id=target.id)
+    original_slice.delete()
+    processed_slice = ProcessedSlice.get(id=target.id)
+    processed_slice.delete()
+
+
 ##########################
 #
 #  Labels related models
@@ -508,6 +517,12 @@ class BrushLabelElement(LabelElement):
     def __repr__(self) -> str:
         """Return string representation for Brush Label Element."""
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
+
+
+@event.listens_for(BrushLabelElement.__class__, 'before_delete')
+def delete_brush_element_from_storage(mapper, connection, target):
+    brush_label_element = BrushLabelElement.get(id=target.id)
+    brush_label_element.delete()
 
 
 class PointLabelElement(LabelElement):

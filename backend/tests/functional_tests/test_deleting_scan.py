@@ -2,19 +2,20 @@
 import json
 from typing import Any
 
-import pytest
+from cassandra.cqlengine.query import DoesNotExist
 from sqlalchemy.orm.exc import NoResultFound
+import pytest
 
-from medtagger.types import ScanID, SliceID
 from medtagger.definitions import LabelTool
-from medtagger.repositories.scans import delete_scan_by_id
-from medtagger.repositories.slices import get_slice_by_id
 from medtagger.repositories import (
     datasets as DatasetsRepository,
     label_tags as LabelTagsRepository,
     tasks as TasksRepository,
+    scans as ScansRepository,
+    slices as SliceRepository,
 )
-
+from medtagger.types import ScanID, SliceID
+from medtagger.storage.models import BrushLabelElement, OriginalSlice, ProcessedSlice
 from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
@@ -50,7 +51,7 @@ def test_delete_scan_without_slices(prepare_environment: Any, synchronous_celery
     assert json_response['number_of_slices'] == 0
 
     # Step 4. Delete scan from the system
-    delete_scan_by_id(scan_id)
+    ScansRepository.delete_scan_by_id(scan_id)
 
     # Step 5. Check that scan has been deleted
     response = api_client.get('/api/v1/scans/{}'.format(scan_id),
@@ -103,7 +104,7 @@ def test_delete_scan_with_slices(prepare_environment: Any, synchronous_celery: A
     assert json_response['height'] == 512
 
     # Step 5. Delete scan from the system
-    delete_scan_by_id(scan_id)
+    ScansRepository.delete_scan_by_id(scan_id)
 
     # Step 6. Check that scan has been deleted
     response = api_client.get('/api/v1/scans/{}'.format(scan_id),
@@ -112,7 +113,7 @@ def test_delete_scan_with_slices(prepare_environment: Any, synchronous_celery: A
 
     # Step 7. Check that slices has been deleted
     with pytest.raises(NoResultFound):
-        get_slice_by_id(slice_id)
+        SliceRepository.get_slice_by_id(slice_id)
 
 
 def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: Any) -> None:
@@ -220,7 +221,6 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
         }
         response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id), data=data,
                                    headers=get_headers(token=user_token, multipart=True))
-
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -228,8 +228,17 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
     assert isinstance(label_id, str)
     assert len(label_id) >= 1
 
+    # Step 7. Fetch details about above Label and check image storage
+    response = api_client.get('/api/v1/labels/' + label_id, headers=get_headers(token=user_token))
+    assert response.status_code == 200
+    json_response = json.loads(response.data)
+    assert isinstance(json_response, dict)
+    label_element_id = json_response['elements'][1]['label_element_id']
+    brush_label_element = BrushLabelElement.get(id=label_element_id)
+    assert brush_label_element.image
+
     # Step 7. Delete scan from the system
-    delete_scan_by_id(scan_id)
+    ScansRepository.delete_scan_by_id(scan_id)
 
     # Step 8. Check that scan has been deleted
     response = api_client.get('/api/v1/scans/{}'.format(scan_id),
@@ -238,9 +247,21 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
 
     # Step 9. Check that slices has been deleted
     with pytest.raises(NoResultFound):
-        get_slice_by_id(slice_id)
+        SliceRepository.get_slice_by_id(slice_id)
 
-    # Step 10. Check that labels has been deleted
+    # Step 10. Check that slices original image has been deleted from storage
+    with pytest.raises(DoesNotExist):
+        OriginalSlice.get(id=slice_id)
+
+    # Step 11. Check that slices processed image has been deleted from storage
+    with pytest.raises(DoesNotExist):
+        ProcessedSlice.get(id=slice_id)
+
+    # Step 12. Check that labels has been deleted
     response = api_client.get('/api/v1/labels/{}'.format(label_id),
                               headers=get_headers(token=user_token))
     assert response.status_code == 404
+
+    # Step 13. Check that Brush Label was deleted from storage
+    with pytest.raises(DoesNotExist):
+        BrushLabelElement.get(id=label_element_id)
