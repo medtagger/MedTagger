@@ -116,6 +116,7 @@ def test_delete_scan_with_slices(prepare_environment: Any, synchronous_celery: A
         SliceRepository.get_slice_by_id(slice_id)
 
 
+# pylint: disable=too-many-locals
 def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: Any) -> None:
     """Test deleting scan with at least 1 slice and with labels made with all tools."""
     api_client = get_api_client()

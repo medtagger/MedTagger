@@ -11,7 +11,7 @@ from medtagger.database.utils import ArrayOfEnum
 from medtagger.database import Base, db_session
 from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
     LabelElementStatus, LabelTool
-from medtagger.storage.models import BrushLabelElement, OriginalSlice, ProcessedSlice
+from medtagger.storage.models import BrushLabelElement as StorageBrushLabelElement, OriginalSlice, ProcessedSlice
 from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime, LabelTagID, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
     ActionResponseID, SurveyResponseID, PointID, TaskID
@@ -311,7 +311,8 @@ class Slice(Base):
 
 
 @event.listens_for(Slice, 'before_delete')
-def delete_original_and_processed_slice_from_storage(mapper, connection, target):
+def delete_original_and_processed_slice_from_storage(target: Any) -> None:
+    """Delete original and processed slices from storage."""
     original_slice = OriginalSlice.get(id=target.id)
     original_slice.delete()
     processed_slice = ProcessedSlice.get(id=target.id)
@@ -519,9 +520,10 @@ class BrushLabelElement(LabelElement):
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
 
 
-@event.listens_for(BrushLabelElement.__class__, 'before_delete')
-def delete_brush_element_from_storage(mapper, connection, target):
-    brush_label_element = BrushLabelElement.get(id=target.id)
+@event.listens_for(BrushLabelElement, 'before_delete')
+def delete_brush_element_from_storage(target: Any) -> None:
+    """Delete BrushLabelElement from storage."""
+    brush_label_element = StorageBrushLabelElement.get(id=target.id)
     brush_label_element.delete()
 
 
@@ -562,7 +564,7 @@ class ChainLabelElement(LabelElement):
 
     points: List['ChainLabelElementPoint'] = relationship('ChainLabelElementPoint',
                                                           order_by='ChainLabelElementPoint.order',
-                                                          back_populates='label_element')
+                                                          back_populates='label_element', cascade='delete')
     loop: bool = Column(Boolean, nullable=False)
 
     __mapper_args__ = {
