@@ -6,6 +6,8 @@ from typing import List, Dict, cast, Optional, Any
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
+from sqlalchemy.engine import Connection
+from sqlalchemy.orm.mapper import Mapper
 
 from medtagger.database.utils import ArrayOfEnum
 from medtagger.database import Base, db_session
@@ -310,9 +312,10 @@ class Slice(Base):
         return self
 
 
+# pylint: disable=unused-argument
 @event.listens_for(Slice, 'before_delete')
-def delete_original_and_processed_slice_from_storage(target: Any) -> None:
-    """Delete original and processed slices from storage."""
+def delete_original_and_processed_slice_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
+    """Delete original and processed Slices from storage."""
     original_slice = OriginalSlice.get(id=target.id)
     original_slice.delete()
     processed_slice = ProcessedSlice.get(id=target.id)
@@ -520,8 +523,9 @@ class BrushLabelElement(LabelElement):
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
 
 
+# pylint: disable=unused-argument
 @event.listens_for(BrushLabelElement, 'before_delete')
-def delete_brush_element_from_storage(target: Any) -> None:
+def delete_brush_element_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
     """Delete BrushLabelElement from storage."""
     brush_label_element = StorageBrushLabelElement.get(id=target.id)
     brush_label_element.delete()
