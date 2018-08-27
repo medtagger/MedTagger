@@ -82,15 +82,14 @@ export class ScanService {
         });
     }
 
-    public sendPredefinedLabel(scanId: string, taskKey: string, label: Object): Promise<Response> {
+    public sendPredefinedLabel(scanId: string, taskKey: string, label: Object, additionalData: Object): Promise<Response> {
         const form = new FormData();
         form.append('label', JSON.stringify(label));
 
-        // const additionalData = selection.getAdditionalData();
-        // for (const key of Object.keys(additionalData)) {
-        //     const value = additionalData[key];
-        //     form.append(key, value, key);
-        // }
+        for (const key of Object.keys(additionalData)) {
+            const value = additionalData[key];
+            form.append(key, value, key);
+        }
 
         return new Promise((resolve, reject) => {
             this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label?predefined=true`, form).toPromise().then((response: Response) => {

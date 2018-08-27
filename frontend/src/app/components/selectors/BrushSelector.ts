@@ -270,6 +270,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.getSelections().forEach((selection: BrushSelection) => {
             if (selection.sliceIndex === sliceIndex && selection.label_tag.key === tag_key) {
                 selection._selectionLayer.src = source;
+                this.lastTagDrawings[selection.label_tag.key + selection.sliceIndex] = selection._selectionLayer;
             }
         });
     }
@@ -285,7 +286,6 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     // To differentiate selections by tags and slices
     private getCurrentSelectingContext(): string {
         if (this.currentTag && this.currentSlice) {
-            console.log('Context: ', this.currentTag.key + this.currentSlice);
             return this.currentTag.key + this.currentSlice;
         } else {
             return '';

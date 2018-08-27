@@ -7,6 +7,7 @@ export class SelectedScan {
     files: File[] = [];
     taskKey: string = '';
     predefinedLabel: Object = undefined;
+    additionalData: Object = {};
 
     public setPredefinedLabel(file: File): Promise<void> {
         return new Promise(((resolve, reject) => {
@@ -25,6 +26,10 @@ export class SelectedScan {
             };
             fileReader.readAsArrayBuffer(file);
         }));
+    }
+
+    public addAdditionalData(key: string, value: Object): void {
+        this.additionalData[key] = value;
     }
 }
 
@@ -144,15 +149,20 @@ export class UploadScansSelectorComponent {
     private prepareSingleScan(): Promise<void> {
         const promises: Array<Promise<any>> = [];
         const singleScan = new SelectedScan();
-
-        // As we cannot fetch these files' directory, we've got to display something on the UI
-        singleScan.directory = 'Single 3D Scan (' + this.totalNumberOfSlices + ' DICOMs)';
         this.scans.push(singleScan);
 
         for (const sliceFile of this.userSelectedFiles) {
             // User can upload a JSON file which will represent Predefined Label
             if (sliceFile.name.endsWith('.json') && sliceFile.type === 'application/json') {
+                // TODO: Allow to have multiple Predefined Labels for different Tasks!
                 promises.push(singleScan.setPredefinedLabel(sliceFile));
+                continue;
+            }
+
+            // User can upload a PNG file which will represent Brush Predefined Label Element
+            if (sliceFile.name.endsWith('.png') && sliceFile.type === 'image/png') {
+                // TODO: Check if file name contains full path to the File
+                singleScan.addAdditionalData(sliceFile.name, sliceFile);
                 continue;
             }
 
@@ -167,7 +177,10 @@ export class UploadScansSelectorComponent {
             }));
         }
 
-        return Promise.all(promises).then(() => {});
+        return Promise.all(promises).then(() => {
+            // As we cannot fetch these files' directory, we've got to display something on the UI
+            singleScan.directory = 'Single 3D Scan (' + this.totalNumberOfSlices + ' DICOMs)';
+        });
     }
 
     private prepareMultipleScans(): Promise<void> {

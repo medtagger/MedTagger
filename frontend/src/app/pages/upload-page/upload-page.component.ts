@@ -260,7 +260,7 @@ export class UploadPageComponent implements OnInit {
             console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
             uploadingScan.id = scanId;
             if (!!uploadingScan.scan.predefinedLabel) {
-                this.scanService.sendPredefinedLabel(scanId, uploadingScan.scan.taskKey, uploadingScan.scan.predefinedLabel);
+                this.scanService.sendPredefinedLabel(scanId, uploadingScan.scan.taskKey, uploadingScan.scan.predefinedLabel, uploadingScan.scan.additionalData);
             }
             return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
         },
