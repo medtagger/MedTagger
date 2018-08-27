@@ -10,7 +10,8 @@ import {
     UploadScansSelectorComponent,
     SelectedScan,
     UserFiles,
-    IncompatibleFile
+    IncompatibleFile,
+    SelectedScanPredefinedLabel
 } from '../../components/upload-scans-selector/upload-scans-selector.component';
 import {Observable} from 'rxjs/internal/Observable';
 import {interval} from 'rxjs/internal/observable/interval';
@@ -138,7 +139,7 @@ export class UploadPageComponent implements OnInit {
     public chooseFiles(userFiles: UserFiles): void {
         this.scans = userFiles.scans;
         this.hasPredefinedLabels = !!this.scans.find((scan: SelectedScan) => {
-            return !!scan.predefinedLabel;
+            return scan.predefinedLabels.length > 0;
         });
         this.totalNumberOfSlices = userFiles.numberOfSlices;
         this.incompatibleFiles = userFiles.incompatibleFiles;
@@ -259,9 +260,16 @@ export class UploadPageComponent implements OnInit {
         return this.scanService.createNewScan(dataset, numberOfSlices).then((scanId: string) => {
             console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
             uploadingScan.id = scanId;
-            if (!!uploadingScan.scan.predefinedLabel) {
-                this.scanService.sendPredefinedLabel(scanId, uploadingScan.scan.taskKey, uploadingScan.scan.predefinedLabel, uploadingScan.scan.additionalData);
-            }
+            uploadingScan.scan.predefinedLabels.forEach((predefinedLabel: SelectedScanPredefinedLabel) => {
+                // Filter and send only these additional data that are needed by the Predefined Label
+                let additionalData = {};
+                predefinedLabel.neededFiles.forEach((fileName: string) => {
+                    additionalData[fileName] = uploadingScan.scan.additionalData[fileName];
+                });
+
+                console.log('Sending Predefined Label for Scan:', scanId, ' and Task:', predefinedLabel.taskKey);
+                this.scanService.sendPredefinedLabel(scanId, predefinedLabel.taskKey, predefinedLabel.label, additionalData);
+            });
             return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
         },
         () => {

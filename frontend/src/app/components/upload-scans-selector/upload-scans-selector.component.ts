@@ -2,22 +2,38 @@ import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@an
 
 const FILE_SIZE_LIMIT = 5;  // MB
 
+export class SelectedScanPredefinedLabel {
+    taskKey: string = undefined;
+    label: Object = undefined;
+    neededFiles: Array<string> = [];
+
+    constructor(taskKey: string, label: Object) {
+        this.taskKey = taskKey;
+        this.label = label;
+        this.label['elements'].forEach((labelElement: Object) => {
+            if (labelElement['tool'] === 'BRUSH') {
+                this.neededFiles.push(labelElement['image_key']);
+            }
+        });
+    }
+}
+
 export class SelectedScan {
     directory: string = '';
     files: File[] = [];
-    taskKey: string = '';
-    predefinedLabel: Object = undefined;
+    predefinedLabels: Array<SelectedScanPredefinedLabel> = [];
     additionalData: Object = {};
 
-    public setPredefinedLabel(file: File): Promise<void> {
+    public addPredefinedLabel(file: File): Promise<void> {
         return new Promise(((resolve, reject) => {
             const fileReader: FileReader = new FileReader();
             fileReader.onloadend = (e: ProgressEvent) => {
                 try {
                     // TODO: Check if fileName does not contain full path to the file on multiple Scans upload!
-                    this.taskKey = file.name.split('.json')[0];
+                    const taskKey = file.name.split('.json')[0];
                     const fileContent: string = String.fromCharCode.apply(null, new Uint8Array(fileReader.result));
-                    this.predefinedLabel = JSON.parse(fileContent);
+                    const predefinedLabel = new SelectedScanPredefinedLabel(taskKey, JSON.parse(fileContent));
+                    this.predefinedLabels.push(predefinedLabel);
                     resolve();
                 } catch (ex) {
                     console.error('Invalid JSON file!', ex);
@@ -151,28 +167,27 @@ export class UploadScansSelectorComponent {
         const singleScan = new SelectedScan();
         this.scans.push(singleScan);
 
-        for (const sliceFile of this.userSelectedFiles) {
+        for (const selectedFile of this.userSelectedFiles) {
             // User can upload a JSON file which will represent Predefined Label
-            if (sliceFile.name.endsWith('.json') && sliceFile.type === 'application/json') {
-                // TODO: Allow to have multiple Predefined Labels for different Tasks!
-                promises.push(singleScan.setPredefinedLabel(sliceFile));
+            if (selectedFile.name.endsWith('.json') && selectedFile.type === 'application/json') {
+                promises.push(singleScan.addPredefinedLabel(selectedFile));
                 continue;
             }
 
             // User can upload a PNG file which will represent Brush Predefined Label Element
-            if (sliceFile.name.endsWith('.png') && sliceFile.type === 'image/png') {
+            if (selectedFile.name.endsWith('.png') && selectedFile.type === 'image/png') {
                 // TODO: Check if file name contains full path to the File
-                singleScan.addAdditionalData(sliceFile.name, sliceFile);
+                singleScan.addAdditionalData(selectedFile.name, selectedFile);
                 continue;
             }
 
             // Check file compatibility and add it to the list of incompatible files
-            promises.push(this.isCompatibleSliceFile(sliceFile, singleScan).then((result: [boolean, SelectedScan]) => {
+            promises.push(this.isCompatibleSliceFile(selectedFile, singleScan).then((result: [boolean, SelectedScan]) => {
                 const isCompatible: boolean = result[0];
                 const scanForThisSlice: SelectedScan = result[1];
                 if (isCompatible) {
                     this.totalNumberOfSlices += 1;
-                    scanForThisSlice.files.push(sliceFile);
+                    scanForThisSlice.files.push(selectedFile);
                 }
             }));
         }
@@ -186,8 +201,8 @@ export class UploadScansSelectorComponent {
     private prepareMultipleScans(): Promise<void> {
         const promises: Array<Promise<any>> = [];
 
-        for (const sliceFile of this.userSelectedFiles) {
-            const slicePath = sliceFile.webkitRelativePath;
+        for (const selectedFile of this.userSelectedFiles) {
+            const slicePath = selectedFile.webkitRelativePath;
             const currentScanDirectory = slicePath.split('/').slice(0, -1).join('/');
             let scanForThisSlice = this.scans.find((scan: SelectedScan) => {
                 return scan.directory === currentScanDirectory;
@@ -199,18 +214,25 @@ export class UploadScansSelectorComponent {
             }
 
             // User can upload a JSON file which will represent Predefined Label
-            if (sliceFile.name === 'label.json' && sliceFile.type === 'application/json') {
-                promises.push(scanForThisSlice.setPredefinedLabel(sliceFile));
+            if (selectedFile.name === 'label.json' && selectedFile.type === 'application/json') {
+                promises.push(scanForThisSlice.addPredefinedLabel(selectedFile));
+                continue;
+            }
+
+            // User can upload a PNG file which will represent Brush Predefined Label Element
+            if (selectedFile.name.endsWith('.png') && selectedFile.type === 'image/png') {
+                // TODO: Check if file name contains full path to the File
+                scanForThisSlice.addAdditionalData(selectedFile.name, selectedFile);
                 continue;
             }
 
             // Check file compatibility and add it to the list of incompatible files
-            promises.push(this.isCompatibleSliceFile(sliceFile, scanForThisSlice).then((result: [boolean, SelectedScan]) => {
+            promises.push(this.isCompatibleSliceFile(selectedFile, scanForThisSlice).then((result: [boolean, SelectedScan]) => {
                 const isCompatible: boolean = result[0];
                 const scanForThisSlice: SelectedScan = result[1];
                 if (isCompatible) {
                     this.totalNumberOfSlices += 1;
-                    scanForThisSlice.files.push(sliceFile);
+                    scanForThisSlice.files.push(selectedFile);
                 }
             }));
         }
