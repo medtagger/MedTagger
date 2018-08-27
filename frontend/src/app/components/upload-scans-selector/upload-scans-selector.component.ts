@@ -22,6 +22,7 @@ export class SelectedScan {
     directory: string = '';
     files: File[] = [];
     predefinedLabels: Array<SelectedScanPredefinedLabel> = [];
+    predefinedLabelsTasks: Array<string> = [];
     additionalData: Object = {};
 
     public addPredefinedLabel(file: File): Promise<void> {
@@ -34,6 +35,7 @@ export class SelectedScan {
                     const fileContent: string = String.fromCharCode.apply(null, new Uint8Array(fileReader.result));
                     const predefinedLabel = new SelectedScanPredefinedLabel(taskKey, JSON.parse(fileContent));
                     this.predefinedLabels.push(predefinedLabel);
+                    this.predefinedLabelsTasks.push(taskKey);
                     resolve();
                 } catch (ex) {
                     console.error('Invalid JSON file!', ex);
@@ -214,7 +216,7 @@ export class UploadScansSelectorComponent {
             }
 
             // User can upload a JSON file which will represent Predefined Label
-            if (selectedFile.name === 'label.json' && selectedFile.type === 'application/json') {
+            if (selectedFile.name.endsWith('.json') && selectedFile.type === 'application/json') {
                 promises.push(scanForThisSlice.addPredefinedLabel(selectedFile));
                 continue;
             }

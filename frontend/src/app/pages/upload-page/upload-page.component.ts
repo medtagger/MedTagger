@@ -172,7 +172,7 @@ export class UploadPageComponent implements OnInit {
                     }
                 });
 
-                // Move all errored and available Scans to uploaded array, so we won't monitor them again
+                // Move all erred and available Scans to uploaded array, so we won't monitor them again
                 switch (scanToMonitor.status) {
                     case UploadingScanStatus.ERROR: {
                         this.uploadingAndProcessingScans.splice(i, 1);
