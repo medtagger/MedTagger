@@ -3,15 +3,15 @@ import {environment} from '../../environments/environment';
 import {UserInfo} from '../model/UserInfo';
 import {HttpClient} from '@angular/common/http';
 
-interface LogInResponse {
+export interface LogInResponse {
     token: string;
 }
 
-interface UserSettingsResponse {
+export interface UserSettingsResponse {
     skipTutorial: boolean;
 }
 
-interface UserInfoResponse {
+export interface UserInfoResponse {
     id: number;
     email: string;
     firstName: string;
@@ -51,13 +51,14 @@ export class AccountService {
             'email': email,
             'password': password
         };
+
         return new Promise((resolve, reject) => {
             this.http.post<LogInResponse>(url, payload).toPromise()
-                .then(response => {
+                .then((response: LogInResponse) => {
                     console.log('AccountService | logIn | response: ', response);
                     resolve(response.token);
                 })
-                .catch(error => {
+                .catch((error: Error) => {
                     console.log('AccountService | logIn | error: ', error);
                     reject(error);
                 });
