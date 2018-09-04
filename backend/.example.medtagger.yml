@@ -6,11 +6,11 @@ tasks:
         - name: Left Kidney
           key: LEFT_KIDNEY
           tools:
-              - CHAIN
+              - RECTANGLE
         - name: Right Kidney
           key: RIGHT_KIDNEY
           tools:
-              - CHAIN
+              - RECTANGLE
 
   - name: Find nodules
     key: FIND_NODULES
@@ -21,7 +21,7 @@ tasks:
           tools:
               - BRUSH
 
-  - name: Find narrowings in vains
+  - name: Find narrowings in veins
     key: FIND_NARROWINGS
     image_path: assets/icon/heart_dataset_icon.svg
     tags:

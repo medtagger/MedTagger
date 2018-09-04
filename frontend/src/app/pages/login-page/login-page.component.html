@@ -12,7 +12,7 @@
     <div class="col-sm-12 col-lg-8 action">
         <div class="action-buttons">
             <h4 [ngClass]="{active: loginPageMode == LoginPageMode.LOG_IN}" (click)="changePageMode(LoginPageMode.LOG_IN)">
-                <a routerLink="/login">Sign in</a>
+                <a routerLink="/login" data-cy="login-toggle">Sign in</a>
             </h4>
             <h4 [ngClass]="{active: loginPageMode == LoginPageMode.REGISTER}" (click)="changePageMode(LoginPageMode.REGISTER)">
                 <a routerLink="/login">Sign up</a>
@@ -27,20 +27,20 @@
                     <mat-form-field appearance="fill">
                         <mat-label>Email</mat-label>
                         <input matInput type="text" placeholder="Insert your email."
-                               id="email" formControlName="email" required>
+                               id="email" formControlName="email" required data-cy="login-email">
                         <mat-error *ngIf="loginForm.get('email').invalid">{{getEmailErrorMessage()}}</mat-error>
                     </mat-form-field>
                     <mat-form-field appearance="fill">
                         <mat-label>Password</mat-label>
                         <input matInput type="{{loginPasswordVisible && 'text' || 'password'}}"
                                placeholder="Insert your password."
-                               id="password" formControlName="password" required>
+                               id="password" formControlName="password" required data-cy="login-password">
                         <mat-error *ngIf="loginForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
                         <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                     </mat-form-field>
                     <div class="action-form__submit">
                         <button *ngIf="!loggingInProgress" mat-raised-button color="primary" (click)="logIn()"
-                                [disabled]="loginForm.invalid">
+                                [disabled]="loginForm.invalid" data-cy="submit">
                             Sign in
                         </button>
                         <mat-progress-spinner *ngIf="loggingInProgress" class="login-spinner" mode="indeterminate"

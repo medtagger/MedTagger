@@ -132,19 +132,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     public get3dSelection(): SliceSelection[] {
-        this.selectors.forEach((selector) => selector.archiveSelections());
-        this.updateSelectionState();
-
-        this.clearCanvasSelections();
-        const coordinates: SliceSelection[] = this.selectors
+        return this.selectors
             .map((selector) => selector.getSelections())
             .reduce((x, y) => x.concat(y), []);
-        this.selectors.forEach((selector) => selector.clearSelections());
-        this.updateSelectionState();
-
-        this.drawSelections();
-
-        return coordinates;
     }
 
     public getCurrentTag() {
@@ -265,6 +255,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         };
 
         this.canvas.onwheel = (wheelEvent: WheelEvent) => {
+            if (this.currentSelector && !this.currentSelector.canUseMouseWheel()) {
+                return;
+            }
+
             const sliderValue = wheelEvent.deltaY > 0 ? this.slider.value - 1 : this.slider.value + 1;
 
             if (sliderValue >= this.slider.min && sliderValue <= this.slider.max) {
