@@ -52,6 +52,32 @@
                         </button>
                     </span>
                 </div>
+                <span *ngFor="let action of selectorActions">
+                    <mat-card *ngIf="action.type === ActionType.SLIDER" class="slider">
+                        <mat-card-content>
+                            <h4>{{ action.name }}:</h4>
+
+                            <mat-slider *ngIf="action.type === ActionType.SLIDER"
+                                        (input)="action.trigger(($event)['value'])"
+                                        [thumbLabel]="true"
+                                        [max]="action.options['sliderMax']"
+                                        [min]="action.options['sliderMin']"
+                                        [value]="action.options['sliderDefault']"
+                                        [step]="action.options['sliderStep']">
+                            </mat-slider>
+                        </mat-card-content>
+                    </mat-card>
+                    <mat-card *ngIf="action.type === ActionType.COLOR_PICKER" class="color-picker">
+                        <mat-card-content>
+                            <h4>{{ action.name }}:</h4>
+
+                            <mcc-color-picker (change)="action.trigger($event)" [hideHexForms]="true" [hideUsedColors]="true"
+                                              [hideButtons]="true"
+                                              [selectedColor]="action.options['defaultColor']">
+                            </mcc-color-picker>
+                        </mat-card-content>
+                    </mat-card>
+                </span>
             </div>
         </div>
 

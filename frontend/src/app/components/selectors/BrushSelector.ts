@@ -9,12 +9,25 @@ export enum BrushMode {
     ERASER = 'Eraser'
 }
 
+export enum BrushOption {
+    SIZE_CHANGE = 'Size Change',
+    COLOR_CHANGE = 'Color Change'
+}
+
+const MAX_BRUSH_SIZE = 50;
+const MIN_BRUSH_SIZE = 1;
+const DEFAULT_BRUSH_SIZE = 10;
+
+const DEFAULT_BRUSH_COLOR = '#ff0000';
+
 export class BrushSelector extends SelectorBase<BrushSelection> implements Selector<BrushSelection> {
     protected canvas: HTMLCanvasElement;
     protected mouseDrag = false;
     protected lastTagDrawings: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
     private mode: BrushMode = BrushMode.BRUSH;
     private actions: Array<SelectorAction>;
+    private brushSize = DEFAULT_BRUSH_SIZE;
+    private brushColor = DEFAULT_BRUSH_COLOR;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -34,7 +47,20 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             new SelectorAction(BrushMode.ERASER, () => !!this.lastTagDrawings[this.getCurrentSelectingContext()], () => {
                 this.changeSelectorMode(BrushMode.ERASER);
                 this.deactivateOtherActions(BrushMode.ERASER);
-            }, SelectorActionType.BUTTON, false)
+            }, SelectorActionType.BUTTON, false),
+            new SelectorAction(BrushOption.SIZE_CHANGE, () => true, (size) => {
+                this.setBrushSize(size);
+            }, SelectorActionType.SLIDER, true, {
+                'sliderMin': MIN_BRUSH_SIZE,
+                'sliderMax': MAX_BRUSH_SIZE,
+                'sliderDefault': DEFAULT_BRUSH_SIZE,
+                'sliderStep': 1
+            }),
+            new SelectorAction(BrushOption.COLOR_CHANGE, () => true, (color) => {
+                this.setBrushColor(color);
+            }, SelectorActionType.COLOR_PICKER, true, {
+                'defaultColor': DEFAULT_BRUSH_COLOR
+            })
         ];
         console.log('BrushSelector created!');
     }
@@ -43,7 +69,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         if (this.mode === BrushMode.BRUSH) {
             return {
                 ...super.getStyle(),
-                LINE_WIDTH: 10,
+                LINE_WIDTH: this.brushSize,
                 LINE_LINKS: 'round',
                 SELECTION_FONT_COLOR: '#ffffff',
                 CURRENT_SELECTION_COLOR: this.brushColor,
@@ -53,7 +79,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         } else if (this.mode === BrushMode.ERASER) {
             return {
                 ...super.getStyle(),
-                LINE_WIDTH: 10,
+                LINE_WIDTH: this.brushSize,
                 LINE_LINKS: 'square',
                 CURRENT_SELECTION_COLOR: 'rgba(0,0,0,1)',
                 ARCHIVED_SELECTION_COLOR: 'rgba(0,0,0,1)',
@@ -317,5 +343,14 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     public getSelectorName(): string {
         return 'BRUSH';
+    }
+
+    public setBrushSize(size: number): void {
+        this.brushSize = size;
+    }
+
+    public setBrushColor(color: string): void {
+        console.log('setting brush color to', color);
+        this.brushColor = color;
     }
 }

@@ -55,6 +55,44 @@ button {
                 border-radius: 30px;
             }
         }
+
+        mat-card {
+            width: 100%;
+            padding-top: 0;
+            padding-bottom: 5px;
+            font-size: 1em;
+        }
+
+        .slider {
+            mat-slider {
+                width: 100%;
+            }
+
+            ::ng-deep {
+
+                .mat-slider-thumb-label {
+                    transform: rotate(45deg) !important;
+                    background-color: #01579b;
+                }
+                .mat-slider-thumb {
+                    display: none !important;
+                }
+                .mat-slider-track-background {
+                  background-color: lightgray !important;
+                }
+            }
+        }
+
+        .color-picker {
+            h4 {
+                display: inline-block;
+            }
+
+            mcc-color-picker {
+                display: inline-block;
+                float: right;
+            }
+        }
     }
 
     app-label-explorer {
