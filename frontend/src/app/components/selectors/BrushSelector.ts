@@ -350,7 +350,6 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     }
 
     public setBrushColor(color: string): void {
-        console.log('setting brush color to', color);
         this.brushColor = color;
     }
 }
