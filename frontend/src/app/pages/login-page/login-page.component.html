@@ -1,24 +1,28 @@
-<div class="row">
-    <header class="header col-sm-12 col-lg-4">
-        <div class="header-logo">
-            <img src="assets/icon/medtagger_logo.svg"/>
-            <h1>MedTagger</h1>
-        </div>
-        <h3 class="header-desc">The first open-source platform for labeling and aggregation of datasets with a usage of
-            a crowdsourcing idea.</h3>
-    </header>
-    <!-- This is a helper for fixed header-description-->
-    <div class="d-none d-lg-block col-lg-4"></div>
-    <div class="col-sm-12 col-lg-8 action">
-        <div class="action-buttons">
-            <h4 [ngClass]="{active: loginPageMode == LoginPageMode.LOG_IN}" (click)="changePageMode(LoginPageMode.LOG_IN)">
-                <a routerLink="/login" data-cy="login-toggle">Sign in</a>
-            </h4>
-            <h4 [ngClass]="{active: loginPageMode == LoginPageMode.REGISTER}" (click)="changePageMode(LoginPageMode.REGISTER)">
-                <a routerLink="/login">Sign up</a>
-            </h4>
-        </div>
-        <main *ngIf="loginPageMode == LoginPageMode.LOG_IN" class="action-content mx-auto">
+<div class="container-fluid">
+    <div class="row">
+        <header class="header col-sm-12 col-lg-4">
+            <div class="header-logo">
+                <img src="assets/icon/medtagger_logo.svg"/>
+                <h1>MedTagger</h1>
+            </div>
+            <h3 class="header-desc">The first open-source platform for labeling and aggregation of datasets with a usage
+                of
+                a crowdsourcing idea.</h3>
+        </header>
+        <!-- This is a helper for fixed header-description-->
+        <div class="d-none d-lg-block col-lg-4"></div>
+        <div class="col-sm-12 col-lg-8 action">
+            <div class="action-buttons">
+                <h4 [ngClass]="{active: loginPageMode == LoginPageMode.LOG_IN}"
+                    (click)="changePageMode(LoginPageMode.LOG_IN)">
+                    <a routerLink="/login" data-cy="login-toggle">Sign in</a>
+                </h4>
+                <h4 [ngClass]="{active: loginPageMode == LoginPageMode.REGISTER}"
+                    (click)="changePageMode(LoginPageMode.REGISTER)">
+                    <a routerLink="/login">Sign up</a>
+                </h4>
+            </div>
+            <main *ngIf="loginPageMode == LoginPageMode.LOG_IN" class="action-content mx-auto">
                 <div class="action-welcoming">
                     <h3 class="action-welcoming__header">Hello!</h3>
                     <h4 class="action-welcoming__description">Good to see you back! Log in and continue your work.</h4>
@@ -39,7 +43,8 @@
                         <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                     </mat-form-field>
                     <div class="action-form__submit">
-                        <button *ngIf="!loggingInProgress" mat-raised-button color="primary" (click)="logIn()" [disabled]="loginForm.invalid" data-cy="submit">
+                        <button *ngIf="!loggingInProgress" mat-raised-button color="primary" (click)="logIn()"
+                                [disabled]="loginForm.invalid" data-cy="submit">
                             Sign in
                         </button>
                         <mat-progress-spinner *ngIf="loggingInProgress" class="login-spinner" mode="indeterminate"
@@ -50,10 +55,10 @@
                         <mat-error>{{loggingInError}}</mat-error>
                     </div>
                 </form>
-        </main>
+            </main>
 
 
-        <main *ngIf="loginPageMode == LoginPageMode.REGISTER" class="action-content mx-auto">
+            <main *ngIf="loginPageMode == LoginPageMode.REGISTER" class="action-content mx-auto">
                 <div class="action-welcoming">
                     <h3 class="action-welcoming__header">Hello!</h3>
                     <h4 class="action-welcoming__description">Start labeling with MedTagger today. It is easy! Just take
@@ -88,7 +93,8 @@
                         <input matInput type="{{registerPasswordVisible && 'text' || 'password'}}"
                                placeholder="Enter your password."
                                id="password" formControlName="password" required>
-                        <mat-error *ngIf="registerForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
+                        <mat-error *ngIf="registerForm.get('password').invalid">{{getPasswordErrorMessage()}}
+                        </mat-error>
                         <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                     </mat-form-field>
                     <mat-form-field appearance="fill">
@@ -113,6 +119,7 @@
                         <mat-error>{{registrationError}}</mat-error>
                     </div>
                 </form>
-        </main>
+            </main>
+        </div>
     </div>
 </div>

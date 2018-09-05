@@ -1,0 +1,12 @@
+@import '~@angular/material/theming';
+
+$primary: mat-palette($mat-light-blue, 600, 500, 800);
+$accent: mat-palette($mat-orange, 500, 300, 600);
+$warn: mat-color($tagger-app-warn);
+
+$black-8-opacity: rgba(0,0,0,0.08);
+$black-disabled: rgba(0,0,0,0.38);
+$white-high-emphasis: #fff;
+$white-medium-emphasis: rgba(#fff, 0.7);
+$black-high-emphasis: #000;
+$black-medium-emphasis: rgba(0,0,0,0.5);

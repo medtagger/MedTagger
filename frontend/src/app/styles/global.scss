@@ -1,0 +1,11 @@
+@import "mixins";
+
+.app-navbar {
+    @include mat-elevation(2);
+    background-color: mat-color($primary, 700);
+    &-brand{
+        &__logo{
+            height: 2em;
+        }
+    }
+}
