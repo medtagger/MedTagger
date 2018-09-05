@@ -46,6 +46,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
                 LINE_WIDTH: 10,
                 LINE_LINKS: 'round',
                 SELECTION_FONT_COLOR: '#ffffff',
+                CURRENT_SELECTION_COLOR: this.brushColor,
                 DRAWING_COMPOSITE_OPERATION: 'source-over',
                 SAVING_COMPOSITE_OPERATION: 'source-over'
             };
@@ -277,7 +278,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     // To differentiate selections by tags and slices
     private getCurrentSelectingContext(): string {
         if (this.currentTag && this.currentSlice) {
-            console.log('Context: ', this.currentTag.key + this.currentSlice);
+            // console.log('Context: ', this.currentTag.key + this.currentSlice);
             return this.currentTag.key + this.currentSlice;
         } else {
             return '';

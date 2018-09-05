@@ -60,6 +60,7 @@ import {MedTaggerWebSocket} from '../services/websocket.service';
 import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
 import {InputDialogComponent} from '../dialogs/input-dialog.component';
 import {TaskService} from '../services/task.service';
+import {MccColorPickerModule} from "material-community-components";
 
 @NgModule({
     declarations: [
@@ -110,6 +111,7 @@ import {TaskService} from '../services/task.service';
         HttpClientModule,
         MatChipsModule,
         MatCheckboxModule,
+        MccColorPickerModule,
     ],
     entryComponents: [
         InfoDialogComponent,
