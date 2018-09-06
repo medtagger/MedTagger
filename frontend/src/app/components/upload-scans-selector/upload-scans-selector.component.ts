@@ -19,7 +19,7 @@ export class SelectedScanPredefinedLabel {
 }
 
 export class SelectedScan {
-    directory: string = '';
+    directory = '';
     files: File[] = [];
     predefinedLabels: Array<SelectedScanPredefinedLabel> = [];
     predefinedLabelsTasks: Array<string> = [];
@@ -228,10 +228,10 @@ export class UploadScansSelectorComponent {
             // Check file compatibility and add it to the list of incompatible files
             promises.push(this.isCompatibleSliceFile(selectedFile, scanForThisSlice).then((result: [boolean, SelectedScan]) => {
                 const isCompatible: boolean = result[0];
-                const scanForThisSlice: SelectedScan = result[1];
+                const scan: SelectedScan = result[1];
                 if (isCompatible) {
                     this.totalNumberOfSlices += 1;
-                    scanForThisSlice.files.push(selectedFile);
+                    scan.files.push(selectedFile);
                 }
             }));
         }

@@ -1,5 +1,5 @@
 // Simple message format for label-explorer <-> marker <-> selector communication
-import {LabelTag} from "./labels/LabelTag";
+import {LabelTag} from './labels/LabelTag';
 
 export class SelectionStateMessage {
     selectorName: string;

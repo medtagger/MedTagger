@@ -1,5 +1,5 @@
 import {SliceSelection} from './SliceSelection';
-import {LabelTag} from "../labels/LabelTag";
+import {LabelTag} from '../labels/LabelTag';
 
 export class ROISelection2D extends SliceSelection {
 

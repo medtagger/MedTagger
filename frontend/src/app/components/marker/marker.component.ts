@@ -13,10 +13,9 @@ import {Subscription} from 'rxjs/Subscription';
 import {isUndefined} from 'util';
 import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/labels/LabelTag';
-import {Label} from "../../model/labels/Label";
-import {LabelSelection} from "../../model/labels/LabelSelection";
-import {PredefinedBrushLabelElement} from "../../model/PredefinedBrushLabelElement";
-import {BrushSelector} from "../selectors/BrushSelector";
+import {Label} from '../../model/labels/Label';
+import {PredefinedBrushLabelElement} from '../../model/PredefinedBrushLabelElement';
+import {BrushSelector} from '../selectors/BrushSelector';
 
 @Component({
     selector: 'app-marker-component',

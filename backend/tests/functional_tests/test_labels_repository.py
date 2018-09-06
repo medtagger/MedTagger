@@ -1,8 +1,6 @@
 """Tests Labels Repository."""
-import json
 from typing import Any
 
-from medtagger.storage.models import BrushLabelElement
 from medtagger.database.models import User
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
@@ -14,8 +12,6 @@ from medtagger.repositories import (
     users as UsersRepository,
 )
 from medtagger.types import LabelingTime
-
-from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
 def test_get_predefined_label_for_scan_in_task__no_predefined_label(prepare_environment: Any) -> None:
@@ -64,6 +60,7 @@ def test_get_predefined_label_for_scan_in_task__predefined_label(prepare_environ
 
     # Step 3. Check if there is is Predefined Label
     predefined_label = LabelsRepository.get_predefined_label_for_scan_in_task(scan, task)
+    assert predefined_label
     assert predefined_label.id == label.id
 
 
@@ -84,8 +81,10 @@ def test_get_predefined_label_for_scan_in_task__predefined_label_for_given_task(
 
     # Step 3. Check if there are these Predefined Labels
     predefined_label = LabelsRepository.get_predefined_label_for_scan_in_task(scan, task_left)
+    assert predefined_label
     assert predefined_label.id == label_left.id
     predefined_label = LabelsRepository.get_predefined_label_for_scan_in_task(scan, task_right)
+    assert predefined_label
     assert predefined_label.id == label_right.id
 
 

@@ -93,7 +93,7 @@ export class UploadPageComponent implements OnInit, OnDestroy {
     uploadingAndProcessingScans: Array<UploadingScan> = [];
     availableScans: Array<UploadingScan> = [];
     errorScans: Array<UploadingScan> = [];
-    hasPredefinedLabels: boolean = false;
+    hasPredefinedLabels = false;
 
     incompatibleFiles: IncompatibleFile[] = [];
 
@@ -273,7 +273,7 @@ export class UploadPageComponent implements OnInit, OnDestroy {
             uploadingScan.id = scanId;
             uploadingScan.scan.predefinedLabels.forEach((predefinedLabel: SelectedScanPredefinedLabel) => {
                 // Filter and send only these additional data that are needed by the Predefined Label
-                let additionalData = {};
+                const additionalData = {};
                 predefinedLabel.neededFiles.forEach((fileName: string) => {
                     additionalData[fileName] = uploadingScan.scan.additionalData[fileName];
                 });

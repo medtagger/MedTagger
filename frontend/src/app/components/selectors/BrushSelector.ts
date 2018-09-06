@@ -241,7 +241,8 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     private finalizeSelectionRemoval(labelToDeleteId: number): void {
         console.log('BrushSelector | inUp | blank selection, removing label...');
-        this.stateChange.emit(new SelectionStateMessage(this.getSelectorName(), this.currentTag, labelToDeleteId, this.selectedArea.sliceIndex, true));
+        this.stateChange.emit(new SelectionStateMessage(this.getSelectorName(), this.currentTag, labelToDeleteId,
+            this.selectedArea.sliceIndex, true));
 
         this.clearSliceDrawingCacheOf(labelToDeleteId);
         this.selectedArea = undefined;
@@ -254,7 +255,8 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
             this.lastTagDrawings[this.getCurrentSelectingContext()] = image;
 
-            this.stateChange.emit(new SelectionStateMessage(this.getSelectorName(), this.currentTag, this.selectedArea.getId(), this.selectedArea.sliceIndex, false));
+            this.stateChange.emit(new SelectionStateMessage(this.getSelectorName(), this.currentTag, this.selectedArea.getId(),
+                this.selectedArea.sliceIndex, false));
             this.selectedArea = undefined;
             this.requestRedraw();
         });

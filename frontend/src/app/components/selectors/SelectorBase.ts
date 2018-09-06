@@ -100,7 +100,8 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
                 this.selections.set(selection.sliceIndex, [selection]);
             }
         }
-        this.stateChange.emit(new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(), selection.sliceIndex, false));
+        this.stateChange.emit(new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(),
+            selection.sliceIndex, false));
     }
 
     public updateCurrentSlice(currentSliceId: number): void {

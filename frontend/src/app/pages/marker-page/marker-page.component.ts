@@ -22,9 +22,9 @@ import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
 import {TaskService} from '../../services/task.service';
 import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
-import {LabelService} from "../../services/label.service";
-import {Label} from "../../model/labels/Label";
-import {PredefinedBrushLabelElement} from "../../model/PredefinedBrushLabelElement";
+import {LabelService} from '../../services/label.service';
+import {Label} from '../../model/labels/Label';
+import {PredefinedBrushLabelElement} from '../../model/PredefinedBrushLabelElement';
 
 
 @Component({

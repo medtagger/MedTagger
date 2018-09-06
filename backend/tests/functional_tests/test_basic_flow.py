@@ -166,6 +166,7 @@ def test_basic_flow_with_predefined_label(prepare_environment: Any, synchronous_
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
+    assert isinstance(json_response, dict)
     scan_id = json_response['scan_id']
 
     # Step 4. Send slices
@@ -204,9 +205,10 @@ def test_basic_flow_with_predefined_label(prepare_environment: Any, synchronous_
                                    data=data, headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
+    assert isinstance(json_response, dict)
     predefined_label_id = json_response['label_id']
     assert type(predefined_label_id), str
-    assert len(predefined_label_id) > 0
+    assert predefined_label_id
 
     # Step 6. Get random scan
     response = api_client.get('/api/v1/scans/random?task={}'.format(task_key),

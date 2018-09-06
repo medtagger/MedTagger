@@ -2,21 +2,20 @@ import {throwError as observableThrowError, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 
-import {Dataset, ScanMetadata} from '../model/ScanMetadata';
+import {ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
 import {ScanSelection} from '../model/selections/ScanSelection';
 import {SliceSelection} from '../model/selections/SliceSelection';
 import {MedTaggerWebSocket} from './websocket.service';
-import {concat, delay, flatMap, map, mergeAll, retryWhen, take} from 'rxjs/operators';
+import {concat, delay, map, mergeAll, retryWhen, take} from 'rxjs/operators';
 import {of} from 'rxjs/internal/observable/of';
 import {from} from 'rxjs/internal/observable/from';
 import {defer} from 'rxjs/internal/observable/defer';
-import {Task} from '../model/Task';
 import {TaskResponse} from './task.service';
 import {isUndefined} from 'util';
-import {PredefinedBrushLabelElement} from "../model/PredefinedBrushLabelElement";
+import {PredefinedBrushLabelElement} from '../model/PredefinedBrushLabelElement';
 
 interface ScanResponse {
     scan_id: string;
@@ -92,13 +91,14 @@ export class ScanService {
         }
 
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label?predefined=true`, form).toPromise().then((response: Response) => {
-                console.log('ScanService | sendPredefinedLabel | response: ', response);
-                resolve(response);
-            }).catch((error: Response) => {
-                console.log('ScanService | sendPredefinedLabel | error: ', error);
-                reject(error);
-            });
+            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label?predefined=true`, form).toPromise()
+                .then((response: Response) => {
+                    console.log('ScanService | sendPredefinedLabel | response: ', response);
+                    resolve(response);
+                }).catch((error: Response) => {
+                    console.log('ScanService | sendPredefinedLabel | error: ', error);
+                    reject(error);
+                });
         });
     }
 

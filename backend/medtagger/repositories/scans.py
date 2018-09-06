@@ -1,5 +1,5 @@
 """Module responsible for definition of ScansRepository."""
-from typing import Optional, List
+from typing import List
 
 from sqlalchemy.sql.expression import func
 

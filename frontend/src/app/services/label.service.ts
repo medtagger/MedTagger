@@ -1,16 +1,16 @@
 import {Injectable} from '@angular/core';
 
 import {environment} from '../../environments/environment';
-import {Label} from '../model/labels/Label';
 import {HttpClient} from '@angular/common/http';
+import {Task} from '../model/Task';
+import {Point} from '../model/Point';
+import {Label} from '../model/labels/Label';
+import {LabelTag} from '../model/labels/LabelTag';
 import {SliceSelection} from '../model/selections/SliceSelection';
-import {LabelTag} from "../model/labels/LabelTag";
-import {ROISelection2D} from "../model/selections/ROISelection2D";
-import {Task} from "../model/Task";
-import {PointSelection} from "../model/selections/PointSelection";
-import {ChainSelection} from "../model/selections/ChainSelection";
-import {Point} from "../model/Point";
-import {BrushSelection} from "../model/selections/BrushSelection";
+import {ROISelection2D} from '../model/selections/ROISelection2D';
+import {PointSelection} from '../model/selections/PointSelection';
+import {ChainSelection} from '../model/selections/ChainSelection';
+import {BrushSelection} from '../model/selections/BrushSelection';
 
 interface RandomLabelResponse {
     label_id: string;

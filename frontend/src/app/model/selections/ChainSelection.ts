@@ -1,6 +1,6 @@
 import {SliceSelection} from './SliceSelection';
 import {Point} from '../Point';
-import {LabelTag} from "../labels/LabelTag";
+import {LabelTag} from '../labels/LabelTag';
 
 export class ChainSelection extends SliceSelection {
 

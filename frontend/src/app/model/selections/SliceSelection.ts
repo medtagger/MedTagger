@@ -1,4 +1,4 @@
-import {LabelTag} from "../labels/LabelTag";
+import {LabelTag} from '../labels/LabelTag';
 
 export abstract class SliceSelection {
 
