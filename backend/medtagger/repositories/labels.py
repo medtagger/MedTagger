@@ -30,6 +30,7 @@ def get_random_label(status: LabelVerificationStatus = None) -> Label:
     query = Label.query
     if status:
         query = query.filter(Label.status == status)
+    query = query.filter(~Label.predefined)
     query = query.order_by(func.random())
     return query.first()
 
@@ -68,6 +69,7 @@ def get_predefined_brush_label_elements(scan_id: ScanID, task_id: int,
     return query.all()
 
 
+# pylint: disable=too-many-arguments;  They are needed to fulfill Label model needs
 def add_new_label(scan_id: ScanID, task_key: str, user: User, labeling_time: LabelingTime,
                   comment: str = None, predefined: bool = False) -> Label:
     """Add new Label for given Scan.

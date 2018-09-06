@@ -53,6 +53,8 @@ export class MarkerPageComponent implements OnInit {
     isInitialSliceLoad: boolean;
     chooseTaskPageUrl = '/labelling/choose-task';
 
+    getTaskPromise: Promise<Task>;
+
     ActionType = SelectorActionType;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
@@ -70,7 +72,8 @@ export class MarkerPageComponent implements OnInit {
             this.taskKey = params.get('task') || undefined;
         });
 
-        this.taskService.getTask(this.taskKey).then(
+        this.getTaskPromise = this.taskService.getTask(this.taskKey);
+        this.getTaskPromise.then(
             (task: Task) => {
                 this.task = task;
 
@@ -170,9 +173,11 @@ export class MarkerPageComponent implements OnInit {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
                 if (this.scan.predefinedLabelID) {
-                    // TODO: Task could have been loaded asynchronously
-                    this.labelService.getLabelByID(this.scan.predefinedLabelID, this.task).then((label: Label) => {
-                        this.marker.setLabel(label);
+                    // Make sure that we've already resolved current Task
+                    this.getTaskPromise.then((task: Task) => {
+                        this.labelService.getLabelByID(this.scan.predefinedLabelID, task).then((label: Label) => {
+                            this.marker.setLabel(label);
+                        });
                     });
                 }
 

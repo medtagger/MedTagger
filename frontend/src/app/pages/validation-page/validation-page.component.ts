@@ -73,7 +73,7 @@ export class ValidationPageComponent implements OnInit {
     }
 
     private requestSlicesWithLabel(): void {
-        // TODO: Make this fucking validation page compatible with marker page! For fucks sake...
+        // TODO: Unify with Marker Page...
         this.labelService.getRandomLabel(undefined).then((label: Label) => {
             this.label = label;
             this.scanViewer.setArchivedSelections(this.label.labelSelections);

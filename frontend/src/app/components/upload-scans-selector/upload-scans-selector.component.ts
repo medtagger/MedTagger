@@ -30,7 +30,6 @@ export class SelectedScan {
             const fileReader: FileReader = new FileReader();
             fileReader.onloadend = (e: ProgressEvent) => {
                 try {
-                    // TODO: Check if fileName does not contain full path to the file on multiple Scans upload!
                     const taskKey = file.name.split('.json')[0];
                     const fileContent: string = String.fromCharCode.apply(null, new Uint8Array(fileReader.result));
                     const predefinedLabel = new SelectedScanPredefinedLabel(taskKey, JSON.parse(fileContent));
@@ -178,7 +177,6 @@ export class UploadScansSelectorComponent {
 
             // User can upload a PNG file which will represent Brush Predefined Label Element
             if (selectedFile.name.endsWith('.png') && selectedFile.type === 'image/png') {
-                // TODO: Check if file name contains full path to the File
                 singleScan.addAdditionalData(selectedFile.name, selectedFile);
                 continue;
             }
@@ -223,7 +221,6 @@ export class UploadScansSelectorComponent {
 
             // User can upload a PNG file which will represent Brush Predefined Label Element
             if (selectedFile.name.endsWith('.png') && selectedFile.type === 'image/png') {
-                // TODO: Check if file name contains full path to the File
                 scanForThisSlice.addAdditionalData(selectedFile.name, selectedFile);
                 continue;
             }

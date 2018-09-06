@@ -48,12 +48,12 @@ def delete_scan_by_id(scan_id: ScanID) -> None:
         session.query(Scan).filter(Scan.id == scan_id).delete()
 
 
-def add_new_scan(dataset: Dataset, number_of_slices: int, user: Optional[User]) -> Scan:
+def add_new_scan(dataset: Dataset, number_of_slices: int, user: User = None) -> Scan:
     """Add new Scan to the database.
 
     :param dataset: Dataset object
     :param number_of_slices: number of Slices that will be uploaded
-    :param user: User that uploaded scan
+    :param user: (optional) User that uploaded scan
     :return: Scan object
     """
     with db_session() as session:

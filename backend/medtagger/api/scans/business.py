@@ -8,9 +8,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
-from medtagger.exceptions import InternalErrorException
+from medtagger.api.utils import get_current_user
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
+from medtagger.exceptions import InternalErrorException
 from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation, BrushLabelElement
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
@@ -23,7 +23,7 @@ from medtagger.repositories import (
 )
 from medtagger.storage.models import BrushLabelElement as StorageBrushLabelElement
 from medtagger.workers.storage import parse_dicom_and_update_slice
-from medtagger.api.utils import get_current_user
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
 
 logger = logging.getLogger(__name__)
 
