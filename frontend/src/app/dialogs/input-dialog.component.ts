@@ -9,10 +9,11 @@ import {FormControl} from '@angular/forms';
 })
 export class InputDialogComponent {
 
-    userInput = new FormControl('', []);
+    userInput: FormControl;
 
     constructor(private dialogRef: MatDialogRef<InputDialogComponent>,
                 @Inject(MAT_DIALOG_DATA) public data: { title: string, content: string, input: string, buttonText: string }) {
+        this.userInput = new FormControl(data.input);
     }
 
     closeDialog(): void {

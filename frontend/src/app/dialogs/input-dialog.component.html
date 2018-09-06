@@ -1,8 +1,8 @@
 <h1 mat-dialog-title>{{data.title}}</h1>
 <div mat-dialog-content>
-    <p>{{data.content}}</p>
+    <p class="dialog__content">{{data.content}}</p>
     <mat-form-field style="width: 100%;">
-        <textarea matInput matTextareaAutosize [formControl]="userInput" placeholder="{{data.input}}"></textarea>
+        <textarea matInput matTextareaAutosize [formControl]="userInput" [(value)]="data.input" rows="1"></textarea>
     </mat-form-field>
 </div>
 <div mat-dialog-actions align="center">

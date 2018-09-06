@@ -11,7 +11,7 @@
                     </mat-card-header>
                     <mat-card-content>
                         <mat-form-field>
-                            <mat-select placeholder="Dataset" formControlName="dataset" required>
+                            <mat-select placeholder="Dataset" formControlName="dataset" required data-cy="datasets">
                                 <mat-option *ngFor="let availableDataset of availableDatasets"
                                             [value]="availableDataset.key">
                                     {{availableDataset.name}}
@@ -20,7 +20,7 @@
                         </mat-form-field>
                     </mat-card-content>
                     <mat-card-actions>
-                        <button class="pull-right" mat-raised-button matStepperNext color="primary">Select</button>
+                        <button class="pull-right" mat-raised-button matStepperNext color="primary" data-cy="datasets-submit">Select</button>
                         <div class="clearfix"></div>
                     </mat-card-actions>
                 </mat-card>
@@ -43,7 +43,7 @@
                     </mat-card-content>
                     <mat-card-actions>
                         <button class="pull-right" mat-raised-button color="primary"
-                                (click)="selectUploadMode(UploadMode.SINGLE_SCAN)">Select
+                                (click)="selectUploadMode(UploadMode.SINGLE_SCAN)" data-cy="single-scan">Select
                         </button>
                         <div class="clearfix"></div>
                     </mat-card-actions>
@@ -139,7 +139,7 @@
                         </mat-card-content>
                         <mat-card-actions>
                             <button mat-raised-button color="primary" (click)="uploadFiles()"
-                                    *ngIf="totalNumberOfSlices != 0" style="float: right;">
+                                    *ngIf="totalNumberOfSlices != 0" style="float: right;" data-cy="single-scan-upload">
                                 <mat-icon>file_upload</mat-icon>
                                 Upload!
                             </button>

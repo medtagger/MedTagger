@@ -297,8 +297,8 @@ export class MarkerPageComponent implements OnInit {
 
     public addLabelComment(): void {
         this.marker.setFocusable(false);
-        this.dialogService.openInputDialog('Add comment to your label (optional)', 'If you\'d like, you can add a comment to the label' +
-            ' below:', this.labelComment, 'Add comment').afterClosed().subscribe(comment => {
+        this.dialogService.openInputDialog('Add comment to your label (optional)', '',
+            this.labelComment, this.labelComment ? 'Save comment' : 'Add comment').afterClosed().subscribe(comment => {
                 this.labelComment = comment;
                 this.marker.setFocusable(true);
         });

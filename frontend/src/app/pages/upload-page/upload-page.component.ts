@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatHorizontalStepper, MatStep, MatSelectionList} from '@angular/material';
 import {FormBuilder, FormGroup, FormControl, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -16,6 +16,7 @@ import {
 import {Observable} from 'rxjs/internal/Observable';
 import {interval} from 'rxjs/internal/observable/interval';
 import {throwError} from 'rxjs/internal/observable/throwError';
+import {Subscription} from 'rxjs/Subscription';
 
 
 enum UploadMode {
@@ -76,7 +77,7 @@ class UploadingScan {
     providers: [ScanService],
     styleUrls: ['./upload-page.component.scss']
 })
-export class UploadPageComponent implements OnInit {
+export class UploadPageComponent implements OnInit, OnDestroy {
 
     @ViewChild('scansForRetry') scansForRetry: MatSelectionList;
     @ViewChild('stepper') stepper: MatHorizontalStepper;
@@ -114,6 +115,8 @@ export class UploadPageComponent implements OnInit {
     uploadCompletedFormGroup: FormGroup;
     chooseDatasetFormGroup: FormGroup;
 
+    private pollScanStatusSubscription: Subscription;
+
     constructor(private scanService: ScanService, private datasetService: DatasetService, private formBuilder: FormBuilder) {
     }
 
@@ -136,6 +139,12 @@ export class UploadPageComponent implements OnInit {
         });
     }
 
+    ngOnDestroy(): void {
+        if (this.pollScanStatusSubscription) {
+            this.pollScanStatusSubscription.unsubscribe();
+        }
+    }
+
     public chooseFiles(userFiles: UserFiles): void {
         this.scans = userFiles.scans;
         this.hasPredefinedLabels = !!this.scans.find((scan: SelectedScan) => {
@@ -152,7 +161,7 @@ export class UploadPageComponent implements OnInit {
 
     private pollScanUploadStatus() {
         const TIME_INTERVAL = 5000; // 5 seconds
-        const subscription = interval(TIME_INTERVAL).subscribe(_ => {
+        this.pollScanStatusSubscription = interval(TIME_INTERVAL).subscribe(_ => {
             // Iteration in reverse order makes it safe to remove elements from this array
             for (let i = this.uploadingAndProcessingScans.length - 1; i >= 0; i--) {
                 const scanToMonitor = this.uploadingAndProcessingScans[i];
@@ -190,7 +199,9 @@ export class UploadPageComponent implements OnInit {
             // End polling once we've uploaded all Scans
             if (this.errorScans.length + this.availableScans.length === this.scans.length) {
                 console.log('We\'ve uploaded all Scans, let\'s move on!');
-                subscription.unsubscribe();
+                if (this.pollScanStatusSubscription) {
+                   this.pollScanStatusSubscription.unsubscribe();
+                }
                 this.sendingFilesFormGroup.controls['filesSent'].setValue('true');
                 this.stepper.next();
             }
