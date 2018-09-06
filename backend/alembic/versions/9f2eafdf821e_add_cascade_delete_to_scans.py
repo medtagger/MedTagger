@@ -35,7 +35,6 @@ def upgrade():
     op.create_foreign_key('fk_LabelElements_label_id_Labels', 'LabelElements', 'Labels', ['label_id'], ['id'],
                           ondelete='CASCADE')
 
-    # Droping PointLabelElement (without 's') due to naming bug
     op.drop_constraint('fk_RectangularLabelElements_id_LabelElements', 'RectangularLabelElements')
     op.create_foreign_key(
         'fk_RectangularLabelElements_id_LabelElements', 'RectangularLabelElements', 'LabelElements', ['id'], ['id'],
@@ -44,6 +43,7 @@ def upgrade():
     # Altering primary key name from LabelSelections to LabelElements
     op.execute('ALTER INDEX "pk_LabelSelections" RENAME TO "pk_LabelElements"')
 
+    # Dropping PointLabelElement (without 's') due to naming bug
     op.drop_constraint('fk_PointLabelElement_id_LabelElements', 'PointLabelElements')
     op.create_foreign_key(
         'fk_PointLabelElements_id_LabelElements', 'PointLabelElements', 'LabelElements', ['id'], ['id'],

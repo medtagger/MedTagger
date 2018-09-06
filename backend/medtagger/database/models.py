@@ -5,8 +5,8 @@ from typing import List, Dict, cast, Optional, Any
 
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import relationship
 from sqlalchemy.engine import Connection
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm.mapper import Mapper
 
 from medtagger.database.utils import ArrayOfEnum
@@ -312,16 +312,6 @@ class Slice(Base):
         return self
 
 
-# pylint: disable=unused-argument
-@event.listens_for(Slice, 'before_delete')
-def delete_original_and_processed_slice_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
-    """Delete original and processed Slices from storage."""
-    original_slice = OriginalSlice.get(id=target.id)
-    original_slice.delete()
-    processed_slice = ProcessedSlice.get(id=target.id)
-    processed_slice.delete()
-
-
 ##########################
 #
 #  Labels related models
@@ -521,14 +511,6 @@ class BrushLabelElement(LabelElement):
     def __repr__(self) -> str:
         """Return string representation for Brush Label Element."""
         return '<{}: {}>'.format(self.__class__.__name__, self.id)
-
-
-# pylint: disable=unused-argument
-@event.listens_for(BrushLabelElement, 'before_delete')
-def delete_brush_element_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
-    """Delete BrushLabelElement from storage."""
-    brush_label_element = StorageBrushLabelElement.get(id=target.id)
-    brush_label_element.delete()
 
 
 class PointLabelElement(LabelElement):
@@ -821,3 +803,21 @@ class SurveyResponse(ActionResponse):
     def get_details(self) -> Dict:
         """Return dictionary details about this Survey Response."""
         return self.data
+
+
+# pylint: disable=unused-argument
+@event.listens_for(BrushLabelElement, 'before_delete')
+def delete_brush_element_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
+    """Delete BrushLabelElement from storage."""
+    brush_label_element = StorageBrushLabelElement.get(id=target.id)
+    brush_label_element.delete()
+
+
+# pylint: disable=unused-argument
+@event.listens_for(Slice, 'before_delete')
+def delete_original_and_processed_slice_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
+    """Delete original and processed Slices from storage."""
+    original_slice = OriginalSlice.get(id=target.id)
+    original_slice.delete()
+    processed_slice = ProcessedSlice.get(id=target.id)
+    processed_slice.delete()
