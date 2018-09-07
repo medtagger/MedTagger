@@ -2,10 +2,11 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
+from medtagger.api.tasks.serializers import out__task
 from medtagger.definitions import ScanStatus, LabelVerificationStatus
 
 in__new_scan = api.model('New Scan model', {
-    'category': fields.String(description='Scan\'s category', required=True),
+    'dataset': fields.String(description='Dataset', required=True),
     'number_of_slices': fields.Integer(description='Number of Slices that will be uploaded', required=True),
 })
 
@@ -86,28 +87,21 @@ elements_schema = {
 in__label_model = api.model('Label model', {
     'elements': fields.List(fields.Raw, required=True),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling', required=True),
+    'comment': fields.String(description='Comment describing a label', required=False),
 })
 
 in__label = api.parser()
 in__label.add_argument('label', type=in__label_model, help='Label model object', location='form', required=True)
 
-in__scan_category = api.model('New Scan Category model', {
+in__dataset = api.model('New Dataset model', {
     'key': fields.String(),
     'name': fields.String(),
-    'image_path': fields.String(),
 })
 
-out__label_tag = api.model('Label Tag model', {
+out__dataset = api.model('Dataset model', {
     'key': fields.String(),
     'name': fields.String(),
-    'actions_ids': fields.List(fields.Integer(), attribute=lambda category: [action.id for action in category.actions]),
-})
-
-out__scan_category = api.model('Scan Category model', {
-    'key': fields.String(),
-    'name': fields.String(),
-    'image_path': fields.String(),
-    'tags': fields.List(fields.Nested(out__label_tag), attribute='available_tags'),
+    'tasks': fields.List(fields.Nested(out__task)),
 })
 
 out__scan = api.model('Scan model', {
@@ -125,6 +119,7 @@ out__label = api.model('Newly created Label model', {
     'owner_id': fields.Integer(description='ID of user that created label'),
     'labeling_time': fields.Float(description='Time in seconds that user spent on labeling'),
     'status': fields.String(description='Label\'s status', enum=[status.name for status in LabelVerificationStatus]),
+    'comment': fields.String(description='Comment describing a label'),
 })
 
 out__new_scan = api.model('Newly created Scan model', {
@@ -137,4 +132,4 @@ out__new_slice = api.model('Newly created Slice model', {
 })
 
 args__random_scan = reqparse.RequestParser()
-args__random_scan.add_argument('category', type=str, required=True, help='Scan\'s category')
+args__random_scan.add_argument('task', type=str, required=True, help='Task\'s key')

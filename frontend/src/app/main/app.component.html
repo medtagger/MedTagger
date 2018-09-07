@@ -1,4 +1,7 @@
-<mat-drawer-container>
+<div *ngIf="!currentUser" class="container-fluid">
+<router-outlet></router-outlet>
+</div>
+<mat-drawer-container  *ngIf="!!currentUser">
     <!-- Right navigation bar -->
     <mat-drawer #sidenav mode="over" position="end" class="right-sidebar mat-typography">
         <div *ngIf="!!currentUser">
@@ -15,12 +18,12 @@
                     <mat-icon matListIcon>apps</mat-icon>
                     <h3 matLine>Home</h3>
                 </a>
-                <a mat-list-item routerLink="{{ currentUser.settings.skipTutorial ? '/labelling/choose-category' : '/labelling/tutorial' }}" (click)="sidenav.close()">
+                <a mat-list-item routerLink="{{ currentUser.settings.skipTutorial ? '/labelling/choose-task' : '/labelling/tutorial' }}" (click)="sidenav.close()" data-cy="sidebar-labelling" >
                     <mat-icon matListIcon>label_outline</mat-icon>
                     <h3 matLine>Labelling</h3>
                 </a>
                 <a mat-list-item routerLink="/upload" (click)="sidenav.close()"
-                   *ngIf="currentUser.role !== 'volunteer'">
+                   *ngIf="currentUser.role !== 'volunteer'" data-cy="sidebar-upload" >
                     <mat-icon matListIcon>add</mat-icon>
                     <h3 matLine>Upload new Scans</h3>
                 </a>
@@ -36,7 +39,7 @@
                     <mat-icon matListIcon>settings</mat-icon>
                     <h3 matLine>Settings</h3>
                 </a>
-                <a mat-list-item routerLink="/login" (click)="sidenav.close(); logOut();">
+                <a mat-list-item routerLink="/login" (click)="sidenav.close(); logOut();" data-cy="sidebar-logout" >
                     <mat-icon matListIcon>exit_to_app</mat-icon>
                     <h3 matLine>Sign out</h3>
                 </a>
@@ -53,7 +56,7 @@
                 <span class="header-name">MedTagger</span>
             </a>
             <span class="header-page-name">{{pageTitle}}</span>
-            <button mat-icon-button (click)="sidenav.toggle()" class="open-sidebar" *ngIf="!isLoginPage">
+            <button mat-icon-button (click)="sidenav.toggle()" class="open-sidebar" *ngIf="!isLoginPage" data-cy="sidebar" >
                 <mat-icon aria-label="Open menu">menu</mat-icon>
             </button>
         </mat-toolbar>

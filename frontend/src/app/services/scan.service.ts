@@ -2,17 +2,20 @@ import {throwError as observableThrowError, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 
-import {ScanCategory, ScanMetadata} from '../model/ScanMetadata';
+import {Dataset, ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
 import {environment} from '../../environments/environment';
-import {ScanSelection} from '../model/ScanSelection';
-import {SliceSelection} from '../model/SliceSelection';
+import {ScanSelection} from '../model/selections/ScanSelection';
+import {SliceSelection} from '../model/selections/SliceSelection';
 import {MedTaggerWebSocket} from './websocket.service';
 import {concat, delay, flatMap, map, mergeAll, retryWhen, take} from 'rxjs/operators';
 import {of} from 'rxjs/internal/observable/of';
 import {from} from 'rxjs/internal/observable/from';
 import {defer} from 'rxjs/internal/observable/defer';
+import {Task} from '../model/Task';
+import {TaskResponse} from './task.service';
+import {isUndefined} from 'util';
 
 interface ScanResponse {
     scan_id: string;
@@ -22,10 +25,16 @@ interface ScanResponse {
     height: number;
 }
 
-interface AvailableCategoryResponse {
+interface AvailableDatasetResponse {
     key: string;
     name: string;
-    image_path: string;
+    tasks: Array<TaskResponse>;
+}
+
+interface LabelTagResponse {
+    key: string;
+    name: string;
+    actions_id: Array<number>;
 }
 
 interface NewScanResponse {
@@ -41,16 +50,26 @@ export class ScanService {
         this.websocket = socket;
     }
 
-    public sendSelection(scanId: string, selection: ScanSelection<SliceSelection>, labelingTime: number): Promise<Response> {
+    public sendSelection(scanId: string, taskKey: string, selection: ScanSelection<SliceSelection>, labelingTime: number,
+                         comment: string): Promise<Response> {
         console.log('ScanService | send3dSelection | sending ROI:',
             selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
 
         const payload = selection.toJSON();
         payload['labeling_time'] = labelingTime;
+        payload['comment'] = comment;
+
         const form = new FormData();
         form.append('label', JSON.stringify(payload));
+
+        const additionalData = selection.getAdditionalData();
+        for (const key of Object.keys(additionalData)) {
+            const value = additionalData[key];
+            form.append(key, value, key);
+        }
+
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/label`, form).toPromise().then((response: Response) => {
+            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label`, form).toPromise().then((response: Response) => {
                 console.log('ScanService | send3dSelection | response: ', response);
                 resolve(response);
             }).catch((error: Response) => {
@@ -60,10 +79,13 @@ export class ScanService {
         });
     }
 
-    public getRandomScan(category: string): Promise<ScanMetadata> {
+    public getRandomScan(taskKey: string): Promise<ScanMetadata> {
+        if (isUndefined(taskKey)) {
+            return Promise.reject('ScanService | getRandomScan | error: Task key is undefined!');
+        }
         return new Promise((resolve, reject) => {
             let params = new HttpParams();
-            params = params.set('category', category);
+            params = params.set('task', taskKey);
             this.http.get<ScanResponse>(environment.API_URL + '/scans/random', {params: params})
                 .subscribe(
                     (response: ScanResponse) => {
@@ -97,25 +119,6 @@ export class ScanService {
         });
     }
 
-    getAvailableCategories(): Promise<ScanCategory[]> {
-        return new Promise((resolve, reject) => {
-            this.http.get<Array<AvailableCategoryResponse>>(environment.API_URL + '/scans/categories').toPromise().then(
-                response => {
-                    console.log('ScanService | getAvailableCategories | response: ', response);
-                    const categories = [];
-                    for (const category of response) {
-                        categories.push(new ScanCategory(category.key, category.name, category.image_path));
-                    }
-                    resolve(categories);
-                },
-                error => {
-                    console.log('ScanService | getAvailableCategories | error: ', error);
-                    reject(error);
-                }
-            );
-        });
-    }
-
     slicesObservable(): Observable<MarkerSlice> {
         return this.websocket.fromEvent<any>('slice').pipe(
             map((slice: { scan_id: string, index: number, last_in_batch: number, image: ArrayBuffer }) => {
@@ -129,10 +132,10 @@ export class ScanService {
         this.websocket.emit('request_slices', {scan_id: scanId, begin: begin, count: count, reversed: reversed});
     }
 
-    createNewScan(category: string, numberOfSlices: number) {
+    createNewScan(dataset: string, numberOfSlices: number) {
         return new Promise((resolve, reject) => {
             const payload = {
-                category: category,
+                dataset: dataset,
                 number_of_slices: numberOfSlices,
             };
             let retryAttempt = 0;

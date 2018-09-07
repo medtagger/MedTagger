@@ -34,11 +34,11 @@ Documentation for the MedTagger can be found [here](/docs).
 
 ## What are we doing now?
 
- - [ ] Labeling using multiple tools
+ - [x] Labeling using multiple tools
    - [x] Rectangle
    - [x] Points
    - [x] Connected Points
-   - [ ] Brush
+   - [x] Brush
  - [ ] Zoom for labeling small objects
  - [ ] Surveys as additional actions for provided labels
  - [ ] Validation mechanism
@@ -85,8 +85,8 @@ Below screenshots show how MedTagger looks like:
 #### Navigation Sidebar
 ![Navigation Sidebar](/docs/assets/navigation_sidebar.png)
 
-#### Categories Page
-![Categories Page](/docs/assets/categories_page.png)
+#### Datasets Page
+![Datasets Page](/docs/assets/datasets_page.png)
 
 #### Labeling Page
 ![Labeling Page](/docs/assets/labelling_page.png)

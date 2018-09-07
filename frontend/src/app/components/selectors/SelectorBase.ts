@@ -1,7 +1,8 @@
 import {EventEmitter} from '@angular/core';
-import {SliceSelection} from '../../model/SliceSelection';
+import {SliceSelection} from '../../model/selections/SliceSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {SelectorAction} from '../../model/SelectorAction';
+import {LabelTag} from '../../model/labels/LabelTag';
 
 export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> {
 
@@ -9,11 +10,13 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     protected selections: Map<number, [CustomSliceSelection]>;
     protected archivedSelections: Array<CustomSliceSelection> = [];
     protected canvasCtx: CanvasRenderingContext2D;
-    protected currentSlice;
+    protected currentSlice: number;
+    protected currentTag: LabelTag;
     protected canvasPosition: ClientRect;
     protected canvasSize: { width: number, height: number };
     protected stateChange: EventEmitter<SelectionStateMessage>;
     protected redrawRequestEmitter: EventEmitter<void>;
+    protected singleSelectionPerSlice = false;
 
     protected constructor(canvas: HTMLCanvasElement) {
         this.canvasCtx = canvas.getContext('2d');
@@ -32,6 +35,10 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
             OTHER_SELECTION_COLOR: '#256fde',
             ARCHIVED_SELECTION_COLOR: '#5f27e5'
         };
+    }
+
+    public isSingleSelectionPerSlice(): boolean {
+        return this.singleSelectionPerSlice;
     }
 
     public formArchivedSelections(selectionMap: CustomSliceSelection[]): CustomSliceSelection[] {
@@ -98,6 +105,10 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
 
     public updateCurrentSlice(currentSliceId: number): void {
         this.currentSlice = currentSliceId;
+    }
+
+    public updateCurrentTag(tag: LabelTag) {
+        this.currentTag = tag;
     }
 
     public updateCanvasPosition(canvasRect: ClientRect) {
@@ -220,6 +231,14 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
 
     protected requestRedraw(): void {
         this.redrawRequestEmitter.emit();
+    }
+
+    public deselect(): void {
+        // pass
+    }
+
+    public canUseMouseWheel(): boolean {
+        return true;
     }
 }
 

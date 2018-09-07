@@ -1,0 +1,6 @@
+{
+  "env": {
+    "HOST_URL": "http://localhost:4200/",
+    "API_URL": "http://localhost:51000/api/v1/"
+  }
+}

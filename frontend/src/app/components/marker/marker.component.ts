@@ -3,13 +3,16 @@ import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs';
 import {ScanViewerComponent} from '../scan-viewer/scan-viewer.component';
-import {SliceSelection} from '../../model/SliceSelection';
 import {SliceRequest} from '../../model/SliceRequest';
+import {SliceSelection} from '../../model/selections/SliceSelection';
 import {LabelExplorerComponent} from '../label-explorer/label-explorer.component';
-import {LabelListItem} from '../../model/LabelListItem';
+import {LabelListItem} from '../../model/labels/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
 import {Selector} from '../selectors/Selector';
 import {Subscription} from 'rxjs/Subscription';
+import {isUndefined} from 'util';
+import {MatSnackBar} from '@angular/material';
+import {LabelTag} from '../../model/labels/LabelTag';
 
 @Component({
     selector: 'app-marker-component',
@@ -31,6 +34,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     canvas: HTMLCanvasElement;
 
     private currentSelector: Selector<SliceSelection>;
+    private currentTag: LabelTag;
 
     @ViewChild('canvas')
     set viewCanvas(viewElement: ElementRef) {
@@ -49,18 +53,15 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     private labelExplorer: LabelExplorerComponent;
 
-    // TODO: dynamic context and tool changes
-    private currentTaggingContext = 'ALL';
-
     private selectorSubscriptions: Array<Subscription> = [];
 
     private selectorsByName: Map<string, Selector<SliceSelection>> = new Map();
 
-    constructor() {
+    constructor(public snackBar: MatSnackBar) {
         super();
 
         this.redrawRequestEmitter.subscribe(() => {
-           this.redrawSelections();
+            this.redrawSelections();
         });
     }
 
@@ -78,8 +79,29 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.hookUpStateChangeSubscription();
     }
 
+    public getCurrentSelector(): Selector<any> {
+        return this.currentSelector;
+    }
+
     public setCurrentSelector(selector: Selector<any>) {
+        if (this.currentSelector) {
+            this.currentSelector.deselect();
+        }
         this.currentSelector = selector;
+        this.updateTagForCurrentSelector(this.currentTag);
+    }
+
+    public updateTagForCurrentSelector(tag: LabelTag): void {
+        super.setCurrentTagForSelector(this.currentSelector, tag);
+    }
+
+    public clearCurrentSelector() {
+        this.currentSelector = undefined;
+    }
+
+    public setCurrentTag(tag: LabelTag) {
+        super.setCurrentTag(tag);
+        this.currentTag = tag;
     }
 
     public setDownloadScanInProgress(isInProgress: boolean) {
@@ -88,6 +110,14 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setDownloadSlicesInProgress(isInProgress: boolean) {
         this.downloadingSlicesInProgress = isInProgress;
+    }
+
+    public selectMiddleSlice(): void {
+        const slicesCount = this.slider.max - this.slider.min + 1;
+        const middleSliceNumber = this.slider.min + Math.floor(slicesCount / 2);
+        this.slider.value = middleSliceNumber;
+        this.changeMarkerImage(middleSliceNumber);
+        this.drawSelections();
     }
 
     public removeAllSelectionsOnCurrentSlice(): void {
@@ -102,20 +132,13 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     public get3dSelection(): SliceSelection[] {
-        this.selectors.forEach((selector) => selector.archiveSelections());
-        this.updateSelectionState();
-
-        this.clearCanvasSelections();
-
-        const coordinates: SliceSelection[] = this.selectors
+        return this.selectors
             .map((selector) => selector.getSelections())
             .reduce((x, y) => x.concat(y), []);
-        this.selectors.forEach((selector) => selector.clearSelections());
-        this.updateSelectionState();
+    }
 
-        this.drawSelections();
-
-        return coordinates;
+    public getCurrentTag() {
+        return this.currentTag;
     }
 
     private hookUpStateChangeSubscription(): void {
@@ -131,11 +154,17 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                     } else {
                         console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
                             selection.selectionId);
-                        this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTaggingContext,
-                            this.currentSelector.getSelectorName());
+                        const selectorName: string = this.currentSelector.getSelectorName();
+                        if (this.currentSelector.isSingleSelectionPerSlice()) {
+                            this.labelExplorer.replaceExistingLabel(selection.selectionId, selection.sliceId,
+                                this.currentTag, selectorName);
+                        } else {
+                            this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, this.currentTag,
+                                selectorName);
+                        }
                     }
                 }
-        }));
+            }));
     }
 
     private hookUpExplorerLabelChangeSubscription(): void {
@@ -200,21 +229,45 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.canvas.onmousedown = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmousedown clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            if (this.currentSelector.onMouseDown(mouseEvent)) {
-                this.redrawSelections();
+            if (isUndefined(this.currentTag)) {
+                this.snackBar.open('Please select Tag and Tool to start labeling.', '', {duration: 2000});
+                return;
+            } else if (isUndefined(this.currentSelector)) {
+                this.snackBar.open('Please select Tool to start labeling.', '', {duration: 2000});
+                return;
+            }
+            if (this.currentSelector) {
+                this.currentSelector.onMouseDown(mouseEvent);
             }
         };
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            if (this.currentSelector.onMouseUp(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseUp(mouseEvent);
             }
         };
 
         this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
-            if (this.currentSelector.onMouseMove(mouseEvent)) {
-                this.redrawSelections();
+            if (this.currentSelector) {
+                this.currentSelector.onMouseMove(mouseEvent);
+            }
+        };
+
+        this.canvas.onwheel = (wheelEvent: WheelEvent) => {
+            if (this.currentSelector && !this.currentSelector.canUseMouseWheel()) {
+                return;
+            }
+
+            const sliderValue = wheelEvent.deltaY > 0 ? this.slider.value - 1 : this.slider.value + 1;
+
+            if (sliderValue >= this.slider.min && sliderValue <= this.slider.max) {
+                this.selectors.forEach((selector) => selector.updateCurrentSlice(sliderValue));
+                this.requestSlicesIfNeeded(sliderValue);
+
+                this.changeMarkerImage(sliderValue);
+
+                this.drawSelections();
             }
         };
     }

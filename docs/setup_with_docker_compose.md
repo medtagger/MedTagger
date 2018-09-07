@@ -57,7 +57,7 @@ To update MedTagger using Docker Compose please use below `up` command with `--b
 ```bash
 $ git pull
 $ docker-compose up -d --no-deps --build medtagger_frontend medtagger_backend_rest \
-  medtagger_backend_websocket medtagger_backend_worker
+  medtagger_backend_websocket medtagger_backend_worker medtagger_backend_database_migrations
 ```
 
 ### How to setup only dependencies?
@@ -75,13 +75,13 @@ For more information about usage please read the [documentation](https://docs.do
 To run MedTagger on a subdirectory export `MEDTAGGER__HOST_ON_SUBDIRECTORY` environment variable
  and run Docker-Compose in the same way as it was done above.
 
-**NOTE:** Always start and end your subdirectory with slashes `/`!
+**NOTE:** Always start your subdirectory with slash `/`! But do not end with it!
  
 Here is an example how to do this:
 
 ```bash
 # Frontend & Backend will be hosted under below subdirectory
-$ export MEDTAGGER__HOST_ON_SUBDIRECTORY=/medtagger/
+$ export MEDTAGGER__HOST_ON_SUBDIRECTORY=/medtagger
 
 # Now, you will be able to build & run your containers
 $ docker-compose up ...

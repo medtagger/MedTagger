@@ -3,16 +3,20 @@
 import uuid
 from typing import List, Dict, cast, Optional, Any
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.engine import Connection
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.mapper import Mapper
 
+from medtagger.database.utils import ArrayOfEnum
 from medtagger.database import Base, db_session
 from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
     LabelElementStatus, LabelTool
+from medtagger.storage.models import BrushLabelElement as StorageBrushLabelElement, OriginalSlice, ProcessedSlice
 from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime, LabelTagID, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
-    ActionResponseID, SurveyResponseID, PointID
+    ActionResponseID, SurveyResponseID, PointID, TaskID
 
 #########################
 #
@@ -90,22 +94,56 @@ class UserSettings(Base):
         self.skip_tutorial = False
 
 
-class ScanCategory(Base):
-    """Definition of a Scan Category."""
+datasets_tasks = Table('Datasets_Tasks', Base.metadata,
+                       Column('dataset_id', Integer, ForeignKey('Datasets.id'), nullable=False),
+                       Column('task_id', Integer, ForeignKey('Tasks.id'), nullable=False))
 
-    __tablename__ = 'ScanCategories'
+
+class Dataset(Base):
+    """Definition of a Dataset."""
+
+    __tablename__ = 'Datasets'
     id: int = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
-    image_path: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
-    available_tags: List['LabelTag'] = relationship("LabelTag", back_populates="scan_category")
+    tasks: List['Task'] = relationship('Task', back_populates='datasets', secondary=datasets_tasks)
+
+    def __init__(self, key: str, name: str) -> None:
+        """Initialize Dataset.
+
+        :param key: unique key representing Dataset
+        :param name: name which describes this Dataset
+        """
+        self.key = key
+        self.name = name
+
+    def __repr__(self) -> str:
+        """Return string representation for Dataset."""
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
+
+
+class Task(Base):
+    """Describe what user should mark on Scans in given Datasets."""
+
+    __tablename__ = 'Tasks'
+    id: TaskID = Column(Integer, autoincrement=True, primary_key=True)
+    key: str = Column(String(50), nullable=False, unique=True)
+    name: str = Column(String(100), nullable=False)
+    image_path: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
+
+    datasets: List[Dataset] = relationship('Dataset', back_populates='tasks',
+                                           secondary=datasets_tasks)
+
+    _tags: List['LabelTag'] = relationship("LabelTag", back_populates="task")
 
     def __init__(self, key: str, name: str, image_path: str) -> None:
-        """Initialize Scan Category.
+        """Initialize Task.
 
-        :param key: unique key representing Scan Category
-        :param name: name which describes this Category
+        :param key: unique key representing Task
+        :param name: name which describes this Task
         :param image_path: path to the image which is located on the frontend
         """
         self.key = key
@@ -113,8 +151,18 @@ class ScanCategory(Base):
         self.image_path = image_path
 
     def __repr__(self) -> str:
-        """Return string representation for Scan Category."""
+        """Return string representation for Task."""
         return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.key, self.name)
+
+    @property
+    def available_tags(self) -> List['LabelTag']:
+        """Return Tags that are enabled for this Task."""
+        return [tag for tag in self._tags if not tag.disabled]
+
+    @available_tags.setter
+    def available_tags(self, new_tags: List['LabelTag']) -> None:
+        """Set new Label Tags for this Task."""
+        self._tags = new_tags
 
 
 class Scan(Base):
@@ -126,30 +174,31 @@ class Scan(Base):
     declared_number_of_slices: int = Column(Integer, nullable=False)
     skip_count: int = Column(Integer, nullable=False, default=0)
 
-    category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
-    category: ScanCategory = relationship('ScanCategory')
+    dataset_id: int = Column(Integer, ForeignKey('Datasets.id'))
+    dataset: Dataset = relationship('Dataset')
 
     owner_id: Optional[int] = Column(Integer, ForeignKey('Users.id'))
     owner: Optional[User] = relationship('User', back_populates='scans')
 
-    slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
-    labels: List['Label'] = relationship('Label', back_populates='scan')
+    slices: List['Slice'] = relationship('Slice', back_populates='scan', cascade='delete',
+                                         order_by=lambda: Slice.location)
+    labels: List['Label'] = relationship('Label', back_populates='scan', cascade='delete')
 
-    def __init__(self, category: ScanCategory, declared_number_of_slices: int, user: Optional[User]) -> None:
+    def __init__(self, dataset: Dataset, declared_number_of_slices: int, user: Optional[User]) -> None:
         """Initialize Scan.
 
-        :param category: Scan's category
+        :param dataset: Dataset
         :param declared_number_of_slices: number of Slices that will be uploaded later
         :param user: User that uploaded scan
         """
         self.id = ScanID(str(uuid.uuid4()))
-        self.category = category
+        self.dataset = dataset
         self.declared_number_of_slices = declared_number_of_slices
         self.owner_id = user.id if user else None
 
     def __repr__(self) -> str:
         """Return string representation for Scan."""
-        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.category.key, self.owner)
+        return '<{}: {}: {}: {}>'.format(self.__class__.__name__, self.id, self.dataset.key, self.owner)
 
     @property
     def width(self) -> Optional[int]:
@@ -207,7 +256,7 @@ class Slice(Base):
     width: int = Column(Integer, nullable=True)
     height: int = Column(Integer, nullable=True)
 
-    scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
+    scan_id: ScanID = Column(String, ForeignKey('Scans.id', ondelete='cascade'))
     scan: Scan = relationship('Scan', back_populates='slices')
 
     def __init__(self, orientation: SliceOrientation, location: SliceLocation = None,
@@ -274,12 +323,14 @@ class Label(Base):
 
     __tablename__ = 'Labels'
     id: LabelID = Column(String, primary_key=True)
-    scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
+    scan_id: ScanID = Column(String, ForeignKey('Scans.id', ondelete='cascade'))
+    scan: Scan = relationship('Scan', back_populates='labels')
+    task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
+    task: Task = relationship('Task')
+
     labeling_time: LabelingTime = Column(Float, nullable=True)
 
-    scan: Scan = relationship('Scan', back_populates='labels')
-
-    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label')
+    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label', cascade='delete')
 
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
     owner: User = relationship('User', back_populates='labels')
@@ -287,7 +338,9 @@ class Label(Base):
     status: LabelVerificationStatus = Column(Enum(LabelVerificationStatus), nullable=False,
                                              server_default=LabelVerificationStatus.NOT_VERIFIED.value)
 
-    def __init__(self, user: User, labeling_time: LabelingTime) -> None:
+    comment: Optional[str] = Column(String, nullable=True)
+
+    def __init__(self, user: User, labeling_time: LabelingTime, comment: str = None) -> None:
         """Initialize Label.
 
         By default all of the labels are not verified
@@ -296,11 +349,12 @@ class Label(Base):
         self.owner = user
         self.labeling_time = labeling_time
         self.status = LabelVerificationStatus.NOT_VERIFIED
+        self.comment = comment
 
     def __repr__(self) -> str:
         """Return string representation for Label."""
-        return '<{}: {}: {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id,
-                                           self.labeling_time, self.owner)
+        return '<{}: {}: {}: {} {} {} {}>'.format(self.__class__.__name__, self.id, self.scan_id, self.task_id,
+                                                  self.labeling_time, self.owner, self.comment)
 
     def update_status(self, status: LabelVerificationStatus) -> 'Label':
         """Update Label's verification status.
@@ -320,21 +374,25 @@ class LabelTag(Base):
     id: LabelTagID = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
+    disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
-    scan_category_id: int = Column(Integer, ForeignKey('ScanCategories.id'))
-    scan_category: ScanCategory = relationship('ScanCategory', back_populates="available_tags")
+    task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
+    task: Task = relationship('Task', back_populates="_tags")
 
+    tools: List[LabelTool] = Column(ArrayOfEnum(Enum(LabelTool, name='label_tool', create_constraint=False)))
     actions: List['Action'] = relationship('Action', back_populates='label_tag')
 
-    def __init__(self, key: str, name: str, actions: List['Action'] = None) -> None:
+    def __init__(self, key: str, name: str, tools: List[LabelTool], actions: List['Action'] = None) -> None:
         """Initialize Label Tag.
 
         :param key: unique key representing Label Tag
         :param name: name which describes this Label Tag
+        :param tools: list of tools for given Label Tag that will be available on labeling page
         :param actions: (optional) list of required actions for this Label Tag
         """
         self.key = key
         self.name = name
+        self.tools = tools
         self.actions = actions or []
 
     def __repr__(self) -> str:
@@ -350,7 +408,7 @@ class LabelElement(Base):
 
     slice_index: int = Column(Integer, nullable=False)
 
-    label_id: LabelID = Column(String, ForeignKey('Labels.id'))
+    label_id: LabelID = Column(String, ForeignKey('Labels.id', ondelete='cascade'))
     label: Label = relationship('Label', back_populates='elements')
 
     tag_id: LabelTagID = Column(Integer, ForeignKey('LabelTags.id'))
@@ -394,7 +452,7 @@ class RectangularLabelElement(LabelElement):
     """Definition of a Label Element made with Rectangle Tool."""
 
     __tablename__ = 'RectangularLabelElements'
-    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'), primary_key=True)
 
     x: float = Column(Float, nullable=False)
     y: float = Column(Float, nullable=False)
@@ -428,7 +486,7 @@ class BrushLabelElement(LabelElement):
     """Definition of a Label Element made with Brush Tool."""
 
     __tablename__ = 'BrushLabelElements'
-    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'), primary_key=True)
 
     width: int = Column(Integer, nullable=False)
     height: int = Column(Integer, nullable=False)
@@ -459,7 +517,7 @@ class PointLabelElement(LabelElement):
     """Definition of a Label Element made with Point Tool."""
 
     __tablename__ = 'PointLabelElements'
-    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'), primary_key=True)
 
     x: float = Column(Float, nullable=False)
     y: float = Column(Float, nullable=False)
@@ -488,11 +546,11 @@ class ChainLabelElement(LabelElement):
     """Definition of a Label Element made with Chain Tool."""
 
     __tablename__ = 'ChainLabelElements'
-    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'), primary_key=True)
 
     points: List['ChainLabelElementPoint'] = relationship('ChainLabelElementPoint',
                                                           order_by='ChainLabelElementPoint.order',
-                                                          back_populates='label_element')
+                                                          back_populates='label_element', cascade='delete')
     loop: bool = Column(Boolean, nullable=False)
 
     __mapper_args__ = {
@@ -523,7 +581,8 @@ class ChainLabelElementPoint(Base):
 
     x: float = Column(Float, nullable=False)
     y: float = Column(Float, nullable=False)
-    label_element_id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), nullable=False)
+    label_element_id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'),
+                                              nullable=False)
     label_element: ChainLabelElement = relationship('ChainLabelElement', back_populates='points')
     order: int = Column(Integer, nullable=False)
 
@@ -574,7 +633,7 @@ class Action(Base):
     def __init__(self, name: str) -> None:
         """Initialize Action.
 
-        :param name: name that should identify such actions for given Scan Category
+        :param name: name that should identify such actions for given Dataset
         """
         self.name = name
 
@@ -600,7 +659,7 @@ class Survey(Action):
     def __init__(self, name: str, initial_element_key: SurveyElementKey) -> None:
         """Initialize Action.
 
-        :param name: name that should identify such actions for given Scan Category
+        :param name: name that should identify such actions for given Dataset
         :param initial_element_key: key for an element that is initial for whole Survey
         """
         super(Survey, self).__init__(name)
@@ -744,3 +803,21 @@ class SurveyResponse(ActionResponse):
     def get_details(self) -> Dict:
         """Return dictionary details about this Survey Response."""
         return self.data
+
+
+# pylint: disable=unused-argument
+@event.listens_for(BrushLabelElement, 'before_delete')
+def delete_brush_element_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
+    """Delete BrushLabelElement from storage."""
+    brush_label_element = StorageBrushLabelElement.get(id=target.id)
+    brush_label_element.delete()
+
+
+# pylint: disable=unused-argument
+@event.listens_for(Slice, 'before_delete')
+def delete_original_and_processed_slice_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
+    """Delete original and processed Slices from storage."""
+    original_slice = OriginalSlice.get(id=target.id)
+    original_slice.delete()
+    processed_slice = ProcessedSlice.get(id=target.id)
+    processed_slice.delete()

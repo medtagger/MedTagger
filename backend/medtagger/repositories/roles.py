@@ -1,6 +1,7 @@
 """Module responsible for definition of RolesRepository."""
 from typing import List
 
+from sqlalchemy import exists
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api import InvalidArgumentsException
@@ -33,3 +34,17 @@ def set_user_role(user_id: int, role_name: str) -> None:
     with db_session() as session:
         user.roles = [role]
         session.add(user)
+
+
+def role_exists(role_name: str) -> bool:
+    """Check if such Role with given name exists."""
+    with db_session() as session:
+        return session.query(exists().where(Role.name == role_name)).scalar()
+
+
+def add_role(role_name: str) -> Role:
+    """Add new Role to the database."""
+    with db_session() as session:
+        role = Role(name=role_name)
+        session.add(role)
+    return role

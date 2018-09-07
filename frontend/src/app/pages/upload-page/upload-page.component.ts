@@ -1,9 +1,10 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatHorizontalStepper, MatStep, MatSelectionList} from '@angular/material';
 import {FormBuilder, FormGroup, FormControl, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
 
 import {ScanService} from '../../services/scan.service';
+import {DatasetService} from '../../services/dataset.service';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {
     UploadScansSelectorComponent,
@@ -14,6 +15,7 @@ import {
 import {Observable} from 'rxjs/internal/Observable';
 import {interval} from 'rxjs/internal/observable/interval';
 import {throwError} from 'rxjs/internal/observable/throwError';
+import {Subscription} from 'rxjs/Subscription';
 
 
 enum UploadMode {
@@ -31,7 +33,7 @@ enum UploadingScanStatus {
 }
 
 enum UploadStep {
-    SELECT_CATEGORY,
+    SELECT_DATASET,
     SELECT_UPLOAD_MODE,
     SELECT_SCAN,
     UPLOADING,
@@ -74,7 +76,7 @@ class UploadingScan {
     providers: [ScanService],
     styleUrls: ['./upload-page.component.scss']
 })
-export class UploadPageComponent implements OnInit {
+export class UploadPageComponent implements OnInit, OnDestroy {
 
     @ViewChild('scansForRetry') scansForRetry: MatSelectionList;
     @ViewChild('stepper') stepper: MatHorizontalStepper;
@@ -102,29 +104,43 @@ export class UploadPageComponent implements OnInit {
     UploadingScanStatus = UploadingScanStatus;
 
     uploadMode: UploadMode = UploadMode.SINGLE_SCAN;
-    category: string;
-    availableCategories = [];
+    dataset: string;
+    availableDatasets = [];
 
     chooseModeFormGroup: FormGroup;
     chooseFilesFormGroup: FormGroup;
     sendingFilesFormGroup: FormGroup;
     uploadCompletedFormGroup: FormGroup;
-    chooseCategoryFormGroup: FormGroup;
+    chooseDatasetFormGroup: FormGroup;
 
-    constructor(private scanService: ScanService, private formBuilder: FormBuilder) {
+    private pollScanStatusSubscription: Subscription;
+
+    constructor(private scanService: ScanService, private datasetService: DatasetService, private formBuilder: FormBuilder) {
     }
 
     ngOnInit() {
-        this.chooseModeFormGroup = this.formBuilder.group({});
-        this.chooseFilesFormGroup = this.formBuilder.group({});
-        this.sendingFilesFormGroup = this.formBuilder.group({});
+        this.chooseModeFormGroup = this.formBuilder.group({
+            'modeChosen': new FormControl(null, [Validators.required]),
+        });
+        this.chooseFilesFormGroup = this.formBuilder.group({
+            'filesChosen': new FormControl(null, [Validators.required]),
+        });
+        this.sendingFilesFormGroup = this.formBuilder.group({
+            'filesSent': new FormControl(null, [Validators.required]),
+        });
         this.uploadCompletedFormGroup = this.formBuilder.group({});
-        this.chooseCategoryFormGroup = this.formBuilder.group({
-            'category': new FormControl(this.category, [Validators.required]),
+        this.chooseDatasetFormGroup = this.formBuilder.group({
+            'dataset': new FormControl(this.dataset, [Validators.required]),
         });
-        this.scanService.getAvailableCategories().then((availableCategories) => {
-            this.availableCategories = availableCategories;
+        this.datasetService.getAvailableDatasets().then((availableDatasets) => {
+            this.availableDatasets = availableDatasets;
         });
+    }
+
+    ngOnDestroy(): void {
+        if (this.pollScanStatusSubscription) {
+            this.pollScanStatusSubscription.unsubscribe();
+        }
     }
 
     public chooseFiles(userFiles: UserFiles): void {
@@ -140,7 +156,7 @@ export class UploadPageComponent implements OnInit {
 
     private pollScanUploadStatus() {
         const TIME_INTERVAL = 5000; // 5 seconds
-        const subscription = interval(TIME_INTERVAL).subscribe(_ => {
+        this.pollScanStatusSubscription = interval(TIME_INTERVAL).subscribe(_ => {
             // Iteration in reverse order makes it safe to remove elements from this array
             for (let i = this.uploadingAndProcessingScans.length - 1; i >= 0; i--) {
                 const scanToMonitor = this.uploadingAndProcessingScans[i];
@@ -178,13 +194,19 @@ export class UploadPageComponent implements OnInit {
             // End polling once we've uploaded all Scans
             if (this.errorScans.length + this.availableScans.length === this.scans.length) {
                 console.log('We\'ve uploaded all Scans, let\'s move on!');
-                subscription.unsubscribe();
+                if (this.pollScanStatusSubscription) {
+                   this.pollScanStatusSubscription.unsubscribe();
+                }
+                this.sendingFilesFormGroup.controls['filesSent'].setValue('true');
                 this.stepper.next();
             }
         });
     }
 
     public async uploadFiles(): Promise<void> {
+        this.chooseFilesFormGroup.controls['filesChosen'].setValue('true');
+        this.stepper.next();
+
         this.slicesSent = 0;
         this.progress = 0.0;
 
@@ -238,10 +260,10 @@ export class UploadPageComponent implements OnInit {
     }
 
     private uploadSingleScan(uploadingScan: UploadingScan): Promise<Observable<any | never>> {
-        const category = this.chooseCategoryFormGroup.get('category').value;
+        const dataset = this.chooseDatasetFormGroup.get('dataset').value;
         const numberOfSlices = uploadingScan.scan.files.length;
 
-        return this.scanService.createNewScan(category, numberOfSlices).then((scanId: string) => {
+        return this.scanService.createNewScan(dataset, numberOfSlices).then((scanId: string) => {
                 console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
                 uploadingScan.id = scanId;
                 return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
@@ -253,15 +275,10 @@ export class UploadPageComponent implements OnInit {
 
     private resetFormGroup(formGroup: FormGroup): void {
         formGroup.reset();
-        formGroup.markAsUntouched();
-        Object.keys(formGroup.controls).forEach((name) => {
-            const control = formGroup.controls[name];
-            control.setErrors(null);
-        });
     }
 
     public restart(): void {
-        this.resetFormGroup(this.chooseCategoryFormGroup);
+        this.resetFormGroup(this.chooseDatasetFormGroup);
         this.resetFormGroup(this.chooseModeFormGroup);
         this.resetFormGroup(this.chooseFilesFormGroup);
         this.resetFormGroup(this.sendingFilesFormGroup);
@@ -284,14 +301,10 @@ export class UploadPageComponent implements OnInit {
         this.totalNumberOfSlices = 0;
         this.slicesSent = 0;
 
-        this.chooseModeStep.completed = false;
-        this.chooseFilesStep.completed = false;
-        this.sendingFilesStep.completed = false;
-        this.uploadCompletedStep.completed = false;
         if (!!this.scansForRetry && !!this.scansForRetry.selectedOptions) {
             this.scansForRetry.selectedOptions.clear();
         }
-        this.stepper.selectedIndex = UploadStep.SELECT_CATEGORY;
+        this.stepper.reset();
     }
 
     public uploadAgain(): void {
@@ -336,5 +349,11 @@ export class UploadPageComponent implements OnInit {
         } else {
             return false;
         }
+    }
+
+    public selectUploadMode(uploadMode: UploadMode): void {
+        this.uploadMode = uploadMode;
+        this.chooseModeFormGroup.controls['modeChosen'].setValue('true');
+        this.stepper.next();
     }
 }
