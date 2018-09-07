@@ -1,7 +1,7 @@
 """Add support for Predefined Labels
 
 Revision ID: c075df75ca43
-Revises: 0707294d0a96
+Revises: 9f2eafdf821e
 Create Date: 2018-08-22 23:07:17.644379
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'c075df75ca43'
-down_revision = '0707294d0a96'
+down_revision = '9f2eafdf821e'
 branch_labels = None
 depends_on = None
 
