@@ -3,14 +3,17 @@
 import uuid
 from typing import List, Dict, cast, Optional, Any
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.engine import Connection
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.mapper import Mapper
 
 from medtagger.database.utils import ArrayOfEnum
 from medtagger.database import Base, db_session
 from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
     LabelElementStatus, LabelTool
+from medtagger.storage.models import BrushLabelElement as StorageBrushLabelElement, OriginalSlice, ProcessedSlice
 from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime, LabelTagID, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
     ActionResponseID, SurveyResponseID, PointID, TaskID
@@ -177,8 +180,9 @@ class Scan(Base):
     owner_id: Optional[int] = Column(Integer, ForeignKey('Users.id'))
     owner: Optional[User] = relationship('User', back_populates='scans')
 
-    slices: List['Slice'] = relationship('Slice', back_populates='scan', order_by=lambda: Slice.location)
-    labels: List['Label'] = relationship('Label', back_populates='scan')
+    slices: List['Slice'] = relationship('Slice', back_populates='scan', cascade='delete',
+                                         order_by=lambda: Slice.location)
+    labels: List['Label'] = relationship('Label', back_populates='scan', cascade='delete')
 
     def __init__(self, dataset: Dataset, declared_number_of_slices: int, user: Optional[User]) -> None:
         """Initialize Scan.
@@ -252,7 +256,7 @@ class Slice(Base):
     width: int = Column(Integer, nullable=True)
     height: int = Column(Integer, nullable=True)
 
-    scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
+    scan_id: ScanID = Column(String, ForeignKey('Scans.id', ondelete='cascade'))
     scan: Scan = relationship('Scan', back_populates='slices')
 
     def __init__(self, orientation: SliceOrientation, location: SliceLocation = None,
@@ -325,7 +329,7 @@ class Label(Base):
     status: LabelVerificationStatus = Column(Enum(LabelVerificationStatus), nullable=False,
                                              server_default=LabelVerificationStatus.NOT_VERIFIED.value)
 
-    scan_id: ScanID = Column(String, ForeignKey('Scans.id'))
+    scan_id: ScanID = Column(String, ForeignKey('Scans.id', ondelete='cascade'))
     scan: Scan = relationship('Scan', back_populates='labels')
 
     task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
@@ -334,7 +338,7 @@ class Label(Base):
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
     owner: User = relationship('User', back_populates='labels')
 
-    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label')
+    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label', cascade='delete')
 
     def __init__(self, user: User, labeling_time: LabelingTime, comment: str = None, predefined: bool = False) -> None:
         """Initialize Label.
@@ -410,7 +414,7 @@ class LabelElement(Base):
 
     slice_index: int = Column(Integer, nullable=False)
 
-    label_id: LabelID = Column(String, ForeignKey('Labels.id'))
+    label_id: LabelID = Column(String, ForeignKey('Labels.id', ondelete='cascade'))
     label: Label = relationship('Label', back_populates='elements')
 
     tag_id: LabelTagID = Column(Integer, ForeignKey('LabelTags.id'))
@@ -454,7 +458,7 @@ class RectangularLabelElement(LabelElement):
     """Definition of a Label Element made with Rectangle Tool."""
 
     __tablename__ = 'RectangularLabelElements'
-    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'), primary_key=True)
 
     x: float = Column(Float, nullable=False)
     y: float = Column(Float, nullable=False)
@@ -488,7 +492,7 @@ class BrushLabelElement(LabelElement):
     """Definition of a Label Element made with Brush Tool."""
 
     __tablename__ = 'BrushLabelElements'
-    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'), primary_key=True)
 
     width: int = Column(Integer, nullable=False)
     height: int = Column(Integer, nullable=False)
@@ -519,7 +523,7 @@ class PointLabelElement(LabelElement):
     """Definition of a Label Element made with Point Tool."""
 
     __tablename__ = 'PointLabelElements'
-    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'), primary_key=True)
 
     x: float = Column(Float, nullable=False)
     y: float = Column(Float, nullable=False)
@@ -548,11 +552,11 @@ class ChainLabelElement(LabelElement):
     """Definition of a Label Element made with Chain Tool."""
 
     __tablename__ = 'ChainLabelElements'
-    id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), primary_key=True)
+    id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'), primary_key=True)
 
     points: List['ChainLabelElementPoint'] = relationship('ChainLabelElementPoint',
                                                           order_by='ChainLabelElementPoint.order',
-                                                          back_populates='label_element')
+                                                          back_populates='label_element', cascade='delete')
     loop: bool = Column(Boolean, nullable=False)
 
     __mapper_args__ = {
@@ -583,7 +587,8 @@ class ChainLabelElementPoint(Base):
 
     x: float = Column(Float, nullable=False)
     y: float = Column(Float, nullable=False)
-    label_element_id: LabelElementID = Column(String, ForeignKey('LabelElements.id'), nullable=False)
+    label_element_id: LabelElementID = Column(String, ForeignKey('LabelElements.id', ondelete='cascade'),
+                                              nullable=False)
     label_element: ChainLabelElement = relationship('ChainLabelElement', back_populates='points')
     order: int = Column(Integer, nullable=False)
 
@@ -804,3 +809,21 @@ class SurveyResponse(ActionResponse):
     def get_details(self) -> Dict:
         """Return dictionary details about this Survey Response."""
         return self.data
+
+
+# pylint: disable=unused-argument
+@event.listens_for(BrushLabelElement, 'before_delete')
+def delete_brush_element_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
+    """Delete BrushLabelElement from storage."""
+    brush_label_element = StorageBrushLabelElement.get(id=target.id)
+    brush_label_element.delete()
+
+
+# pylint: disable=unused-argument
+@event.listens_for(Slice, 'before_delete')
+def delete_original_and_processed_slice_from_storage(mapper: Mapper, connection: Connection, target: Slice) -> None:
+    """Delete original and processed Slices from storage."""
+    original_slice = OriginalSlice.get(id=target.id)
+    original_slice.delete()
+    processed_slice = ProcessedSlice.get(id=target.id)
+    processed_slice.delete()

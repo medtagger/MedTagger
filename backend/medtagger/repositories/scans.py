@@ -45,7 +45,8 @@ def get_random_scan(task: Task = None, user: User = None) -> Scan:
 def delete_scan_by_id(scan_id: ScanID) -> None:
     """Remove Scan from SQL database."""
     with db_session() as session:
-        session.query(Scan).filter(Scan.id == scan_id).delete()
+        scan = session.query(Scan).filter(Scan.id == scan_id).one()
+        session.delete(scan)
 
 
 def add_new_scan(dataset: Dataset, number_of_slices: int, user: User = None) -> Scan:
