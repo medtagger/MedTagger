@@ -116,6 +116,9 @@ functional_tests__run:
 	
 functional_tests__delete_environment:
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic downgrade base
+	make functional_tests__clear_dependencies
+
+functional_tests__clear_dependencies:
 	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down
 
 functional_tests_docker:
