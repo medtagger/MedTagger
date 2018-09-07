@@ -34,7 +34,6 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
         this.canvasCtx.fillStyle = color;
         this.canvasCtx.textAlign = 'start';
         this.canvasCtx.fillText(selection.getId().toString(), scaledStartPoint.x + (fontSize / 4), scaledStartPoint.y + fontSize);
-        this.canvasCtx.setLineDash([]);
     }
 
     public onMouseDown(event: MouseEvent): void {
