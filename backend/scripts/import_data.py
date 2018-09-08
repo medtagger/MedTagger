@@ -7,7 +7,7 @@ https://www.kaggle.com/c/data-science-bowl-2017/data (look for 'sample_images.7z
 
 Then, place these data (unzipped) anywhere on your computer and run this script by:
 
-    (venv) $ python3.6 scripts/import_data.py --source=./dir_with_scans/
+    (venv) $ python3.7 scripts/import_data.py --source=./dir_with_scans/
 
 Please keep all scans with given structure:
 
