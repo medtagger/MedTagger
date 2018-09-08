@@ -164,9 +164,4 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
     private isMovingPoint(): boolean {
         return this.selectedAreaPointIndex !== -1;
     }
-
-    private checkIfAnyPointBelow(x: number, y: number): [ChainSelection, number] {
-
-        return [null, -1];
-    }
 }
