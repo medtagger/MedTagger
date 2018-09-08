@@ -1,7 +1,6 @@
 import {Selector} from './Selector';
 import {SelectorBase} from './SelectorBase';
 import {Point} from '../../model/Point';
-import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
 import {ChainSelection} from '../../model/selections/ChainSelection';
 
 export class ChainSelector extends SelectorBase<ChainSelection> implements Selector<ChainSelection> {
@@ -20,17 +19,6 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
             SELECTION_LINE_WIDTH: 3,
             SELECTION_FONT_COLOR: '#ffffff',
         };
-    }
-
-    public getActions(): Array<SelectorAction> {
-        return [
-            new SelectorAction('Stop', () => !this.isMovingPoint() && !!this.selectedArea, () => {
-                this.completeSelection(false);
-            }, SelectorActionType.BUTTON),
-            new SelectorAction('Loop', () => !this.isMovingPoint() && !!this.selectedArea && this.selectedArea.points.length > 2, () => {
-                this.completeSelection(true);
-            }, SelectorActionType.BUTTON)
-        ];
     }
 
     public drawSelection(selection: ChainSelection, color: string): void {
@@ -97,46 +85,63 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
 
-        if (this.selectedArea) {
-            const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-            const point = new Point(normalizedPoint.x, normalizedPoint.y);
-            this.selectedArea.points.push(point);
-            this.requestRedraw();
-        } else {
-            const currentSliceSelections = this.selections.get(this.currentSlice);
-            if (currentSliceSelections) {
-                currentSliceSelections.forEach((selection: ChainSelection) => {
-                    if (!selection.hidden) {
-                        for (const index in selection.points) {
-                            if (this.checkDistance(selection.points[index], x, y)) {
-                                this.selectedArea = selection;
-                                this.selectedAreaPointIndex = +index;
-                                return;
-                            }
-                        }
-                    }
-                });
-            }
+        if (event.button === 0) {
+            // left mouse button
+            if (this.selectedArea) {
+                if (this.checkDistance(this.selectedArea.points[0], x, y)) {
+                    this.selectedArea.points.splice(this.selectedArea.points.length - 1, 1);
+                    this.completeSelection(true);
+                    return;
+                }
 
-            if (!this.selectedArea) {
                 const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
                 const point = new Point(normalizedPoint.x, normalizedPoint.y);
-                this.selectedArea = new ChainSelection([point], this.currentSlice, this.currentTag.key);
+                this.selectedArea.points.push(point);
                 this.requestRedraw();
+            } else {
+                const currentSliceSelections = this.selections.get(this.currentSlice);
+                if (currentSliceSelections) {
+                    currentSliceSelections.forEach((selection: ChainSelection) => {
+                        if (!selection.hidden) {
+                            for (const index in selection.points) {
+                                if (this.checkDistance(selection.points[index], x, y)) {
+                                    this.selectedArea = selection;
+                                    this.selectedAreaPointIndex = +index;
+                                }
+                            }
+                        }
+                    });
+                }
+
+                if (!this.selectedArea) {
+                    const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
+                    const point = new Point(normalizedPoint.x, normalizedPoint.y);
+                    this.selectedArea = new ChainSelection([point, point], this.currentSlice, this.currentTag.key);
+                    this.requestRedraw();
+                }
             }
+        } else if (event.button === 2 && this.selectedArea) {
+            // right mouse button
+            this.selectedArea.points.splice(this.selectedArea.points.length - 1, 1);
+            this.completeSelection(false);
         }
     }
 
     public onMouseMove(event: MouseEvent): void {
-        if (this.selectedArea && this.isMovingPoint()) {
+        if (this.selectedArea) {
             console.log('ChainSelector | updateSelection | event: ', event);
-
             const newX = event.clientX - this.canvasPosition.left;
             const newY = event.clientY - this.canvasPosition.top;
-
             const normalizedValues: { x: number, y: number } = this.normalizeByView(newX, newY);
-
-            this.selectedArea.points[this.selectedAreaPointIndex] = new Point(normalizedValues.x, normalizedValues.y);
+            if (this.isMovingPoint()) {
+                this.selectedArea.points[this.selectedAreaPointIndex] = new Point(normalizedValues.x, normalizedValues.y);
+            } else {
+                if (this.checkDistance(this.selectedArea.points[0], newX, newY)) {
+                    this.selectedArea.points[this.selectedArea.points.length - 1] = this.selectedArea.points[0];
+                } else {
+                    this.selectedArea.points[this.selectedArea.points.length - 1] = new Point(normalizedValues.x, normalizedValues.y);
+                }
+            }
             this.requestRedraw();
         }
     }
@@ -156,11 +161,12 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         return 'CHAIN';
     }
 
-    public canSendScan(): boolean {
-        return !this.selectedArea || this.isMovingPoint();
-    }
-
     private isMovingPoint(): boolean {
         return this.selectedAreaPointIndex !== -1;
+    }
+
+    private checkIfAnyPointBelow(x: number, y: number): [ChainSelection, number] {
+
+        return [null, -1];
     }
 }

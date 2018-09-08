@@ -228,6 +228,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     }
 
     protected initializeCanvas(): void {
+        this.canvas.oncontextmenu = (e) => e.preventDefault();
         this.selectors.forEach((selector) => selector.updateCanvasPosition(this.canvas.getBoundingClientRect()));
     }
 

@@ -65,6 +65,4 @@ export interface Selector<SliceSelection> {
 
     // Used to check if using mouse wheel is safe with current selector
     canUseMouseWheel(): boolean;
-
-    canSendScan(): boolean;
 }

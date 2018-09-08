@@ -236,9 +236,5 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     public canUseMouseWheel(): boolean {
         return true;
     }
-
-    public canSendScan(): boolean {
-        return true;
-    }
 }
 
