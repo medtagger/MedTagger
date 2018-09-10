@@ -15,7 +15,7 @@ export const labellingRoutes: Routes = [
     {
         path: appRoutes.LABELLING,
         component: MarkerPageComponent,
-        data: {title: 'Labelling', disableFooter: true},
+        data: {title: 'Labelling'},
         canActivate: [AuthGuard]
     },
     {
