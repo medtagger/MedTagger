@@ -49,8 +49,9 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
 
     public onMouseMove(mouseEvent: MouseEvent): boolean {
         if (this.selectedArea) {
-            console.log('RectROISelector | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
+            console.log('RectROISelector | drawSelectionRectangle | onmousemove clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
             this.updateSelection(mouseEvent);
+            this.requestRedraw();
             return true;
         }
         return false;
@@ -83,6 +84,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
                 this.addSelection(this.selectedArea);
             }
             this.selectedArea = undefined;
+            this.requestRedraw();
             return true;
         }
         return false;
