@@ -1,0 +1,21 @@
+<ng-container *ngIf="downloadingTasksInProgress">
+    <mat-progress-spinner [diameter]="150" [strokeWidth]="15" mode="indeterminate" color="accent"></mat-progress-spinner>
+</ng-container>
+<div *ngIf="!downloadingTasksInProgress && tasks?.length > 0" class="task-cards">
+    <div class="task-cards__desc">
+        Start labeling
+    </div>
+    <mat-card class="task-card m-2 py-1" *ngFor="let task of tasks">
+        <div class="task-card__icon">
+            <mat-icon svgIcon="{{task.key}}"></mat-icon>
+        </div>
+        <div class="task-card__name">
+            <span class="task-card__name-main">{{task.name}}</span>
+            <span class="task-card__name-desc">{{task.name}}</span>
+        </div>
+        <a class="task-card__action" routerLink="/labelling" [queryParams]="{task: task.key}" data-cy="task">
+            <mat-icon>play_arrow</mat-icon>
+        </a>
+    </mat-card>
+</div>
+

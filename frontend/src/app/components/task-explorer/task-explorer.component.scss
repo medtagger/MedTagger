@@ -1,0 +1,82 @@
+@import "src/app/styles/mixins";
+
+.task-cards {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    &__desc {
+        flex-basis: 100%;
+        color: $black-high-emphasis;
+        text-transform: uppercase;
+    }
+}
+
+.task-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    background-color: $card-bg;
+    border-radius: 5px;
+    @include media-breakpoint-up(lg) {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        width: auto;
+    }
+    &__icon {
+        @include size(3em);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: mat-color($primary, 700);
+        border-radius: 100px;
+        @include media-breakpoint-up(md) {
+            @include size(4.8em);
+        }
+        .mat-icon {
+            @include size(2em);
+            @include media-breakpoint-up(md) {
+                @include size(3em);
+            }
+        }
+    }
+    &__name{
+        margin: 1.2em 0 1.2em 1.2em;
+        @include media-breakpoint-up(md) {
+            margin: 2em;
+        }
+        span {
+            display: block;
+        }
+        &-main {
+            color: $black-high-emphasis;
+            font-size: 1em;
+            font-weight: 600;
+            @include media-breakpoint-up(md) {
+                font-size: 1.2em;
+            }
+        }
+        &-desc {
+            color: $black-medium-emphasis;
+            font-size: 0.8em;
+            @include media-breakpoint-up(md) {
+                font-size: 1em;
+            }
+        }
+    }
+    &__action {
+        flex-basis: 100%;
+        color: $black-high-emphasis;
+        text-align: center;
+        @include media-breakpoint-up(md) {
+            flex-basis: auto;
+        }
+        .mat-icon {
+            $button-size: 50px;
+            @include size($button-size);
+            font-size: $button-size;
+        }
+
+    }
+}
