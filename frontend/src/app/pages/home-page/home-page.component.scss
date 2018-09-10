@@ -1,3 +1,5 @@
+@import "src/app/styles/variables";
+
 .menu {
     text-align: center;
 }
@@ -5,4 +7,24 @@
 .button-row {
     margin-top: 13em;
     display: inline-block;
+}
+
+.home-welcome {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    &__main {
+        flex-basis: 100%;
+        color: $black-medium-emphasis;
+        font-weight: 400;
+    }
+    &__desc {
+        color: $black-8-opacity;
+        font-weight: 300;
+    }
+    &__divider{
+        display: block;
+        flex: 1;
+    }
 }

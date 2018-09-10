@@ -61,6 +61,7 @@ import {LabelExplorerComponent} from '../components/label-explorer/label-explore
 import {InputDialogComponent} from '../dialogs/input-dialog.component';
 import {TaskService} from '../services/task.service';
 import {NavBarComponent} from "../components/nav-bar/nav-bar.component";
+import {TaskExplorerComponent} from "../components/task-explorer/task-explorer.component";
 
 @NgModule({
     declarations: [
@@ -79,7 +80,8 @@ import {NavBarComponent} from "../components/nav-bar/nav-bar.component";
         ValidationPageComponent,
         InfoDialogComponent,
         InputDialogComponent,
-        NavBarComponent
+        NavBarComponent,
+        TaskExplorerComponent
     ],
     imports: [
         routing,
