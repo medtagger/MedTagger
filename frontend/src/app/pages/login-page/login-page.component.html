@@ -27,7 +27,7 @@
                     <h3 class="action-welcoming__header">Hello!</h3>
                     <h4 class="action-welcoming__description">Good to see you back! Log in and continue your work.</h4>
                 </div>
-                <form class="action-form" [formGroup]="loginForm" (keyup.enter)="logIn()">
+                <form class="action-form" [formGroup]="loginForm">
                     <mat-form-field appearance="fill">
                         <mat-label>Email</mat-label>
                         <input matInput type="text" placeholder="Insert your email."
@@ -65,7 +65,7 @@
                         your time and fill this registration form and
                         you are ready to go. </h4>
                 </div>
-                <form class="action-form" [formGroup]="registerForm" (keyup.enter)="register()">
+                <form class="action-form" [formGroup]="registerForm">
                     <div class="row">
                         <mat-form-field appearance="fill" class="col-12 col-lg-6">
                             <mat-label>First name</mat-label>
