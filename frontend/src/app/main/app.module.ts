@@ -60,6 +60,7 @@ import {MedTaggerWebSocket} from '../services/websocket.service';
 import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
 import {InputDialogComponent} from '../dialogs/input-dialog.component';
 import {TaskService} from '../services/task.service';
+import {NavBarComponent} from "../components/nav-bar/nav-bar.component";
 
 @NgModule({
     declarations: [
@@ -77,7 +78,8 @@ import {TaskService} from '../services/task.service';
         SettingsPageComponent,
         ValidationPageComponent,
         InfoDialogComponent,
-        InputDialogComponent
+        InputDialogComponent,
+        NavBarComponent
     ],
     imports: [
         routing,

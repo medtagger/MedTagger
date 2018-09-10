@@ -1,0 +1,14 @@
+<nav class="app-navbar navbar">
+    <a class="app-navbar-brand" routerLink="#">
+        <ng-container *ngIf="activePage; else app_brand">
+            <mat-icon class="app-navbar-brand__icon">arrow_back</mat-icon>
+            <span class="app-navbar-brand__text">{{activePage}}</span>
+        </ng-container>
+        <ng-template #app_brand >
+            <img class="app-navbar-brand__logo" src="../assets/icon/medtagger-logo.svg" alt="Medtagger logo" />
+        </ng-template>
+    </a>
+    <div class="app-navbar__nav">
+        <ng-content></ng-content>
+    </div>
+</nav>
