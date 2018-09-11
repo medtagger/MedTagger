@@ -165,7 +165,8 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
     assert json_response['height'] == 512
 
     # Step 5. Get slices from the server
-    web_socket_client.emit('request_slices', {'scan_id': scan_id, 'task_key': 'MARK_KIDNEYS', 'begin': 0, 'count': 1}, namespace='/slices')
+    payload = {'scan_id': scan_id, 'task_key': 'MARK_KIDNEYS', 'begin': 0, 'count': 1}
+    web_socket_client.emit('request_slices', payload, namespace='/slices')
     responses = web_socket_client.get_received(namespace='/slices')
     assert len(responses) == 1
     response = responses[0]
