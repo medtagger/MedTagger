@@ -11,12 +11,12 @@ import {
     SelectedScan,
     UserFiles,
     IncompatibleFile,
-    SelectedScanPredefinedLabel
 } from '../../components/upload-scans-selector/upload-scans-selector.component';
 import {Observable} from 'rxjs/internal/Observable';
 import {interval} from 'rxjs/internal/observable/interval';
 import {throwError} from 'rxjs/internal/observable/throwError';
 import {Subscription} from 'rxjs/Subscription';
+import {PredefinedLabelToUpload} from "../../utils/PredefinedLabelHandler";
 
 
 enum UploadMode {
@@ -271,7 +271,7 @@ export class UploadPageComponent implements OnInit, OnDestroy {
         return this.scanService.createNewScan(dataset, numberOfSlices).then((scanId: string) => {
             console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
             uploadingScan.id = scanId;
-            uploadingScan.scan.predefinedLabels.forEach((predefinedLabel: SelectedScanPredefinedLabel) => {
+            uploadingScan.scan.predefinedLabels.forEach((predefinedLabel: PredefinedLabelToUpload) => {
                 // Filter and send only these additional data that are needed by the Predefined Label
                 const additionalData = {};
                 predefinedLabel.neededFiles.forEach((fileName: string) => {

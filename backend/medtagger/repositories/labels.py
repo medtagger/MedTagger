@@ -30,7 +30,7 @@ def get_random_label(status: LabelVerificationStatus = None) -> Label:
     query = Label.query
     if status:
         query = query.filter(Label.status == status)
-    query = query.filter(~Label.predefined)
+    query = query.filter(~Label.is_predefined)
     query = query.order_by(func.random())
     return query.first()
 
@@ -43,7 +43,7 @@ def get_predefined_label_for_scan_in_task(scan: Scan, task: Task) -> Optional[La
     :return: (optional) Label object
     """
     query = Label.query
-    query = query.filter(Label.predefined)
+    query = query.filter(Label.is_predefined)
     query = query.filter(Label.scan == scan)
     query = query.filter(Label.task == task)
     return query.first()
@@ -61,7 +61,7 @@ def get_predefined_brush_label_elements(scan_id: ScanID, task_id: int,
     """
     query = BrushLabelElement.query
     query = query.join(Label)
-    query = query.filter(Label.predefined)
+    query = query.filter(Label.is_predefined)
     query = query.filter(Label.scan_id == scan_id)
     query = query.filter(Label.task_id == task_id)
     query = query.filter(BrushLabelElement.slice_index >= begin)
@@ -71,7 +71,7 @@ def get_predefined_brush_label_elements(scan_id: ScanID, task_id: int,
 
 # pylint: disable=too-many-arguments;  They are needed to fulfill Label model needs
 def add_new_label(scan_id: ScanID, task_key: str, user: User, labeling_time: LabelingTime,
-                  comment: str = None, predefined: bool = False) -> Label:
+                  comment: str = None, is_predefined: bool = False) -> Label:
     """Add new Label for given Scan.
 
     :param scan_id: Scan ID for which Label has been created
@@ -79,11 +79,11 @@ def add_new_label(scan_id: ScanID, task_key: str, user: User, labeling_time: Lab
     :param user: User object that created this Label
     :param labeling_time: time needed to create this Label on Labeling Page
     :param comment: (optional) comment for this Label
-    :param predefined: (optional) mark this Label as predefined
+    :param is_predefined: (optional) mark this Label as predefined
     :return: Label object
     """
     with db_session() as session:
-        label = Label(user, labeling_time, comment, predefined)
+        label = Label(user, labeling_time, comment, is_predefined)
         label.scan_id = scan_id
         label.task = Task.query.filter(Task.key == task_key).one()
         session.add(label)

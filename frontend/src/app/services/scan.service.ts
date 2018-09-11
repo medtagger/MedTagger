@@ -91,7 +91,7 @@ export class ScanService {
         }
 
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label?predefined=true`, form).toPromise()
+            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label?is_predefined=true`, form).toPromise()
                 .then((response: Response) => {
                     console.log('ScanService | sendPredefinedLabel | response: ', response);
                     resolve(response);

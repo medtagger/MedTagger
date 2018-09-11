@@ -121,8 +121,8 @@ class Label(Resource):
                                "labeling_time": 0.1};type=application/json"
                      http://localhost:51000/api/v1/scans/c5102707-cb36-4869-8041-f00421c03fa1/MARK_KIDNEYS/label
         """
-        predefined = (request.args.get('predefined', 'false') == 'true')
-        if predefined:
+        is_predefined = (request.args.get('is_predefined', 'false') == 'true')
+        if is_predefined:
             require_one_of_roles({'doctor', 'admin'})
 
         files = {name: file_data.read() for name, file_data in request.files.items()}
@@ -140,7 +140,7 @@ class Label(Resource):
 
         labeling_time = label['labeling_time']
         comment = label.get('comment')
-        label = business.add_label(scan_id, task_key, elements, files, labeling_time, comment, predefined)
+        label = business.add_label(scan_id, task_key, elements, files, labeling_time, comment, is_predefined)
         return label, 201
 
 

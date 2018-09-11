@@ -17,8 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('Labels', sa.Column('predefined', sa.Boolean(), nullable=False, server_default='f'))
+    op.add_column('Labels', sa.Column('is_predefined', sa.Boolean(), nullable=False, server_default=sa.false()))
 
 
 def downgrade():
-    op.drop_column('Labels', 'predefined')
+    op.drop_column('Labels', 'is_predefined')

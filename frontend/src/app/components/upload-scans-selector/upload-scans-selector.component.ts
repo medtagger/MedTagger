@@ -1,47 +1,25 @@
 import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@angular/core';
+import {PredefinedLabelToUpload, handlePredefinedLabelFile} from '../../utils/PredefinedLabelHandler';
 
 const FILE_SIZE_LIMIT = 5;  // MB
-
-export class SelectedScanPredefinedLabel {
-    taskKey: string = undefined;
-    label: Object = undefined;
-    neededFiles: Array<string> = [];
-
-    constructor(taskKey: string, label: Object) {
-        this.taskKey = taskKey;
-        this.label = label;
-        this.label['elements'].forEach((labelElement: Object) => {
-            if (labelElement['tool'] === 'BRUSH') {
-                this.neededFiles.push(labelElement['image_key']);
-            }
-        });
-    }
-}
 
 export class SelectedScan {
     directory = '';
     files: File[] = [];
-    predefinedLabels: Array<SelectedScanPredefinedLabel> = [];
+    predefinedLabels: Array<PredefinedLabelToUpload> = [];
     predefinedLabelsTasks: Array<string> = [];
     additionalData: Object = {};
 
     public addPredefinedLabel(file: File): Promise<void> {
         return new Promise(((resolve, reject) => {
-            const fileReader: FileReader = new FileReader();
-            fileReader.onloadend = (e: ProgressEvent) => {
-                try {
-                    const taskKey = file.name.split('.json')[0];
-                    const fileContent: string = String.fromCharCode.apply(null, new Uint8Array(fileReader.result));
-                    const predefinedLabel = new SelectedScanPredefinedLabel(taskKey, JSON.parse(fileContent));
-                    this.predefinedLabels.push(predefinedLabel);
-                    this.predefinedLabelsTasks.push(taskKey);
-                    resolve();
-                } catch (ex) {
-                    console.error('Invalid JSON file!', ex);
-                    reject();
-                }
-            };
-            fileReader.readAsArrayBuffer(file);
+            handlePredefinedLabelFile(file).then((values: [string, PredefinedLabelToUpload]) => {
+                const taskKey = values[0], predefinedLabel = values[1];
+                this.predefinedLabelsTasks.push(taskKey);
+                this.predefinedLabels.push(predefinedLabel);
+                resolve();
+            }, _ => {
+                reject();
+            });
         }));
     }
 
@@ -80,6 +58,7 @@ export class UploadScansSelectorComponent {
     @Input() multipleScans: boolean;
     @Output() onFileSelect: EventEmitter<object> = new EventEmitter();
 
+    public ACCEPTED_FILE_TYPES = ['.dcm', '.png', '.json'].join(',');
     @ViewChild('inputFile') nativeInputFile: ElementRef;
     private userSelectedFiles: File[] = [];
 

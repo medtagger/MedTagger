@@ -92,7 +92,7 @@ in__label_model = api.model('Label model', {
 
 in__label = api.parser()
 in__label.add_argument('label', type=in__label_model, help='Label model object', location='form', required=True)
-in__label.add_argument('predefined', type=bool, help='Set it as predefined Label', location='query', required=False)
+in__label.add_argument('is_predefined', type=bool, help='Set it as predefined Label', location='query', required=False)
 
 in__dataset = api.model('New Dataset model', {
     'key': fields.String(),

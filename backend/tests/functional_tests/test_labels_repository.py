@@ -38,7 +38,7 @@ def test_get_predefined_label_for_scan_in_task__label_that_is_not_predefined(pre
     user = UsersRepository.get_user_by_id(user_id)
 
     # Step 2. Add Label which is not predefined
-    LabelsRepository.add_new_label(scan.id, task.key, user, LabelingTime(0), predefined=False)
+    LabelsRepository.add_new_label(scan.id, task.key, user, LabelingTime(0), is_predefined=False)
 
     # Step 3. Check if there is no Predefined Label
     predefined_label = LabelsRepository.get_predefined_label_for_scan_in_task(scan, task)
@@ -56,7 +56,7 @@ def test_get_predefined_label_for_scan_in_task__predefined_label(prepare_environ
     user = UsersRepository.get_user_by_id(user_id)
 
     # Step 2. Add Label which is predefined
-    label = LabelsRepository.add_new_label(scan.id, task.key, user, LabelingTime(0), predefined=True)
+    label = LabelsRepository.add_new_label(scan.id, task.key, user, LabelingTime(0), is_predefined=True)
 
     # Step 3. Check if there is is Predefined Label
     predefined_label = LabelsRepository.get_predefined_label_for_scan_in_task(scan, task)
@@ -76,8 +76,8 @@ def test_get_predefined_label_for_scan_in_task__predefined_label_for_given_task(
     user = UsersRepository.get_user_by_id(user_id)
 
     # Step 2. Add Labels for each Task
-    label_left = LabelsRepository.add_new_label(scan.id, task_left.key, user, LabelingTime(0), predefined=True)
-    label_right = LabelsRepository.add_new_label(scan.id, task_right.key, user, LabelingTime(0), predefined=True)
+    label_left = LabelsRepository.add_new_label(scan.id, task_left.key, user, LabelingTime(0), is_predefined=True)
+    label_right = LabelsRepository.add_new_label(scan.id, task_right.key, user, LabelingTime(0), is_predefined=True)
 
     # Step 3. Check if there are these Predefined Labels
     predefined_label = LabelsRepository.get_predefined_label_for_scan_in_task(scan, task_left)
@@ -99,7 +99,7 @@ def test_get_predefined_brush_label_elements(prepare_environment: Any) -> None:
     user = UsersRepository.get_user_by_id(user_id)
 
     # Step 2. Add Label with Brush Elements
-    label = LabelsRepository.add_new_label(scan.id, task.key, user, LabelingTime(0), predefined=True)
+    label = LabelsRepository.add_new_label(scan.id, task.key, user, LabelingTime(0), is_predefined=True)
     LabelsRepository.add_new_brush_label_element(label.id, 0, 0, 0, b'', label_tag)
     LabelsRepository.add_new_brush_label_element(label.id, 1, 0, 0, b'', label_tag)
     LabelsRepository.add_new_brush_label_element(label.id, 2, 0, 0, b'', label_tag)

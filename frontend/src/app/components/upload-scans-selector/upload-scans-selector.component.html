@@ -1,5 +1,5 @@
 <section *ngIf="!multipleScans">
-    <input accept=".dcm,.png,.json" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden multiple/>
+    <input [accept]="ACCEPTED_FILE_TYPES" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden multiple/>
     <button type="button" mat-raised-button (click)="selectFile()">
         <mat-icon>recent_actors</mat-icon>
         <span *ngIf="!scans.length">Select DICOM images</span>

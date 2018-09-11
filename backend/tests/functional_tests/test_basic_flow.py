@@ -201,7 +201,7 @@ def test_basic_flow_with_predefined_label(prepare_environment: Any, synchronous_
             'label': json.dumps(payload),
             'SLICE_1': (image, 'slice_1'),
         }
-        response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label?predefined=true'.format(scan_id),
+        response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label?is_predefined=true'.format(scan_id),
                                    data=data, headers=get_headers(token=user_token, multipart=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
