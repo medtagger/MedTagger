@@ -22,6 +22,7 @@ import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
 import {TaskService} from '../../services/task.service';
 import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
+import {HOME} from "../../constants/routes";
 
 
 @Component({
@@ -48,7 +49,7 @@ export class MarkerPageComponent implements OnInit {
     selectorActions: Array<SelectorAction> = [];
     labelComment: string;
     isInitialSliceLoad: boolean;
-    chooseTaskPageUrl = '/labelling/choose-task';
+    homePage = '/' + HOME;
 
     ActionType = SelectorActionType;
 
@@ -75,7 +76,7 @@ export class MarkerPageComponent implements OnInit {
                         .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
                         .afterClosed()
                         .subscribe(() => {
-                            this.router.navigateByUrl(this.chooseTaskPageUrl);
+                            this.router.navigateByUrl(this.homePage);
                         });
                 }
             },
@@ -85,7 +86,7 @@ export class MarkerPageComponent implements OnInit {
                         .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
                         .afterClosed()
                         .subscribe(() => {
-                            this.router.navigateByUrl(this.chooseTaskPageUrl);
+                            this.router.navigateByUrl(this.homePage);
                         });
                 }
             });
@@ -175,7 +176,7 @@ export class MarkerPageComponent implements OnInit {
                     .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this dataset!', 'Go back')
                     .afterClosed()
                     .subscribe(() => {
-                        this.router.navigateByUrl(this.chooseTaskPageUrl);
+                        this.router.navigateByUrl(this.homePage);
                     });
             });
     }
