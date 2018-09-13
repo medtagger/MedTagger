@@ -1,11 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, Router} from '@angular/router';
 import {HOME} from '../../constants/routes';
-import "rxjs-compat/add/operator/map";
 
 @Component({
     selector: 'app-nav-bar',
-    inputs: ['showPageTitle'],
     templateUrl: './nav-bar.component.html',
     styleUrls: ['./nav-bar.component.scss']
 })

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {UserInfo} from '../../model/UserInfo';
-import {Router} from "@angular/router";
-import {UPLOAD, SETTINGS, LOGIN} from "../../constants/routes";
+import {Router} from '@angular/router';
+import {UPLOAD, SETTINGS, LOGIN} from '../../constants/routes';
 import {
     trigger,
     style,
@@ -27,7 +27,7 @@ import {
 })
 export class HomePageComponent implements OnInit {
     public user: UserInfo;
-    public isDropdownActive: boolean = false;
+    public isDropdownActive = false;
     public settingsPage: string = '/' + SETTINGS;
     public loginPage: string = '/' + LOGIN;
 

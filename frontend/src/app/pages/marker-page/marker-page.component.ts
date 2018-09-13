@@ -22,7 +22,7 @@ import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
 import {TaskService} from '../../services/task.service';
 import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
-import {HOME} from "../../constants/routes";
+import {HOME} from '../../constants/routes';
 
 
 @Component({
@@ -258,7 +258,7 @@ export class MarkerPageComponent implements OnInit {
             this.marker.setCurrentSelector(selector);
             this.selectorActions = selector.getActions();
         } else {
-            console.warn(`MarkerPage | setSelector | Selector "${selectorName}" doesn't exist`);
+            console.warn(`MarkerPage | setSelector | Selector "'${selectorName}'" doesn't exist`);
         }
     }
 
@@ -285,8 +285,8 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setFocusable(false);
         this.dialogService.openInputDialog('Add comment to your label (optional)', '',
             this.labelComment, this.labelComment ? 'Save comment' : 'Add comment').afterClosed().subscribe(comment => {
-                this.labelComment = comment;
-                this.marker.setFocusable(true);
+            this.labelComment = comment;
+            this.marker.setFocusable(true);
         });
     }
 }

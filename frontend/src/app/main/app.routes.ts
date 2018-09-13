@@ -22,7 +22,7 @@ export const labellingRoutes: Routes = [
         component: MarkerTutorialPageComponent,
         data: {title: 'Marker tutorial'},
         canActivate: [AuthGuard]
-    }
+    },
 ];
 
 export const routes: Routes = [
@@ -32,7 +32,7 @@ export const routes: Routes = [
     {path: appRoutes.UPLOAD, component: UploadPageComponent, data: {title: 'Upload new Scans'}, canActivate: [AuthGuard]},
     {path: appRoutes.SETTINGS, component: SettingsPageComponent, data: {title: 'Settings'}, canActivate: [AuthGuard]},
     {path: appRoutes.VALIDATION, component: ValidationPageComponent, data: {title: 'Validation'}, canActivate: [AuthGuard]},
-    ...labellingRoutes
+    ...labellingRoutes,
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forRoot(routes, {enableTracing: true} // config for debugging
