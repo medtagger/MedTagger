@@ -12,6 +12,7 @@
 }
 
 .task-card {
+    @include mat-elevation(2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -19,10 +20,22 @@
     width: 100%;
     background-color: $card-bg;
     border-radius: 5px;
+    transition: all 0.3s;
     @include media-breakpoint-up(lg) {
         justify-content: flex-start;
         flex-wrap: nowrap;
         width: auto;
+    }
+    &:hover {
+        @include mat-elevation(4);
+        transform: translateY(-2px);
+        .task-card__icon {
+            transform: scale(1.05);
+            filter: drop-shadow(0 3px 7px rgba($black-high-emphasis, 0.15));
+        }
+        .task-card__action {
+            color: mat-color($accent);
+        }
     }
     &__icon {
         @include size(3em);
@@ -31,11 +44,13 @@
         justify-content: center;
         background-color: mat-color($primary, 700);
         border-radius: 100px;
+        transition: all 0.2s;
         @include media-breakpoint-up(md) {
             @include size(4.8em);
         }
         .mat-icon {
             @include size(2em);
+            filter: drop-shadow(0 1px 5px rgba($black-high-emphasis, 0.3));
             @include media-breakpoint-up(md) {
                 @include size(3em);
             }
@@ -69,6 +84,7 @@
         flex-basis: 100%;
         color: $black-high-emphasis;
         text-align: center;
+        transition: all 0.4s;
         @include media-breakpoint-up(md) {
             flex-basis: auto;
         }

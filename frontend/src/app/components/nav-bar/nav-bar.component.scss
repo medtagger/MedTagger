@@ -2,6 +2,7 @@
 
 .app-navbar {
     @include mat-elevation(2);
+    height: $size-height-nav;
     background-color: mat-color($primary, 700);
     &-brand{
         display: flex;

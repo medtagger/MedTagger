@@ -1,5 +1,5 @@
 <nav class="app-navbar navbar">
-    <a class="app-navbar-brand" (routerLink)="homeRoute">
+    <a class="app-navbar-brand" [routerLink]="'/' + homeRoute">
         <ng-container *ngIf="showPageTitle; else app_brand">
             <mat-icon class="app-navbar-brand__icon">arrow_back</mat-icon>
             <span class="app-navbar-brand__text">{{activeRoute}}</span>

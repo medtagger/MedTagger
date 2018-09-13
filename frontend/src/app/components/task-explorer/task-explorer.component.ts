@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {MatIconRegistry, MatSnackBar} from "@angular/material";
 import {DomSanitizer} from "@angular/platform-browser";
 import {TaskService} from "../../services/task.service";
+import {LABELLING, LABELLING_TUTORIAL} from "../../constants/routes";
+import {UserInfo} from "../../model/UserInfo";
 
 @Component({
   selector: 'app-task-explorer',
@@ -9,11 +11,12 @@ import {TaskService} from "../../services/task.service";
   styleUrls: ['./task-explorer.component.scss']
 })
 export class TaskExplorerComponent implements OnInit {
-
+    private user: UserInfo;
     tasks = [];
     downloadingTasksInProgress = false;
     constructor(private iconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private taskService: TaskService,
                 public snackBar: MatSnackBar) {
+        this.user = JSON.parse(sessionStorage.getItem('userInfo'));
     }
 
     ngOnInit() {
@@ -30,5 +33,10 @@ export class TaskExplorerComponent implements OnInit {
                 duration: 5000,
             });
         });
+    }
+
+    getTaskUrl(): Array<string> {
+        const labelingPage = this.user.settings.skipTutorial ? '/' + LABELLING : '/' + LABELLING_TUTORIAL;
+        return [labelingPage];
     }
 }
