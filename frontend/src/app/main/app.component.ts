@@ -3,6 +3,7 @@ import {Router, NavigationEnd, ActivatedRoute} from '@angular/router';
 import {UserInfo} from '../model/UserInfo';
 import {MatSnackBar} from '@angular/material';
 import {filter, map, mergeMap} from 'rxjs/operators';
+import * as appRoutes from '../constants/routes';
 
 @Component({
     selector: 'app-root',
@@ -41,13 +42,13 @@ export class AppComponent implements OnInit {
     }
 
     get isLoginPage(): boolean {
-        return this.router.url.startsWith('/login');
+        return this.router.url.startsWith('/' + appRoutes.LOGIN);
     }
 
     public logOut(): void {
         sessionStorage.removeItem('authorizationToken');
         sessionStorage.removeItem('userInfo');
-        this.router.navigate(['login']);
+        this.router.navigate([appRoutes.LOGIN]);
     }
 
     private indicateValidationPageIsUnavailable(): void {
