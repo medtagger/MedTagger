@@ -4,6 +4,8 @@ import {DomSanitizer} from "@angular/platform-browser";
 import {TaskService} from "../../services/task.service";
 import {LABELLING, LABELLING_TUTORIAL} from "../../constants/routes";
 import {UserInfo} from "../../model/UserInfo";
+import {Router} from "@angular/router";
+import {Task} from "../../model/Task";
 
 @Component({
   selector: 'app-task-explorer',
@@ -15,7 +17,7 @@ export class TaskExplorerComponent implements OnInit {
     tasks = [];
     downloadingTasksInProgress = false;
     constructor(private iconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private taskService: TaskService,
-                public snackBar: MatSnackBar) {
+                public snackBar: MatSnackBar, private router: Router) {
         this.user = JSON.parse(sessionStorage.getItem('userInfo'));
     }
 
@@ -35,8 +37,11 @@ export class TaskExplorerComponent implements OnInit {
         });
     }
 
-    getTaskUrl(): Array<string> {
-        const labelingPage = this.user.settings.skipTutorial ? '/' + LABELLING : '/' + LABELLING_TUTORIAL;
-        return [labelingPage];
+    private getTaskUrl(): Array<string> {
+        return [this.user.settings.skipTutorial ? '/' + LABELLING : '/' + LABELLING_TUTORIAL];
+    }
+
+    goToLabelingPage(task: Task): void {
+        this.router.navigate(this.getTaskUrl(), {queryParams: {task: task.key}});
     }
 }

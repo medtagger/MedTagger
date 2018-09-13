@@ -5,7 +5,7 @@
     <div class="task-cards__desc">
         Start labeling
     </div>
-    <mat-card class="task-card m-2 py-1" *ngFor="let task of tasks">
+    <mat-card class="task-card m-2 py-1" *ngFor="let task of tasks" (click)="goToLabelingPage(task)">
         <div class="task-card__icon">
             <mat-icon svgIcon="{{task.key}}"></mat-icon>
         </div>
@@ -13,9 +13,9 @@
             <span class="task-card__name-main">{{task.name}}</span>
             <span class="task-card__name-desc">{{task.name}}</span>
         </div>
-        <a class="task-card__action" [routerLink]="getTaskUrl(task)" [queryParams]="{task: task.key}" data-cy="task">
+        <div class="task-card__action">
             <mat-icon>play_arrow</mat-icon>
-        </a>
+        </div>
     </mat-card>
 </div>
 

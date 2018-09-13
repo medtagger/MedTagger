@@ -8,7 +8,7 @@ import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
 import {LoginPageComponent} from '../pages/login-page/login-page.component';
 import {ModuleWithProviders} from '@angular/core';
 import {AuthGuard} from '../guards/auth.guard';
-import  * as appRoutes from '../constants/routes';
+import * as appRoutes from '../constants/routes';
 
 export const labellingRoutes: Routes = [
     {

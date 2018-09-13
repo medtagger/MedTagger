@@ -1,4 +1,4 @@
-@import "src/app/styles/variables";
+@import "src/app/styles/mixins";
 
 .menu {
     text-align: center;
@@ -9,22 +9,80 @@
     display: inline-block;
 }
 
-.home-welcome {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    &__main {
-        flex-basis: 100%;
-        color: $black-medium-emphasis;
-        font-weight: 400;
+.account {
+    &-button {
+        @include mat-elevation(4);
+        position: relative;
+        transition: background-color 0.2s ease-in;
+
+        &__options {
+            display: none;
+            transition: all 0.2s ease-in;
+        }
+        &.active {
+            background-color: mat-color($primary, 400);
+            .account-button {
+                &__options {
+                    @include mat-elevation(6);
+                    position: absolute;
+                    top: 105%;
+                    right: 0;
+                    display: flex;
+                    flex-direction: column;
+                    padding: 2em 0.5em;
+                    border-radius: 5px;
+                    background-color: $white-high-emphasis;
+                    color: $black-high-emphasis;
+                }
+                &__link{
+                    padding: 0.5em 2em;
+                    color: $black-high-emphasis;
+                    text-decoration: none;
+                    &:hover {
+                        background-color: gray("200");
+                    }
+                }
+            }
+        }
     }
-    &__desc {
-        color: $black-8-opacity;
-        font-weight: 300;
+}
+
+.home {
+    &-welcome {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        &__main {
+            flex-basis: 100%;
+            color: $black-medium-emphasis;
+            font-weight: 400;
+        }
+        &__desc {
+            color: $black-8-opacity;
+            font-weight: 300;
+        }
+        &__divider {
+            display: block;
+            flex: 1;
+        }
     }
-    &__divider{
-        display: block;
-        flex: 1;
+    &-upload {
+        &__button {
+            @include mat-elevation-transition();
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            margin: 2em;
+            @include media-breakpoint-up(lg) {
+                margin: 5em;
+            }
+            &:hover {
+                @include mat-elevation(10);
+            }
+        }
+        &__icon {
+            color: $white-high-emphasis;
+        }
     }
 }

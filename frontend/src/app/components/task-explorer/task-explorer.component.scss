@@ -21,6 +21,7 @@
     background-color: $card-bg;
     border-radius: 5px;
     transition: all 0.3s;
+    cursor: pointer;
     @include media-breakpoint-up(lg) {
         justify-content: flex-start;
         flex-wrap: nowrap;
@@ -29,10 +30,6 @@
     &:hover {
         @include mat-elevation(4);
         transform: translateY(-2px);
-        .task-card__icon {
-            transform: scale(1.05);
-            filter: drop-shadow(0 3px 7px rgba($black-high-emphasis, 0.15));
-        }
         .task-card__action {
             color: mat-color($accent);
         }
