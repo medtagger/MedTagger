@@ -16,7 +16,7 @@ import {Observable} from 'rxjs/internal/Observable';
 import {interval} from 'rxjs/internal/observable/interval';
 import {throwError} from 'rxjs/internal/observable/throwError';
 import {Subscription} from 'rxjs/Subscription';
-import {PredefinedLabelToUpload} from "../../utils/PredefinedLabelHandler";
+import {PredefinedLabelToUpload} from '../../utils/PredefinedLabelHandler';
 
 
 enum UploadMode {
