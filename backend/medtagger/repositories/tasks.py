@@ -21,7 +21,7 @@ def get_task_by_key(key: str) -> Task:
     :return: Task object
     """
     with db_session() as session:
-        task = session.query(Task).filter(Task.key == key).one()
+        task = session.query(Task).filter(Task.key == key).first()
     return task
 
 
