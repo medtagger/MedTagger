@@ -15,6 +15,9 @@ interface RandomLabelResponse {
     comment: string;
 }
 
+/**
+ * @deprecated Should be updated along new validation page
+ */
 @Injectable()
 export class LabelService {
 

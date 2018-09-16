@@ -29,7 +29,7 @@ module.exports = function (config) {
         autoWatch: true,
         browsers: ['Chrome'],
         singleRun: false,
-        browserNoActivityTimeout: 10000,
+        browserNoActivityTimeout: 30000,
         browserDisconnectTimeout : 10000,
         browserDisconnectTolerance : 0,
     });
