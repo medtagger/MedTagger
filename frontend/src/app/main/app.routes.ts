@@ -9,22 +9,23 @@ import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
 import {LoginPageComponent} from '../pages/login-page/login-page.component';
 import {ModuleWithProviders} from '@angular/core';
 import {AuthGuard} from '../guards/auth.guard';
+import * as appRoutes from '../constants/routes';
 
 export const labellingRoutes: Routes = [
     {
-        path: 'labelling',
+        path: appRoutes.LABELLING,
         component: MarkerPageComponent,
         data: {title: 'Labelling', disableFooter: true},
         canActivate: [AuthGuard]
     },
     {
-        path: 'labelling/choose-task',
+        path: appRoutes.LABELLING_TASK_CHOOSE,
         component: TasksPageComponent,
         data: {title: 'Choosing task'},
         canActivate: [AuthGuard]
     },
     {
-        path: 'labelling/tutorial',
+        path: appRoutes.LABELLING_TUTORIAL,
         component: MarkerTutorialPageComponent,
         data: {title: 'Marker tutorial'},
         canActivate: [AuthGuard]
@@ -32,12 +33,12 @@ export const labellingRoutes: Routes = [
 ];
 
 export const routes: Routes = [
-    {path: '', redirectTo: 'login', pathMatch: 'full'},
-    {path: 'login', component: LoginPageComponent, data: {title: 'Welcome'}},
-    {path: 'home', component: HomePageComponent, data: {title: 'Home'}, canActivate: [AuthGuard]},
-    {path: 'upload', component: UploadPageComponent, data: {title: 'Upload new Scans'}, canActivate: [AuthGuard]},
-    {path: 'settings', component: SettingsPageComponent, data: {title: 'Settings'}, canActivate: [AuthGuard]},
-    {path: 'validation', component: ValidationPageComponent, data: {title: 'Validation'}, canActivate: [AuthGuard]},
+    {path: '', redirectTo: appRoutes.LOGIN, pathMatch: 'full'},
+    {path: appRoutes.LOGIN, component: LoginPageComponent, data: {title: 'Welcome'}},
+    {path: appRoutes.HOME, component: HomePageComponent, data: {title: 'Home'}, canActivate: [AuthGuard]},
+    {path: appRoutes.UPLOAD, component: UploadPageComponent, data: {title: 'Upload new Scans'}, canActivate: [AuthGuard]},
+    {path: appRoutes.SETTINGS, component: SettingsPageComponent, data: {title: 'Settings'}, canActivate: [AuthGuard]},
+    {path: appRoutes.VALIDATION, component: ValidationPageComponent, data: {title: 'Validation'}, canActivate: [AuthGuard]},
     ...labellingRoutes
 ];
 
