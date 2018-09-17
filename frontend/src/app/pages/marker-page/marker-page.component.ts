@@ -52,6 +52,9 @@ export class MarkerPageComponent implements OnInit {
 
     ActionType = SelectorActionType;
 
+    zoomLevels = [1.0, 2.0, 4.0, 8.0];
+    currentZoomLevelIndex = 0;
+
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
                 private router: Router, private snackBar: MatSnackBar, private taskService: TaskService) {
         console.log('MarkerPage constructor', this.marker);
@@ -152,6 +155,16 @@ export class MarkerPageComponent implements OnInit {
                 });
             }
         });
+    }
+
+    public zoomIn(): void {
+        this.currentZoomLevelIndex++;
+        this.marker.scale = this.zoomLevels[this.currentZoomLevelIndex];
+    }
+
+    public zoomOut(): void {
+        this.currentZoomLevelIndex--;
+        this.marker.scale = this.zoomLevels[this.currentZoomLevelIndex];
     }
 
     private requestScan(): void {

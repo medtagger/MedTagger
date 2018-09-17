@@ -34,10 +34,12 @@
                         data-cy="chain-tool">
                     <mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon>
                 </button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('ZOOM_IN')}" disabled>
+                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('ZOOM_IN')}" (click)="zoomIn()"
+                    [disabled]="currentZoomLevelIndex >= zoomLevels.length - 1">
                     <mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon>
                 </button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('ZOOM_OUT')}" disabled>
+                <button mat-mini-fab [ngClass]="{'active-button': isCurrentSelector('ZOOM_OUT')}" (click)="zoomOut()"
+                    [disabled]="currentZoomLevelIndex <= 0">
                     <mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon>
                 </button>
             </div>
