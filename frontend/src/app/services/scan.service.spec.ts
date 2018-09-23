@@ -1,9 +1,8 @@
-import {async, fakeAsync, inject, TestBed, tick} from '@angular/core/testing';
-import {HttpClient, HttpClientModule, HttpErrorResponse, HttpRequest} from '@angular/common/http';
+import {async, inject, TestBed} from '@angular/core/testing';
+import {HttpClient, HttpClientModule, HttpRequest} from '@angular/common/http';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 import {ScanService} from './scan.service';
 import {environment} from '../../environments/environment';
-import {SliceSelection} from '../model/selections/SliceSelection';
 import {Selection3D} from '../model/selections/Selection3D';
 import {MedTaggerWebSocket} from './websocket.service';
 import {ScanMetadata} from '../model/ScanMetadata';
@@ -11,46 +10,13 @@ import {MarkerSlice} from '../model/MarkerSlice';
 import {of} from 'rxjs';
 import {WrappedSocket} from 'ng-socket-io/dist/src/socket-io.service';
 import {SelectedScan} from '../components/upload-scans-selector/upload-scans-selector.component';
-
-class MockSelection extends SliceSelection {
-    constructor(sliceIndex: number,
-                label_tool: string,
-                label_tag: string) {
-        super();
-
-        this.sliceIndex = sliceIndex;
-        this.label_tag = label_tag;
-        this.label_tool = label_tool;
-
-        this.pinned = false;
-        this.hidden = false;
-    }
-
-    getAdditionalData(): Object {
-        return {
-            EXAMPLE_PARAM_1: 1337,
-            EXAMPLE_PARAM_2: this.label_tool + this.label_tag,
-            EXAMPLE_PARAM_3: {
-                EXAMPLE_PARAM_3_1: 'Example'
-            }
-        };
-    }
-
-    toJSON(): Object {
-        return {
-            'width': 1,
-            'height': 1,
-            'slice_index': this.sliceIndex,
-            'tag': this.label_tag,
-            'tool': this.label_tool
-        };
-    }
-}
+import {SelectionMock} from '../mocks/selection.mock';
+import {API_URL} from '../utils/ApiUrl';
 
 const fakeMedTaggerSocket: WrappedSocket = new WrappedSocket({url: environment.WEBSOCKET_URL + '/slices'});
 
 describe('Service: ScanService', () => {
-    const MOCK_SELECTION: MockSelection = new MockSelection(1, 'MOCK', 'MOCK');
+    const MOCK_SELECTION: SelectionMock = new SelectionMock(1, 'MOCK', 'MOCK');
 
     const EXAMPLE_DATA = {
         SCAN_ID: '1',
@@ -64,6 +30,12 @@ describe('Service: ScanService', () => {
         DATASET: 'Example dataset',
         NUM_SLICES: 1337
     };
+
+    const SEND_SELECTIION_API = API_URL.SCANS
+        + EXAMPLE_DATA.SCAN_ID
+        + '/'
+        + EXAMPLE_DATA.TASK_KEY
+        + API_URL.LABEL;
 
     const MOCK_SCAN_METADATA: ScanMetadata = new ScanMetadata(EXAMPLE_DATA.SCAN_ID,
         EXAMPLE_DATA.STATUS, 50, 512, 512);
@@ -97,14 +69,6 @@ describe('Service: ScanService', () => {
         },
         onSubscribeError: function (error: Error) {
         }
-    };
-
-    const API_URL = {
-        SEND_SCAN: `/scans/${EXAMPLE_DATA.SCAN_ID}/${EXAMPLE_DATA.TASK_KEY}/label`,
-        GET_RANDOM_SCAN: '/scans/random',
-        SCANS: '/scans/',
-        SLICES: '/slices',
-        SKIP: '/skip'
     };
 
     let http: HttpClient;
@@ -143,11 +107,11 @@ describe('Service: ScanService', () => {
                     additionalDataValid = formData.has(key);
                 }
 
-                return req.url === environment.API_URL + API_URL.SEND_SCAN
+                return req.url === environment.API_URL + SEND_SELECTIION_API
                     && req.method === 'POST'
                     && formData.has('label')
                     && additionalDataValid;
-            }, `POST to ${API_URL.SEND_SCAN}`)
+            }, `POST to ${SEND_SELECTIION_API}`)
                 .flush({
                         comment: EXAMPLE_DATA.COMMENT,
                         label_id: EXAMPLE_DATA.LABEL_ID,
@@ -171,9 +135,9 @@ describe('Service: ScanService', () => {
                 });
 
             backend.expectOne((req: HttpRequest<any>) => {
-                return req.url === environment.API_URL + API_URL.SEND_SCAN
+                return req.url === environment.API_URL + SEND_SELECTIION_API
                     && req.method === 'POST';
-            }, `POST to ${API_URL.SEND_SCAN}`)
+            }, `POST to ${SEND_SELECTIION_API}`)
                 .flush({},
                     {status: 404, statusText: 'Could not find scan or tag'});
         }
@@ -198,9 +162,9 @@ describe('Service: ScanService', () => {
             };
 
             backend.expectOne((req: HttpRequest<any>) => {
-                return req.url === environment.API_URL + API_URL.GET_RANDOM_SCAN
+                return req.url === environment.API_URL + API_URL.RANDOM_SCAN
                     && req.method === 'GET';
-            }, `GET from ${API_URL.GET_RANDOM_SCAN}`)
+            }, `GET from ${API_URL.RANDOM_SCAN}`)
                 .flush(response,
                     {status: 200, statusText: 'Ok'});
         }
@@ -221,9 +185,9 @@ describe('Service: ScanService', () => {
             });
 
             backend.expectOne((req: HttpRequest<any>) => {
-                return req.url === environment.API_URL + API_URL.GET_RANDOM_SCAN
+                return req.url === environment.API_URL + API_URL.RANDOM_SCAN
                     && req.method === 'GET';
-            }, `GET from ${API_URL.GET_RANDOM_SCAN}`)
+            }, `GET from ${API_URL.RANDOM_SCAN}`)
                 .flush({},
                     {status: 404, statusText: 'No Scans available'});
         }

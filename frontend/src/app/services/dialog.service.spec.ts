@@ -2,7 +2,6 @@ import {ComponentFixture, inject, TestBed} from '@angular/core/testing';
 import {
     MatDialogModule,
     MatDialogRef,
-    MatFormFieldControl,
     MatFormFieldModule,
     MatInputModule
 } from '@angular/material';

@@ -5,6 +5,7 @@ import {HttpClientTestingModule, HttpTestingController} from '@angular/common/ht
 import {environment} from '../../environments/environment';
 import {UserInfo} from '../model/UserInfo';
 import {UserSettings} from '../model/UserSettings';
+import {API_URL} from '../utils/ApiUrl';
 
 describe('Service: AccountService', () => {
     const USER_SETTINGS: UserSettings = {
@@ -21,12 +22,6 @@ describe('Service: AccountService', () => {
          SETTINGS: USER_SETTINGS
      };
 
-    const API_URL = {
-        LOGIN: '/auth/sign-in',
-        REGISTER: '/auth/register',
-        USER_INFO: '/users/info'
-    };
-
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -39,7 +34,7 @@ describe('Service: AccountService', () => {
         });
     });
 
-    it(`should log in with valid credentials`, async(inject([AccountService, HttpTestingController],
+    it('should log in with valid credentials', async(inject([AccountService, HttpTestingController],
         (service: AccountService, backend: HttpTestingController) => {
 
             service.logIn(EXAMPLE_USER.EMAIL, EXAMPLE_USER.PASSWORD).then((userToken: string) => {
@@ -56,7 +51,7 @@ describe('Service: AccountService', () => {
                     {status: 200, statusText: 'Ok'});
         })));
 
-    it(`should not log in because of invalid credentials`, async(inject([AccountService, HttpTestingController],
+    it('should not log in because of invalid credentials', async(inject([AccountService, HttpTestingController],
         (service: AccountService, backend: HttpTestingController) => {
             service.logIn(EXAMPLE_USER.EMAIL, EXAMPLE_USER.INVALID_PASSWORD).catch((error: Error) => {
                 expect(error).toBeTruthy();
@@ -72,7 +67,7 @@ describe('Service: AccountService', () => {
                     {status: 401, statusText: 'Unauthorized'});
         })));
 
-    it(`should register new account`, async(inject([AccountService, HttpTestingController],
+    it('should register new account', async(inject([AccountService, HttpTestingController],
         (service: AccountService, backend: HttpTestingController) => {
 
             service.register(EXAMPLE_USER.EMAIL, EXAMPLE_USER.PASSWORD,
@@ -101,7 +96,7 @@ describe('Service: AccountService', () => {
                     {status: 201, statusText: 'Created'});
         })));
 
-    it(`should get user info`, async(inject([AccountService, HttpTestingController],
+    it('should get user info', async(inject([AccountService, HttpTestingController],
         (service: AccountService, backend: HttpTestingController) => {
 
             service.getCurrentUserInfo().then((userInfo: UserInfo) => {

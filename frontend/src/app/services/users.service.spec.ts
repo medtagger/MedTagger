@@ -5,15 +5,9 @@ import {UsersService} from './users.service';
 import {UserSettings} from '../model/UserSettings';
 import {UserInfo} from '../model/UserInfo';
 import {environment} from '../../environments/environment';
+import {API_URL} from '../utils/ApiUrl';
 
 describe('Service: UsersService', () => {
-
-    const API_URL = {
-        USERS: '/users/',
-        ROLE: '/role',
-        SETTINGS: '/settings'
-    };
-
     const USER_SETTINGS: UserSettings = {
         skipTutorial: true
     };

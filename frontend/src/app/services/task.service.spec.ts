@@ -5,9 +5,9 @@ import {TaskService} from './task.service';
 import {Task} from '../model/Task';
 import {environment} from '../../environments/environment';
 import {LabelTag} from '../model/labels/LabelTag';
+import {API_URL} from '../utils/ApiUrl';
 
 describe('Service: TaskService', () => {
-
     const EXAMPLE_DATA = {
         TASK: {
             task_id: 1,
@@ -20,11 +20,6 @@ describe('Service: TaskService', () => {
                 tools: ['tool1', 'tool2']
             }]
         }
-    };
-
-    const API_URL = {
-        TASK: '/tasks/',
-        TASKS: '/tasks'
     };
 
     beforeEach(() => {
