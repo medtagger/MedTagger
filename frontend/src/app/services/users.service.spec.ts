@@ -22,6 +22,10 @@ describe('Service: UsersService', () => {
         settings: USER_SETTINGS
     };
 
+    const SET_DETAILS_API = API_URL.USERS + EXAMPLE_USER.id;
+    const SET_ROLE_API = SET_DETAILS_API + API_URL.ROLE;
+    const SET_SETTINGS_API = SET_DETAILS_API + API_URL.SETTINGS;
+
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -42,7 +46,7 @@ describe('Service: UsersService', () => {
                     expect(user.email).toBe(EXAMPLE_USER.email);
                     expect(user.firstName).toBe(EXAMPLE_USER.firstName);
                     expect(user.lastName).toBe(EXAMPLE_USER.lastName);
-                    expect(user.id).toBeGreaterThan(0);
+                    expect(user.id).toEqual(EXAMPLE_USER.id);
                     expect(user.role).toBe(EXAMPLE_USER.role);
                     expect(user.settings).toBe(EXAMPLE_USER.settings);
                 });
@@ -51,7 +55,7 @@ describe('Service: UsersService', () => {
             backend.expectOne((req: HttpRequest<any>) => {
                 return req.url === environment.API_URL + API_URL.USERS
                     && req.method === 'GET';
-            }, `GET from ${environment.API_URL + API_URL.USERS}`)
+            }, `GET from ${API_URL.USERS}`)
                 .flush({users: [EXAMPLE_USER, EXAMPLE_USER]},
                     {status: 200, statusText: 'Ok'});
         }
@@ -67,7 +71,7 @@ describe('Service: UsersService', () => {
             backend.expectOne((req: HttpRequest<any>) => {
                 return req.url === environment.API_URL + API_URL.USERS
                     && req.method === 'GET';
-            }, `GET from ${environment.API_URL + API_URL.USERS}`)
+            }, `GET from ${API_URL.USERS}`)
                 .flush({users: [EXAMPLE_USER, EXAMPLE_USER]},
                     {status: 404, statusText: ''});
         }
@@ -87,10 +91,10 @@ describe('Service: UsersService', () => {
 
                 payload = req.body;
 
-                return req.url === environment.API_URL + API_URL.USERS + EXAMPLE_USER.id + API_URL.ROLE
+                return req.url === environment.API_URL + SET_ROLE_API
                     && req.method === 'PUT'
                     && payload.role === EXAMPLE_USER.role;
-            }, `PUT to ${environment.API_URL + API_URL.USERS + EXAMPLE_USER.id + API_URL.ROLE}`)
+            }, `PUT to ${SET_ROLE_API}`)
                 .flush({},
                     {status: 200, statusText: 'Ok'});
 
@@ -111,10 +115,10 @@ describe('Service: UsersService', () => {
 
                 payload = req.body;
 
-                return req.url === environment.API_URL + API_URL.USERS + EXAMPLE_USER.id + API_URL.ROLE
+                return req.url === environment.API_URL + SET_ROLE_API
                     && req.method === 'PUT'
                     && payload.role === EXAMPLE_USER.role;
-            }, `PUT to ${environment.API_URL + API_URL.USERS + EXAMPLE_USER.id + API_URL.ROLE}`)
+            }, `PUT to ${SET_ROLE_API}`)
                 .flush({},
                     {status: 404, statusText: ''});
 
@@ -164,11 +168,11 @@ describe('Service: UsersService', () => {
 
                 payload = req.body;
 
-                return req.url === environment.API_URL + API_URL.USERS + EXAMPLE_USER.id
+                return req.url === environment.API_URL + SET_DETAILS_API
                     && req.method === 'PUT'
                     && payload.firstName === EXAMPLE_USER.firstName
                     && payload.lastName === EXAMPLE_USER.lastName;
-            }, `PUT to ${environment.API_URL + API_URL.USERS + EXAMPLE_USER.id}`)
+            }, `PUT to ${SET_DETAILS_API}`)
                 .flush({},
                     {status: 404, statusText: ''});
 
@@ -188,10 +192,10 @@ describe('Service: UsersService', () => {
 
                 payload = req.body;
 
-                return req.url === environment.API_URL + API_URL.USERS + EXAMPLE_USER.id + API_URL.SETTINGS
+                return req.url === environment.API_URL + SET_SETTINGS_API
                     && req.method === 'POST'
                     && payload.skipTutorial === EXAMPLE_USER.settings.skipTutorial;
-            }, `POST to ${environment.API_URL + API_URL.USERS + EXAMPLE_USER.id + API_URL.SETTINGS}`)
+            }, `POST to ${SET_SETTINGS_API}`)
                 .flush({},
                     {status: 200, statusText: 'Ok'});
         }
@@ -210,10 +214,10 @@ describe('Service: UsersService', () => {
 
                 payload = req.body;
 
-                return req.url === environment.API_URL + API_URL.USERS + EXAMPLE_USER.id + API_URL.SETTINGS
+                return req.url === environment.API_URL + SET_SETTINGS_API
                     && req.method === 'POST'
                     && payload.skipTutorial === EXAMPLE_USER.settings.skipTutorial;
-            }, `POST to ${environment.API_URL + API_URL.USERS + EXAMPLE_USER.id + API_URL.SETTINGS}`)
+            }, `POST to ${SET_SETTINGS_API}`)
                 .flush({},
                     {status: 404, statusText: ''});
         }

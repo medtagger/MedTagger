@@ -31,11 +31,13 @@ describe('Service: ScanService', () => {
         NUM_SLICES: 1337
     };
 
-    const SEND_SELECTIION_API = API_URL.SCANS
+    const SEND_SELECTION_API = API_URL.SCANS
         + EXAMPLE_DATA.SCAN_ID
         + '/'
         + EXAMPLE_DATA.TASK_KEY
         + API_URL.LABEL;
+
+    const SKIP_SCAN_API = API_URL.SCANS + EXAMPLE_DATA.SCAN_ID + API_URL.SKIP;
 
     const MOCK_SCAN_METADATA: ScanMetadata = new ScanMetadata(EXAMPLE_DATA.SCAN_ID,
         EXAMPLE_DATA.STATUS, 50, 512, 512);
@@ -65,10 +67,7 @@ describe('Service: ScanService', () => {
     };
 
     const MOCK_FUNCTIONS = {
-        onSubscribe: function (response: any) {
-        },
-        onSubscribeError: function (error: Error) {
-        }
+        onSubscribe: function (response: any) {}
     };
 
     let http: HttpClient;
@@ -107,11 +106,11 @@ describe('Service: ScanService', () => {
                     additionalDataValid = formData.has(key);
                 }
 
-                return req.url === environment.API_URL + SEND_SELECTIION_API
+                return req.url === environment.API_URL + SEND_SELECTION_API
                     && req.method === 'POST'
                     && formData.has('label')
                     && additionalDataValid;
-            }, `POST to ${SEND_SELECTIION_API}`)
+            }, `POST to ${SEND_SELECTION_API} with label and metadata`)
                 .flush({
                         comment: EXAMPLE_DATA.COMMENT,
                         label_id: EXAMPLE_DATA.LABEL_ID,
@@ -135,9 +134,9 @@ describe('Service: ScanService', () => {
                 });
 
             backend.expectOne((req: HttpRequest<any>) => {
-                return req.url === environment.API_URL + SEND_SELECTIION_API
+                return req.url === environment.API_URL + SEND_SELECTION_API
                     && req.method === 'POST';
-            }, `POST to ${SEND_SELECTIION_API}`)
+            }, `POST to ${SEND_SELECTION_API} with label and metadata`)
                 .flush({},
                     {status: 404, statusText: 'Could not find scan or tag'});
         }
@@ -285,7 +284,7 @@ describe('Service: ScanService', () => {
                     && req.method === 'POST'
                     && payload.dataset === EXAMPLE_DATA.DATASET
                     && payload.number_of_slices === EXAMPLE_DATA.NUM_SLICES;
-            }, `POST to ${API_URL.SCANS}`)
+            }, `POST to ${API_URL.SCANS} with dataset and metadata`)
                 .flush({scan_id: EXAMPLE_DATA.SCAN_ID},
                     {status: 201, statusText: 'Created'});
         }
@@ -306,14 +305,13 @@ describe('Service: ScanService', () => {
                 const request = backend.expectOne((req: HttpRequest<any>) => {
                     return req.url === environment.API_URL + API_URL.SCANS
                         && req.method === 'POST';
-                }, `POST to ${API_URL.SCANS}`);
+                }, `POST to ${API_URL.SCANS} with dataset and metadata`);
 
-                const responeBody = i === 0 ? {} : {scan_id: EXAMPLE_DATA.SCAN_ID};
-                const responsOpts = i === 0 ? {status: 404, statusText: ''} : {status: 201, statusText: 'Created'};
+                const responseBody = i === 0 ? {} : {scan_id: EXAMPLE_DATA.SCAN_ID};
+                const responseOpts = i === 0 ? {status: 404, statusText: ''} : {status: 201, statusText: 'Created'};
 
-                request.flush(responeBody, responsOpts);
-                setTimeout(() => {
-                }, service.delay);
+                request.flush(responseBody, responseOpts);
+                setTimeout(() => {}, service.delay);
             }
         }
     )));
@@ -334,12 +332,8 @@ describe('Service: ScanService', () => {
                         && req.method === 'POST';
                 }, `POST to ${API_URL.SCANS}`);
 
-                const responeBody = {};
-                const responsOpts = {status: 404, statusText: ''};
-
-                request.flush(responeBody, responsOpts);
-                setTimeout(() => {
-                }, service.delay);
+                request.flush({}, {status: 404, statusText: ''});
+                setTimeout(() => {}, service.delay);
             }
         }
     )));
@@ -369,9 +363,9 @@ describe('Service: ScanService', () => {
             });
 
             backend.expectOne((req: HttpRequest<any>) => {
-                return req.url === environment.API_URL + API_URL.SCANS + EXAMPLE_DATA.SCAN_ID + API_URL.SKIP
+                return req.url === environment.API_URL + SKIP_SCAN_API
                     && req.method === 'POST';
-            }, `POST to ${API_URL.SCANS}`)
+            }, `POST to ${SKIP_SCAN_API}`)
                 .flush({status: 200, statusText: ''});
         }
     )));
@@ -384,9 +378,9 @@ describe('Service: ScanService', () => {
             });
 
             backend.expectOne((req: HttpRequest<any>) => {
-                return req.url === environment.API_URL + API_URL.SCANS + EXAMPLE_DATA.SCAN_ID + API_URL.SKIP
+                return req.url === environment.API_URL + SKIP_SCAN_API
                     && req.method === 'POST';
-            }, `POST to ${API_URL.SCANS}`)
+            }, `POST to ${SKIP_SCAN_API}`)
                 .flush({status: 404, statusText: 'Could not find scan'});
         }
     )));
