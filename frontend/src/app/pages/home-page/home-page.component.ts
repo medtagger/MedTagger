@@ -23,7 +23,7 @@ import {
                 animate(200, style({transform: 'translateY(10%)'}))
             ])
         ])
-    ]
+    ],
 })
 export class HomePageComponent implements OnInit {
     public user: UserInfo;
@@ -44,8 +44,6 @@ export class HomePageComponent implements OnInit {
 
     toggleDropdown(): void {
         this.isDropdownActive = !this.isDropdownActive;
-        // TODO: find how to close dropdown when button above loses focus
-        setTimeout(() => this.isDropdownActive = false, 2000);
     }
 
     public logOut(): void {

@@ -55,7 +55,7 @@ button {
         .active-button {
             background-color: mat-color($accent, 600);
             .mat-icon{
-                color: $white-high-emphasis;
+                color: color('white');
             }
         }
 

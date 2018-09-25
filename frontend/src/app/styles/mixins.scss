@@ -115,3 +115,9 @@ $breakpoints: ('small': (min-width: 320px), 'medium': (min-width: 768px), 'large
         transition: background-color 5000s ease-in-out 0s;
     }
 }
+
+@mixin text-ellipsis(){
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

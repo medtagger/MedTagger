@@ -79,7 +79,7 @@ import {TaskExplorerComponent} from '../components/task-explorer/task-explorer.c
         InfoDialogComponent,
         InputDialogComponent,
         NavBarComponent,
-        TaskExplorerComponent
+        TaskExplorerComponent,
     ],
     imports: [
         routing,

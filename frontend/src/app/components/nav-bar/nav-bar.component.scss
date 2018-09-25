@@ -7,7 +7,7 @@
     &-brand{
         display: flex;
         align-items: center;
-        color: $white-high-emphasis;
+        color: color('white');
         text-decoration: none;
         &__logo{
             height: 2em;

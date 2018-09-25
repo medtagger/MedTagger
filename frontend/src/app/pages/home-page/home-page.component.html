@@ -1,6 +1,7 @@
 <app-nav-bar>
-    <button mat-mini-fab color="primary" class="account-button" (click)="toggleDropdown()" [ngClass]="{ 'active' : isDropdownActive}">
-        <mat-icon class="account-button__icon">person</mat-icon>
+    <button mat-raised-button color="primary" id="dropdown-button" class="account-button" (blur)="toggleDropdown()" (click)="toggleDropdown()" [ngClass]="{ 'active' : isDropdownActive}">
+        <mat-icon class="account-button__icon mr-2">person</mat-icon>
+        <span class="account-button__name">{{user.firstName + ' ' + user.lastName}}</span>
         <span *ngIf="isDropdownActive" [@displayDropdown]="isDropdownActive" class="account-button__options">
             <a class="account-button__link" [routerLink]="settingsPage">Settings</a>
             <a class="account-button__link" [routerLink]="loginPage" (click)="logOut()">LogOut</a>
@@ -13,8 +14,15 @@
         <h4 class="home-welcome__desc pr-2">Welcome to Medtagger</h4>
         <hr class="home-welcome__divider"/>
     </div>
-    <app-task-explorer></app-task-explorer>
-    <button mat-fab class="home-upload__button" (click)="goToUploadPage()" color="accent">
-        <mat-icon class="home-upload__icon" aria-label="Upload new labelling scans">cloud_upload</mat-icon>
-    </button>
+    <div class="home-upload">
+        <div class="home-upload__desc">Upload new scans</div>
+        <button mat-raised-button class="home-upload__button" (click)="goToUploadPage()" color="accent">
+            <mat-icon class="home-upload__icon" aria-label="Upload new labelling scans">cloud_upload</mat-icon>
+            Start uploading new scans
+        </button>
+    </div>
+    <div class="home-tasks">
+        <div class="home-tasks__desc">Start labeling</div>
+        <app-task-explorer></app-task-explorer>
+    </div>
 </div>
