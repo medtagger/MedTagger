@@ -49,9 +49,9 @@ def test_add_label_non_existing_tag(prepare_environment: Any) -> None:
     response = api_client.post('/api/v1/scans/{}/MARK_KIDNEYS/label'.format(scan_id),
                                data={'label': json.dumps(payload)},
                                headers=get_headers(token=user_token, multipart=True))
-    assert response.status_code == 404
+    assert response.status_code == 400
     json_response = json.loads(response.data)
-    assert json_response['details'] == 'Could not find any Label Tag for that key!'
+    assert json_response['details'] == 'Tag NON_EXISTING is not part of Task MARK_KIDNEYS.'
 
 
 def test_add_label_non_supported_tool(prepare_environment: Any) -> None:

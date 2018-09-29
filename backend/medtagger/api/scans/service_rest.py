@@ -132,7 +132,7 @@ class Label(Resource):
             best_error = best_match(errors)
             raise InvalidArgumentsException(best_error.message)
 
-        business.validate_label_payload(elements, files)
+        business.validate_label_payload(label, task_key, files)
 
         labeling_time = label['labeling_time']
         comment = label.get('comment')

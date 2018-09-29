@@ -104,19 +104,21 @@ def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
         yield _slice, image
 
 
-def validate_label_payload(elements: List[Dict], files: Dict[str, bytes]) -> None:
+def validate_label_payload(label: Dict, task_key: str, files: Dict[str, bytes]) -> None:
     """Validate and raise an Exception for sent payload.
 
-    :param elements: List of JSONs describing elements for a single label
+    :param label: JSON describing a single Label
+    :param task_key: key for the Task
     :param files: mapping of uploaded files (name and content)
     """
-    _validate_label_elements(elements, files)
+    _validate_label_elements(label, task_key, files)
     _validate_files(files)
-    _validate_tool(elements)
+    _validate_tool(label)
 
 
-def _validate_tool(elements: List[Dict]) -> None:
+def _validate_tool(label: Dict) -> None:
     """Validate if the tool for given Label Element is available for given tag."""
+    elements = label['elements']
     for label_element in elements:
         tag = _get_label_tag(label_element['tag'])
         if label_element['tool'] not in {tool.name for tool in tag.tools}:
@@ -135,16 +137,20 @@ def _validate_files(files: Dict[str, bytes]) -> None:
             raise InvalidArgumentsException('Type of file "{}" is not supported!'.format(file_name))
 
 
-def _validate_label_elements(elements: List[Dict], files: Dict[str, bytes]) -> None:
+def _validate_label_elements(label: Dict, task_key: str, files: Dict[str, bytes]) -> None:
     """Validate Label Elements and make sure that all Brush Elements have images."""
+    task = TasksRepository.get_task_by_key(task_key)
+    available_tags_keys = {tag.key for tag in task.available_tags}
+    elements = label['elements']
     for label_element in elements:
+        # Check if Label Element Tag is part of this Task
+        if label_element['tag'] not in available_tags_keys:
+            raise InvalidArgumentsException('Tag {} is not part of Task {}.'.format(label_element['tag'], task_key))
+
         # Each Brush Label Element should have its own image attached
-        if label_element['tool'] == LabelTool.BRUSH.value:
-            try:
-                files[label_element['image_key']]
-            except KeyError:
-                message = 'Request does not have field named {} that could contain the image!'
-                raise InvalidArgumentsException(message.format(label_element['image_key']))
+        if label_element['tool'] == LabelTool.BRUSH.value and not files.get(label_element['image_key']):
+            message = 'Request does not have field named {} that could contain the image!'
+            raise InvalidArgumentsException(message.format(label_element['image_key']))
 
 
 def add_label(scan_id: ScanID, task_key: str, elements: List[Dict],   # pylint: disable-msg=too-many-arguments
