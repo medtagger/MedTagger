@@ -35,6 +35,7 @@ matrix:
       node_js:
         - "8"
       script:
+        - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
         - ./.travis/run_tests_if_subproject_changed.py frontend --command="
            cd frontend/ &&
            npm i &&
