@@ -1,5 +1,5 @@
 # Global constants for whole Makefile
-PYTHON = python3.6
+PYTHON = python3.7
 MAIN_MODULE = medtagger
 SCRIPTS_DIRECTORY = scripts
 
