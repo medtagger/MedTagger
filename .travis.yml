@@ -29,6 +29,7 @@ matrix:
     # Frontend - linters
     - language: node_js
       env: FRONTEND=linters_and_unit_tests
+      sudo: required
       addons:
         chrome: stable
       node_js:
