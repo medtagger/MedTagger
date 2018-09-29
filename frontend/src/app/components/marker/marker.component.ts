@@ -191,8 +191,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     ngOnInit() {
-        console.log('Marker init');
-        console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
+        console.log('MarkerComponent init');
 
         this.slices = new Map<number, MarkerSlice>();
 

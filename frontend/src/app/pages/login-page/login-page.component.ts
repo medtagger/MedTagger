@@ -3,6 +3,7 @@ import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {passwordValidator} from '../validators/password-validator.directive';
 import {AccountService} from '../../services/account.service';
+import * as appRoutes from '../../constants/routes';
 
 enum LoginPageMode {
     LOG_IN,
@@ -36,7 +37,7 @@ export class LoginPageComponent implements OnInit {
 
     ngOnInit() {
         if (this.accountService.isLoggedIn()) {
-            this.routerService.navigate(['home']);
+            this.routerService.navigate([appRoutes.HOME]);
         }
         this.registerForm = new FormGroup({
             firstName: new FormControl(null, [Validators.required]),
@@ -77,7 +78,7 @@ export class LoginPageComponent implements OnInit {
                 console.log(userInfo);
                 if (userInfo) {
                     sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-                    this.routerService.navigate(['home']);
+                    this.routerService.navigate([appRoutes.HOME]);
                 }
             }, (error) => {
                 this.loggingInProgress = false;

@@ -5,7 +5,7 @@ import {Router} from '@angular/router';
 import {UsersService} from '../../services/users.service';
 import {UserInfo} from '../../model/UserInfo';
 import {UserSettings} from '../../model/UserSettings';
-
+import * as appRoutes from '../../constants/routes';
 
 @Component({
     selector: 'app-marker-tutorial-page',
@@ -92,10 +92,10 @@ export class MarkerTutorialPageComponent implements OnInit {
             this.usersService.setUserSettings(this.user.id, settings).then(() => {
                 this.user.settings.skipTutorial = true;
                 sessionStorage.setItem('userInfo', JSON.stringify(this.user));
-                this.router.navigateByUrl('/labelling/choose-task');
+                this.router.navigateByUrl('/' + appRoutes.LABELLING_TASK_CHOOSE);
             });
         } else {
-            this.router.navigateByUrl('/labelling/choose-task');
+            this.router.navigateByUrl('/' + appRoutes.LABELLING_TASK_CHOOSE);
         }
     }
 }
