@@ -29,6 +29,8 @@ matrix:
     # Frontend - linters
     - language: node_js
       env: FRONTEND=linters_and_unit_tests
+      addons:
+        chrome: stable
       node_js:
         - "8"
       script:
