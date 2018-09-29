@@ -14,7 +14,6 @@ import {TasksPageComponent} from '../pages/tasks-page/tasks-page.component';
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
-import {HttpAuthenticationInterceptor} from '../services/http-authentication.interceptor';
 
 import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
@@ -46,7 +45,7 @@ import {
     MatDialogModule,
     MatChipsModule,
     MatCheckboxModule,
-    MatIconRegistry,
+    MatIconRegistry, MatSnackBar,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {routing} from './app.routes';
@@ -60,6 +59,7 @@ import {MedTaggerWebSocket} from '../services/websocket.service';
 import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
 import {InputDialogComponent} from '../dialogs/input-dialog.component';
 import {TaskService} from '../services/task.service';
+import {HttpAuthenticationInterceptor} from '../interceptors/http-authentication.interceptor';
 
 @NgModule({
     declarations: [
@@ -127,6 +127,7 @@ import {TaskService} from '../services/task.service';
         AccountService,
         DialogService,
         MatDialog,
+        MatSnackBar,
         MedTaggerWebSocket,
     ],
     bootstrap: [AppComponent]

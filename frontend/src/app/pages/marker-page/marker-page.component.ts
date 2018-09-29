@@ -221,10 +221,10 @@ export class MarkerPageComponent implements OnInit {
         this.nextScan();
     }
 
-    private sendSelection(roiSelection: Selection3D, comment: string) {
+    private sendSelection(selection3d: Selection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
 
-        this.scanService.sendSelection(this.scan.scanId, this.task.key, roiSelection, labelingTime, comment)
+        this.scanService.sendSelection(this.scan.scanId, this.task.key, selection3d, labelingTime, comment)
             .then((response: Response) => {
                 console.log('MarkerPage | sendSelection | success!');
                 this.indicateLabelHasBeenSend();

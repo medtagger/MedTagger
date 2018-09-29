@@ -47,14 +47,16 @@ export class ScanService {
 
     websocket: MedTaggerWebSocket;
 
+    delay = 5000;
+    retries = 5;
+
     constructor(private http: HttpClient, private socket: MedTaggerWebSocket) {
         this.websocket = socket;
     }
 
-    public sendSelection(scanId: string, taskKey: string, selection: ScanSelection<SliceSelection>, labelingTime: number,
+    sendSelection(scanId: string, taskKey: string, selection: ScanSelection<SliceSelection>, labelingTime: number,
                          comment: string): Promise<Response> {
-
-        console.log('ScanService | send3dSelection | sending ROI:',
+        console.log('ScanService | send3dSelection | sending 3D selection:',
             selection, `for scanId: ${scanId}`, `with labeling time: ${labelingTime}`);
 
         const payload = selection.toJSON();
@@ -158,7 +160,7 @@ export class ScanService {
         );
     }
 
-    requestSlices(scanId: string, taskKey: string, begin: number, count: number, reversed: boolean) {
+    requestSlices(scanId: string, taskKey: string, begin: number, count: number, reversed: boolean): void {
         console.log('ScanService | requestSlices | begin:', begin);
         this.websocket.emit('request_slices', {
             scan_id: scanId,
@@ -169,7 +171,7 @@ export class ScanService {
         });
     }
 
-    createNewScan(dataset: string, numberOfSlices: number) {
+    createNewScan(dataset: string, numberOfSlices: number): Promise<string> {
         return new Promise((resolve, reject) => {
             const payload = {
                 dataset: dataset,
@@ -184,8 +186,8 @@ export class ScanService {
                                 console.warn('Retrying request for creating new Scan (attempt: ' + (++retryAttempt) + ').');
                                 return of(scanRequestError.status);
                             }),
-                            delay(5000), // Let's give it a try after 5 seconds
-                            take(5), // Let's give it 5 retries (each after 5 seconds)
+                            delay(this.delay), // Let's give it a try after 5 seconds
+                            take(this.retries), // Let's give it 5 retries (each after 5 seconds)
                             concat(observableThrowError({error: 'Cannot create new Scan.'}))
                         );
                     })
@@ -200,12 +202,12 @@ export class ScanService {
         });
     }
 
-    uploadSlices(scanId: string, files: File[]) {
+    uploadSlices(scanId: string, files: File[]): Observable<any> {
         const CONCURRENT_API_CALLS = 5;
 
         return from(files).pipe(
             map((file: File) => {
-                console.log('Uploading file...', file);
+                console.log('Uploading file...', file.name);
                 let retryAttempt = 0;
                 const form = new FormData();
                 form.append('image', file, file.name);
@@ -219,8 +221,8 @@ export class ScanService {
                                             + file.name + ', attempt: ' + (++retryAttempt) + ').');
                                         return of(uploadRequestError.status);
                                     }),
-                                    delay(5000),  // Let's give it a try after 5 seconds
-                                    take(5),  // Let's give it 5 retries (each after 5 seconds)
+                                    delay(this.delay),  // Let's give it a try after 5 seconds
+                                    take(this.retries),  // Let's give it 5 retries (each after 5 seconds)
                                     concat(observableThrowError({error: 'Cannot upload Slice ' + file.name}))
                                 );
                             })
