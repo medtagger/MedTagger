@@ -24,14 +24,14 @@ e2e:
 	make e2e__delete_environment
 
 e2e_docker:
-	docker-compose up -d
+	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d
 	@if ! make e2e__run_docker; then\
-		docker-compose down;\
+		docker-compose -f $(E2E_DOCKER_COMPOSE) down;\
 		echo "E2E Tests failed!";\
 		exit 1;\
 	fi
 	echo "E2E Tests passed!"
-	docker-compose down
+	docker-compose -f $(E2E_DOCKER_COMPOSE) down
 
 e2e__prepare_environment:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d cassandra postgres rabbitmq
@@ -74,7 +74,7 @@ e2e__run:
 
 e2e__run_docker:
 	sleep 30  # Let's wait a while for booting up of all services
-	cd $(E2E_DIRECTORY) && CYPRESS_HOST_URL=http://localhost/ $(NODE_MODULES_BIN)/cypress run
+	cd $(E2E_DIRECTORY) && CYPRESS_HOST_URL=http://localhost/ CYPRESS_API_URL=http://localhost/api/v1/ $(NODE_MODULES_BIN)/cypress run
 
 e2e__delete_environment:
 	. $(E2E_DIRECTORY)/configuration.sh && cd backend && alembic downgrade base
@@ -83,4 +83,4 @@ e2e__delete_environment:
 e2e__clear_dependencies:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) down
 
-.PHONY: e2e e2e__prepare_environment e2e__run e2e__delete_environment e2e__clear_dependencies
+.PHONY: e2e e2e_docker e2e__prepare_environment e2e__run e2e__delete_environment e2e__clear_dependencies
