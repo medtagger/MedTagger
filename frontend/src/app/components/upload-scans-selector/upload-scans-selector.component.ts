@@ -10,6 +10,15 @@ export class SelectedScan {
     predefinedLabelsTasks: Array<string> = [];
     additionalData: Object = {};
 
+    constructor(directory = '', files: File[] = [], predefinedLabels: Array<PredefinedLabelToUpload> = [],
+                predefinedLabelsTasks: Array<string> = [], additionalData: Object = {}) {
+        this.directory = directory;
+        this.files = files;
+        this.predefinedLabels = predefinedLabels;
+        this.predefinedLabelsTasks = predefinedLabelsTasks;
+        this.additionalData = additionalData;
+    }
+
     public addPredefinedLabel(file: File): Promise<void> {
         return new Promise(((resolve, reject) => {
             handlePredefinedLabelFile(file).then((values: [string, PredefinedLabelToUpload]) => {

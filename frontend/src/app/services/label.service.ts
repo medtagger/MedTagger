@@ -12,19 +12,16 @@ import {PointSelection} from '../model/selections/PointSelection';
 import {ChainSelection} from '../model/selections/ChainSelection';
 import {BrushSelection} from '../model/selections/BrushSelection';
 
-interface RandomLabelResponse {
+export interface RandomLabelResponse {
     label_id: string;
     scan_id: string;
     task_id: string;
     status: string;
-    elements: Array<SliceSelection>;
+    elements: Array<Object>;
     labeling_time: number;
     comment: string;
 }
 
-/**
- * @deprecated Should be updated along new validation page
- */
 @Injectable()
 export class LabelService {
 
@@ -39,7 +36,7 @@ export class LabelService {
         }
     }
 
-    private convertElements(rawElements: any, task: Task): Array<SliceSelection> {
+    private convertElements(rawElements: Array<Object>, task: Task): Array<SliceSelection> {
         const elements: Array<SliceSelection> = [];
         rawElements.forEach((element: any) => {
             const labelTag = this.getLabelTagByKey(element.tag, task);
@@ -104,7 +101,7 @@ export class LabelService {
         return new Promise((resolve, reject) => {
             const payload = {'status': status};
             this.http.put(environment.API_URL + '/labels/' + labelId + '/status', payload).toPromise().then(
-                response => {
+                _ => {
                     resolve();
                 },
                 error => {

@@ -160,7 +160,7 @@ export class ScanService {
         );
     }
 
-    requestSlices(scanId: string, taskKey: string, begin: number, count: number, reversed: boolean): void {
+    requestSlices(scanId: string, taskKey: string, begin: number, count: number, reversed: boolean = false): void {
         console.log('ScanService | requestSlices | begin:', begin);
         this.websocket.emit('request_slices', {
             scan_id: scanId,

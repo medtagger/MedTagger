@@ -1,9 +1,10 @@
 import {SliceSelection} from '../model/selections/SliceSelection';
+import {LabelTag} from '../model/labels/LabelTag';
 
 export class SelectionMock extends SliceSelection {
     constructor(sliceIndex: number,
                 label_tool: string,
-                label_tag: string) {
+                label_tag: LabelTag) {
         super();
 
         this.sliceIndex = sliceIndex;
@@ -17,7 +18,7 @@ export class SelectionMock extends SliceSelection {
     getAdditionalData(): Object {
         return {
             EXAMPLE_PARAM_1: 1337,
-            EXAMPLE_PARAM_2: this.label_tool + this.label_tag,
+            EXAMPLE_PARAM_2: this.label_tool + this.label_tag.key,
             EXAMPLE_PARAM_3: {
                 EXAMPLE_PARAM_3_1: 'Example'
             }
@@ -29,7 +30,7 @@ export class SelectionMock extends SliceSelection {
             'width': 1,
             'height': 1,
             'slice_index': this.sliceIndex,
-            'tag': this.label_tag,
+            'tag': this.label_tag.key,
             'tool': this.label_tool
         };
     }

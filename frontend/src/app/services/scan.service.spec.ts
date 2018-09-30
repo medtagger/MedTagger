@@ -7,6 +7,7 @@ import {Selection3D} from '../model/selections/Selection3D';
 import {MedTaggerWebSocket} from './websocket.service';
 import {ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
+import {LabelTag} from '../model/labels/LabelTag';
 import {of} from 'rxjs';
 import {WrappedSocket} from 'ng-socket-io/dist/src/socket-io.service';
 import {SelectedScan} from '../components/upload-scans-selector/upload-scans-selector.component';
@@ -16,7 +17,8 @@ import {API_URL} from '../utils/ApiUrl';
 const fakeMedTaggerSocket: WrappedSocket = new WrappedSocket({url: environment.WEBSOCKET_URL + '/slices'});
 
 describe('Service: ScanService', () => {
-    const MOCK_SELECTION: SelectionMock = new SelectionMock(1, 'MOCK', 'MOCK');
+    const LABEL_TAG: LabelTag = new LabelTag('MOCK', 'Mock', []);
+    const MOCK_SELECTION: SelectionMock = new SelectionMock(1, 'MOCK', LABEL_TAG);
 
     const EXAMPLE_DATA = {
         SCAN_ID: '1',
@@ -35,15 +37,16 @@ describe('Service: ScanService', () => {
         + EXAMPLE_DATA.SCAN_ID
         + '/'
         + EXAMPLE_DATA.TASK_KEY
-        + API_URL.LABEL;
+        + '/label';
 
     const SKIP_SCAN_API = API_URL.SCANS + EXAMPLE_DATA.SCAN_ID + API_URL.SKIP;
 
     const MOCK_SCAN_METADATA: ScanMetadata = new ScanMetadata(EXAMPLE_DATA.SCAN_ID,
-        EXAMPLE_DATA.STATUS, 50, 512, 512);
+        EXAMPLE_DATA.STATUS, 50, 512, 512, null);
 
     const MOCK_MARKER_SLICE_RAW = {
         scan_id: '1',
+        task_key: 'NODULE',
         index: 1,
         last_in_batch: 50,
         image: new ArrayBuffer(256)
@@ -55,16 +58,13 @@ describe('Service: ScanService', () => {
             MOCK_MARKER_SLICE_RAW.last_in_batch,
             MOCK_MARKER_SLICE_RAW.image);
 
-    const MOCK_UPLOAD_SCAN: SelectedScan = {
-        directory: 'Example',
-        files: [
+    const MOCK_UPLOAD_SCAN: SelectedScan = new SelectedScan('Example', [
             new File(['Example file 1'], 'file1'),
             new File(['Example file 2'], 'file2'),
             new File(['Example file 3'], 'file3'),
             new File(['Example file 4'], 'file4'),
             new File(['Example file 5'], 'file5')
-        ]
-    };
+        ], [], [], {});
 
     const MOCK_FUNCTIONS = {
         onSubscribe: function (response: any) {}
@@ -250,12 +250,14 @@ describe('Service: ScanService', () => {
             const spy = spyOn(fakeMedTaggerSocket, 'emit');
 
             service.requestSlices(MOCK_MARKER_SLICE_RAW.scan_id,
+                MOCK_MARKER_SLICE_RAW.task_key,
                 MOCK_MARKER_SLICE_RAW.index,
                 MOCK_MARKER_SLICE_RAW.last_in_batch,
                 false);
 
             expect(spy).toHaveBeenCalledWith('request_slices', {
                 scan_id: MOCK_MARKER_SLICE_RAW.scan_id,
+                task_key: MOCK_MARKER_SLICE_RAW.task_key,
                 begin: MOCK_MARKER_SLICE_RAW.index,
                 count: MOCK_MARKER_SLICE_RAW.last_in_batch,
                 reversed: false
