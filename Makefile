@@ -24,8 +24,8 @@ e2e:
 	make e2e__delete_environment
 
 e2e_docker:
-	cd e2e && npm install
 	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d
+	cd e2e && npm install
 	@if ! make e2e__run_docker; then\
 		docker-compose -f $(E2E_DOCKER_COMPOSE) down;\
 		echo "E2E Tests failed!";\
