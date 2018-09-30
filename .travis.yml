@@ -4,6 +4,13 @@ before_install:
 
 matrix:
   include:
+    # E2E Tests
+    - services:
+        - docker
+      env: TESTS=e2e
+      script:
+        - make e2e_docker
+
     # Backend - linters & unit tests
     - language: python
       services:

@@ -1,3 +1,7 @@
+export function waitForAnimation() {
+    cy.wait(200);
+}
+
 export function login(email, password) {
     cy.request('POST', Cypress.env('API_URL') + 'auth/sign-in', {
         email: email,
@@ -20,6 +24,7 @@ export function loginAsAdmin() {
 
 export function openSidebar() {
     cy.get('[data-cy=sidebar]').click();
+    waitForAnimation();
 }
 
 export function setFilesInInput(filePath, fileCount = 1, selector = 'input[type="file"]') {
@@ -52,11 +57,15 @@ export function uploadScans(datasets, scansCount) {
     cy.visit(Cypress.env('HOST_URL'));
     openSidebar();
     cy.get('[data-cy=sidebar-upload]').click();
+    waitForAnimation();
     matSelect('[data-cy=datasets]', datasets);
     cy.get('[data-cy=datasets-submit]').click();
+    waitForAnimation();
     cy.get('[data-cy=single-scan]').click();
+    waitForAnimation();
     setFilesInInput('scans/scan.dcm', scansCount);
     cy.get('[data-cy=single-scan-upload]').click();
+    waitForAnimation();
     cy.contains(/Upload completed sucessfully!/, {timeout: 60000}); // uploading scan is time consuming so we must increase timeout
 }
 
@@ -64,10 +73,15 @@ export function goToLabeling(task) {
     cy.visit(Cypress.env('HOST_URL'));
     openSidebar();
     cy.get('[data-cy=sidebar-labelling]').click();
+    waitForAnimation();
     cy.get('[data-cy=next1]').click();
+    waitForAnimation();
     cy.get('[data-cy=next2]').click();
+    waitForAnimation();
     cy.get('[data-cy=next3]').click();
+    waitForAnimation();
     cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
     cy.get('[data-cy=next4]').click();
+    waitForAnimation();
     cy.get(`[data-cy=task]:contains(${task})`).click({force: true}); // clicking on svg has bug, https://github.com/cypress-io/cypress/issues/2245
 }

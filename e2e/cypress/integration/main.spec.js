@@ -5,7 +5,7 @@ describe('Basic flow', () => {
     beforeEach(() => {
         // local session and cookies are cleared automatically before each test so we don't have to do this manually
         // we need to clear only session storage
-        window.sessionStorage.clear()
+        window.sessionStorage.clear();
     });
 
     afterEach(() => {
