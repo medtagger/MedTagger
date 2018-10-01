@@ -1,4 +1,5 @@
 """Script for MedTagger's configuration synchronization."""
+import argparse
 import logging.config
 from typing import Dict
 
@@ -17,7 +18,7 @@ from medtagger.types import TaskID
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger(__name__)
 
-CONFIGURATION_FILE_NAME = '.medtagger.yml'
+DEFAULT_CONFIGURATION_FILE_NAME = '.medtagger.yml'
 
 
 def sync_configuration(configuration: Dict) -> None:
@@ -178,8 +179,12 @@ def _add_label_tag(tag: Dict, db_task_id: TaskID) -> None:
 
 def run() -> None:
     """Entry point for this script."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--configuration', type=str, default=DEFAULT_CONFIGURATION_FILE_NAME)
+    arguments = parser.parse_args()
+
     try:
-        with open(CONFIGURATION_FILE_NAME) as config_file:
+        with open(arguments.configuration) as config_file:
             configuration = yaml.load(config_file)
             sync_configuration(configuration)
     except yaml.YAMLError:

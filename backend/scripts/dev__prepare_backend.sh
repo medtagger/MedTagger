@@ -10,8 +10,11 @@ python3.7 medtagger/database/fixtures.py
 
 echo "Configuration synchronization..."
 cp -n .example.medtagger.yml .medtagger.yml || :
-python3.7 scripts/sync_configuration.py
+if [ -z "$1" ]; then
+    python3.7 scripts/sync_configuration.py
+else
+    python3.7 scripts/sync_configuration.py --configuration=$1
+fi
 
 echo "Populate database with default user accounts..."
 python3.7 scripts/dev__add_default_accounts.py
-

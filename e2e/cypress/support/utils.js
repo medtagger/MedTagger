@@ -1,5 +1,5 @@
 export function waitForAnimation() {
-    cy.wait(200);
+    cy.wait(250);
 }
 
 export function login(email, password) {

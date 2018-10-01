@@ -2,6 +2,7 @@ E2E_DIRECTORY = e2e
 E2E_DOCKER_COMPOSE = $(E2E_DIRECTORY)/docker-compose.yml
 SCRIPTS_DIRECTORY = scripts
 NODE_MODULES_BIN = node_modules/.bin
+MEDTAGGER_CONFIGURATION = $(PWD)/e2e/.medtagger.yml
 
 NG_SERVE_PID_FILE = ng_serve.pid
 REST_PID_FILE = rest.pid
@@ -36,9 +37,9 @@ e2e_docker:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) down
 
 e2e__prepare_environment:
-	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d cassandra postgres rabbitmq
+	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d e2e_cassandra e2e_postgres e2e_rabbitmq
 	cd e2e && npm install
-	. $(E2E_DIRECTORY)/configuration.sh && cd backend && ./$(SCRIPTS_DIRECTORY)/dev__prepare_backend.sh
+	. $(E2E_DIRECTORY)/configuration.sh && cd backend && ./$(SCRIPTS_DIRECTORY)/dev__prepare_backend.sh $(MEDTAGGER_CONFIGURATION)
 
 e2e__start_medtagger:
 	cd frontend && { ng serve -c local & echo $$! > ../$(NG_SERVE_PID_FILE); }

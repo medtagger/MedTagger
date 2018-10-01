@@ -21,6 +21,9 @@ services:
 
   e2e_rabbitmq:
     image: rabbitmq:management
+    ports:
+      - 52003:5672
+      - 52004:15672
     labels:
       - "traefik.enable=false"
 
