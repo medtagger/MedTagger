@@ -24,7 +24,7 @@ e2e:
 	make e2e__delete_environment
 
 e2e_docker:
-	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d
+	docker-compose -f $(E2E_DOCKER_COMPOSE) up --build -d
 	cd e2e && npm install
 	@if ! make e2e__run_docker; then\
 		docker-compose -f $(E2E_DOCKER_COMPOSE) down;\
