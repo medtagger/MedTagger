@@ -27,7 +27,7 @@ e2e_docker:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) up --build -d
 	cd e2e && npm install
 	@if ! make e2e__run_docker; then\
-	    docker-compose logs e2e_medtagger_backend_database_migrations;\
+	    docker-compose -f $(E2E_DOCKER_COMPOSE) logs e2e_medtagger_backend_database_migrations;\
 		docker-compose -f $(E2E_DOCKER_COMPOSE) down;\
 		echo "E2E Tests failed!";\
 		exit 1;\
