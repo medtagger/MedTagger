@@ -126,6 +126,7 @@ venv/
 
 # MedTagger
 .medtagger.yml
+!e2e/.medtagger.yml
 
 # Others
 *.log
