@@ -1,5 +1,5 @@
 """Methods related to API authorization control."""
-from typing import Callable, Optional, Any, cast
+from typing import Callable, Set, Optional, Any, cast
 from functools import wraps
 
 from flask import g
@@ -9,7 +9,7 @@ from passlib.apps import custom_app_context as pwd_context
 
 from medtagger.config import AppConfiguration
 from medtagger.database.models import User
-from medtagger.api.exceptions import UnauthorizedException
+from medtagger.api.exceptions import UnauthorizedException, AccessForbiddenException
 
 TOKEN_EXPIRE_TIME = 24 * 60 * 60  # 24 hours
 
@@ -34,13 +34,18 @@ def role_required(*required_roles: str) -> Callable:
         @wraps(wrapped_method)
         def decorated(*args: Any, **kwargs: Any) -> Any:
             """Check User's roles and raise an exception in case of unauthorized use."""
-            if not g.user:
-                raise UnauthorizedException('You are not logged in.')
-            if g.user.role.name not in required_roles:  # One of required roles is sufficient
-                raise UnauthorizedException('You don\'t have required roles to access this method.')
+            require_one_of_roles(set(required_roles))
             return wrapped_method(*args, **kwargs)
         return decorated
     return wrapper
+
+
+def require_one_of_roles(required_roles: Set[str]) -> None:
+    """Check User's roles and raise an exception in case of unauthorized use."""
+    if not g.user:
+        raise UnauthorizedException('You are not logged in.')
+    if g.user.role.name not in required_roles:  # One of required roles is sufficient
+        raise AccessForbiddenException('You don\'t have required roles to access this method.')
 
 
 def hash_password(password: str) -> str:

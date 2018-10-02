@@ -8,10 +8,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from PIL import Image
 
-from medtagger.exceptions import InternalErrorException
+from medtagger.api.utils import get_current_user
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
-from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
-from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation
+from medtagger.exceptions import InternalErrorException
+from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation, BrushLabelElement
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
     labels as LabelsRepository,
@@ -21,8 +21,9 @@ from medtagger.repositories import (
     datasets as DatasetsRepository,
     tasks as TasksRepository,
 )
+from medtagger.storage.models import BrushLabelElement as StorageBrushLabelElement
 from medtagger.workers.storage import parse_dicom_and_update_slice
-from medtagger.api.utils import get_current_user
+from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
 
 logger = logging.getLogger(__name__)
 
@@ -78,30 +79,52 @@ def get_random_scan(task_key: str) -> Scan:
     :param task_key: unique key identifying task
     :return: Scan Metadata object
     """
-    user = get_current_user()
     task = TasksRepository.get_task_by_key(task_key)
     if not task:
         raise InvalidArgumentsException('Task key {} is invalid!'.format(task_key))
+
+    user = get_current_user()
     scan = ScansRepository.get_random_scan(task, user)
     if not scan:
         raise NotFoundException('Could not find any Scan for this task!')
+
+    predefined_label = LabelsRepository.get_predefined_label_for_scan_in_task(scan, task)
+    if predefined_label:
+        scan.predefined_label_id = predefined_label.id
+
     return scan
 
 
 def get_slices_for_scan(scan_id: ScanID, begin: int, count: int,
                         orientation: SliceOrientation = SliceOrientation.Z) -> Iterable[Tuple[Slice, bytes]]:
-    """Fetch multiple slices for given scan.
+    """Fetch multiple slices for given Scan.
 
-    :param scan_id: ID of a given scan
-    :param begin: first slice index (included)
-    :param count: number of slices that will be returned
+    :param scan_id: ID of a given Scan
+    :param begin: first Slice index (included)
+    :param count: number of Slices that will be returned
     :param orientation: orientation for Slices (by default set to Z axis)
-    :return: generator for Slices
+    :return: generator for Slices and its images
     """
     slices = SlicesRepository.get_slices_by_scan_id(scan_id, orientation=orientation)
     for _slice in slices[begin:begin + count]:
         image = SlicesRepository.get_slice_converted_image(_slice.id)
         yield _slice, image
+
+
+def get_predefined_brush_label_elements(scan_id: ScanID, task_id: int,
+                                        begin: int, count: int) -> Iterable[Tuple[BrushLabelElement, bytes]]:
+    """Fetch Predefined Brush Label Elements for given Scan and Task.
+
+    :param scan_id: ID of a given Scan
+    :param task_id: ID of a given Task
+    :param begin: first Slice index
+    :param count: number of Slices for which Label Elements will be returned
+    :return: generator for Brush Label Elements and its images
+    """
+    label_elements = LabelsRepository.get_predefined_brush_label_elements(scan_id, task_id, begin, count)
+    for label_element in label_elements:
+        storage_brush_label_element = StorageBrushLabelElement.get(id=label_element.id)
+        yield label_element, storage_brush_label_element.image
 
 
 def validate_label_payload(label: Dict, task_key: str, files: Dict[str, bytes]) -> None:
@@ -154,7 +177,8 @@ def _validate_label_elements(label: Dict, task_key: str, files: Dict[str, bytes]
 
 
 def add_label(scan_id: ScanID, task_key: str, elements: List[Dict],   # pylint: disable-msg=too-many-arguments
-              files: Dict[str, bytes], labeling_time: LabelingTime, comment: str = None) -> Label:
+              files: Dict[str, bytes], labeling_time: LabelingTime, comment: str = None,
+              is_predefined: bool = False) -> Label:
     """Add label to given scan.
 
     :param scan_id: ID of a given scan
@@ -163,11 +187,12 @@ def add_label(scan_id: ScanID, task_key: str, elements: List[Dict],   # pylint: 
     :param files: mapping of uploaded files (name and content)
     :param labeling_time: time in seconds that user spent on labeling
     :param comment: (optional) comment describing a label
+    :param is_predefined: (optional) mark such Label as predefined to show on Labeling Page
     :return: Label object
     """
     user = get_current_user()
     try:
-        label = LabelsRepository.add_new_label(scan_id, task_key, user, labeling_time, comment)
+        label = LabelsRepository.add_new_label(scan_id, task_key, user, labeling_time, comment, is_predefined)
     except IntegrityError:
         raise NotFoundException('Could not find Scan for that id!')
     for element in elements:

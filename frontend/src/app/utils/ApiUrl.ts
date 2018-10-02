@@ -3,7 +3,7 @@ export enum API_URL {
     REGISTER = '/auth/register',
     USER_INFO = '/users/info',
     DATASETS = '/scans/datasets',
-    LABEL = '/label',
+    LABELS = '/labels',
     RANDOM_SCAN = '/scans/random',
     SCANS = '/scans/',
     SLICES = '/slices',

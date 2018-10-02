@@ -1,4 +1,5 @@
 import {SliceSelection} from './SliceSelection';
+import {LabelTag} from '../labels/LabelTag';
 
 export class ROISelection2D extends SliceSelection {
 
@@ -8,7 +9,7 @@ export class ROISelection2D extends SliceSelection {
     _width: number;
     _height: number;
 
-    constructor(x: number, y: number, depth: number, tag: string, width?: number, height?: number) {
+    constructor(x: number, y: number, depth: number, tag: LabelTag, width?: number, height?: number) {
         super();
         this._positionX = x;
         this._positionY = y;
@@ -63,7 +64,7 @@ export class ROISelection2D extends SliceSelection {
             'y': correctPositionY,
             'width': correctWidth,
             'height': correctHeight,
-            'tag': this.label_tag,
+            'tag': this.label_tag.key,
             'tool': this.label_tool
         };
     }
