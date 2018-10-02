@@ -123,7 +123,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
             if (!this.selectedArea) {
                 const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
                 const point = new Point(normalizedPoint.x, normalizedPoint.y);
-                this.selectedArea = new ChainSelection([point], this.currentSlice, this.currentTag.key);
+                this.selectedArea = new ChainSelection([point], false, this.currentSlice, this.currentTag);
                 this.selectingInProgress = true;
                 this.requestRedraw();
             }

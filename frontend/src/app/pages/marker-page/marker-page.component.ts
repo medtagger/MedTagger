@@ -22,12 +22,15 @@ import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
 import {TaskService} from '../../services/task.service';
 import {Task} from '../../model/Task';
 import {ROISelection2D} from '../../model/selections/ROISelection2D';
+import {LabelService} from '../../services/label.service';
+import {Label} from '../../model/labels/Label';
+import {PredefinedBrushLabelElement} from '../../model/PredefinedBrushLabelElement';
 
 
 @Component({
     selector: 'app-marker-page',
     templateUrl: './marker-page.component.html',
-    providers: [ScanService],
+    providers: [ScanService, LabelService],
     styleUrls: ['./marker-page.component.scss']
 })
 export class MarkerPageComponent implements OnInit {
@@ -50,10 +53,13 @@ export class MarkerPageComponent implements OnInit {
     isInitialSliceLoad: boolean;
     chooseTaskPageUrl = '/labelling/choose-task';
 
+    getTaskPromise: Promise<Task>;
+
     ActionType = SelectorActionType;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private router: Router, private snackBar: MatSnackBar, private taskService: TaskService) {
+                private router: Router, private snackBar: MatSnackBar, private taskService: TaskService,
+                private labelService: LabelService) {
         console.log('MarkerPage constructor', this.marker);
         this.labelComment = '';
         this.isInitialSliceLoad = true;
@@ -66,7 +72,8 @@ export class MarkerPageComponent implements OnInit {
             this.taskKey = params.get('task') || undefined;
         });
 
-        this.taskService.getTask(this.taskKey).then(
+        this.getTaskPromise = this.taskService.getTask(this.taskKey);
+        this.getTaskPromise.then(
             (task: Task) => {
                 this.task = task;
 
@@ -125,6 +132,11 @@ export class MarkerPageComponent implements OnInit {
             }
         });
 
+        this.scanService.predefinedBrushLabelElementsObservable().subscribe((labelElement: PredefinedBrushLabelElement) => {
+            console.log('MarkerPage | ngOnInit | predefinedBrushLabelElementsObservable: ', labelElement);
+            this.marker.updatePredefinedBrushLabelElement(labelElement);
+        });
+
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
             if (isObserverHooked) {
                 this.marker.observableSliceRequest.subscribe((request: SliceRequest) => {
@@ -146,7 +158,7 @@ export class MarkerPageComponent implements OnInit {
                         return;
                     }
                     if (this.marker.downloadingSlicesInProgress === false) {
-                        this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
+                        this.scanService.requestSlices(this.scan.scanId, this.taskKey, sliceRequest, count, reversed);
                         this.marker.setDownloadSlicesInProgress(true);
                     }
                 });
@@ -160,12 +172,20 @@ export class MarkerPageComponent implements OnInit {
             (scan: ScanMetadata) => {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
+                if (this.scan.predefinedLabelID) {
+                    // Make sure that we've already resolved current Task
+                    this.getTaskPromise.then((task: Task) => {
+                        this.labelService.getLabelByID(this.scan.predefinedLabelID, task).then((label: Label) => {
+                            this.marker.setLabel(label);
+                        });
+                    });
+                }
 
                 const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
                 this.startMeasuringLabelingTime();
                 this.isInitialSliceLoad = true;
-                this.scanService.requestSlices(scan.scanId, begin, count, false);
+                this.scanService.requestSlices(this.scan.scanId, this.taskKey, begin, count, false);
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);

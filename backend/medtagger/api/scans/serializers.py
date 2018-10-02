@@ -92,6 +92,7 @@ in__label_model = api.model('Label model', {
 
 in__label = api.parser()
 in__label.add_argument('label', type=in__label_model, help='Label model object', location='form', required=True)
+in__label.add_argument('is_predefined', type=bool, help='Set it as predefined Label', location='query', required=False)
 
 in__dataset = api.model('New Dataset model', {
     'key': fields.String(),
@@ -112,6 +113,10 @@ out__scan = api.model('Scan model', {
                             attribute='status.name'),
     'number_of_slices': fields.Integer(description='Total number of Slices in given scan',
                                        attribute='declared_number_of_slices'),
+})
+
+out__random_scan = api.inherit('Random Scan model', out__scan, {
+    'predefined_label_id': fields.String(description='Predefined Label\'s ID'),
 })
 
 out__label = api.model('Newly created Label model', {
