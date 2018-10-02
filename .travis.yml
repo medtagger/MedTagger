@@ -9,6 +9,7 @@ matrix:
       services:
         - docker
       env: TESTS=e2e
+      if: branch = master AND type = push
       node_js:
         - "8"
       script:
