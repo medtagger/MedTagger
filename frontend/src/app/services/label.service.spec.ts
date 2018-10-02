@@ -12,7 +12,7 @@ import {ROISelection2D} from '../model/selections/ROISelection2D';
 describe('Service: LabelService', () => {
     const EXAMPLE_TASK = new Task(1, 'EXAMPLE_TASK', 'Example Task', 'image.jpg', [
         new LabelTag('LEFT_NODULE', 'Left Nodule', ['RECTANGLE'])
-    ]);
+    ], ['LUNGS']);
 
     const EXAMPLE_RANDOM_LABEL_RESPONSE: RandomLabelResponse = {
         label_id: 'label-hash',
