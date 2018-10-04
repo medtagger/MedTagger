@@ -11,7 +11,7 @@ from PIL import Image
 from medtagger.exceptions import InternalErrorException
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
-from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation
+from medtagger.database.models import Scan, Slice, Label, LabelTag, SliceOrientation
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
     labels as LabelsRepository,
@@ -29,14 +29,6 @@ logger = logging.getLogger(__name__)
 LabelElementHandler = Callable[[Dict[str, Any], LabelID, Dict[str, bytes]], None]
 
 
-def get_available_datasets() -> List[Dataset]:
-    """Fetch list of all available Datasets.
-
-    :return: list of Datasets
-    """
-    return DatasetsRepository.get_all_datasets()
-
-
 def dataset_is_valid(dataset_key: str) -> bool:
     """Check if Dataset for such key exists.
 
@@ -48,16 +40,6 @@ def dataset_is_valid(dataset_key: str) -> bool:
         return True
     except NoResultFound:
         return False
-
-
-def create_dataset(key: str, name: str) -> Dataset:
-    """Create new Dataset.
-
-    :param key: unique key representing Dataset
-    :param name: name which describes this Dataset
-    :return: Dataset object
-    """
-    return DatasetsRepository.add_new_dataset(key, name)
 
 
 def create_empty_scan(dataset_key: str, declared_number_of_slices: int) -> Scan:
@@ -153,7 +135,7 @@ def _validate_label_elements(label: Dict, task_key: str, files: Dict[str, bytes]
             raise InvalidArgumentsException(message.format(label_element['image_key']))
 
 
-def add_label(scan_id: ScanID, task_key: str, elements: List[Dict],   # pylint: disable-msg=too-many-arguments
+def add_label(scan_id: ScanID, task_key: str, elements: List[Dict],  # pylint: disable-msg=too-many-arguments
               files: Dict[str, bytes], labeling_time: LabelingTime, comment: str = None) -> Label:
     """Add label to given scan.
 

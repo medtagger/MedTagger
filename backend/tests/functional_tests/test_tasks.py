@@ -44,7 +44,7 @@ def test_add_task(prepare_environment: Any) -> None:
     assert len(json_response['tags']) == 2
 
     # Step 3. Check for available Datasets through the REST API
-    response = api_client.get('/api/v1/scans/datasets', headers=get_headers(token=user_token, json=True))
+    response = api_client.get('/api/v1/datasets/', headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)
     datasets = [dataset for dataset in json_response
                 if any(task for task in dataset['tasks'] if task['key'] == 'MARK_NODULES')]

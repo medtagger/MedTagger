@@ -26,7 +26,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Get all datasets
-    response = api_client.get('/api/v1/scans/datasets', headers=get_headers(token=user_token))
+    response = api_client.get('/api/v1/datasets/', headers=get_headers(token=user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, list)

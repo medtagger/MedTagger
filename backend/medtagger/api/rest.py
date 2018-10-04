@@ -29,6 +29,7 @@ from medtagger.storage import create_connection  # noqa
 from medtagger.api.core.service import core_ns as core_rest_ns  # noqa
 from medtagger.api.labels.service import labels_ns  # noqa
 from medtagger.api.scans.service_rest import scans_ns as scans_rest_ns  # noqa
+from medtagger.api.datasets.service_rest import datasets_ns as datasets_rest_ns  # noqa
 from medtagger.api.tasks.service_rest import tasks_ns  # noqa
 from medtagger.api.users.service import users_ns  # noqa
 from medtagger.api.auth.service import auth_ns  # noqa

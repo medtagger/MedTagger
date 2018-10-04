@@ -41,37 +41,6 @@ class Scans(Resource):
         return scan, 201
 
 
-@scans_ns.route('/datasets')
-class Datasets(Resource):
-    """Endpoint that manages datasets."""
-
-    @staticmethod
-    @login_required
-    @scans_ns.marshal_with(serializers.out__dataset)
-    @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Returns all available Datasets.')
-    @scans_ns.doc(responses={200: 'Success'})
-    def get() -> Any:
-        """Return all available datasets."""
-        return business.get_available_datasets()
-
-    @staticmethod
-    @login_required
-    @role_required('doctor', 'admin')
-    @scans_ns.expect(serializers.in__dataset)
-    @scans_ns.marshal_with(serializers.out__dataset)
-    @scans_ns.doc(security='token')
-    @scans_ns.doc(description='Create new Dataset.')
-    @scans_ns.doc(responses={201: 'Success'})
-    def post() -> Any:
-        """Create Dataset."""
-        payload = request.json
-        key = payload['key']
-        name = payload['name']
-
-        return business.create_dataset(key, name), 201
-
-
 @scans_ns.route('/random')
 class Random(Resource):
     """Endpoint that returns random scan for labeling from specified task."""
