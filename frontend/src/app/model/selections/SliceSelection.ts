@@ -1,3 +1,5 @@
+import {LabelTag} from '../labels/LabelTag';
+
 export abstract class SliceSelection {
 
     private static nextId = 1;
@@ -6,7 +8,7 @@ export abstract class SliceSelection {
     public pinned: boolean;
     public hidden: boolean;
     public label_tool: string;
-    public label_tag: string;
+    public label_tag: LabelTag;
 
     private id: number = SliceSelection.nextId++;
 

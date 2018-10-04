@@ -60,7 +60,7 @@ export class ValidationPageComponent implements OnInit {
                         if (count <= 0) {
                             return;
                         }
-                        this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
+                        this.scanService.requestSlices(this.scan.scanId, undefined, sliceRequest, count, reversed);
                         // TODO: Downloading Slices indicator is not available on Validation Page...
                         // if (this.scanViewer.downloadingSlicesInProgress === false) {
                         //     this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
@@ -72,16 +72,9 @@ export class ValidationPageComponent implements OnInit {
         });
     }
 
-    private rect2DROIConverter(selections: any): Array<ROISelection2D> {
-        const roiSelections: Array<ROISelection2D> = [];
-        selections.forEach((selection: any) => {
-            roiSelections.push(new ROISelection2D(selection.x, selection.y, selection.slice_index, selection.width, selection.height));
-        });
-        return roiSelections;
-    }
-
     private requestSlicesWithLabel(): void {
-        this.labelService.getRandomLabel(this.rect2DROIConverter).then((label: Label) => {
+        // TODO: Unify with Marker Page...
+        this.labelService.getRandomLabel(undefined).then((label: Label) => {
             this.label = label;
             this.scanViewer.setArchivedSelections(this.label.labelSelections);
 
@@ -97,7 +90,7 @@ export class ValidationPageComponent implements OnInit {
                 if (begin + ValidationPageComponent.SLICE_BATCH_SIZE > this.scan.numberOfSlices) {
                     count = this.scan.numberOfSlices - begin;
                 }
-                this.scanService.requestSlices(this.label.scanId, begin, count, false);
+                this.scanService.requestSlices(this.label.scanId, undefined, begin, count, false);
             });
         }).catch((error: Error) => {
             this.dialogService

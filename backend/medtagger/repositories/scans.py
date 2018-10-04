@@ -1,5 +1,5 @@
 """Module responsible for definition of ScansRepository."""
-from typing import Optional, List
+from typing import List
 
 from sqlalchemy.sql.expression import func
 
@@ -31,9 +31,12 @@ def get_random_scan(task: Task = None, user: User = None) -> Scan:
         query = query.join(Dataset).join(datasets_tasks).join(Task)
         query = query.filter(Task.key == task.key)
     if user:
-        labelled_scans = Label.query.filter(Label.owner == user).all()
-        labelled_scans_ids = [label.scan_id for label in labelled_scans]
-        query = query.filter(~Scan.id.in_(labelled_scans_ids))  # type: ignore  # "ScanID" has no attribute "in_"
+        labeled_scans_ids = Label.query.with_entities(Label.scan_id)
+        labeled_scans_ids = labeled_scans_ids.filter(Label.owner == user)
+        if task:
+            labeled_scans_ids = labeled_scans_ids.filter(Label.task == task)
+            labeled_scans_ids = labeled_scans_ids.filter(~Label.is_predefined)
+        query = query.filter(~Scan.id.in_(labeled_scans_ids.subquery()))  # type: ignore  # "ScanID" doesn't have "in_"
     query = query.filter(Scan.status == ScanStatus.AVAILABLE)
     query = query.order_by(func.random())
     return query.first()
@@ -46,12 +49,12 @@ def delete_scan_by_id(scan_id: ScanID) -> None:
         session.delete(scan)
 
 
-def add_new_scan(dataset: Dataset, number_of_slices: int, user: Optional[User]) -> Scan:
+def add_new_scan(dataset: Dataset, number_of_slices: int, user: User = None) -> Scan:
     """Add new Scan to the database.
 
     :param dataset: Dataset object
     :param number_of_slices: number of Slices that will be uploaded
-    :param user: User that uploaded scan
+    :param user: (optional) User that uploaded scan
     :return: Scan object
     """
     with db_session() as session:

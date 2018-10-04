@@ -21,6 +21,8 @@ export interface Selector<SliceSelection> {
 
     getStateChangeEmitter(): EventEmitter<SelectionStateMessage>;
 
+    addSelection(selection: SliceSelection): void;
+
     updateCurrentSlice(currentSliceId: number): any;
 
     updateCurrentTag(tag: LabelTag);

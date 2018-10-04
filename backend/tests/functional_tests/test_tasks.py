@@ -42,6 +42,7 @@ def test_add_task(prepare_environment: Any) -> None:
     assert json_response['name'] == 'Mark nodules'
     assert json_response['image_path'] == 'assets/icon/my_icon.svg'
     assert len(json_response['tags']) == 2
+    assert len(json_response['datasets_keys']) == 2
 
     # Step 3. Check for available Datasets through the REST API
     response = api_client.get('/api/v1/datasets/', headers=get_headers(token=user_token, json=True))
