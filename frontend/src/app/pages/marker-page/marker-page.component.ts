@@ -51,7 +51,7 @@ export class MarkerPageComponent implements OnInit {
     toolActions: Array<ToolAction> = [];
     labelComment: string;
     isInitialSliceLoad: boolean;
-    chooseTaskPageUrl = '/labelling/choose-task';
+    chooseTaskPageUrl = '/labeling/choose-task';
 
     getTaskPromise: Promise<Task>;
 

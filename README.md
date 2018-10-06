@@ -89,7 +89,7 @@ Below screenshots show how MedTagger looks like:
 ![Datasets Page](/docs/assets/datasets_page.png)
 
 #### Labeling Page
-![Labeling Page](/docs/assets/labelling_page.png)
+![Labeling Page](/docs/assets/labeling_page.png)
 
 #### Upload Page
 ![Upload Page](docs/assets/upload_page.png)

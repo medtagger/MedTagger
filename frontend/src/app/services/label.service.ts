@@ -42,7 +42,8 @@ export class LabelService {
             const labelTag = this.getLabelTagByKey(element.tag, task);
             switch (element.tool) {
                 case 'RECTANGLE':
-                    elements.push(new RectangleSelection(element.x, element.y, element.slice_index, labelTag, element.width, element.height));
+                    elements.push(new RectangleSelection(element.x, element.y, element.slice_index, labelTag,
+                        element.width, element.height));
                     break;
                 case 'POINT':
                     elements.push(new PointSelection(element.x, element.y, element.slice_index, labelTag));
