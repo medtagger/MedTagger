@@ -1,10 +1,10 @@
 import {EventEmitter} from '@angular/core';
 import {SliceSelection} from '../../model/selections/SliceSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {SelectorAction} from '../../model/SelectorAction';
+import {ToolAction} from '../../model/ToolAction';
 import {LabelTag} from '../../model/labels/LabelTag';
 
-export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> {
+export abstract class ToolBase<CustomSliceSelection extends SliceSelection> {
 
     protected selectedArea: CustomSliceSelection;
     protected selections: Map<number, [CustomSliceSelection]>;
@@ -44,13 +44,13 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     public formArchivedSelections(selectionMap: CustomSliceSelection[]): CustomSliceSelection[] {
         selectionMap.forEach((selection: CustomSliceSelection) => {
             this.drawSelection(selection, this.getStyle().ARCHIVED_SELECTION_COLOR);
-            console.log('Selector | scaleToView selection: ', selection);
+            console.log('ToolBase | scaleToView selection: ', selection);
         });
         return selectionMap;
     }
 
     public drawSelections(): void {
-        console.log('RectROISelector | drawSelections | selection: ', this.selections);
+        console.log('ToolBase | drawSelections | selection: ', this.selections);
         this.getSelections().forEach((selection: CustomSliceSelection) => {
             let color: string;
             const isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
@@ -88,7 +88,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
     }
 
     public addSelection(selection: CustomSliceSelection): void {
-        console.log('Selector | addCurrentSelection');
+        console.log('ToolBase | addCurrentSelection');
         if (this.isOnlyOneSelectionPerSlice()) {
             this.removeSelectionsOnCurrentSlice();
             this.selections.set(selection.sliceIndex, [selection]);
@@ -171,7 +171,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         if (height && height > 0) {
             this.canvasSize.height = height;
         } else {
-            console.warn('RectROISelector | updateCanvasHeight - non numeric/positive height provided', height);
+            console.warn('ToolBase | updateCanvasHeight - non numeric/positive height provided', height);
         }
     }
 
@@ -179,7 +179,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
         if (width && width > 0) {
             this.canvasSize.width = width;
         } else {
-            console.warn('RectROISelector | updateCanvasWidth - non numeric/positive width provided', width);
+            console.warn('ToolBase | updateCanvasWidth - non numeric/positive width provided', width);
         }
     }
 
@@ -222,7 +222,7 @@ export abstract class SelectorBase<CustomSliceSelection extends SliceSelection> 
 
     public abstract drawSelection(selection: CustomSliceSelection, color: string): any;
 
-    public getActions(): Array<SelectorAction> {
+    public getActions(): Array<ToolAction> {
         return [];
     }
 

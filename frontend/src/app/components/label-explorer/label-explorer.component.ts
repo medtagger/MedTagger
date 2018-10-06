@@ -80,7 +80,7 @@ export class LabelExplorerComponent implements OnInit {
     public replaceExistingLabel(selectionId: number, labelSlice: number, tag: LabelTag, tool: string): void {
         const currentLabelIndex = this.labels.findIndex(label => label.tag === tag
             && label.sliceIndex === labelSlice
-            && label.selectorName === tool);
+            && label.toolName === tool);
         console.log('currentLabelIndex: ', currentLabelIndex);
         if (currentLabelIndex > -1) {
             this.labels[currentLabelIndex] = new LabelListItem(selectionId, labelSlice, tag, tool);

@@ -6,8 +6,8 @@ import {MarkerSlice} from '../../model/MarkerSlice';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {SliceRequest} from '../../model/SliceRequest';
 import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
-import {RectROISelector} from '../../components/selectors/RectROISelector';
-import {ROISelection2D} from '../../model/selections/ROISelection2D';
+import {RectangleTool} from '../../components/tools/RectangleTool';
+import {RectangleSelection} from '../../model/selections/RectangleSelection';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 
@@ -33,7 +33,7 @@ export class ValidationPageComponent implements OnInit {
     ngOnInit() {
         console.log('ValidationPage init', this.scanViewer);
 
-        this.scanViewer.setSelectors([new RectROISelector(this.scanViewer.getCanvas())]);
+        this.scanViewer.setTools([new RectangleTool(this.scanViewer.getCanvas())]);
 
         this.requestSlicesWithLabel();
         this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
