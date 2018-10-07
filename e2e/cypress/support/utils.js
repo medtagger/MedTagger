@@ -72,7 +72,7 @@ export function uploadScans(datasets, scansCount) {
 export function goToLabeling(task) {
     cy.visit(Cypress.env('HOST_URL'));
     openSidebar();
-    cy.get('[data-cy=sidebar-labelling]').click();
+    cy.get('[data-cy=sidebar-labeling]').click();
     waitForAnimation();
     cy.get('[data-cy=next1]').click();
     waitForAnimation();
