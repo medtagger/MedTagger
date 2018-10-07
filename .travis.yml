@@ -4,6 +4,17 @@ before_install:
 
 matrix:
   include:
+    # E2E Tests
+    - language: node_js
+      services:
+        - docker
+      env: TESTS=e2e
+      if: branch = master AND type = push
+      node_js:
+        - "8"
+      script:
+        - make e2e_docker
+
     # Backend - linters & unit tests
     - language: python
       services:
