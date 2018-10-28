@@ -1,8 +1,8 @@
-import {ROISelection2D} from '../../model/selections/ROISelection2D';
-import {SelectorBase} from './SelectorBase';
-import {Selector} from './Selector';
+import {RectangleSelection} from '../../model/selections/RectangleSelection';
+import {ToolBase} from './ToolBase';
+import {Tool} from './Tool';
 
-export class RectROISelector extends SelectorBase<ROISelection2D> implements Selector<ROISelection2D> {
+export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<RectangleSelection> {
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -16,8 +16,8 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
         };
     }
 
-    public drawSelection(selection: ROISelection2D, color: string): void {
-        console.log('RectROISelector | drawSelection | selection: ', selection);
+    public drawSelection(selection: RectangleSelection, color: string): void {
+        console.log('RectangleTool | drawSelection | selection: ', selection);
         this.canvasCtx.strokeStyle = color;
         this.canvasCtx.setLineDash(this.getStyle().SELECTION_LINE_DENSITY);
         this.canvasCtx.lineWidth = this.getStyle().SELECTION_LINE_WIDTH;
@@ -38,19 +38,19 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
     }
 
     public onMouseDown(event: MouseEvent): void {
-        console.log('RectROISelector | startMouseSelection | event: ', event);
+        console.log('RectangleTool | startMouseSelection | event: ', event);
         const selectionStartX = (event.clientX) - this.canvasPosition.left;
         const selectionStartY = (event.clientY) - this.canvasPosition.top;
 
         const normalizedPoint: { x: number, y: number } = this.normalizeByView(selectionStartX, selectionStartY);
 
-        this.selectedArea = new ROISelection2D(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag);
+        this.selectedArea = new RectangleSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag);
         this.requestRedraw();
     }
 
     public onMouseMove(mouseEvent: MouseEvent): boolean {
         if (this.selectedArea) {
-            console.log('RectROISelector | drawSelectionRectangle | onmousemove clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
+            console.log('RectangleTool | drawSelectionRectangle | onmousemove clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
             this.updateSelection(mouseEvent);
             this.requestRedraw();
             return true;
@@ -59,7 +59,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
     }
 
     public updateSelection(event: MouseEvent): void {
-        console.log('RectROISelector | updateSelection | event: ', event);
+        console.log('RectangleTool | updateSelection | event: ', event);
 
         if (this.selectedArea) {
 
@@ -95,7 +95,7 @@ export class RectROISelector extends SelectorBase<ROISelection2D> implements Sel
         return !this.selectedArea;
     }
 
-    public getSelectorName(): string {
+    public getToolName(): string {
         return 'RECTANGLE';
     }
 }

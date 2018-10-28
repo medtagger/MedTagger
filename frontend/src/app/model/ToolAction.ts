@@ -1,17 +1,17 @@
-export enum SelectorActionType {
+export enum ToolActionType {
     BUTTON,
     COLOR
 }
 
-export class SelectorAction {
+export class ToolAction {
     name: string;
     enable: () => boolean;
     trigger: () => void;
     isActive: boolean;
-    type: SelectorActionType;
+    type: ToolActionType;
 
     constructor(name: string, enable: () => boolean, trigger: () => void,
-                type: SelectorActionType, isActive?: boolean) {
+                type: ToolActionType, isActive?: boolean) {
         this.name = name;
         this.enable = enable;
         this.isActive = isActive;

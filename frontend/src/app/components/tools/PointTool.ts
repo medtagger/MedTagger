@@ -1,8 +1,8 @@
-import {SelectorBase} from './SelectorBase';
+import {ToolBase} from './ToolBase';
 import {PointSelection} from '../../model/selections/PointSelection';
-import {Selector} from './Selector';
+import {Tool} from './Tool';
 
-export class PointSelector extends SelectorBase<PointSelection> implements Selector<PointSelection> {
+export class PointTool extends ToolBase<PointSelection> implements Tool<PointSelection> {
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -17,7 +17,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
     }
 
     public drawSelection(selection: PointSelection, color: string): void {
-        console.log('PointSelector | drawSelection | selection: ', selection);
+        console.log('PointTool | drawSelection | selection: ', selection);
         this.canvasCtx.fillStyle = color;
 
         const scaledPointPosition: { x: number, y: number } = this.scaleToView(selection.positionX, selection.positionY);
@@ -43,7 +43,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
     }
 
     public onMouseDown(event: MouseEvent): void {
-        console.log('PointSelector | onMouseDown | event: ', event);
+        console.log('PointTool | onMouseDown | event: ', event);
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
 
@@ -66,14 +66,14 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
 
     public onMouseMove(mouseEvent: MouseEvent): void {
         if (this.selectedArea) {
-            console.log('PointSelector | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
+            console.log('PointTool | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
             this.updateSelection(mouseEvent);
             this.requestRedraw();
         }
     }
 
     public updateSelection(event: MouseEvent): void {
-        console.log('PointSelector | updateSelection | event: ', event);
+        console.log('PointTool | updateSelection | event: ', event);
 
         if (this.selectedArea) {
             const newX = event.clientX - this.canvasPosition.left;
@@ -90,7 +90,7 @@ export class PointSelector extends SelectorBase<PointSelection> implements Selec
         this.selectedArea = undefined;
     }
 
-    public getSelectorName(): string {
+    public getToolName(): string {
         return 'POINT';
     }
 }

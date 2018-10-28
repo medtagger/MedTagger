@@ -1,0 +1,143 @@
+version: '3'
+services:
+  e2e_reverse_proxy:
+    image: traefik
+    restart: unless-stopped
+    command: --configFile=/var/traefik/traefik.toml
+    ports:
+      - 80:80
+    volumes:
+      - $PWD/traefik.toml:/var/traefik/traefik.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=false"
+
+  e2e_cassandra:
+    image: cassandra
+    ports:
+      - 52001:9042
+    labels:
+      - "traefik.enable=false"
+
+  e2e_rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - 52003:5672
+      - 52004:15672
+    labels:
+      - "traefik.enable=false"
+
+  e2e_postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: medtagger
+      POSTGRES_USER: medtagger_user
+      POSTGRES_PASSWORD: MedTa99er!
+    ports:
+      - 52002:5432
+    labels:
+      - "traefik.enable=false"
+
+  e2e_medtagger_frontend:
+    image: medtagger_frontend/web
+    restart: unless-stopped
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        - PRODUCTION=${MEDTAGGER__FRONTEND_PRODUCTION}
+        - SUBDIRECTORY=${MEDTAGGER__HOST_ON_SUBDIRECTORY}
+    depends_on:
+      - e2e_medtagger_backend_rest
+    labels:
+      - "traefik.backend=medtagger_frontend"
+      - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) $$1"
+
+  e2e_medtagger_backend_rest:
+    image: medtagger_backend/rest
+    restart: unless-stopped
+    env_file:
+      - ./backend.env
+    build:
+      context: ../backend
+      dockerfile: docker/Dockerfile_rest
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+    depends_on:
+      - e2e_cassandra
+      - e2e_rabbitmq
+      - e2e_postgres
+      - e2e_medtagger_backend_websocket
+      - e2e_medtagger_backend_worker
+    command: bash -c "./scripts/wait_for_dependencies.sh && make run_rest_production"
+    volumes:
+      - ${PWD}/e2e/.medtagger.yml:/medtagger_backend/.medtagger.yml
+    labels:
+      - "traefik.backend=medtagger_backend_rest"
+      - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}/api/v1/,${MEDTAGGER__HOST_ON_SUBDIRECTORY}/swaggerui/; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) $$1"
+
+  e2e_medtagger_backend_websocket:
+    image: medtagger_backend/websocket
+    restart: unless-stopped
+    env_file:
+      - ./backend.env
+    build:
+      context: ../backend
+      dockerfile: docker/Dockerfile_websocket
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+    depends_on:
+      - e2e_cassandra
+      - e2e_rabbitmq
+      - e2e_postgres
+    command: bash -c "./scripts/wait_for_dependencies.sh && make run_websocket_production"
+    volumes:
+      - ${PWD}/e2e/.medtagger.yml:/medtagger_backend/.medtagger.yml
+    labels:
+      - "traefik.backend=medtagger_backend_websocket"
+      - "traefik.backend.loadbalancer.stickiness=true"
+      - "traefik.backend.loadbalancer.stickiness.cookieName=MEDTAGER_WEBSOCKET_NODE"
+      - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}/socket.io; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) $$1"
+
+  e2e_medtagger_backend_worker:
+    image: medtagger_backend/worker
+    restart: unless-stopped
+    env_file:
+      - ./backend.env
+    build:
+      context: ../backend
+      dockerfile: docker/Dockerfile_worker
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+    depends_on:
+      - e2e_cassandra
+      - e2e_rabbitmq
+      - e2e_postgres
+    command: bash -c "./scripts/wait_for_dependencies.sh && make run_workers"
+    volumes:
+      - ${PWD}/e2e/.medtagger.yml:/medtagger_backend/.medtagger.yml
+    labels:
+      - "traefik.enable=false"
+
+  e2e_medtagger_backend_database_migrations:
+    image: medtagger_backend/database_migrations
+    env_file:
+      - ./backend.env
+    build:
+      context: ../backend
+      dockerfile: docker/Dockerfile_database_migrations
+      args:
+        - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
+        - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+    depends_on:
+      - e2e_cassandra
+      - e2e_rabbitmq
+      - e2e_postgres
+    command: bash -c "./scripts/dev__prepare_backend.sh"
+    volumes:
+      - ${PWD}/e2e/.medtagger.yml:/medtagger_backend/.medtagger.yml
+    labels:
+      - "traefik.enable=false"

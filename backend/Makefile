@@ -5,9 +5,9 @@ SCRIPTS_DIRECTORY = scripts
 
 # Tests configuration
 ifdef TESTS
-    TESTS_TO_RUN = -k $(TESTS)
+	TESTS_TO_RUN = -k $(TESTS)
 else
-    TESTS_TO_RUN =
+	TESTS_TO_RUN =
 endif
 COVERAGE_LIMIT = 0
 MAX_CYCLOMATIC_COMPLEXITY = 5
@@ -99,7 +99,7 @@ unit_tests:
 functional_tests:
 	make functional_tests__prepare_environment
 	@if ! make functional_tests__run; then\
-		docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down;\
+		make functional_tests__clear_dependencies;\
 		echo "Functional tests failed!";\
 		exit 1;\
 	fi
