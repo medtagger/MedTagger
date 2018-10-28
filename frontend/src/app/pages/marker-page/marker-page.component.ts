@@ -5,29 +5,32 @@ import {MarkerComponent} from '../../components/marker/marker.component';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {Selection3D} from '../../model/selections/Selection3D';
-import {RectROISelector} from '../../components/selectors/RectROISelector';
+import {RectangleTool} from '../../components/tools/RectangleTool';
 import {SliceRequest} from '../../model/SliceRequest';
 import {DialogService} from '../../services/dialog.service';
 import {Router} from '@angular/router';
 import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/labels/LabelTag';
 import {LabelExplorerComponent} from '../../components/label-explorer/label-explorer.component';
-import {Selector} from '../../components/selectors/Selector';
-import {PointSelector} from '../../components/selectors/PointSelector';
-import {BrushSelector} from '../../components/selectors/BrushSelector';
+import {Tool} from '../../components/tools/Tool';
+import {PointTool} from '../../components/tools/PointTool';
+import {BrushTool} from '../../components/tools/BrushTool';
 import {FormControl, Validators} from '@angular/forms';
 import {isUndefined} from 'util';
-import {ChainSelector} from '../../components/selectors/ChainSelector';
-import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
+import {ChainTool} from '../../components/tools/ChainTool';
+import {ToolAction, ToolActionType} from '../../model/ToolAction';
 import {TaskService} from '../../services/task.service';
 import {Task} from '../../model/Task';
-import {ROISelection2D} from '../../model/selections/ROISelection2D';
+import {RectangleSelection} from '../../model/selections/RectangleSelection';
+import {LabelService} from '../../services/label.service';
+import {Label} from '../../model/labels/Label';
+import {PredefinedBrushLabelElement} from '../../model/PredefinedBrushLabelElement';
 
 
 @Component({
     selector: 'app-marker-page',
     templateUrl: './marker-page.component.html',
-    providers: [ScanService],
+    providers: [ScanService, LabelService],
     styleUrls: ['./marker-page.component.scss']
 })
 export class MarkerPageComponent implements OnInit {
@@ -43,20 +46,23 @@ export class MarkerPageComponent implements OnInit {
     taskKey: string;
     lastSliceID = 0;
     startTime: Date;
-    selectors: Map<string, Selector<any>>;
+    tools: Map<string, Tool<any>>;
     taskTags: FormControl;
-    selectorActions: Array<SelectorAction> = [];
+    toolActions: Array<ToolAction> = [];
     labelComment: string;
     isInitialSliceLoad: boolean;
-    chooseTaskPageUrl = '/labelling/choose-task';
+    chooseTaskPageUrl = '/labeling/choose-task';
 
-    ActionType = SelectorActionType;
+    getTaskPromise: Promise<Task>;
+
+    ActionType = ToolActionType;
 
     zoomLevels = [1.0, 2.0, 4.0, 8.0];
     currentZoomLevelIndex = 0;
 
     constructor(private scanService: ScanService, private route: ActivatedRoute, private dialogService: DialogService,
-                private router: Router, private snackBar: MatSnackBar, private taskService: TaskService) {
+                private router: Router, private snackBar: MatSnackBar, private taskService: TaskService,
+                private labelService: LabelService) {
         console.log('MarkerPage constructor', this.marker);
         this.labelComment = '';
         this.isInitialSliceLoad = true;
@@ -69,7 +75,8 @@ export class MarkerPageComponent implements OnInit {
             this.taskKey = params.get('task') || undefined;
         });
 
-        this.taskService.getTask(this.taskKey).then(
+        this.getTaskPromise = this.taskService.getTask(this.taskKey);
+        this.getTaskPromise.then(
             (task: Task) => {
                 this.task = task;
 
@@ -95,15 +102,15 @@ export class MarkerPageComponent implements OnInit {
 
         this.taskTags = new FormControl('', [Validators.required]);
 
-        // Brush selector should be first on the list to avoid canvas shenanigans
-        this.selectors = new Map<string, Selector<any>>([
-            ['BRUSH', new BrushSelector(this.marker.getCanvas())],
-            ['RECTANGLE', new RectROISelector(this.marker.getCanvas())],
-            ['POINT', new PointSelector(this.marker.getCanvas())],
-            ['CHAIN', new ChainSelector(this.marker.getCanvas())]
+        // Brush tool should be first on the list to avoid canvas shenanigans
+        this.tools = new Map<string, Tool<any>>([
+            ['BRUSH', new BrushTool(this.marker.getCanvas())],
+            ['RECTANGLE', new RectangleTool(this.marker.getCanvas())],
+            ['POINT', new PointTool(this.marker.getCanvas())],
+            ['CHAIN', new ChainTool(this.marker.getCanvas())]
         ]);
 
-        this.marker.setSelectors(Array.from(this.selectors.values()));
+        this.marker.setTools(Array.from(this.tools.values()));
 
         this.marker.setLabelExplorer(this.labelExplorer);
 
@@ -128,6 +135,11 @@ export class MarkerPageComponent implements OnInit {
             }
         });
 
+        this.scanService.predefinedBrushLabelElementsObservable().subscribe((labelElement: PredefinedBrushLabelElement) => {
+            console.log('MarkerPage | ngOnInit | predefinedBrushLabelElementsObservable: ', labelElement);
+            this.marker.updatePredefinedBrushLabelElement(labelElement);
+        });
+
         this.marker.hookUpSliceObserver(MarkerPageComponent.SLICE_BATCH_SIZE).then((isObserverHooked: boolean) => {
             if (isObserverHooked) {
                 this.marker.observableSliceRequest.subscribe((request: SliceRequest) => {
@@ -149,7 +161,7 @@ export class MarkerPageComponent implements OnInit {
                         return;
                     }
                     if (this.marker.downloadingSlicesInProgress === false) {
-                        this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
+                        this.scanService.requestSlices(this.scan.scanId, this.taskKey, sliceRequest, count, reversed);
                         this.marker.setDownloadSlicesInProgress(true);
                     }
                 });
@@ -173,12 +185,20 @@ export class MarkerPageComponent implements OnInit {
             (scan: ScanMetadata) => {
                 this.scan = scan;
                 this.marker.setScanMetadata(this.scan);
+                if (this.scan.predefinedLabelID) {
+                    // Make sure that we've already resolved current Task
+                    this.getTaskPromise.then((task: Task) => {
+                        this.labelService.getLabelByID(this.scan.predefinedLabelID, task).then((label: Label) => {
+                            this.marker.setLabel(label);
+                        });
+                    });
+                }
 
                 const begin = Math.floor(Math.random() * (scan.numberOfSlices - MarkerPageComponent.SLICE_BATCH_SIZE));
                 const count = MarkerPageComponent.SLICE_BATCH_SIZE;
                 this.startMeasuringLabelingTime();
                 this.isInitialSliceLoad = true;
-                this.scanService.requestSlices(scan.scanId, begin, count, false);
+                this.scanService.requestSlices(this.scan.scanId, this.taskKey, begin, count, false);
             },
             (errorResponse: Error) => {
                 console.log(errorResponse);
@@ -206,7 +226,7 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
-        this.sendSelection(new Selection3D(<ROISelection2D[]>this.marker.get3dSelection()), this.labelComment);
+        this.sendSelection(new Selection3D(<RectangleSelection[]>this.marker.get3dSelection()), this.labelComment);
     }
 
     public sendEmptyLabel(): void {
@@ -214,10 +234,10 @@ export class MarkerPageComponent implements OnInit {
         this.nextScan();
     }
 
-    private sendSelection(roiSelection: Selection3D, comment: string) {
+    private sendSelection(selection3d: Selection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
 
-        this.scanService.sendSelection(this.scan.scanId, this.task.key, roiSelection, labelingTime, comment)
+        this.scanService.sendSelection(this.scan.scanId, this.task.key, selection3d, labelingTime, comment)
             .then((response: Response) => {
                 console.log('MarkerPage | sendSelection | success!');
                 this.indicateLabelHasBeenSend();
@@ -251,9 +271,9 @@ export class MarkerPageComponent implements OnInit {
         this.snackBar.open('New scan has been loaded!', '', {duration: 2000});
     }
 
-    public isCurrentSelector(selectorName: string): boolean {
-        const currentSelector = this.marker.getCurrentSelector();
-        return currentSelector && currentSelector.getSelectorName() === selectorName;
+    public isCurrentTool(toolName: string): boolean {
+        const currentTool = this.marker.getCurrentTool();
+        return currentTool && currentTool.getToolName() === toolName;
     }
 
     public isToolSupportedByCurrentTag(tool: string) {
@@ -264,27 +284,27 @@ export class MarkerPageComponent implements OnInit {
         return tag.tools.includes(tool);
     }
 
-    public setSelector(selectorName: string) {
-        const selector = this.selectors.get(selectorName);
-        if (selector) {
-            this.marker.setCurrentSelector(selector);
-            this.selectorActions = selector.getActions();
+    public setTool(toolName: string) {
+        const tool = this.tools.get(toolName);
+        if (tool) {
+            this.marker.setCurrentTool(tool);
+            this.toolActions = tool.getActions();
         } else {
-            console.warn(`MarkerPage | setSelector | Selector "${selectorName}" doesn't exist`);
+            console.warn(`MarkerPage | setTool | Tool "${toolName}" doesn't exist`);
         }
     }
 
-    public clearSelector() {
-        this.marker.clearCurrentSelector();
-        this.selectorActions = [];
+    public clearTool() {
+        this.marker.clearCurrentTool();
+        this.toolActions = [];
     }
 
     public setTag(tag: LabelTag) {
         this.marker.setCurrentTag(tag);
-        const currentSelector = this.marker.getCurrentSelector();
-        if (!isUndefined(currentSelector)) {
-            if (!this.isToolSupportedByCurrentTag(currentSelector.getSelectorName())) {
-                this.clearSelector();
+        const currentTool = this.marker.getCurrentTool();
+        if (!isUndefined(currentTool)) {
+            if (!this.isToolSupportedByCurrentTag(currentTool.getToolName())) {
+                this.clearTool();
             }
         }
     }

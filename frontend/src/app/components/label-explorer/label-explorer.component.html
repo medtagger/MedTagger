@@ -12,7 +12,7 @@
                     <mat-list-item *ngFor="let label of getLabelsForTag(tag)"
                                    (mouseenter)="label.hovered=true"
                                    (mouseleave)="label.hovered=false">
-                        <p matLine><mat-icon class="smaller-svg" [svgIcon]="getToolIconName(label.selectorName)"></mat-icon>Slice #{{ label.sliceIndex }} (Selection #{{ label.selectionId }})</p>
+                        <p matLine><mat-icon class="smaller-svg" [svgIcon]="getToolIconName(label.toolName)"></mat-icon>Slice #{{ label.sliceIndex }} (Selection #{{ label.selectionId }})</p>
                         <button mat-icon-button *ngIf="label.hovered" (click)="deleteLabel(label)">
                             <mat-icon class="size-16px">delete</mat-icon>
                         </button>

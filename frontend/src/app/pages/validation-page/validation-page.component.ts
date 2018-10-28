@@ -6,8 +6,8 @@ import {MarkerSlice} from '../../model/MarkerSlice';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {SliceRequest} from '../../model/SliceRequest';
 import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
-import {RectROISelector} from '../../components/selectors/RectROISelector';
-import {ROISelection2D} from '../../model/selections/ROISelection2D';
+import {RectangleTool} from '../../components/tools/RectangleTool';
+import {RectangleSelection} from '../../model/selections/RectangleSelection';
 import {DialogService} from '../../services/dialog.service';
 import {Location} from '@angular/common';
 
@@ -33,7 +33,7 @@ export class ValidationPageComponent implements OnInit {
     ngOnInit() {
         console.log('ValidationPage init', this.scanViewer);
 
-        this.scanViewer.setSelectors([new RectROISelector(this.scanViewer.getCanvas())]);
+        this.scanViewer.setTools([new RectangleTool(this.scanViewer.getCanvas())]);
 
         this.requestSlicesWithLabel();
         this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
@@ -60,7 +60,7 @@ export class ValidationPageComponent implements OnInit {
                         if (count <= 0) {
                             return;
                         }
-                        this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
+                        this.scanService.requestSlices(this.scan.scanId, undefined, sliceRequest, count, reversed);
                         // TODO: Downloading Slices indicator is not available on Validation Page...
                         // if (this.scanViewer.downloadingSlicesInProgress === false) {
                         //     this.scanService.requestSlices(this.scan.scanId, sliceRequest, count, reversed);
@@ -72,16 +72,9 @@ export class ValidationPageComponent implements OnInit {
         });
     }
 
-    private rect2DROIConverter(selections: any): Array<ROISelection2D> {
-        const roiSelections: Array<ROISelection2D> = [];
-        selections.forEach((selection: any) => {
-            roiSelections.push(new ROISelection2D(selection.x, selection.y, selection.slice_index, selection.width, selection.height));
-        });
-        return roiSelections;
-    }
-
     private requestSlicesWithLabel(): void {
-        this.labelService.getRandomLabel(this.rect2DROIConverter).then((label: Label) => {
+        // TODO: Unify with Marker Page...
+        this.labelService.getRandomLabel(undefined).then((label: Label) => {
             this.label = label;
             this.scanViewer.setArchivedSelections(this.label.labelSelections);
 
@@ -97,7 +90,7 @@ export class ValidationPageComponent implements OnInit {
                 if (begin + ValidationPageComponent.SLICE_BATCH_SIZE > this.scan.numberOfSlices) {
                     count = this.scan.numberOfSlices - begin;
                 }
-                this.scanService.requestSlices(this.label.scanId, begin, count, false);
+                this.scanService.requestSlices(this.label.scanId, undefined, begin, count, false);
             });
         }).catch((error: Error) => {
             this.dialogService

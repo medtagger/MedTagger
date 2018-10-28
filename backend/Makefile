@@ -1,13 +1,13 @@
 # Global constants for whole Makefile
-PYTHON = python3.6
+PYTHON = python3.7
 MAIN_MODULE = medtagger
 SCRIPTS_DIRECTORY = scripts
 
 # Tests configuration
 ifdef TESTS
-    TESTS_TO_RUN = -k $(TESTS)
+	TESTS_TO_RUN = -k $(TESTS)
 else
-    TESTS_TO_RUN =
+	TESTS_TO_RUN =
 endif
 COVERAGE_LIMIT = 0
 MAX_CYCLOMATIC_COMPLEXITY = 5
@@ -99,7 +99,7 @@ unit_tests:
 functional_tests:
 	make functional_tests__prepare_environment
 	@if ! make functional_tests__run; then\
-		docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down;\
+		make functional_tests__clear_dependencies;\
 		echo "Functional tests failed!";\
 		exit 1;\
 	fi
@@ -116,6 +116,9 @@ functional_tests__run:
 	
 functional_tests__delete_environment:
 	. $(FUNCTIONAL_TESTS_MODULE)/configuration.sh && alembic downgrade base
+	make functional_tests__clear_dependencies
+
+functional_tests__clear_dependencies:
 	docker-compose -f $(FUNCTIONAL_TESTS_DOCKER_COMPOSE) down
 
 functional_tests_docker:

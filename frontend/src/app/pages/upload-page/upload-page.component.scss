@@ -17,8 +17,12 @@ $duration: 1.4s;
     width: 60%;
     min-width: 470px;
     max-width: 800px;
-    margin: 5px auto 60px auto;
+    margin: 5px auto 20px auto;
     display: block;
+}
+
+.middle-screen-width:last-child {
+    margin: 5px auto 60px auto;
 }
 
 //
@@ -129,6 +133,11 @@ mat-icon.upload-status {
 
 .warning-message {
     background: #dba604;
+    color: white;
+}
+
+.info-message {
+    background: #80c0e7;
     color: white;
 }
 

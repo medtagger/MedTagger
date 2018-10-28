@@ -1,3 +1,5 @@
+import {BinaryConverter} from '../utils/BinaryConverter';
+
 export class MarkerSlice {
     private readonly _id: number;
     private readonly _index: number;
@@ -9,7 +11,7 @@ export class MarkerSlice {
         this._index = index;
         this._lastInBatch = lastInBatch;
         if (source instanceof ArrayBuffer) {
-            this._source = MarkerSlice.byteToBase64(source);
+            this._source = BinaryConverter.byteToBase64(source);
         } else if (typeof String) {
             this._source = source;
         } else {
@@ -27,15 +29,6 @@ export class MarkerSlice {
 
     public get source() {
         return this._source;
-    }
-
-    private static byteToBase64(byteImage: ArrayBuffer): string {
-        const bytes = new Uint8Array(byteImage);
-        let binary = '';
-        for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
-        return 'data:image/png;base64,' + btoa(binary);
     }
 
     public isLastInBatch(): boolean {
