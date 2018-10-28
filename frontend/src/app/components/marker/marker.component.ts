@@ -158,7 +158,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.slices = new Map<number, MarkerSlice>();
 
-        this.updateCanvasPositionInSelectors();
+        this.updateCanvasPositionInTools();
 
         this.initializeImage(() => {
             this.clearCanvasSelections();

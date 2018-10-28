@@ -1,5 +1,5 @@
 <div #canvasWorkspace id="markerWrapper">
-    <div #imageContainer id="imageContainer" (scroll)="updateCanvasPositionInSelectors()">
+    <div #imageContainer id="imageContainer" (scroll)="updateCanvasPositionInTools()" (wheel)="$event.preventDefault()">
         <img #image id="markerBackgroundImage"/>
         <canvas #canvas id="markerCanvas"></canvas>
     </div>

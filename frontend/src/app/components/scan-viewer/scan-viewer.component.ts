@@ -213,8 +213,8 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         });
     }
 
-    public updateCanvasPositionInSelectors(): void {
-        this.selectors.forEach((selector) => selector.updateCanvasPosition(this.canvas.getBoundingClientRect()));
+    public updateCanvasPositionInTools(): void {
+        this.tools.forEach((selector) => selector.updateCanvasPosition(this.canvas.getBoundingClientRect()));
     }
 
     public selectMiddleSlice(): void {
@@ -231,7 +231,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
         this.slices = new Map<number, MarkerSlice>();
 
-        this.updateCanvasPositionInSelectors();
+        this.updateCanvasPositionInTools();
 
         this.initializeImage(this.drawSelections);
 
