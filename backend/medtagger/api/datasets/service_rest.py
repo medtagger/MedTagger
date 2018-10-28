@@ -11,7 +11,7 @@ from medtagger.api.security import login_required, role_required
 datasets_ns = api.namespace('datasets', 'Methods related with datasets')
 
 
-@datasets_ns.route('/')
+@datasets_ns.route('')
 class Datasets(Resource):
     """Endpoint that manages datasets."""
 
