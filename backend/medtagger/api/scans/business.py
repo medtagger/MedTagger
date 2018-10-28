@@ -11,7 +11,7 @@ from PIL import Image
 from medtagger.api.utils import get_current_user
 from medtagger.api.exceptions import NotFoundException, InvalidArgumentsException
 from medtagger.exceptions import InternalErrorException
-from medtagger.database.models import Dataset, Scan, Slice, Label, LabelTag, SliceOrientation, BrushLabelElement
+from medtagger.database.models import Scan, Slice, Label, LabelTag, SliceOrientation, BrushLabelElement
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
     labels as LabelsRepository,
