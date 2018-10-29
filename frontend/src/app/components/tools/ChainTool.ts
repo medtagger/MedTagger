@@ -116,7 +116,7 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
                 if (!this.selectedArea) {
                     const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
                     const point = new Point(normalizedPoint.x, normalizedPoint.y);
-                    this.selectedArea = new ChainSelection([point, point], this.currentSlice, this.currentTag.key);
+                    this.selectedArea = new ChainSelection([point, point], false, this.currentSlice, this.currentTag);
                     this.requestRedraw();
                 }
             }
@@ -153,12 +153,17 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
         }
     }
 
-    public canUseMouseWheel(): boolean {
+    public canChangeSlice(): boolean {
         return !this.selectedArea;
     }
 
     public getToolName(): string {
         return 'CHAIN';
+    }
+
+    public onToolChange(): void {
+        this.selectedArea = undefined;
+        this.requestRedraw();
     }
 
     private isMovingPoint(): boolean {

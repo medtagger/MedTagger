@@ -234,8 +234,12 @@ export abstract class ToolBase<CustomSliceSelection extends SliceSelection> {
         this.redrawRequestEmitter.emit();
     }
 
-    public canUseMouseWheel(): boolean {
+    public canChangeSlice(): boolean {
         return true;
+    }
+
+    public onToolChange(): void {
+
     }
 }
 

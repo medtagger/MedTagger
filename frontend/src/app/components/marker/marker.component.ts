@@ -87,6 +87,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     public setCurrentTool(tool: Tool<any>) {
+        if (this.currentTool) {
+            this.currentTool.onToolChange();
+        }
         this.currentTool = tool;
         this.updateTagForCurrentTool(this.currentTag);
     }
@@ -264,14 +267,14 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         };
 
         this.canvas.onwheel = (wheelEvent: WheelEvent) => {
-            if (this.currentTool && !this.currentTool.canUseMouseWheel()) {
+            if (this.currentTool && !this.currentTool.canChangeSlice()) {
                 return;
             }
 
             const sliderValue = wheelEvent.deltaY > 0 ? this.slider.value - 1 : this.slider.value + 1;
 
             if (sliderValue >= this.slider.min && sliderValue <= this.slider.max) {
-                this.selectors.forEach((selector) => selector.updateCurrentSlice(sliderValue));
+                this.tools.forEach((selector) => selector.updateCurrentSlice(sliderValue));
                 this.requestSlicesIfNeeded(sliderValue);
 
                 this.changeMarkerImage(sliderValue);
@@ -284,5 +287,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     public setLabelExplorer(labelExplorerRef: LabelExplorerComponent): void {
         this.labelExplorer = labelExplorerRef;
         this.hookUpExplorerLabelChangeSubscription();
+    }
+
+    public canChangeSlice(): boolean {
+        return this.currentTool ? this.currentTool.canChangeSlice() : true;
     }
 }
