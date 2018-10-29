@@ -18,9 +18,9 @@
                     <mat-icon matListIcon>apps</mat-icon>
                     <h3 matLine>Home</h3>
                 </a>
-                <a mat-list-item routerLink="{{ currentUser.settings.skipTutorial ? '/labelling/choose-task' : '/labelling/tutorial' }}" (click)="sidenav.close()" data-cy="sidebar-labelling" >
+                <a mat-list-item routerLink="{{ currentUser.settings.skipTutorial ? '/labeling/choose-task' : '/labeling/tutorial' }}" (click)="sidenav.close()" data-cy="sidebar-labeling" >
                     <mat-icon matListIcon>label_outline</mat-icon>
-                    <h3 matLine>Labelling</h3>
+                    <h3 matLine>Labeling</h3>
                 </a>
                 <a mat-list-item routerLink="/upload" (click)="sidenav.close()"
                    *ngIf="currentUser.role !== 'volunteer'" data-cy="sidebar-upload" >

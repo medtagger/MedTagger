@@ -10,12 +10,13 @@ import {
     UploadScansSelectorComponent,
     SelectedScan,
     UserFiles,
-    IncompatibleFile
+    IncompatibleFile,
 } from '../../components/upload-scans-selector/upload-scans-selector.component';
 import {Observable} from 'rxjs/internal/Observable';
 import {interval} from 'rxjs/internal/observable/interval';
 import {throwError} from 'rxjs/internal/observable/throwError';
 import {Subscription} from 'rxjs/Subscription';
+import {PredefinedLabelToUpload} from '../../utils/PredefinedLabelHandler';
 
 
 enum UploadMode {
@@ -92,6 +93,7 @@ export class UploadPageComponent implements OnInit, OnDestroy {
     uploadingAndProcessingScans: Array<UploadingScan> = [];
     availableScans: Array<UploadingScan> = [];
     errorScans: Array<UploadingScan> = [];
+    hasPredefinedLabels = false;
 
     incompatibleFiles: IncompatibleFile[] = [];
 
@@ -145,6 +147,9 @@ export class UploadPageComponent implements OnInit, OnDestroy {
 
     public chooseFiles(userFiles: UserFiles): void {
         this.scans = userFiles.scans;
+        this.hasPredefinedLabels = !!this.scans.find((scan: SelectedScan) => {
+            return scan.predefinedLabels.length > 0;
+        });
         this.totalNumberOfSlices = userFiles.numberOfSlices;
         this.incompatibleFiles = userFiles.incompatibleFiles;
     }
@@ -176,7 +181,7 @@ export class UploadPageComponent implements OnInit, OnDestroy {
                     }
                 });
 
-                // Move all errored and available Scans to uploaded array, so we won't monitor them again
+                // Move all erred and available Scans to uploaded array, so we won't monitor them again
                 switch (scanToMonitor.status) {
                     case UploadingScanStatus.ERROR: {
                         this.uploadingAndProcessingScans.splice(i, 1);
@@ -264,13 +269,23 @@ export class UploadPageComponent implements OnInit, OnDestroy {
         const numberOfSlices = uploadingScan.scan.files.length;
 
         return this.scanService.createNewScan(dataset, numberOfSlices).then((scanId: string) => {
-                console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
-                uploadingScan.id = scanId;
-                return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
-            },
-            () => {
-                return throwError({error: 'Could not create Scan.'});
+            console.log('New Scan created with ID:', scanId, ', number of Slices:', numberOfSlices);
+            uploadingScan.id = scanId;
+            uploadingScan.scan.predefinedLabels.forEach((predefinedLabel: PredefinedLabelToUpload) => {
+                // Filter and send only these additional data that are needed by the Predefined Label
+                const additionalData = {};
+                predefinedLabel.neededFiles.forEach((fileName: string) => {
+                    additionalData[fileName] = uploadingScan.scan.additionalData[fileName];
+                });
+
+                console.log('Sending Predefined Label for Scan:', scanId, ' and Task:', predefinedLabel.taskKey);
+                this.scanService.sendPredefinedLabel(scanId, predefinedLabel.taskKey, predefinedLabel.label, additionalData);
             });
+            return this.scanService.uploadSlices(scanId, uploadingScan.scan.files);
+        },
+        () => {
+            return throwError({error: 'Could not create Scan.'});
+        });
     }
 
     private resetFormGroup(formGroup: FormGroup): void {

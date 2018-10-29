@@ -19,6 +19,7 @@ BRANCHES_WITH_FULL_TESTS = ['master']
 def get_root_dir(path):
     return os.path.dirname(path).split('/')[0]
 
+
 def run(command):
     logging.info('Let\'s run the CI!')
     p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
@@ -31,6 +32,7 @@ def run(command):
     p.stdout.close()
     return_code = p.wait()
     exit(return_code)
+
 
 def do_not_run():
     logging.info('This subproject does not contain changes.')

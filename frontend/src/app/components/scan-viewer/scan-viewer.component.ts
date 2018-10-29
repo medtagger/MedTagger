@@ -4,7 +4,7 @@ import {Subject, from} from 'rxjs';
 import {groupBy, toArray} from 'rxjs/operators';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
-import {Selector} from '../selectors/Selector';
+import {Tool} from '../tools/Tool';
 import {SliceRequest} from '../../model/SliceRequest';
 import {SliceSelection} from '../../model/selections/SliceSelection';
 import {LabelTag} from '../../model/labels/LabelTag';
@@ -47,7 +47,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public observableSliceRequest: Subject<SliceRequest>;
     protected sliceBatchSize: number;
 
-    protected selectors: Array<Selector<SliceSelection>>;
+    protected tools: Array<Tool<SliceSelection>>;
     protected _currentTag;
 
     focusable: boolean;
@@ -93,21 +93,21 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         }
     }
 
-    public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {
+    public setTools(newTools: Array<Tool<SliceSelection>>) {
         this.clearCanvasSelections();
-        this.selectors = newSelectors.slice();
-        this.selectors.forEach((selector) => {
-            selector.updateCanvasPosition(this.canvas.getBoundingClientRect());
-            selector.updateCurrentSlice(this._currentSlice);
-            selector.updateCanvasWidth(this.canvas.width);
-            selector.updateCanvasHeight(this.canvas.height);
-            selector.drawSelections();
+        this.tools = newTools.slice();
+        this.tools.forEach((tool) => {
+            tool.updateCanvasPosition(this.canvas.getBoundingClientRect());
+            tool.updateCurrentSlice(this._currentSlice);
+            tool.updateCanvasWidth(this.canvas.width);
+            tool.updateCanvasHeight(this.canvas.height);
+            tool.drawSelections();
         });
     }
 
-    public setCurrentTagForSelector(selector: Selector<SliceSelection>, tag: LabelTag) {
-        console.log('Updating tag for selector: ', selector);
-        selector.updateCurrentTag(tag);
+    public setCurrentTagForTool(tool: Tool<SliceSelection>, tag: LabelTag) {
+        console.log('Updating tag for tool: ', tool);
+        tool.updateCurrentTag(tag);
     }
 
     public setCurrentTag(tag: LabelTag) {
@@ -117,9 +117,9 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public setArchivedSelections(selections: Array<SliceSelection>): void {
         console.log('ScanViewer | setArchivedSelections: ', selections);
         from(selections).pipe(groupBy((selection) => selection.label_tool)).subscribe(selectionGroup => {
-            const selector = this.selectors.find((s) => s.getSelectorName() === selectionGroup.key);
-            if (selector !== undefined) {
-                selectionGroup.pipe(toArray()).subscribe((s) => selector.archiveSelections(selector.formArchivedSelections(s)));
+            const tool = this.tools.find((s) => s.getToolName() === selectionGroup.key);
+            if (tool !== undefined) {
+                selectionGroup.pipe(toArray()).subscribe((s) => tool.archiveSelections(tool.formArchivedSelections(s)));
             } else {
                 console.warn(`ScanViewer | setArchivedSelections | '${selectionGroup.key}' tool doesn't exist`);
             }
@@ -133,12 +133,12 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     public setCanvasWidth(newWidth: number): void {
         this.canvas.width = newWidth;
-        this.selectors.forEach((selector) => selector.updateCanvasWidth(this.canvas.width));
+        this.tools.forEach((tool) => tool.updateCanvasWidth(this.canvas.width));
     }
 
     public setCanvasHeight(newHeight: number): void {
         this.canvas.height = newHeight;
-        this.selectors.forEach((selector) => selector.updateCanvasHeight(this.canvas.height));
+        this.tools.forEach((tool) => tool.updateCanvasHeight(this.canvas.height));
     }
 
     get currentSlice() {
@@ -148,7 +148,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     public clearData(): void {
         this.slices = new Map<number, MarkerSlice>();
         this._currentSlice = undefined;
-        this.selectors.forEach((selector) => selector.clearData());
+        this.tools.forEach((tool) => tool.clearData());
         SliceSelection.resetIdCounter();
     }
 
@@ -156,7 +156,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         console.log('ScanViewer | feedData: ', newSlice);
         if (!this._currentSlice) {
             this._currentSlice = newSlice.index;
-            this.selectors.forEach((selector) => selector.updateCurrentSlice(this._currentSlice));
+            this.tools.forEach((tool) => tool.updateCurrentSlice(this._currentSlice));
         }
         this.addSlice(newSlice);
         this.updateSliderRange();
@@ -203,7 +203,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         this.slider.registerOnChange((sliderValue: number) => {
             console.log('ScanViewer init | slider change: ', sliderValue);
 
-            this.selectors.forEach((selector) => selector.updateCurrentSlice(sliderValue));
+            this.tools.forEach((tool) => tool.updateCurrentSlice(sliderValue));
             this.requestSlicesIfNeeded(sliderValue);
 
             this.changeMarkerImage(sliderValue);
@@ -229,7 +229,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     protected initializeCanvas(): void {
         this.canvas.oncontextmenu = (e) => e.preventDefault();
-        this.selectors.forEach((selector) => selector.updateCanvasPosition(this.canvas.getBoundingClientRect()));
+        this.tools.forEach((tool) => tool.updateCanvasPosition(this.canvas.getBoundingClientRect()));
     }
 
     protected initializeImage(afterImageLoad?: () => void): void {
@@ -243,7 +243,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     protected changeMarkerImage(sliceID: number): void {
         this._currentSlice = sliceID;
-        this.selectors.forEach((selector) => selector.updateCurrentSlice(this._currentSlice));
+        this.tools.forEach((tool) => tool.updateCurrentSlice(this._currentSlice));
 
         this.clearCanvasSelections();
         this.setCanvasImage();
@@ -290,11 +290,11 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         this.canvas.style.left = centerX + 'px';
         this.canvas.style.top = centerY + 'px';
 
-        this.selectors.forEach((selector) => selector.updateCanvasPosition(this.canvas.getBoundingClientRect()));
+        this.tools.forEach((tool) => tool.updateCanvasPosition(this.canvas.getBoundingClientRect()));
     }
 
     protected drawSelections(): void {
-        this.selectors.forEach((selector) => selector.drawSelections());
+        this.tools.forEach((tool) => tool.drawSelections());
     }
 
     protected clearCanvasSelections(): void {

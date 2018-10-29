@@ -105,16 +105,49 @@
                         <mat-card-actions>
                             <app-upload-scans-selector #uploadSingleScanSelector (onFileSelect)="chooseFiles($event)"
                                                    [multipleScans]="false" style="float: left;"></app-upload-scans-selector>
+                            <div class="clearfix"></div>
+                        </mat-card-actions>
+                    </mat-card>
+                </div>
+
+                <!-- Information about Scans that will be sent -->
+                <div class="middle-screen-width" *ngIf="scans.length > 0">
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>Selected Scans</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <!-- Tip about Predefined Labels -->
+                            <section class="box-message info-message" *ngIf="!hasPredefinedLabels">
+                                <mat-icon>info</mat-icon>
+                                <p>
+                                    <strong>Tip!</strong> You can also specify Predefined Label which will be shown initially
+                                    on the Labeling Page. To do so, send "TASK_KEY.json" file together with your DICOM files.
+                                </p>
+                            </section>
+
+                            <!-- Show list of selected Scans -->
+                            <mat-list dense>
+                                <mat-list-item *ngFor="let selectedScan of scans">
+                                    <mat-icon matListIcon>recent_actors</mat-icon>
+                                    <p class="scan-directory" matLine>{{selectedScan.directory}}</p>
+                                    <span class="scan-status" matTooltip="{{selectedScan.predefinedLabelsTasks.join(', ')}}">
+                                        {{selectedScan.predefinedLabels.length}} Predefined Labels
+                                    </span>
+                                </mat-list-item>
+                            </mat-list>
+                        </mat-card-content>
+                        <mat-card-actions>
                             <button mat-raised-button color="primary" (click)="uploadFiles()"
                                     *ngIf="totalNumberOfSlices != 0" style="float: right;" data-cy="single-scan-upload">
                                 <mat-icon>file_upload</mat-icon>
-                                Upload Scan!
+                                Upload!
                             </button>
                             <span class="button-wrapper" *ngIf="totalNumberOfSlices == 0"
                                   matTooltip="Please select at least one DICOM file" matTooltipPosition="above">
                                 <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" disabled>
                                     <mat-icon>file_upload</mat-icon>
-                                    Upload Scan!
+                                    Upload!
                                 </button>
                             </span>
                             <div class="clearfix"></div>
@@ -152,16 +185,49 @@
                         <mat-card-actions>
                             <app-upload-scans-selector #uploadMultipleScansSelector (onFileSelect)="chooseFiles($event)"
                                                    [multipleScans]="true" style="float: left;"></app-upload-scans-selector>
+                            <div class="clearfix"></div>
+                        </mat-card-actions>
+                    </mat-card>
+                </div>
+
+                <!-- Information about Scans that will be sent -->
+                <div class="middle-screen-width" *ngIf="scans.length > 0">
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>Selected Scans</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <!-- Tip about Predefined Labels -->
+                            <section class="box-message info-message" *ngIf="!hasPredefinedLabels">
+                                <mat-icon>info</mat-icon>
+                                <p>
+                                    <strong>Tip!</strong> You can also specify Predefined Label which will be shown initially
+                                    on the Labeling Page. To do so, send "TASK_KEY.json" file together with your DICOM files.
+                                </p>
+                            </section>
+
+                            <!-- Show list of selected Scans -->
+                            <mat-list dense>
+                                <mat-list-item *ngFor="let selectedScan of scans">
+                                    <mat-icon matListIcon>recent_actors</mat-icon>
+                                    <p class="scan-directory" matLine>{{selectedScan.directory}}</p>
+                                    <span class="scan-status" matTooltip="{{selectedScan.predefinedLabelsTasks.join(', ')}}">
+                                        {{selectedScan.predefinedLabels.length}} Predefined Labels
+                                    </span>
+                                </mat-list-item>
+                            </mat-list>
+                        </mat-card-content>
+                        <mat-card-actions>
                             <button mat-raised-button color="primary" (click)="uploadFiles()"
                                     *ngIf="totalNumberOfSlices != 0" style="float: right;">
                                 <mat-icon>file_upload</mat-icon>
-                                Upload Scans!
+                                Upload!
                             </button>
                             <span class="button-wrapper" *ngIf="totalNumberOfSlices == 0"
-                                  matTooltip="Please select directory with all your Scans" matTooltipPosition="above">
+                                  matTooltip="Please select at least one DICOM file" matTooltipPosition="above">
                                 <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" disabled>
                                     <mat-icon>file_upload</mat-icon>
-                                    Upload Scans!
+                                    Upload!
                                 </button>
                             </span>
                             <div class="clearfix"></div>
@@ -243,7 +309,7 @@
                         <mat-icon>check</mat-icon>
                         <p>
                             Upload completed sucessfully!<br/>
-                            All of your scans are now available for labelling.
+                            All of your scans are now available for labeling.
                         </p>
                     </section>
                     <section class="box-message warning-message" *ngIf="availableScans.length != scans.length && errorScans.length != scans.length">

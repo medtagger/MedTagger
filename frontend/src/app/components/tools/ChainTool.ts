@@ -1,9 +1,9 @@
-import {Selector} from './Selector';
-import {SelectorBase} from './SelectorBase';
+import {Tool} from './Tool';
+import {ToolBase} from './ToolBase';
 import {Point} from '../../model/Point';
 import {ChainSelection} from '../../model/selections/ChainSelection';
 
-export class ChainSelector extends SelectorBase<ChainSelection> implements Selector<ChainSelection> {
+export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSelection> {
 
     private selectedAreaPointIndex = -1;
 
@@ -22,7 +22,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
     }
 
     public drawSelection(selection: ChainSelection, color: string): void {
-        console.log('ChainSelector | drawSelection | selection: ', selection);
+        console.log('ChainTool | drawSelection | selection: ', selection);
 
         this.canvasCtx.fillStyle = color;
         this.canvasCtx.strokeStyle = color;
@@ -81,7 +81,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
     }
 
     public onMouseDown(event: MouseEvent): void {
-        console.log('ChainSelector | onMouseDown | event: ', event);
+        console.log('ChainTool | onMouseDown | event: ', event);
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
 
@@ -129,7 +129,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
 
     public onMouseMove(event: MouseEvent): void {
         if (this.selectedArea) {
-            console.log('ChainSelector | updateSelection | event: ', event);
+            console.log('ChainTool | updateSelection | event: ', event);
             const newX = event.clientX - this.canvasPosition.left;
             const newY = event.clientY - this.canvasPosition.top;
             const normalizedValues: { x: number, y: number } = this.normalizeByView(newX, newY);
@@ -157,7 +157,7 @@ export class ChainSelector extends SelectorBase<ChainSelection> implements Selec
         return !this.selectedArea;
     }
 
-    public getSelectorName(): string {
+    public getToolName(): string {
         return 'CHAIN';
     }
 

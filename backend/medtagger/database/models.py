@@ -3,7 +3,7 @@
 import uuid
 from typing import List, Dict, cast, Optional, Any
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event
+from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event, false
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import relationship
@@ -323,33 +323,40 @@ class Label(Base):
 
     __tablename__ = 'Labels'
     id: LabelID = Column(String, primary_key=True)
+    comment: Optional[str] = Column(String, nullable=True)
+    labeling_time: LabelingTime = Column(Float, nullable=True)
+    is_predefined: Boolean = Column(Boolean, nullable=False, server_default=false())
+    status: LabelVerificationStatus = Column(Enum(LabelVerificationStatus), nullable=False,
+                                             server_default=LabelVerificationStatus.NOT_VERIFIED.value)
+
     scan_id: ScanID = Column(String, ForeignKey('Scans.id', ondelete='cascade'))
     scan: Scan = relationship('Scan', back_populates='labels')
+
     task_id: TaskID = Column(Integer, ForeignKey('Tasks.id'), nullable=False)
     task: Task = relationship('Task')
-
-    labeling_time: LabelingTime = Column(Float, nullable=True)
-
-    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label', cascade='delete')
 
     owner_id: int = Column(Integer, ForeignKey('Users.id'))
     owner: User = relationship('User', back_populates='labels')
 
-    status: LabelVerificationStatus = Column(Enum(LabelVerificationStatus), nullable=False,
-                                             server_default=LabelVerificationStatus.NOT_VERIFIED.value)
+    elements: List['LabelElement'] = relationship('LabelElement', back_populates='label', cascade='delete')
 
-    comment: Optional[str] = Column(String, nullable=True)
-
-    def __init__(self, user: User, labeling_time: LabelingTime, comment: str = None) -> None:
+    def __init__(self, user: User, labeling_time: LabelingTime, comment: str = None,
+                 is_predefined: bool = False) -> None:
         """Initialize Label.
 
-        By default all of the labels are not verified
+        By default all of the labels are not verified.
+
+        :param user: User that entered such Label
+        :param labeling_time: time that was needed to prepare such Label
+        :param comment: (optional) comment added by User on Labeling Page
+        :param is_predefined: (optional) mark such Label as predefined for given Scan and Task
         """
         self.id = LabelID(str(uuid.uuid4()))
         self.owner = user
         self.labeling_time = labeling_time
         self.status = LabelVerificationStatus.NOT_VERIFIED
         self.comment = comment
+        self.is_predefined = is_predefined
 
     def __repr__(self) -> str:
         """Return string representation for Label."""

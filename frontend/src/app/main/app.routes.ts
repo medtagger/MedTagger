@@ -11,21 +11,21 @@ import {ModuleWithProviders} from '@angular/core';
 import {AuthGuard} from '../guards/auth.guard';
 import * as appRoutes from '../constants/routes';
 
-export const labellingRoutes: Routes = [
+export const labelingRoutes: Routes = [
     {
-        path: appRoutes.LABELLING,
+        path: appRoutes.LABELING,
         component: MarkerPageComponent,
-        data: {title: 'Labelling', disableFooter: true},
+        data: {title: 'Labeling', disableFooter: true},
         canActivate: [AuthGuard]
     },
     {
-        path: appRoutes.LABELLING_TASK_CHOOSE,
+        path: appRoutes.LABELING_TASK_CHOOSE,
         component: TasksPageComponent,
         data: {title: 'Choosing task'},
         canActivate: [AuthGuard]
     },
     {
-        path: appRoutes.LABELLING_TUTORIAL,
+        path: appRoutes.LABELING_TUTORIAL,
         component: MarkerTutorialPageComponent,
         data: {title: 'Marker tutorial'},
         canActivate: [AuthGuard]
@@ -39,7 +39,7 @@ export const routes: Routes = [
     {path: appRoutes.UPLOAD, component: UploadPageComponent, data: {title: 'Upload new Scans'}, canActivate: [AuthGuard]},
     {path: appRoutes.SETTINGS, component: SettingsPageComponent, data: {title: 'Settings'}, canActivate: [AuthGuard]},
     {path: appRoutes.VALIDATION, component: ValidationPageComponent, data: {title: 'Validation'}, canActivate: [AuthGuard]},
-    ...labellingRoutes
+    ...labelingRoutes
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forRoot(routes, {enableTracing: true} // config for debugging

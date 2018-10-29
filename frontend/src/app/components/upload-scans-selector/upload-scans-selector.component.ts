@@ -1,10 +1,40 @@
 import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@angular/core';
+import {PredefinedLabelToUpload, handlePredefinedLabelFile} from '../../utils/PredefinedLabelHandler';
 
 const FILE_SIZE_LIMIT = 5;  // MB
 
 export class SelectedScan {
     directory = '';
     files: File[] = [];
+    predefinedLabels: Array<PredefinedLabelToUpload> = [];
+    predefinedLabelsTasks: Array<string> = [];
+    additionalData: Object = {};
+
+    constructor(directory = '', files: File[] = [], predefinedLabels: Array<PredefinedLabelToUpload> = [],
+                predefinedLabelsTasks: Array<string> = [], additionalData: Object = {}) {
+        this.directory = directory;
+        this.files = files;
+        this.predefinedLabels = predefinedLabels;
+        this.predefinedLabelsTasks = predefinedLabelsTasks;
+        this.additionalData = additionalData;
+    }
+
+    public addPredefinedLabel(file: File): Promise<void> {
+        return new Promise(((resolve, reject) => {
+            handlePredefinedLabelFile(file).then((values: [string, PredefinedLabelToUpload]) => {
+                const taskKey = values[0], predefinedLabel = values[1];
+                this.predefinedLabelsTasks.push(taskKey);
+                this.predefinedLabels.push(predefinedLabel);
+                resolve();
+            }, _ => {
+                reject();
+            });
+        }));
+    }
+
+    public addAdditionalData(key: string, value: Object): void {
+        this.additionalData[key] = value;
+    }
 }
 
 export class IncompatibleFile {
@@ -37,6 +67,7 @@ export class UploadScansSelectorComponent {
     @Input() multipleScans: boolean;
     @Output() onFileSelect: EventEmitter<object> = new EventEmitter();
 
+    public ACCEPTED_FILE_TYPES = ['.dcm', '.png', '.json'].join(',');
     @ViewChild('inputFile') nativeInputFile: ElementRef;
     private userSelectedFiles: File[] = [];
 
@@ -44,11 +75,11 @@ export class UploadScansSelectorComponent {
     public totalNumberOfSlices = 0;
     public incompatibleFiles: IncompatibleFile[] = [];
 
-    // https://en.wikipedia.org/wiki/List_of_file_signatures -> dicom format
+    // https://en.wikipedia.org/wiki/List_of_file_signatures -> DICOM format
     private DICOM_BYTE_SIGNATURE = '4449434D';
     private DICOM_BYTE_SIGNATURE_OFFSET = 128;
 
-    private async isCompatibleSliceFile(sliceFile: File): Promise<boolean> {
+    private async isCompatibleSliceFile(sliceFile: File, scan: SelectedScan): Promise<[boolean, SelectedScan]> {
         let isCompatible = null;
 
         // Skip all files that are not DICOMs
@@ -69,7 +100,7 @@ export class UploadScansSelectorComponent {
             isCompatible = false;
         });
 
-        return isCompatible;
+        return [isCompatible, scan];
     }
 
     private async isFileDicom(sliceFile: File): Promise<any> {
@@ -93,7 +124,7 @@ export class UploadScansSelectorComponent {
                     if (fileSignature === this.DICOM_BYTE_SIGNATURE) {
                         resolve();
                     } else {
-                        reject(new Error('Non dicom file!'));
+                        reject(new Error('Not a DICOM file!'));
                     }
                 };
                 const blob = sliceFile.slice(this.DICOM_BYTE_SIGNATURE_OFFSET, this.DICOM_BYTE_SIGNATURE_OFFSET + 4);
@@ -121,67 +152,79 @@ export class UploadScansSelectorComponent {
     }
 
     private prepareSingleScan(): Promise<void> {
-        const slicePromises: Array<Promise<any>> = [];
+        const promises: Array<Promise<any>> = [];
         const singleScan = new SelectedScan();
-        for (const sliceFile of this.userSelectedFiles) {
+        this.scans.push(singleScan);
+
+        for (const selectedFile of this.userSelectedFiles) {
+            // User can upload a JSON file which will represent Predefined Label
+            if (selectedFile.name.endsWith('.json') && selectedFile.type === 'application/json') {
+                promises.push(singleScan.addPredefinedLabel(selectedFile));
+                continue;
+            }
+
+            // User can upload a PNG file which will represent Brush Predefined Label Element
+            if (selectedFile.name.endsWith('.png') && selectedFile.type === 'image/png') {
+                singleScan.addAdditionalData(selectedFile.name, selectedFile);
+                continue;
+            }
+
             // Check file compatibility and add it to the list of incompatible files
-            slicePromises.push(this.isCompatibleSliceFile(sliceFile).then((isCompatible: boolean) => {
+            promises.push(this.isCompatibleSliceFile(selectedFile, singleScan).then((result: [boolean, SelectedScan]) => {
+                const isCompatible: boolean = result[0];
+                const scanForThisSlice: SelectedScan = result[1];
                 if (isCompatible) {
                     this.totalNumberOfSlices += 1;
-                    singleScan.files.push(sliceFile);
+                    scanForThisSlice.files.push(selectedFile);
                 }
             }));
         }
 
-        // As we cannot fetch these files' directory, we've got to display something on the UI
-        return Promise.all(slicePromises)
-            .then(() => {
-                singleScan.directory = 'Single 3D Scan (' + this.totalNumberOfSlices + ' DICOMs)';
-                this.scans.push(singleScan);
-            });
+        return Promise.all(promises).then(() => {
+            // As we cannot fetch these files' directory, we've got to display something on the UI
+            singleScan.directory = 'Single 3D Scan (' + this.totalNumberOfSlices + ' DICOMs)';
+        });
     }
 
     private prepareMultipleScans(): Promise<void> {
-        const slicePromises: Array<Promise<any>> = [];
-        let lastScanDirectory: String;
+        const promises: Array<Promise<any>> = [];
 
-        // User selected multiple scans for upload, so let's group them into the Scans
-        let currentScan;
+        for (const selectedFile of this.userSelectedFiles) {
+            const slicePath = selectedFile.webkitRelativePath;
+            const currentScanDirectory = slicePath.split('/').slice(0, -1).join('/');
+            let scanForThisSlice = this.scans.find((scan: SelectedScan) => {
+                return scan.directory === currentScanDirectory;
+            });
+            if (!scanForThisSlice) {
+                scanForThisSlice = new SelectedScan();
+                scanForThisSlice.directory = currentScanDirectory;
+                this.scans.splice(0, 0, scanForThisSlice);
+            }
 
-        for (const sliceFile of this.userSelectedFiles) {
+            // User can upload a JSON file which will represent Predefined Label
+            if (selectedFile.name.endsWith('.json') && selectedFile.type === 'application/json') {
+                promises.push(scanForThisSlice.addPredefinedLabel(selectedFile));
+                continue;
+            }
+
+            // User can upload a PNG file which will represent Brush Predefined Label Element
+            if (selectedFile.name.endsWith('.png') && selectedFile.type === 'image/png') {
+                scanForThisSlice.addAdditionalData(selectedFile.name, selectedFile);
+                continue;
+            }
+
             // Check file compatibility and add it to the list of incompatible files
-            slicePromises.push(this.isCompatibleSliceFile(sliceFile).then((isCompatible: boolean) => {
+            promises.push(this.isCompatibleSliceFile(selectedFile, scanForThisSlice).then((result: [boolean, SelectedScan]) => {
+                const isCompatible: boolean = result[0];
+                const scan: SelectedScan = result[1];
                 if (isCompatible) {
-                    // Slices that are in the same directory as others (previous ones) are considered as a single Scan
-                    const slicePath = sliceFile.webkitRelativePath;
-                    const currentScanDirectory = slicePath.split('/').slice(0, -1).join('/');
-                    if (currentScanDirectory !== lastScanDirectory) {
-                        // If this is not the first iteration of the whole loop over files -> save current Scan
-                        if (!!lastScanDirectory) {
-                            this.scans.push(currentScan);
-                        }
-
-                        // If we found Slice from new directory - we consider this as another Scan
-                        currentScan = new SelectedScan();
-                        currentScan.directory = currentScanDirectory;
-                        currentScan.files = [];
-                        lastScanDirectory = currentScanDirectory;
-                    }
-
-                    // Store given Slice to the Scan which is defined as current Scan Directory
                     this.totalNumberOfSlices += 1;
-                    currentScan.files.push(sliceFile);
+                    scan.files.push(selectedFile);
                 }
             }));
         }
 
-        return Promise.all(slicePromises)
-            .then(() => {
-                // Don't forget about current scan!
-                if (!!currentScan) {
-                    this.scans.push(currentScan);
-                }
-            });
+        return Promise.all(promises).then(() => {});
     }
 
     public onNativeInputFileSelect($event): void {

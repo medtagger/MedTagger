@@ -1,9 +1,9 @@
 import {EventEmitter} from '@angular/core';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {SelectorAction} from '../../model/SelectorAction';
+import {ToolAction} from '../../model/ToolAction';
 import {LabelTag} from '../../model/labels/LabelTag';
 
-export interface Selector<SliceSelection> {
+export interface Tool<SliceSelection> {
 
     drawSelections(): any;
 
@@ -20,6 +20,8 @@ export interface Selector<SliceSelection> {
     setRedrawRequestEmitter(emitter: EventEmitter<void>): void;
 
     getStateChangeEmitter(): EventEmitter<SelectionStateMessage>;
+
+    addSelection(selection: SliceSelection): void;
 
     updateCurrentSlice(currentSliceId: number): any;
 
@@ -57,12 +59,12 @@ export interface Selector<SliceSelection> {
     // Hides selection from user view without deleting from memory, return true if selection with selectionId exists
     hideSelection(selectionId: number, newValue: boolean): boolean;
 
-    getSelectorName(): string;
+    getToolName(): string;
 
-    getActions(): Array<SelectorAction>;
+    getActions(): Array<ToolAction>;
 
     isSingleSelectionPerSlice(): boolean;
 
-    // Used to check if using mouse wheel is safe with current selector
+    // Used to check if using mouse wheel is safe with current tool
     canUseMouseWheel(): boolean;
 }
