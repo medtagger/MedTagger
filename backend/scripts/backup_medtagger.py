@@ -1,4 +1,5 @@
-"""Script for backuping whole MedTagger."""  # flake8: noqa: T001  # Prints instead of logging
+"""Script for backuping whole MedTagger."""
+# flake8: noqa: T001  # Prints instead of logging
 import os
 import json
 from typing import Dict, List  # pylint: disable=unused-import

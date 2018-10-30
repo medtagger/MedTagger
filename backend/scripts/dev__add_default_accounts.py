@@ -38,5 +38,5 @@ def insert_admin_account() -> None:
 if __name__ == '__main__':
     try:
         insert_admin_account()
-    except Exception as ex:  # pylint: disable=broad-except;  This should be fixed once we move to repository
+    except Exception:  # pylint: disable=broad-except;  This should be fixed once we move to repository
         logger.exception('Unhandled exception while inserting default admin account!')
