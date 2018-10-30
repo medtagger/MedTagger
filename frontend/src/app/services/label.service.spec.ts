@@ -7,7 +7,7 @@ import {Task} from '../model/Task';
 import {LabelService, RandomLabelResponse} from './label.service';
 import {LabelTag} from '../model/labels/LabelTag';
 import {Label} from '../model/labels/Label';
-import {ROISelection2D} from '../model/selections/ROISelection2D';
+import {RectangleSelection} from '../model/selections/RectangleSelection';
 
 describe('Service: LabelService', () => {
     const EXAMPLE_TASK = new Task(1, 'EXAMPLE_TASK', 'Example Task', 'image.jpg', [
@@ -57,7 +57,7 @@ describe('Service: LabelService', () => {
                 expect(label.labelComment).toBe(EXAMPLE_RANDOM_LABEL_RESPONSE.comment);
                 expect(label.labelSelections.length).toBe(1);
 
-                const rectangleSelection = label.labelSelections[0] as ROISelection2D;
+                const rectangleSelection = label.labelSelections[0] as RectangleSelection;
                 expect(rectangleSelection.positionX).toBe(0.5);
                 expect(rectangleSelection.positionY).toBe(0.5);
                 expect(rectangleSelection.width).toBe(0.5);
@@ -83,7 +83,7 @@ describe('Service: LabelService', () => {
                 expect(label.labelComment).toBe(EXAMPLE_RANDOM_LABEL_RESPONSE.comment);
                 expect(label.labelSelections.length).toBe(1);
 
-                const rectangleSelection = label.labelSelections[0] as ROISelection2D;
+                const rectangleSelection = label.labelSelections[0] as RectangleSelection;
                 expect(rectangleSelection.positionX).toBe(0.5);
                 expect(rectangleSelection.positionY).toBe(0.5);
                 expect(rectangleSelection.width).toBe(0.5);

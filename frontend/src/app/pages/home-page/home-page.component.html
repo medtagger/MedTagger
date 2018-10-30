@@ -1,8 +1,8 @@
 <div class="menu">
     <div class="button-row">
-        <button mat-fab routerLink="{{ user.settings.skipTutorial ? '/labelling/choose-task' : '/labelling/tutorial' }}">
+        <button mat-fab routerLink="{{ user.settings.skipTutorial ? '/labeling/choose-task' : '/labeling/tutorial' }}">
             <mat-icon>label_outline</mat-icon>
-            <div>Labelling</div>
+            <div>Labeling</div>
         </button>
         <button mat-fab routerLink="/upload" *ngIf="user.role !== 'volunteer'">
             <mat-icon>add</mat-icon>

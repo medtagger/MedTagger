@@ -1,7 +1,7 @@
 import {SliceSelection} from './SliceSelection';
 import {LabelTag} from '../labels/LabelTag';
 
-export class ROISelection2D extends SliceSelection {
+export class RectangleSelection extends SliceSelection {
 
     // Normalized parameters of selection (<0;1>)
     _positionX: number;

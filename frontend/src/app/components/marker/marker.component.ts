@@ -8,14 +8,14 @@ import {SliceSelection} from '../../model/selections/SliceSelection';
 import {LabelExplorerComponent} from '../label-explorer/label-explorer.component';
 import {LabelListItem} from '../../model/labels/LabelListItem';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {Selector} from '../selectors/Selector';
+import {Tool} from '../tools/Tool';
 import {Subscription} from 'rxjs/Subscription';
 import {isUndefined} from 'util';
 import {MatSnackBar} from '@angular/material';
 import {LabelTag} from '../../model/labels/LabelTag';
 import {Label} from '../../model/labels/Label';
 import {PredefinedBrushLabelElement} from '../../model/PredefinedBrushLabelElement';
-import {BrushSelector} from '../selectors/BrushSelector';
+import {BrushTool} from '../tools/BrushTool';
 
 @Component({
     selector: 'app-marker-component',
@@ -36,7 +36,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     canvas: HTMLCanvasElement;
 
-    private currentSelector: Selector<SliceSelection>;
+    private currentTool: Tool<SliceSelection>;
     private currentTag: LabelTag;
 
     @ViewChild('canvas')
@@ -56,9 +56,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     private labelExplorer: LabelExplorerComponent;
 
-    private selectorSubscriptions: Array<Subscription> = [];
+    private toolSubscriptions: Array<Subscription> = [];
 
-    private selectorsByName: Map<string, Selector<SliceSelection>> = new Map();
+    private toolsByName: Map<string, Tool<SliceSelection>> = new Map();
 
     constructor(public snackBar: MatSnackBar) {
         super();
@@ -72,34 +72,34 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         return this._currentSlice;
     }
 
-    public setSelectors(newSelectors: Array<Selector<SliceSelection>>) {
-        super.setSelectors(newSelectors);
-        this.selectorsByName.clear();
-        this.selectors.forEach((selector: Selector<SliceSelection>) => {
-            selector.setRedrawRequestEmitter(this.redrawRequestEmitter);
-            this.selectorsByName.set(selector.getSelectorName(), selector);
+    public setTools(newTools: Array<Tool<SliceSelection>>) {
+        super.setTools(newTools);
+        this.toolsByName.clear();
+        this.tools.forEach((tool: Tool<SliceSelection>) => {
+            tool.setRedrawRequestEmitter(this.redrawRequestEmitter);
+            this.toolsByName.set(tool.getToolName(), tool);
         });
         this.hookUpStateChangeSubscription();
     }
 
-    public getCurrentSelector(): Selector<any> {
-        return this.currentSelector;
+    public getCurrentTool(): Tool<any> {
+        return this.currentTool;
     }
 
-    public setCurrentSelector(selector: Selector<any>) {
-        if (this.currentSelector) {
-            this.currentSelector.deselect();
+    public setCurrentTool(tool: Tool<any>) {
+        if (this.currentTool) {
+            this.currentTool.deselect();
         }
-        this.currentSelector = selector;
-        this.updateTagForCurrentSelector(this.currentTag);
+        this.currentTool = tool;
+        this.updateTagForCurrentTool(this.currentTag);
     }
 
-    public updateTagForCurrentSelector(tag: LabelTag): void {
-        super.setCurrentTagForSelector(this.currentSelector, tag);
+    public updateTagForCurrentTool(tag: LabelTag): void {
+        super.setCurrentTagForTool(this.currentTool, tag);
     }
 
-    public clearCurrentSelector() {
-        this.currentSelector = undefined;
+    public clearCurrentTool() {
+        this.currentTool = undefined;
     }
 
     public setCurrentTag(tag: LabelTag) {
@@ -124,19 +124,19 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     public removeAllSelectionsOnCurrentSlice(): void {
-        this.selectors.forEach((selector) => selector.removeSelectionsOnCurrentSlice());
+        this.tools.forEach((tool) => tool.removeSelectionsOnCurrentSlice());
         this.updateSelectionState();
     }
 
     private updateSelectionState(): void {
-        this.selectionState.hasArchive = this.selectors.some((selector) => selector.hasArchivedSelections());
-        this.selectionState.is2d = this.selectors.some((selector) => selector.hasSliceSelection());
-        this.selectionState.isValid = this.selectors.every((selector) => selector.hasValidSelection());
+        this.selectionState.hasArchive = this.tools.some((tool) => tool.hasArchivedSelections());
+        this.selectionState.is2d = this.tools.some((tool) => tool.hasSliceSelection());
+        this.selectionState.isValid = this.tools.every((tool) => tool.hasValidSelection());
     }
 
     public get3dSelection(): SliceSelection[] {
-        return this.selectors
-            .map((selector) => selector.getSelections())
+        return this.tools
+            .map((tool) => tool.getSelections())
             .reduce((x, y) => x.concat(y), []);
     }
 
@@ -145,10 +145,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     }
 
     private hookUpStateChangeSubscription(): void {
-        this.selectorSubscriptions.forEach((subscription) => subscription.unsubscribe());
-        this.selectorSubscriptions = this.selectors
-            .map((selector) => selector.getStateChangeEmitter().subscribe((selection: SelectionStateMessage) => {
-                console.log('Marker | getStateChange event from selector!');
+        this.toolSubscriptions.forEach((subscription) => subscription.unsubscribe());
+        this.toolSubscriptions = this.tools
+            .map((tool) => tool.getStateChangeEmitter().subscribe((selection: SelectionStateMessage) => {
+                console.log('Marker | getStateChange event from tool!');
                 this.updateSelectionState();
                 if (this.labelExplorer) {
                     if (selection.toDelete) {
@@ -157,12 +157,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
                     } else {
                         console.log('Marker | getStateChange adding new selection to label explorer, selectionId: ',
                             selection.selectionId);
-                        if (!isUndefined(this.currentSelector) && this.currentSelector.isSingleSelectionPerSlice()) {
+                        if (!isUndefined(this.currentTool) && this.currentTool.isSingleSelectionPerSlice()) {
                             this.labelExplorer.replaceExistingLabel(selection.selectionId, selection.sliceId,
-                                selection.labelTag, selection.selectorName);
+                                selection.labelTag, selection.toolName);
                         } else {
                             this.labelExplorer.addLabel(selection.selectionId, selection.sliceId, selection.labelTag,
-                                selection.selectorName);
+                                selection.toolName);
                         }
                     }
                 }
@@ -174,10 +174,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             this.labelExplorer.getLabelChangeEmitter().subscribe((labelChanged: LabelListItem) => {
                 console.log('Marker | getLabelChange event from label-explorer!');
                 if (labelChanged.toDelete) {
-                    this.selectorsByName.get(labelChanged.selectorName).removeSelection(labelChanged.selectionId);
+                    this.toolsByName.get(labelChanged.toolName).removeSelection(labelChanged.selectionId);
                 } else {
-                    this.selectorsByName.get(labelChanged.selectorName).pinSelection(labelChanged.selectionId, labelChanged.pinned);
-                    this.selectorsByName.get(labelChanged.selectorName).hideSelection(labelChanged.selectionId, labelChanged.hidden);
+                    this.toolsByName.get(labelChanged.toolName).pinSelection(labelChanged.selectionId, labelChanged.pinned);
+                    this.toolsByName.get(labelChanged.toolName).hideSelection(labelChanged.selectionId, labelChanged.hidden);
                 }
                 this.redrawSelections();
             });
@@ -220,13 +220,13 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setLabel(label: Label): void {
         label.labelSelections.forEach( (selection: SliceSelection) => {
-            this.selectorsByName.get(selection.label_tool).addSelection(selection);
+            this.toolsByName.get(selection.label_tool).addSelection(selection);
         });
     }
 
     public updatePredefinedBrushLabelElement(labelElement: PredefinedBrushLabelElement): void {
-        const selector: BrushSelector = this.selectorsByName.get('BRUSH') as BrushSelector;
-        selector.updateBrushSelection(labelElement.index, labelElement.tag_key, labelElement.source);
+        const tool: BrushTool = this.toolsByName.get('BRUSH') as BrushTool;
+        tool.updateBrushSelection(labelElement.index, labelElement.tag_key, labelElement.source);
     }
 
     private afterImageLoad(): void {
@@ -244,37 +244,37 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
             if (isUndefined(this.currentTag)) {
                 this.snackBar.open('Please select Tag and Tool to start labeling.', '', {duration: 2000});
                 return;
-            } else if (isUndefined(this.currentSelector)) {
+            } else if (isUndefined(this.currentTool)) {
                 this.snackBar.open('Please select Tool to start labeling.', '', {duration: 2000});
                 return;
             }
-            if (this.currentSelector) {
-                this.currentSelector.onMouseDown(mouseEvent);
+            if (this.currentTool) {
+                this.currentTool.onMouseDown(mouseEvent);
             }
         };
 
         this.canvas.onmouseup = (mouseEvent: MouseEvent) => {
             console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            if (this.currentSelector) {
-                this.currentSelector.onMouseUp(mouseEvent);
+            if (this.currentTool) {
+                this.currentTool.onMouseUp(mouseEvent);
             }
         };
 
         this.canvas.onmousemove = (mouseEvent: MouseEvent) => {
-            if (this.currentSelector) {
-                this.currentSelector.onMouseMove(mouseEvent);
+            if (this.currentTool) {
+                this.currentTool.onMouseMove(mouseEvent);
             }
         };
 
         this.canvas.onwheel = (wheelEvent: WheelEvent) => {
-            if (this.currentSelector && !this.currentSelector.canUseMouseWheel()) {
+            if (this.currentTool && !this.currentTool.canUseMouseWheel()) {
                 return;
             }
 
             const sliderValue = wheelEvent.deltaY > 0 ? this.slider.value - 1 : this.slider.value + 1;
 
             if (sliderValue >= this.slider.min && sliderValue <= this.slider.max) {
-                this.selectors.forEach((selector) => selector.updateCurrentSlice(sliderValue));
+                this.tools.forEach((tool) => tool.updateCurrentSlice(sliderValue));
                 this.requestSlicesIfNeeded(sliderValue);
 
                 this.changeMarkerImage(sliderValue);

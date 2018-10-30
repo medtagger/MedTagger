@@ -1,20 +1,20 @@
-import {SelectorBase} from './SelectorBase';
-import {Selector} from './Selector';
+import {ToolBase} from './ToolBase';
+import {Tool} from './Tool';
 import {BrushSelection} from '../../model/selections/BrushSelection';
 import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {SelectorAction, SelectorActionType} from '../../model/SelectorAction';
+import {ToolAction, ToolActionType} from '../../model/ToolAction';
 
 export enum BrushMode {
     BRUSH = 'Brush',
     ERASER = 'Eraser'
 }
 
-export class BrushSelector extends SelectorBase<BrushSelection> implements Selector<BrushSelection> {
+export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSelection> {
     protected canvas: HTMLCanvasElement;
     protected mouseDrag = false;
     protected lastTagDrawings: Map<string, HTMLImageElement> = new Map<string, HTMLImageElement>();
     private mode: BrushMode = BrushMode.BRUSH;
-    private actions: Array<SelectorAction>;
+    private actions: Array<ToolAction>;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -27,16 +27,16 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         this.singleSelectionPerSlice = true;
 
         this.actions = [
-            new SelectorAction(BrushMode.BRUSH, () => true, () => {
-                this.changeSelectorMode(BrushMode.BRUSH);
+            new ToolAction(BrushMode.BRUSH, () => true, () => {
+                this.changeToolMode(BrushMode.BRUSH);
                 this.deactivateOtherActions(BrushMode.BRUSH);
-            }, SelectorActionType.BUTTON, true),
-            new SelectorAction(BrushMode.ERASER, () => !!this.lastTagDrawings[this.getCurrentSelectingContext()], () => {
-                this.changeSelectorMode(BrushMode.ERASER);
+            }, ToolActionType.BUTTON, true),
+            new ToolAction(BrushMode.ERASER, () => !!this.lastTagDrawings[this.getCurrentSelectingContext()], () => {
+                this.changeToolMode(BrushMode.ERASER);
                 this.deactivateOtherActions(BrushMode.ERASER);
-            }, SelectorActionType.BUTTON, false)
+            }, ToolActionType.BUTTON, false)
         ];
-        console.log('BrushSelector created!');
+        console.log('BrushTool created!');
     }
 
     protected getStyle(): any {
@@ -60,11 +60,11 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
                 SAVING_COMPOSITE_OPERATION: 'source-over'
             };
         } else {
-            console.error('Error: wrong selector mode: ', this.mode);
+            console.error('Error: wrong tool mode: ', this.mode);
         }
     }
 
-    public getActions(): Array<SelectorAction> {
+    public getActions(): Array<ToolAction> {
         return this.actions;
     }
 
@@ -76,13 +76,13 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         });
     }
 
-    public changeSelectorMode(newMode: BrushMode): void {
+    public changeToolMode(newMode: BrushMode): void {
         this.mode = newMode;
         this.deactivateOtherActions(newMode);
     }
 
     drawSelection(selection: BrushSelection, color: string): any {
-        console.log('BrushSelector | drawSelection | selection: ', selection);
+        console.log('BrushTool | drawSelection | selection: ', selection);
 
         selection.getSelectionLayer().then((selectionLayerImage: HTMLImageElement) => {
             this.canvasCtx.drawImage(selectionLayerImage, 0, 0, this.canvasSize.width, this.canvasSize.height);
@@ -102,7 +102,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     }
 
     drawSelections(): any {
-        console.log('BrushSelector | drawSelections | selection: ', this.selections);
+        console.log('BrushTool | drawSelections | selection: ', this.selections);
 
         const currentSelections: Array<BrushSelection> = [];
 
@@ -131,13 +131,13 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     formArchivedSelections(selectionMap: Array<BrushSelection>): Array<BrushSelection> {
         selectionMap.forEach((selection: BrushSelection) => {
             this.drawSelection(selection, this.getStyle().ARCHIVED_SELECTION_COLOR);
-            console.log('BrushSelector | scaleToView selection: ', selection);
+            console.log('BrushTool | scaleToView selection: ', selection);
         });
         return selectionMap;
     }
 
     onMouseDown(event: MouseEvent): void {
-        console.log('BrushSelector | onMouseDown | event: ', event);
+        console.log('BrushTool | onMouseDown | event: ', event);
 
         // starting new brush selection needs temporary canvas clear
         this.canvasCtx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
@@ -165,7 +165,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     onMouseMove(event: MouseEvent): void {
         if (this.mouseDrag) {
-            console.log('BrushSelector | onMove | event: ', event);
+            console.log('BrushTool | onMove | event: ', event);
             const x = (event.clientX) - this.canvasPosition.left;
             const y = (event.clientY) - this.canvasPosition.top;
 
@@ -176,7 +176,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     onMouseUp(event: MouseEvent): void {
         if (this.mouseDrag) {
-            console.log('BrushSelector | onUp | event: ', event);
+            console.log('BrushTool | onUp | event: ', event);
             const x = (event.clientX) - this.canvasPosition.left;
             const y = (event.clientY) - this.canvasPosition.top;
 
@@ -201,7 +201,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
             // When canvas is cleared, we have only our brush selection in canvas
             const selectionImageURL: string = this.canvas.toDataURL();
 
-            console.log('BrushSelector | onUp | SelectionLabelId: ', selectionLabelId);
+            console.log('BrushTool | onUp | SelectionLabelId: ', selectionLabelId);
             this.selectedArea = new BrushSelection(selectionImageURL, this.currentSlice, this.currentTag, selectionLabelId);
 
             const isSelectionErased: boolean = this.isCanvasBlank();
@@ -240,22 +240,22 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     }
 
     private finalizeSelectionRemoval(labelToDeleteId: number): void {
-        console.log('BrushSelector | inUp | blank selection, removing label...');
-        this.stateChange.emit(new SelectionStateMessage(this.getSelectorName(), this.currentTag, labelToDeleteId,
+        console.log('BrushTool | inUp | blank selection, removing label...');
+        this.stateChange.emit(new SelectionStateMessage(this.getToolName(), this.currentTag, labelToDeleteId,
             this.selectedArea.sliceIndex, true));
 
         this.clearSliceDrawingCacheOf(labelToDeleteId);
         this.selectedArea = undefined;
         this.requestRedraw();
 
-        this.changeSelectorMode(BrushMode.BRUSH);
+        this.changeToolMode(BrushMode.BRUSH);
     }
 
     private finalizeNewSelection(): void {
         this.selectedArea.getSelectionLayer().then((image: HTMLImageElement) => {
             this.lastTagDrawings[this.getCurrentSelectingContext()] = image;
 
-            this.stateChange.emit(new SelectionStateMessage(this.getSelectorName(), this.currentTag, this.selectedArea.getId(),
+            this.stateChange.emit(new SelectionStateMessage(this.getToolName(), this.currentTag, this.selectedArea.getId(),
                 this.selectedArea.sliceIndex, false));
             this.selectedArea = undefined;
             this.requestRedraw();
@@ -281,7 +281,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
     private returnToBrushModeIfNeeded(): void {
         const hasDrawing: boolean = this.lastTagDrawings[this.getCurrentSelectingContext()] !== undefined;
         if (this.mode === BrushMode.ERASER && !hasDrawing) {
-            this.changeSelectorMode(BrushMode.BRUSH);
+            this.changeToolMode(BrushMode.BRUSH);
         }
     }
 
@@ -296,7 +296,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
 
     public removeSelection(selectionId: number): boolean {
         this.clearSliceDrawingCacheOf(selectionId);
-        this.changeSelectorMode(BrushMode.BRUSH);
+        this.changeToolMode(BrushMode.BRUSH);
         this.returnToBrushModeIfNeeded();
 
         return super.removeSelection(selectionId);
@@ -307,7 +307,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         if (!!selectionToDelete) {
             this.lastTagDrawings[selectionToDelete.label_tag.key + selectionToDelete.sliceIndex] = undefined;
         } else {
-            console.warn('BrushSelector | clearSliceDrawingCacheOf | no selection to delete!');
+            console.warn('BrushTool | clearSliceDrawingCacheOf | no selection to delete!');
         }
     }
 
@@ -324,7 +324,7 @@ export class BrushSelector extends SelectorBase<BrushSelection> implements Selec
         return !this.mouseDrag;
     }
 
-    public getSelectorName(): string {
+    public getToolName(): string {
         return 'BRUSH';
     }
 }
