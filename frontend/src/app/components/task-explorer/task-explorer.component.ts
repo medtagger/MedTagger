@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {MatIconRegistry, MatSnackBar} from '@angular/material';
 import {DomSanitizer} from '@angular/platform-browser';
 import {TaskService} from '../../services/task.service';
-import {LABELLING, LABELLING_TUTORIAL} from '../../constants/routes';
+import {LABELING, LABELING_TUTORIAL} from '../../constants/routes';
 import {UserInfo} from '../../model/UserInfo';
 import {Router} from '@angular/router';
 import {Task} from '../../model/Task';
@@ -38,7 +38,7 @@ export class TaskExplorerComponent implements OnInit {
     }
 
     private getTaskUrl(): Array<string> {
-        return [this.user.settings.skipTutorial ? '/' + LABELLING : '/' + LABELLING_TUTORIAL];
+        return [this.user.settings.skipTutorial ? '/' + LABELING : '/' + LABELING_TUTORIAL];
     }
 
     goToLabelingPage(task: Task): void {
