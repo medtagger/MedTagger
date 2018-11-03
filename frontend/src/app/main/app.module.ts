@@ -13,7 +13,6 @@ import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
-import {HttpAuthenticationInterceptor} from '../services/http-authentication.interceptor';
 
 import {MarkerComponent} from '../components/marker/marker.component';
 import {UploadScansSelectorComponent} from '../components/upload-scans-selector/upload-scans-selector.component';
@@ -45,7 +44,7 @@ import {
     MatDialogModule,
     MatChipsModule,
     MatCheckboxModule,
-    MatIconRegistry,
+    MatIconRegistry, MatSnackBar,
 } from '@angular/material';
 import {ScanViewerComponent} from '../components/scan-viewer/scan-viewer.component';
 import {routing} from './app.routes';
@@ -61,6 +60,7 @@ import {InputDialogComponent} from '../dialogs/input-dialog.component';
 import {TaskService} from '../services/task.service';
 import {NavBarComponent} from '../components/nav-bar/nav-bar.component';
 import {TaskExplorerComponent} from '../components/task-explorer/task-explorer.component';
+import {HttpAuthenticationInterceptor} from '../interceptors/http-authentication.interceptor';
 
 @NgModule({
     declarations: [
@@ -129,6 +129,7 @@ import {TaskExplorerComponent} from '../components/task-explorer/task-explorer.c
         AccountService,
         DialogService,
         MatDialog,
+        MatSnackBar,
         MedTaggerWebSocket,
     ],
     bootstrap: [AppComponent]

@@ -1,4 +1,5 @@
 import {SliceSelection} from './SliceSelection';
+import {LabelTag} from '../labels/LabelTag';
 
 export class PointSelection extends SliceSelection {
 
@@ -6,7 +7,7 @@ export class PointSelection extends SliceSelection {
     _positionX: number;
     _positionY: number;
 
-    constructor(x: number, y: number, depth: number, tag: string) {
+    constructor(x: number, y: number, depth: number, tag: LabelTag) {
         super();
         this._positionX = x;
         this._positionY = y;
@@ -36,7 +37,7 @@ export class PointSelection extends SliceSelection {
             'slice_index': this.sliceIndex,
             'x': this._positionX,
             'y': this._positionY,
-            'tag': this.label_tag,
+            'tag': this.label_tag.key,
             'tool': this.label_tool
         };
     }

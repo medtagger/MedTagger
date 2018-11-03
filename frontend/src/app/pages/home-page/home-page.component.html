@@ -14,7 +14,7 @@
         <h4 class="home-welcome__desc pr-2">Welcome to Medtagger</h4>
         <hr class="home-welcome__divider"/>
     </div>
-    <div class="home-upload">
+    <div class="home-upload" *ngIf="user.role !== 'volunteer'">
         <div class="home-upload__desc">Upload new scans</div>
         <button mat-raised-button class="home-upload__button" (click)="goToUploadPage()" color="accent">
             <mat-icon class="home-upload__icon" aria-label="Upload new labelling scans">cloud_upload</mat-icon>

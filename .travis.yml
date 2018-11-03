@@ -4,6 +4,17 @@ before_install:
 
 matrix:
   include:
+    # E2E Tests
+    - language: node_js
+      services:
+        - docker
+      env: TESTS=e2e
+      if: branch = master AND type = push
+      node_js:
+        - "8"
+      script:
+        - make e2e_docker
+
     # Backend - linters & unit tests
     - language: python
       services:
@@ -28,14 +39,20 @@ matrix:
 
     # Frontend - linters
     - language: node_js
-      env: FRONTEND=linters
+      env: FRONTEND=linters_and_unit_tests
+      sudo: required
+      addons:
+        chrome: stable
       node_js:
         - "8"
       script:
+        - export DISPLAY=:99.0
+        - sh -e /etc/init.d/xvfb start
         - ./.travis/run_tests_if_subproject_changed.py frontend --command="
            cd frontend/ &&
            npm i &&
-           ng lint"
+           ng lint &&
+           ng test"
 
     # Frontend - build production Docker
     - language: node_js

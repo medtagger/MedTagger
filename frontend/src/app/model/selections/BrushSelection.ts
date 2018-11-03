@@ -1,11 +1,13 @@
 import {SliceSelection} from './SliceSelection';
 import {BinaryConverter} from '../../utils/BinaryConverter';
+import {LabelTag} from '../labels/LabelTag';
+import {isUndefined} from 'util';
 
 export class BrushSelection extends SliceSelection {
     _selectionLayer: HTMLImageElement;
     isReady: Promise<void>;
 
-    constructor(selectionLayer: string, depth: number, tag: string, id?: number) {
+    constructor(selectionLayer: string, depth: number, tag: LabelTag, id?: number) {
         super();
         this._selectionLayer = new Image();
 
@@ -13,7 +15,9 @@ export class BrushSelection extends SliceSelection {
             this._selectionLayer.onload = () => resolve();
             this._selectionLayer.onerror = () => reject();
 
-            this._selectionLayer.src = selectionLayer;
+            if (!isUndefined(selectionLayer)) {
+                this._selectionLayer.src = selectionLayer;
+            }
         });
 
 
@@ -40,7 +44,7 @@ export class BrushSelection extends SliceSelection {
             'height': 1,
             'image_key': this.getId().toString(),
             'slice_index': this.sliceIndex,
-            'tag': this.label_tag,
+            'tag': this.label_tag.key,
             'tool': this.label_tool
         };
     }

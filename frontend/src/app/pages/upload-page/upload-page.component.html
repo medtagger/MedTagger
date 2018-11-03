@@ -22,9 +22,53 @@
                             </mat-form-field>
                         </mat-card-content>
                         <mat-card-actions>
-                            <button class="pull-right" mat-raised-button matStepperNext color="primary"
-                                    data-cy="datasets-submit">Select
+                            <app-upload-scans-selector #uploadSingleScanSelector (onFileSelect)="chooseFiles($event)"
+                                                   [multipleScans]="false" style="float: left;"></app-upload-scans-selector>
+                            <div class="clearfix"></div>
+                        </mat-card-actions>
+                    </mat-card>
+                </div>
+
+                <!-- Information about Scans that will be sent -->
+                <div class="middle-screen-width" *ngIf="scans.length > 0">
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>Selected Scans</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <!-- Tip about Predefined Labels -->
+                            <section class="box-message info-message" *ngIf="!hasPredefinedLabels">
+                                <mat-icon>info</mat-icon>
+                                <p>
+                                    <strong>Tip!</strong> You can also specify Predefined Label which will be shown initially
+                                    on the Labeling Page. To do so, send "TASK_KEY.json" file together with your DICOM files.
+                                </p>
+                            </section>
+
+                            <!-- Show list of selected Scans -->
+                            <mat-list dense>
+                                <mat-list-item *ngFor="let selectedScan of scans">
+                                    <mat-icon matListIcon>recent_actors</mat-icon>
+                                    <p class="scan-directory" matLine>{{selectedScan.directory}}</p>
+                                    <span class="scan-status" matTooltip="{{selectedScan.predefinedLabelsTasks.join(', ')}}">
+                                        {{selectedScan.predefinedLabels.length}} Predefined Labels
+                                    </span>
+                                </mat-list-item>
+                            </mat-list>
+                        </mat-card-content>
+                        <mat-card-actions>
+                            <button mat-raised-button color="primary" (click)="uploadFiles()"
+                                    *ngIf="totalNumberOfSlices != 0" style="float: right;" data-cy="single-scan-upload">
+                                <mat-icon>file_upload</mat-icon>
+                                Upload!
                             </button>
+                            <span class="button-wrapper" *ngIf="totalNumberOfSlices == 0"
+                                  matTooltip="Please select at least one DICOM file" matTooltipPosition="above">
+                                <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" disabled>
+                                    <mat-icon>file_upload</mat-icon>
+                                    Upload!
+                                </button>
+                            </span>
                             <div class="clearfix"></div>
                         </mat-card-actions>
                     </mat-card>
@@ -60,124 +104,51 @@
                             <p>Select this option if you want to upload multiple 3D Scans.</p>
                         </mat-card-content>
                         <mat-card-actions>
-                            <button class="pull-right" mat-raised-button color="primary"
-                                    (click)="selectUploadMode(UploadMode.MULTIPLE_SCANS)" *ngIf="isGoogleChrome()">
-                                Select
-                            </button>
-                            <span class="button-wrapper" *ngIf="!isGoogleChrome()"
-                                  matTooltip="This mode is available only on Google Chrome" matTooltipPosition="above">
-                            <button class="pull-right" mat-raised-button color="primary"
-                                    (click)="selectUploadMode(UploadMode.MULTIPLE_SCANS)" disabled>Select</button>
-                        </span>
+                            <app-upload-scans-selector #uploadMultipleScansSelector (onFileSelect)="chooseFiles($event)"
+                                                   [multipleScans]="true" style="float: left;"></app-upload-scans-selector>
                             <div class="clearfix"></div>
                         </mat-card-actions>
                     </mat-card>
                 </div>
-            </form>
-        </mat-step>
 
-        <!-- Select Scan/Scans step -->
-        <mat-step [stepControl]="chooseFilesFormGroup" #chooseFilesStep>
-            <form [formGroup]="chooseFilesFormGroup">
-                <input type="hidden" required formControlName="filesChosen">
-                <section *ngIf="uploadMode == UploadMode.SINGLE_SCAN">
-                    <ng-template matStepLabel>Select Scan</ng-template>
-                    <div class="middle-screen-width">
-                        <mat-card>
-                            <mat-card-header>
-                                <mat-card-title>Single 3D Scan</mat-card-title>
-                            </mat-card-header>
-                            <mat-card-content>
-                                <p>Go to the directory containing CT Scan and select all DICOM files (*.dcm).</p>
-                                <p><strong>Single file size limit:</strong> 5 MB</p>
-
-                                <!-- Warning about incompatible Files -->
-                                <section class="box-message warning-message" *ngIf="incompatibleFiles.length">
-                                    <mat-icon>warning</mat-icon>
-                                    <p>
-                                        Not all of your files will be uploaded!<br/>
-                                        Some of them may be corrupted or incompatible with MedTagger.
-                                    </p>
-                                    <mat-list dense>
-                                        <mat-list-item class="incompatible-file"
-                                                       *ngFor="let incompatibleFile of incompatibleFiles">
-                                            <mat-icon matListIcon>attachment</mat-icon>
-                                            <span matLine>{{incompatibleFile.file.name}}</span>
-                                            <mat-icon [matTooltip]="incompatibleFile.reason">info_outline</mat-icon>
-                                        </mat-list-item>
-                                    </mat-list>
-                                </section>
-                            </mat-card-content>
-                            <mat-card-actions>
-                                <app-upload-scans-selector #uploadSingleScanSelector
-                                                           (onFileSelect)="chooseFiles($event)"
-                                                           [multipleScans]="false"
-                                                           style="float: left;"></app-upload-scans-selector>
-                                <button mat-raised-button color="primary" (click)="uploadFiles()"
-                                        *ngIf="totalNumberOfSlices != 0" style="float: right;"
-                                        data-cy="single-scan-upload">
-                                    <mat-icon>file_upload</mat-icon>
-                                    Upload Scan!
-                                </button>
-                                <span class="button-wrapper" *ngIf="totalNumberOfSlices == 0"
-                                      matTooltip="Please select at least one DICOM file" matTooltipPosition="above">
-                                <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;"
-                                        disabled>
-                                    <mat-icon>file_upload</mat-icon>
-                                    Upload Scan!
-                                </button>
-                            </span>
-                                <div class="clearfix"></div>
-                            </mat-card-actions>
-                        </mat-card>
-                    </div>
-                </section>
-                <section *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS">
-                    <ng-template matStepLabel>Select Scans</ng-template>
-                    <div class="middle-screen-width">
-                        <mat-card>
-                            <mat-card-header>
-                                <mat-card-title>Multiple 3D Scans</mat-card-title>
-                            </mat-card-header>
-                            <mat-card-content>
-                                <p>Select <strong>parent directory</strong> that contains subdirectories with CT Scans.
+                <!-- Information about Scans that will be sent -->
+                <div class="middle-screen-width" *ngIf="scans.length > 0">
+                    <mat-card>
+                        <mat-card-header>
+                            <mat-card-title>Selected Scans</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <!-- Tip about Predefined Labels -->
+                            <section class="box-message info-message" *ngIf="!hasPredefinedLabels">
+                                <mat-icon>info</mat-icon>
+                                <p>
+                                    <strong>Tip!</strong> You can also specify Predefined Label which will be shown initially
+                                    on the Labeling Page. To do so, send "TASK_KEY.json" file together with your DICOM files.
                                 </p>
-                                <p><strong>Single file size limit:</strong> 5 MB</p>
+                            </section>
 
-                                <!-- Warning about incompatible Files -->
-                                <section class="box-message warning-message" *ngIf="incompatibleFiles.length">
-                                    <mat-icon>warning</mat-icon>
-                                    <p>
-                                        Not all of your files will be uploaded!<br/>
-                                        Some of them may be corrupted or incompatible with MedTagger.
-                                    </p>
-                                    <mat-list dense>
-                                        <mat-list-item class="incompatible-file"
-                                                       *ngFor="let incompatibleFile of incompatibleFiles">
-                                            <mat-icon matListIcon>attachment</mat-icon>
-                                            <span matLine>{{incompatibleFile.file.webkitRelativePath}}</span>
-                                            <mat-icon [matTooltip]="incompatibleFile.reason">info_outline</mat-icon>
-                                        </mat-list-item>
-                                    </mat-list>
-                                </section>
-                            </mat-card-content>
-                            <mat-card-actions>
-                                <app-upload-scans-selector #uploadMultipleScansSelector
-                                                           (onFileSelect)="chooseFiles($event)"
-                                                           [multipleScans]="true"
-                                                           style="float: left;"></app-upload-scans-selector>
-                                <button mat-raised-button color="primary" (click)="uploadFiles()"
-                                        *ngIf="totalNumberOfSlices != 0" style="float: right;">
+                            <!-- Show list of selected Scans -->
+                            <mat-list dense>
+                                <mat-list-item *ngFor="let selectedScan of scans">
+                                    <mat-icon matListIcon>recent_actors</mat-icon>
+                                    <p class="scan-directory" matLine>{{selectedScan.directory}}</p>
+                                    <span class="scan-status" matTooltip="{{selectedScan.predefinedLabelsTasks.join(', ')}}">
+                                        {{selectedScan.predefinedLabels.length}} Predefined Labels
+                                    </span>
+                                </mat-list-item>
+                            </mat-list>
+                        </mat-card-content>
+                        <mat-card-actions>
+                            <button mat-raised-button color="primary" (click)="uploadFiles()"
+                                    *ngIf="totalNumberOfSlices != 0" style="float: right;">
+                                <mat-icon>file_upload</mat-icon>
+                                Upload!
+                            </button>
+                            <span class="button-wrapper" *ngIf="totalNumberOfSlices == 0"
+                                  matTooltip="Please select at least one DICOM file" matTooltipPosition="above">
+                                <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;" disabled>
                                     <mat-icon>file_upload</mat-icon>
-                                    Upload Scans!
-                                </button>
-                                <span class="button-wrapper" *ngIf="totalNumberOfSlices == 0"
-                                      matTooltip="Please select directory with all your Scans"
-                                      matTooltipPosition="above">
-                                <button mat-raised-button color="primary" (click)="uploadFiles()" style="float: right;"
-                                        disabled>
-                                    <mat-icon>file_upload</mat-icon>
-                                    Upload Scans!
+                                    Upload!
                                 </button>
                             </span>
                                 <div class="clearfix"></div>
@@ -296,14 +267,37 @@
                             </button>
                             <div style="clear: both;"></div>
 
-                            <!-- Then show all Scans with Errors -->
-                            <mat-selection-list dense #scansForRetry>
-                                <mat-list-option *ngFor="let uploadingScan of errorScans" [value]="uploadingScan">
-                                    <!-- TODO: It would be nice to add mat-icon here but Material Design has a bug... -->
-                                    {{uploadingScan.scan.directory}}
-                                </mat-list-option>
-                            </mat-selection-list>
-                        </section>
+    <!-- Summary step -->
+    <mat-step [stepControl]="uploadCompletedFormGroup" [editable]="false" #uploadCompletedStep>
+        <ng-template matStepLabel>Summary</ng-template>
+        <div class="middle-screen-width">
+            <mat-card>
+                <mat-card-header>
+                    <mat-card-title>Upload Summary</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <!-- Big box with success/warning/error message inside -->
+                    <section class="box-message success-message" *ngIf="availableScans.length == scans.length">
+                        <mat-icon>check</mat-icon>
+                        <p>
+                            Upload completed sucessfully!<br/>
+                            All of your scans are now available for labeling.
+                        </p>
+                    </section>
+                    <section class="box-message warning-message" *ngIf="availableScans.length != scans.length && errorScans.length != scans.length">
+                        <mat-icon>warning</mat-icon>
+                        <p>
+                            There were some issues with uploading your scans!<br/>
+                            Your files may be corrupted or incompatible with MedTagger.
+                        </p>
+                    </section>
+                    <section class="box-message error-message" *ngIf="errorScans.length == scans.length">
+                        <mat-icon>error</mat-icon>
+                        <p>
+                            None of your scans were uploaded properly!<br/>
+                            Your files may be corrupted or incompatible with MedTagger.
+                        </p>
+                    </section>
 
                         <!-- Buttons with actions that can be taken -->
                         <button mat-raised-button class="restart-button" color="primary-color" (click)="restart()">
