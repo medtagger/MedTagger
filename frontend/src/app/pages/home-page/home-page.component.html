@@ -1,10 +1,10 @@
 <app-nav-bar>
-    <button mat-raised-button color="primary" id="dropdown-button" class="account-button" (blur)="toggleDropdown()" (click)="toggleDropdown()" [ngClass]="{ 'active' : isDropdownActive}">
-        <mat-icon class="account-button__icon mr-2">person</mat-icon>
+    <button mat-raised-button color="primary" id="dropdown-button" class="account-button" (click)="toggleDropdown()" [ngClass]="{ 'active' : isDropdownActive}">
+        <mat-icon class="account-button__icon mr-2">{{isDropdownActive ? 'close' : 'person'}}</mat-icon>
         <span class="account-button__name">{{user.firstName + ' ' + user.lastName}}</span>
         <span *ngIf="isDropdownActive" [@displayDropdown]="isDropdownActive" class="account-button__options">
-            <a class="account-button__link" [routerLink]="settingsPage">Settings</a>
-            <a class="account-button__link" [routerLink]="loginPage" (click)="logOut()">LogOut</a>
+            <a class="account-button__link" [routerLink]="settingsPage"><mat-icon class="mr-2">settings</mat-icon>Settings</a>
+            <a class="account-button__link" [routerLink]="loginPage" (click)="logOut()"><mat-icon class="mr-2">exit_to_app</mat-icon>Log out</a>
         </span>
     </button>
 </app-nav-bar>

@@ -49,7 +49,7 @@ export class HomePageComponent implements OnInit {
     public logOut(): void {
         sessionStorage.removeItem('authorizationToken');
         sessionStorage.removeItem('userInfo');
-        this.router.navigate([LOGIN]);
+        this.router.navigate([this.loginPage]);
     }
 
 }

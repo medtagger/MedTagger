@@ -41,6 +41,8 @@
                     color: color('black');
                 }
                 &__link{
+                    display: flex;
+                    align-items: center;
                     padding: 0.5em 2em;
                     color: color('black');
                     text-decoration: none;
