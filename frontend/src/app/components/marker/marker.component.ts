@@ -105,6 +105,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     public setCurrentTag(tag: LabelTag) {
         super.setCurrentTag(tag);
         this.currentTag = tag;
+        this.updateTagForCurrentTool(this.currentTag);
     }
 
     public setDownloadScanInProgress(isInProgress: boolean) {
