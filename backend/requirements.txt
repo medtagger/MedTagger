@@ -1,6 +1,6 @@
 # App requirements
 alembic==1.0.1
-SQLAlchemy==1.2.12
+SQLAlchemy==1.2.14
 werkzeug==0.14.1
 flask==1.0.2
 flask-socketio==3.0.1
