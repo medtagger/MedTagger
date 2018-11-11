@@ -38,7 +38,7 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
 
     # Step 3. Add Scan to the system
     payload = {'dataset': dataset_key, 'number_of_slices': 1}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -162,7 +162,7 @@ def test_basic_flow_with_predefined_label(prepare_environment: Any, synchronous_
 
     # Step 3. Add Scan to the system
     payload = {'dataset': dataset_key, 'number_of_slices': 1}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)

@@ -32,7 +32,7 @@ def test_delete_scan_without_slices(prepare_environment: Any, synchronous_celery
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 0}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -71,7 +71,7 @@ def test_delete_scan_with_slices(prepare_environment: Any, synchronous_celery: A
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 1}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -132,7 +132,7 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 1}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
