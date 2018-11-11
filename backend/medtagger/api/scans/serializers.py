@@ -2,7 +2,6 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
-from medtagger.api.tasks.serializers import out__task
 from medtagger.definitions import ScanStatus, LabelVerificationStatus
 
 in__new_scan = api.model('New Scan model', {
@@ -93,17 +92,6 @@ in__label_model = api.model('Label model', {
 in__label = api.parser()
 in__label.add_argument('label', type=in__label_model, help='Label model object', location='form', required=True)
 in__label.add_argument('is_predefined', type=bool, help='Set it as predefined Label', location='query', required=False)
-
-in__dataset = api.model('New Dataset model', {
-    'key': fields.String(),
-    'name': fields.String(),
-})
-
-out__dataset = api.model('Dataset model', {
-    'key': fields.String(),
-    'name': fields.String(),
-    'tasks': fields.List(fields.Nested(out__task)),
-})
 
 out__scan = api.model('Scan model', {
     'scan_id': fields.String(description='Scan\'s ID', attribute='id'),
