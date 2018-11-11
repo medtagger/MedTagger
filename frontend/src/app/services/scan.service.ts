@@ -74,13 +74,14 @@ export class ScanService {
         }
 
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + API_URL.SCANS + `/${scanId}/${taskKey}/label`, form).toPromise().then((response: Response) => {
-                console.log('ScanService | send3dSelection | response: ', response);
-                resolve(response);
-            }).catch((error: Response) => {
-                console.log('ScanService | send3dSelection | error: ', error);
-                reject(error);
-            });
+            this.http.post(environment.API_URL + API_URL.SCANS + `/${scanId}/${taskKey}/label`, form).toPromise()
+                .then((response: Response) => {
+                    console.log('ScanService | send3dSelection | response: ', response);
+                    resolve(response);
+                }).catch((error: Response) => {
+                    console.log('ScanService | send3dSelection | error: ', error);
+                    reject(error);
+                });
         });
     }
 
