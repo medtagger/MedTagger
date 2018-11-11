@@ -29,7 +29,7 @@ def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']
@@ -83,7 +83,7 @@ def test_scan_upload_with_retrying(fixture_problems_with_storage: Any, prepare_e
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     json_response = json.loads(response.data)
     scan_id = json_response['scan_id']

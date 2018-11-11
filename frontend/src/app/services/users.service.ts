@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {UserInfo} from '../model/UserInfo';
 import {environment} from '../../environments/environment';
 import {UserSettings} from '../model/UserSettings';
+import {API_URL} from '../utils/ApiUrl';
 
 interface AllUsersResponse {
     users: Array<UserInfo>;
@@ -14,7 +15,7 @@ export class UsersService {
     }
 
     public getAllUsers(): Promise<Array<UserInfo>> {
-        const url = environment.API_URL + '/users/';
+        const url = environment.API_URL + API_URL.USERS;
         return new Promise<Array<UserInfo>>((resolve, reject) => {
             this.http.get<AllUsersResponse>(url)
                 .toPromise()
@@ -33,7 +34,7 @@ export class UsersService {
     }
 
     public setRole(userId: number, role: string): Promise<void> {
-        const url = environment.API_URL + `/users/${userId}/role`;
+        const url = environment.API_URL + API_URL.USERS + `/${userId}/role`;
         const payload = {
             role: role
         };
@@ -52,7 +53,7 @@ export class UsersService {
     }
 
     public setUserDetails(userId: number, userFirstName: string, userLastName: string): Promise<void> {
-        const url = environment.API_URL + `/users/${userId}`;
+        const url = environment.API_URL + API_URL.USERS + `/${userId}`;
         const payload = {
             firstName: userFirstName,
             lastName: userLastName
@@ -72,7 +73,7 @@ export class UsersService {
     }
 
     public setUserSettings(userId: number, settings: UserSettings): Promise<void> {
-        const url = environment.API_URL + `/users/${userId}/settings`;
+        const url = environment.API_URL + API_URL.USERS + `/${userId}/settings`;
         return new Promise<void>((resolve, reject) => {
             // properties with the undefined value will not be sent
             // only necessary properties of variable 'settings' should be specified

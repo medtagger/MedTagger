@@ -22,7 +22,7 @@ describe('Service: UsersService', () => {
         settings: USER_SETTINGS
     };
 
-    const SET_DETAILS_API = API_URL.USERS + EXAMPLE_USER.id;
+    const SET_DETAILS_API = API_URL.USERS + '/' + EXAMPLE_USER.id;
     const SET_ROLE_API = SET_DETAILS_API + API_URL.ROLE;
     const SET_SETTINGS_API = SET_DETAILS_API + API_URL.SETTINGS;
 
@@ -141,11 +141,11 @@ describe('Service: UsersService', () => {
 
                 payload = req.body;
 
-                return req.url === environment.API_URL + API_URL.USERS + EXAMPLE_USER.id
+                return req.url === environment.API_URL + API_URL.USERS + '/' + EXAMPLE_USER.id
                     && req.method === 'PUT'
                     && payload.firstName === EXAMPLE_USER.firstName
                     && payload.lastName === EXAMPLE_USER.lastName;
-            }, `PUT to ${environment.API_URL + API_URL.USERS + EXAMPLE_USER.id}`)
+            }, `PUT to ${environment.API_URL + API_URL.USERS + '/' + EXAMPLE_USER.id}`)
                 .flush({},
                     {status: 200, statusText: 'Ok'});
 
