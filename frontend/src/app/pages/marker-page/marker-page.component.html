@@ -16,36 +16,44 @@
         <div class="tools">
             <h3 class="category__name">Tools</h3>
             <div class="buttons">
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentTool('RECTANGLE')}"
+                <button mat-mini-fab
+                        [color]="isCurrentTool('RECTANGLE') ? 'accent' : 'primary'"
                         [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')" (click)="setTool('RECTANGLE')"
                         data-cy="rectangle-tool">
                     <mat-icon [svgIcon]="getToolIconName('RECTANGLE')"></mat-icon>
                 </button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentTool('BRUSH')}"
-                        [disabled]="!isToolSupportedByCurrentTag('BRUSH')" (click)="setTool('BRUSH')"
+                <button mat-mini-fab
+                    [color]="isCurrentTool('BRUSH') ? 'accent' : 'primary'"
+                    [disabled]="!isToolSupportedByCurrentTag('BRUSH')" (click)="setTool('BRUSH')"
                         data-cy="brush-tool">
                     <mat-icon [svgIcon]="getToolIconName('BRUSH')"></mat-icon>
                 </button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentTool('POINT')}"
+                <button mat-mini-fab
+                        [color]="isCurrentTool('POINT') ? 'accent' : 'primary'"
                         [disabled]="!isToolSupportedByCurrentTag('POINT')" (click)="setTool('POINT')"
                         data-cy="point-tool">
                     <mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon>
                 </button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentTool('CHAIN')}"
+                <button mat-mini-fab
+                        [color]="isCurrentTool('CHAIN') ? 'accent' : 'primary'"
                         [disabled]="!isToolSupportedByCurrentTag('CHAIN')" (click)="setTool('CHAIN')"
                         data-cy="chain-tool">
                     <mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon>
                 </button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentTool('ZOOM_IN')}" disabled>
+                <button mat-mini-fab
+                    [color]="isCurrentTool('ZOOM_IN') ? 'accent' : 'primary'"
+                    [ngClass]="{'active-button': isCurrentTool('ZOOM_IN')}" disabled>
                     <mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon>
                 </button>
-                <button mat-mini-fab [ngClass]="{'active-button': isCurrentTool('ZOOM_OUT')}" disabled>
+                <button mat-mini-fab
+                    [color]="isCurrentTool('ZOOM_OUT') ? 'accent' : 'primary'"
+                    disabled>
                     <mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon>
                 </button>
             </div>
 
             <div *ngIf="toolActions.length > 0">
-                <h3>Actions</h3>
+                <h3 class="category__name">Actions</h3>
                 <div class="buttons action-buttons">
                     <span *ngFor="let action of toolActions">
                         <button mat-raised-button color="primary" *ngIf="action.type === ActionType.BUTTON"
