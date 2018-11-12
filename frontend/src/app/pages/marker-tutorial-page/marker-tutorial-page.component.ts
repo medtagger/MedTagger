@@ -1,7 +1,7 @@
 import {Component, ViewChild, OnInit} from '@angular/core';
 import {MatHorizontalStepper} from '@angular/material';
 import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {UsersService} from '../../services/users.service';
 import {UserInfo} from '../../model/UserInfo';
 import {UserSettings} from '../../model/UserSettings';
@@ -27,7 +27,10 @@ export class MarkerTutorialPageComponent implements OnInit {
 
     private readonly user: UserInfo;
 
-    constructor(private _formBuilder: FormBuilder, private router: Router, private usersService: UsersService) {
+    constructor(private route: ActivatedRoute,
+            private _formBuilder: FormBuilder,
+            private router: Router,
+            private usersService: UsersService) {
         this.user = JSON.parse(sessionStorage.getItem('userInfo'));
     }
 
@@ -86,16 +89,16 @@ export class MarkerTutorialPageComponent implements OnInit {
     }
 
     public endTutorial(): void {
+        let taskKey;
+        this.route.queryParams.subscribe(params => taskKey = params['task']);
         if (this.doNotShowAgain.value) {
             const settings = new UserSettings();
             settings.skipTutorial = true;
             this.usersService.setUserSettings(this.user.id, settings).then(() => {
                 this.user.settings.skipTutorial = true;
                 sessionStorage.setItem('userInfo', JSON.stringify(this.user));
-                this.router.navigateByUrl('/' + appRoutes.LABELING_TASK_CHOOSE);
             });
-        } else {
-            this.router.navigateByUrl('/' + appRoutes.LABELING_TASK_CHOOSE);
         }
+        this.router.navigate(['/' + appRoutes.LABELING], {queryParams: {task: taskKey}});
     }
 }

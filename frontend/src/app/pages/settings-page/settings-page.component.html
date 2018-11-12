@@ -26,7 +26,7 @@
             </button>
         </mat-card-content>
     </mat-card>
-    <mat-card class="tab-container__card">
+    <mat-card *ngIf="currentUser.role === 'admin'" class="tab-container__card">
         <mat-card-title>
             Users
         </mat-card-title>
