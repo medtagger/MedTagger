@@ -15,7 +15,7 @@ export class DatasetService {
 
     getAvailableDatasets(): Promise<Dataset[]> {
         return new Promise((resolve, reject) => {
-            this.http.get<Array<AvailableDatasetResponse>>(environment.API_URL + '/scans/datasets').toPromise().then(
+            this.http.get<Array<AvailableDatasetResponse>>(environment.API_URL + '/datasets').toPromise().then(
                 response => {
                     console.log('DatasetService | getAvailableDatasets | response: ', response);
                     const datasets = [];
