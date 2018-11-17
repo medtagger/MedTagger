@@ -1,3 +1,9 @@
+@import '~@angular/material/theming';
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+@import "variables";
+
 @mixin size($width, $height: $width) {
     width: $width;
     height: $height;
@@ -108,4 +114,10 @@ $breakpoints: ('small': (min-width: 320px), 'medium': (min-width: 768px), 'large
     input:-webkit-autofill:active {
         transition: background-color 5000s ease-in-out 0s;
     }
+}
+
+@mixin text-ellipsis(){
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

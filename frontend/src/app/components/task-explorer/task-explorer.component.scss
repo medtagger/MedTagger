@@ -1,0 +1,95 @@
+@import "src/app/styles/mixins";
+
+.task-cards {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.task-card {
+    @include mat-elevation(2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    background-color: $color-card;
+    border-radius: 5px;
+    transition: all 0.3s;
+    cursor: pointer;
+    @include media-breakpoint-up(lg) {
+        flex: 1;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        width: auto;
+        min-width: 30em;
+    }
+    &:hover {
+        @include mat-elevation(4);
+        transform: translateY(-2px);
+        .task-card__action {
+            color: mat-color($accent);
+        }
+    }
+    &__icon {
+        @include size(3em);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: mat-color($primary, 700);
+        border-radius: 100px;
+        transition: all 0.2s;
+        @include media-breakpoint-up(md) {
+            @include size(4.8em);
+        }
+        .mat-icon {
+            @include size(2em);
+            filter: drop-shadow(0 1px 5px color('black', disabled));
+            @include media-breakpoint-up(md) {
+                @include size(3em);
+            }
+        }
+    }
+    &__name{
+        margin: 1.2em 0 1.2em 1.2em;
+        @include media-breakpoint-up(md) {
+            margin: 2em;
+        }
+        span {
+            display: block;
+        }
+        &-main {
+            @include text-ellipsis;
+            color: color('black');
+            font-size: 1em;
+            font-weight: 600;
+            @include media-breakpoint-up(md) {
+                font-size: 1.2em;
+            }
+        }
+        &-desc {
+            @include text-ellipsis;
+            color: color('black', medium);
+            font-size: 0.8em;
+            @include media-breakpoint-up(md) {
+                font-size: 1em;
+            }
+        }
+    }
+    &__action {
+        flex-basis: 100%;
+        color: color('black');
+        text-align: center;
+        transition: all 0.4s;
+        @include media-breakpoint-up(md) {
+            flex-basis: auto;
+            margin-left: auto;
+        }
+        .mat-icon {
+            $button-size: 50px;
+            @include size($button-size);
+            font-size: $button-size;
+        }
+
+    }
+}

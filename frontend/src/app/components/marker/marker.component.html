@@ -11,10 +11,11 @@
                 [step]="1"
                 [thumbLabel]="true"
                 [tickInterval]="1"
-                [value]="currentSlice"
-                [vertical]="true">
+                [value]="this.currentSlice"
+                [vertical]="true"
+                color="primary">
     </mat-slider>
     <div *ngIf="downloadingScanInProgress || downloadingSlicesInProgress">
-         <mat-progress-spinner id="markerSpinner" mode="indeterminate" color="accent"></mat-progress-spinner>
+        <mat-progress-spinner id="markerSpinner" mode="indeterminate" color="primary"></mat-progress-spinner>
     </div>
 </div>

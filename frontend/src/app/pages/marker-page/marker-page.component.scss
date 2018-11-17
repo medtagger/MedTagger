@@ -1,6 +1,7 @@
+@import '../../components/marker/marker.component.scss';
+@import "styles/mixins";
 @import '../../components/scan-viewer/scan-viewer.component.scss';
 
-$top-header-size: 64px;
 $top-header-color: #0277bd;
 $toolbox-width: 300px;
 
@@ -8,11 +9,20 @@ button {
     margin: 5px;
 }
 
+.category {
+    &__name {
+        padding: 0.8em 1em;
+        font-size: 1em;
+        font-weight: 300;
+        text-transform: uppercase;
+    }
+}
+
 .marker-page {
     display: grid;
     grid-template-columns: $toolbox-width auto;
     width: 100vw;
-    height: calc(100vh - #{$top-header-size});
+    height: calc(100vh - #{$size-height-nav});
     overflow: hidden;
 }
 
@@ -27,7 +37,6 @@ button {
 
     h3 {
         color: white;
-        padding: 8px 16px;
         margin: 0px;
         background-color: $top-header-color;
     }
@@ -45,7 +54,10 @@ button {
         }
 
         .active-button {
-            background-color: #fb8c00;
+            background-color: mat-color($accent, 600);
+            .mat-icon{
+                color: color('white');
+            }
         }
 
         .action-buttons {

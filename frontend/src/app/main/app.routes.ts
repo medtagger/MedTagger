@@ -1,7 +1,6 @@
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
 import {MarkerTutorialPageComponent} from '../pages/marker-tutorial-page/marker-tutorial-page.component';
 import {HomePageComponent} from '../pages/home-page/home-page.component';
-import {TasksPageComponent} from '../pages/tasks-page/tasks-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {RouterModule, Routes} from '@angular/router';
@@ -15,13 +14,7 @@ export const labelingRoutes: Routes = [
     {
         path: appRoutes.LABELING,
         component: MarkerPageComponent,
-        data: {title: 'Labeling', disableFooter: true},
-        canActivate: [AuthGuard]
-    },
-    {
-        path: appRoutes.LABELING_TASK_CHOOSE,
-        component: TasksPageComponent,
-        data: {title: 'Choosing task'},
+        data: {title: 'Labelling'},
         canActivate: [AuthGuard]
     },
     {
@@ -29,7 +22,7 @@ export const labelingRoutes: Routes = [
         component: MarkerTutorialPageComponent,
         data: {title: 'Marker tutorial'},
         canActivate: [AuthGuard]
-    }
+    },
 ];
 
 export const routes: Routes = [

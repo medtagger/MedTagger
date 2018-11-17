@@ -1,7 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~bootstrap/scss/bootstrap';
-@import './app-theme';
-@import "app/utils/mixins";
+@import 'app/styles/app-theme';
+@import "app/styles/mixins";
+@import "app/styles/global";
 
 body {
     font-family: 'Roboto', sans-serif;

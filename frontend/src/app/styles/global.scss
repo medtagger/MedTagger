@@ -1,0 +1,8 @@
+@import "mixins";
+
+button {
+    &:focus, &:active, &:hover {
+        outline: none;
+    }
+}
+

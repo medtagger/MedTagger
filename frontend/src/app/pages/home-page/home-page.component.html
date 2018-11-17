@@ -1,20 +1,28 @@
-<div class="menu">
-    <div class="button-row">
-        <button mat-fab routerLink="{{ user.settings.skipTutorial ? '/labeling/choose-task' : '/labeling/tutorial' }}">
-            <mat-icon>label_outline</mat-icon>
-            <div>Labeling</div>
+<app-nav-bar>
+    <button mat-raised-button color="primary" id="dropdown-button" class="account-button" (click)="toggleDropdown()" [ngClass]="{ 'active' : isDropdownActive}">
+        <mat-icon class="account-button__icon mr-2">{{isDropdownActive ? 'close' : 'person'}}</mat-icon>
+        <span class="account-button__name">{{user.firstName + ' ' + user.lastName}}</span>
+        <span *ngIf="isDropdownActive" [@displayDropdown]="isDropdownActive" class="account-button__options">
+            <a class="account-button__link" [routerLink]="settingsPage"><mat-icon class="mr-2">settings</mat-icon>Settings</a>
+            <a class="account-button__link" [routerLink]="loginPage" (click)="logOut()"><mat-icon class="mr-2">exit_to_app</mat-icon>Log out</a>
+        </span>
+    </button>
+</app-nav-bar>
+<div class="container">
+    <div class="home-welcome my-5">
+        <h2 class="home-welcome__main">Hello, {{user.firstName}}</h2>
+        <h4 class="home-welcome__desc pr-2">Welcome to MedTagger</h4>
+        <hr class="home-welcome__divider"/>
+    </div>
+    <div class="home-upload" *ngIf="user.role !== 'volunteer'">
+        <div class="home-upload__desc">Upload new scans</div>
+        <button mat-raised-button class="home-upload__button" (click)="goToUploadPage()" color="accent">
+            <mat-icon class="home-upload__icon" aria-label="Upload new labelling scans">cloud_upload</mat-icon>
+            Start uploading new scans
         </button>
-        <button mat-fab routerLink="/upload" *ngIf="user.role !== 'volunteer'">
-            <mat-icon>add</mat-icon>
-            <div>Upload new Scans</div>
-        </button>
-        <button mat-fab (click)="indicateValidationPageIsUnavailable()" *ngIf="user.role !== 'volunteer'">
-            <mat-icon>assignment_turned_in</mat-icon>
-            <div>Validation</div>
-        </button>
-        <button mat-fab routerLink="/settings">
-            <mat-icon>settings</mat-icon>
-            <div>Settings</div>
-        </button>
+    </div>
+    <div class="home-tasks">
+        <div class="home-tasks__desc">Start labeling</div>
+        <app-task-explorer></app-task-explorer>
     </div>
 </div>

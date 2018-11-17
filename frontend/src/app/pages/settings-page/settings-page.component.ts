@@ -20,7 +20,7 @@ export class SettingsPageComponent implements OnInit {
     userPasswordConfirmation = new FormControl('', [Validators.required]);
 
     public currentUser: UserInfo;
-    protected allUsers: Array<UserInfo>;
+    public allUsers: Array<UserInfo>;
 
     constructor(public snackBar: MatSnackBar, private usersService: UsersService) {
         this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));

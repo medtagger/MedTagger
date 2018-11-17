@@ -1,0 +1,21 @@
+@import "../../styles/mixins";
+
+.app-navbar {
+    @include mat-elevation(2);
+    height: $size-height-nav;
+    background-color: mat-color($primary, 700);
+    &-brand{
+        display: flex;
+        align-items: center;
+        color: color('white');
+        text-decoration: none;
+        &__logo{
+            height: 2em;
+        }
+        &__text {
+            padding-left: 0.5em;
+            font-size: 1.5em;
+            font-weight: 300;
+        }
+    }
+}

@@ -1,72 +1,52 @@
-<section class="main-content">
-    <mat-card>
-        <mat-card-header>
-            <mat-card-title><h1>Account Settings</h1></mat-card-title>
-        </mat-card-header>
+<app-nav-bar>
+</app-nav-bar>
+<div class="tab-container">
+    <mat-card class="tab-container__card">
+        <mat-card-title>
+            Account settings
+        </mat-card-title>
+        <mat-card-subtitle>
+            Change your account data
+        </mat-card-subtitle>
         <mat-card-content>
-            <mat-accordion class="align-accordion-descriptions">
-                <mat-expansion-panel>
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            User data
-                        </mat-panel-title>
-                        <mat-panel-description>
-                            Basic user information
-                        </mat-panel-description>
-                    </mat-expansion-panel-header>
-
-                    <mat-form-field>
-                        <input matInput placeholder="First name" type="text" [formControl]="userFirstName" required>
-                        <mat-error *ngIf="userFirstName.invalid">{{getUserFirstNameErrorMessage()}}</mat-error>
-                    </mat-form-field>
-                    <mat-form-field>
-                        <input matInput placeholder="Last name" type="text" [formControl]="userLastName" required>
-                        <mat-error *ngIf="userLastName.invalid">{{getUserLastNameErrorMessage()}}</mat-error>
-                    </mat-form-field>
-                    <mat-form-field>
-                        <input matInput placeholder="E-mail" type="text" [formControl]="userEmail" required readonly>
-                        <mat-error *ngIf="userEmail.invalid">{{getUserEmailErrorMessage()}}</mat-error>
-                    </mat-form-field>
-
-                    <button mat-button color="primary" (click)="updateUserDetails()" [disabled]="!validateUserInput()">
-                      Save
+            <mat-form-field>
+                <input matInput placeholder="First name" type="text" [formControl]="userFirstName" required>
+                <mat-error *ngIf="userFirstName.invalid">{{getUserFirstNameErrorMessage()}}</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput placeholder="Last name" type="text" [formControl]="userLastName" required>
+                <mat-error *ngIf="userLastName.invalid">{{getUserLastNameErrorMessage()}}</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput placeholder="E-mail" type="text" [formControl]="userEmail" required readonly>
+                <mat-error *ngIf="userEmail.invalid">{{getUserEmailErrorMessage()}}</mat-error>
+            </mat-form-field>
+            <button mat-button color="primary" (click)="updateUserDetails()" [disabled]="!validateUserInput()">
+                Save
+            </button>
+        </mat-card-content>
+    </mat-card>
+    <mat-card *ngIf="currentUser.role === 'admin'" class="tab-container__card">
+        <mat-card-title>
+            Users
+        </mat-card-title>
+        <mat-card-subtitle>
+            Browse users and change their's privilages
+        </mat-card-subtitle>
+        <mat-card-content>
+            <mat-list>
+                <mat-list-item *ngFor="let user of allUsers">
+                    <mat-icon matListIcon *ngIf="user.role === 'volunteer'">person</mat-icon>
+                    <mat-icon matListIcon *ngIf="user.role === 'doctor'">healing</mat-icon>
+                    <mat-icon matListIcon *ngIf="user.role === 'admin'">build</mat-icon>
+                    <span>{{user.firstName}} {{user.lastName}} ({{user.email}})</span>
+                    <button *ngIf="user.role === 'volunteer'" mat-button color="primary"
+                            (click)="promoteToDoctor(user)">
+                        <mat-icon matListIcon>add_circle_outline</mat-icon>
+                        Doctor role
                     </button>
-
-                </mat-expansion-panel>
-            </mat-accordion>
+                </mat-list-item>
+            </mat-list>
         </mat-card-content>
     </mat-card>
-    <mat-card *ngIf="currentUser.role === 'admin'">
-        <mat-card-header>
-            <mat-card-title><h1>Administrator Panel</h1></mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <mat-accordion class="align-accordion-descriptions">
-                <mat-expansion-panel>
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            Users
-                        </mat-panel-title>
-                        <mat-panel-description>
-                            Browse users and change privilages
-                        </mat-panel-description>
-                    </mat-expansion-panel-header>
-
-                    <mat-list>
-                        <mat-list-item *ngFor="let user of allUsers">
-                            <mat-icon matListIcon *ngIf="user.role === 'volunteer'">person</mat-icon>
-                            <mat-icon matListIcon *ngIf="user.role === 'doctor'">healing</mat-icon>
-                            <mat-icon matListIcon *ngIf="user.role === 'admin'">build</mat-icon>
-                            <span>{{user.firstName}} {{user.lastName}} ({{user.email}})</span>
-                            <button *ngIf="user.role === 'volunteer'" mat-button color="primary"
-                                    (click)="promoteToDoctor(user)">
-                                <mat-icon matListIcon>add_circle_outline</mat-icon>
-                                Doctor role
-                            </button>
-                        </mat-list-item>
-                    </mat-list>
-                </mat-expansion-panel>
-            </mat-accordion>
-        </mat-card-content>
-    </mat-card>
-</section>
+</div>

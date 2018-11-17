@@ -21,6 +21,7 @@ import {ChainTool} from '../../components/tools/ChainTool';
 import {ToolAction, ToolActionType} from '../../model/ToolAction';
 import {TaskService} from '../../services/task.service';
 import {Task} from '../../model/Task';
+import {HOME} from '../../constants/routes';
 import {RectangleSelection} from '../../model/selections/RectangleSelection';
 import {LabelService} from '../../services/label.service';
 import {Label} from '../../model/labels/Label';
@@ -51,7 +52,7 @@ export class MarkerPageComponent implements OnInit {
     toolActions: Array<ToolAction> = [];
     labelComment: string;
     isInitialSliceLoad: boolean;
-    chooseTaskPageUrl = '/labeling/choose-task';
+    homePage = '/' + HOME;
 
     getTaskPromise: Promise<Task>;
 
@@ -85,7 +86,7 @@ export class MarkerPageComponent implements OnInit {
                         .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
                         .afterClosed()
                         .subscribe(() => {
-                            this.router.navigateByUrl(this.chooseTaskPageUrl);
+                            this.router.navigateByUrl(this.homePage);
                         });
                 }
             },
@@ -95,7 +96,7 @@ export class MarkerPageComponent implements OnInit {
                         .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
                         .afterClosed()
                         .subscribe(() => {
-                            this.router.navigateByUrl(this.chooseTaskPageUrl);
+                            this.router.navigateByUrl(this.homePage);
                         });
                 }
             });
@@ -208,7 +209,7 @@ export class MarkerPageComponent implements OnInit {
                     .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this dataset!', 'Go back')
                     .afterClosed()
                     .subscribe(() => {
-                        this.router.navigateByUrl(this.chooseTaskPageUrl);
+                        this.router.navigateByUrl(this.homePage);
                     });
             });
     }
@@ -317,8 +318,8 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setFocusable(false);
         this.dialogService.openInputDialog('Add comment to your label (optional)', '',
             this.labelComment, this.labelComment ? 'Save comment' : 'Add comment').afterClosed().subscribe(comment => {
-                this.labelComment = comment;
-                this.marker.setFocusable(true);
+            this.labelComment = comment;
+            this.marker.setFocusable(true);
         });
     }
 }

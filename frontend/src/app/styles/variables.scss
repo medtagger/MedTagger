@@ -1,0 +1,39 @@
+@import "app-theme";
+
+$primary: mat-palette($mat-light-blue, 600, 500, 800);
+$accent: mat-palette($mat-orange, 500, 300, 600);
+$warn: mat-color($tagger-app-warn);
+
+$color-black: #000;
+$color-white: #fff;
+$color-card: #FAFAFA;
+
+$size-height-nav: 60px;
+
+$colors: (
+    'black': $color-black,
+    'white': $color-white,
+    'card': $color-card
+);
+
+$colors-emphasis: (
+    high: 0.9,
+    medium: 0.5,
+    low: 0.2,
+    disabled: 0.4
+);
+
+@function color($key, $opacity: 1) {
+    $color: map-get($colors, $key);
+    @if(type_of($opacity) == string and map-has_key($colors-emphasis, $opacity) ) {
+        $opacity: map-get($colors-emphasis, $opacity);
+        @return rgba($color, $opacity);
+    }
+    @else if (type_of($opacity) == number) {
+        @if ($opacity > 1) {
+            $opacity: 1;
+            @warn 'Opacity cannot be higher than 1! Value was changed to 1.';
+        }
+        @return rgba($color, $opacity);
+    }
+}

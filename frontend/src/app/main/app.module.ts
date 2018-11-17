@@ -10,7 +10,6 @@ import {HomePageComponent} from '../pages/home-page/home-page.component';
 import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
 import {MarkerTutorialPageComponent} from '../pages/marker-tutorial-page/marker-tutorial-page.component';
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
-import {TasksPageComponent} from '../pages/tasks-page/tasks-page.component';
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 
@@ -40,6 +39,7 @@ import {
     MatExpansionModule,
     MatSnackBarModule,
     MatSelectModule,
+    MatTabsModule,
     MatTooltipModule,
     MatDialog,
     MatDialogModule,
@@ -59,6 +59,8 @@ import {MedTaggerWebSocket} from '../services/websocket.service';
 import {LabelExplorerComponent} from '../components/label-explorer/label-explorer.component';
 import {InputDialogComponent} from '../dialogs/input-dialog.component';
 import {TaskService} from '../services/task.service';
+import {NavBarComponent} from '../components/nav-bar/nav-bar.component';
+import {TaskExplorerComponent} from '../components/task-explorer/task-explorer.component';
 import {HttpAuthenticationInterceptor} from '../interceptors/http-authentication.interceptor';
 
 @NgModule({
@@ -67,7 +69,6 @@ import {HttpAuthenticationInterceptor} from '../interceptors/http-authentication
         LoginPageComponent,
         MarkerPageComponent,
         HomePageComponent,
-        TasksPageComponent,
         MarkerComponent,
         LabelExplorerComponent,
         ScanViewerComponent,
@@ -77,7 +78,9 @@ import {HttpAuthenticationInterceptor} from '../interceptors/http-authentication
         SettingsPageComponent,
         ValidationPageComponent,
         InfoDialogComponent,
-        InputDialogComponent
+        InputDialogComponent,
+        NavBarComponent,
+        TaskExplorerComponent,
     ],
     imports: [
         routing,
@@ -97,6 +100,7 @@ import {HttpAuthenticationInterceptor} from '../interceptors/http-authentication
         MatSidenavModule,
         MatListModule,
         MatGridListModule,
+        MatTabsModule,
         MatTooltipModule,
         MatDialogModule,
         BrowserAnimationsModule,
