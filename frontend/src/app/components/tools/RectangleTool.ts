@@ -91,11 +91,16 @@ export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<
         return false;
     }
 
-    public canUseMouseWheel(): boolean {
+    public canChangeSlice(): boolean {
         return !this.selectedArea;
     }
 
     public getToolName(): string {
         return 'RECTANGLE';
+    }
+
+    public onToolChange(): void {
+        this.selectedArea = undefined;
+        this.requestRedraw();
     }
 }

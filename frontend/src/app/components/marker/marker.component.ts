@@ -65,7 +65,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
     public setCurrentTool(tool: Tool<any>) {
         if (this.currentTool) {
-            this.currentTool.deselect();
+            this.currentTool.onToolChange();
         }
         this.currentTool = tool;
         this.updateTagForCurrentTool(this.currentTag);
@@ -224,7 +224,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         };
 
         this.canvas.onwheel = (wheelEvent: WheelEvent) => {
-            if (this.currentTool && !this.currentTool.canUseMouseWheel()) {
+            if (this.currentTool && !this.currentTool.canChangeSlice()) {
                 return;
             }
 
@@ -244,5 +244,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     public setLabelExplorer(labelExplorerRef: LabelExplorerComponent): void {
         this.labelExplorer = labelExplorerRef;
         this.hookUpExplorerLabelChangeSubscription();
+    }
+
+    public canChangeSlice(): boolean {
+        return this.currentTool ? this.currentTool.canChangeSlice() : true;
     }
 }
