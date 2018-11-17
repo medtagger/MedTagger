@@ -23,7 +23,7 @@ authorizations = {
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 api = Api(blueprint, version='0.1', title='Backend API', description='Documentation for Backend API',
           default='core', default_label='Core methods', authorizations=authorizations, validate=True)
-web_socket = SocketIO(logger=True, engineio_logger=True, cors_allowed_origins=True)
+web_socket = SocketIO(logger=True, engineio_logger=True)
 
 
 @api.errorhandler
