@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, OnInit, ViewChild} from '@angular/core';
+import {Component, EventEmitter, OnInit} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
 import {MatSlider} from '@angular/material/slider';
 import {Subject} from 'rxjs';
@@ -24,35 +24,16 @@ import {BrushTool} from '../tools/BrushTool';
 })
 export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
-    currentImage: HTMLImageElement;
-    downloadingScanInProgress = false;
-    downloadingSlicesInProgress = false;
     redrawRequestEmitter: EventEmitter<void> = new EventEmitter<void>();
-
-    @ViewChild('image')
-    set viewImage(viewElement: ElementRef) {
-        this.currentImage = viewElement.nativeElement;
-    }
-
-    canvas: HTMLCanvasElement;
 
     private currentTool: Tool<SliceSelection>;
     private currentTag: LabelTag;
-
-    @ViewChild('canvas')
-    set viewCanvas(viewElement: ElementRef) {
-        this.canvas = viewElement.nativeElement;
-    }
-
-    @ViewChild('slider') slider: MatSlider;
 
     public selectionState: { isValid: boolean, is2d: boolean, hasArchive: boolean } = {
         isValid: false,
         is2d: false,
         hasArchive: false
     };
-
-    public observableSliceRequest: Subject<SliceRequest>;
 
     private labelExplorer: LabelExplorerComponent;
 
@@ -66,10 +47,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         this.redrawRequestEmitter.subscribe(() => {
             this.redrawSelections();
         });
-    }
-
-    get currentSlice() {
-        return this._currentSlice;
     }
 
     public setTools(newTools: Array<Tool<SliceSelection>>) {
@@ -106,22 +83,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
         super.setCurrentTag(tag);
         this.currentTag = tag;
         this.updateTagForCurrentTool(this.currentTag);
-    }
-
-    public setDownloadScanInProgress(isInProgress: boolean) {
-        this.downloadingScanInProgress = isInProgress;
-    }
-
-    public setDownloadSlicesInProgress(isInProgress: boolean) {
-        this.downloadingSlicesInProgress = isInProgress;
-    }
-
-    public selectMiddleSlice(): void {
-        const slicesCount = this.slider.max - this.slider.min + 1;
-        const middleSliceNumber = this.slider.min + Math.floor(slicesCount / 2);
-        this.slider.value = middleSliceNumber;
-        this.changeMarkerImage(middleSliceNumber);
-        this.drawSelections();
     }
 
     public removeAllSelectionsOnCurrentSlice(): void {
@@ -198,10 +159,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
 
         this.slices = new Map<number, MarkerSlice>();
 
-        this.initializeCanvas();
+        this.updateCanvasPositionInTools();
 
         this.initializeImage(() => {
-            this.afterImageLoad();
+            this.clearCanvasSelections();
+            this.drawSelections();
+            this.updateSelectionState();
         });
 
         this.setCanvasImage();
@@ -228,13 +191,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit {
     public updatePredefinedBrushLabelElement(labelElement: PredefinedBrushLabelElement): void {
         const tool: BrushTool = this.toolsByName.get('BRUSH') as BrushTool;
         tool.updateBrushSelection(labelElement.index, labelElement.tag_key, labelElement.source);
-    }
-
-    private afterImageLoad(): void {
-        this.clearCanvasSelections();
-
-        this.drawSelections();
-        this.updateSelectionState();
     }
 
     private initCanvasSelectionTool(): void {
