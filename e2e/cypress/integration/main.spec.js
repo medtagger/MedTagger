@@ -56,20 +56,46 @@ describe('Basic flow', () => {
     });
 
     it('Chain selector', () => {
+        // Watch on Label endpoint
+        cy.server();
+        cy.route('POST', '/api/v1/scans/*/*/label').as('addLabel');
+
+        // Prepare for labeling
         loginAsAdmin();
         uploadScans('Heart', 11);
         goToLabeling('Find narrowings');
         matSelect('[data-cy=tags]', 'Narrowing (lenghtwise)');
         cy.get('[data-cy=chain-tool]').click({force: true});
+
+        // Enter first Chain element
         cy.get('canvas').click(100, 100);
         cy.get('canvas').click(200, 100);
         cy.get('canvas').click(200, 200);
-        cy.get('.action-buttons button:contains(Stop)').click();
+        // NOTE: Cannot use right click event, so as a work around we are changing Tool
+        cy.get('[data-cy=chain-tool]').click({force: true});
+
+        // Enter second Chain element
         cy.get('canvas').click(300, 300);
         cy.get('canvas').click(200, 300);
         cy.get('canvas').click(300, 200);
-        cy.get('.action-buttons button:contains(Loop)').click();
+        cy.get('canvas').click(300, 300);
+        // NOTE: Cannot use right click event, so as a work around we are changing Tool
+        cy.get('[data-cy=chain-tool]').click({force: true});
+
+        // Send and check Label in backend
         cy.get('[data-cy=send-label]').click();
+        cy.wait('@addLabel').then(function(xhr) {
+            let labelId = xhr.response.body.label_id;
+            let token = window.sessionStorage.getItem('authorizationToken');
+            cy.request({url: Cypress.env('API_URL') + `labels/${labelId}`, headers: {Authorization: `Bearer ${token}`}}).then(function(response) {
+                let labelElements = response.body.elements;
+                // TODO: There is a UI bug! There should be 2 Label Elements!
+                // Check this Issue for details: https://github.com/jpowie01/MedTagger/issues/497
+                expect(labelElements.length).equals(1);
+            });
+        });
+
+        // UI should be empty once again
         cy.get('[data-cy=no-labels-added]');
     });
 

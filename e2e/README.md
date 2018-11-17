@@ -23,6 +23,34 @@ Also, you can run them inside of the Docker containers in the same way as it is 
 $ make e2e_docker
 ```
 
+### Speed up your testing
+
+To speed up multiple runs on your development instance, you can split above make command
+ into mulitple separate commands which will help you quickly write & test E2E.
+
+Example commands:
+
+```bash
+$ make e2e__prepare_environment
+$ make e2e__run
+$ make e2e__delete_environment
+```
+
+...or even with more controll on your environment:
+
+```bash
+$ make e2e__prepare_environment
+$ make e2e__start_medtagger
+$ make e2e__execure
+$ make e2e__stop_medtagger
+$ make e2e__delete_environment
+```
+
+Now, you can execute your tests multiple times very quickly!
+
+**TIP!** Logs from MedTagger may print to your console, so start your environemt in different
+ terminal.
+
 ## Manual run
 
 There is also a classic way to run Cypress tests. Before first execution fetch all
