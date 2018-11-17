@@ -1,5 +1,5 @@
 # App requirements
-alembic==1.0.2
+alembic==1.0.3
 SQLAlchemy==1.2.14
 werkzeug==0.14.1
 flask==1.0.2
