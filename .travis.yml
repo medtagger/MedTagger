@@ -52,7 +52,7 @@ matrix:
            cd frontend/ &&
            npm i &&
            ng lint &&
-           ng test"
+           ng test --watch=false"
 
     # Frontend - build production Docker
     - language: node_js
