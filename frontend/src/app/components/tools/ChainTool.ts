@@ -1,13 +1,11 @@
 import {Tool} from './Tool';
 import {ToolBase} from './ToolBase';
 import {Point} from '../../model/Point';
-import {ToolAction, ToolActionType} from '../../model/ToolAction';
 import {ChainSelection} from '../../model/selections/ChainSelection';
 
 export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSelection> {
 
     private selectedAreaPointIndex = -1;
-    private selectingInProgress = false;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -21,17 +19,6 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
             SELECTION_LINE_WIDTH: 3,
             SELECTION_FONT_COLOR: '#ffffff',
         };
-    }
-
-    public getActions(): Array<ToolAction> {
-        return [
-            new ToolAction('Stop', () => this.selectingInProgress, () => {
-                this.completeSelection(false);
-            }, ToolActionType.BUTTON),
-            new ToolAction('Loop', () => this.selectingInProgress && this.selectedArea.points.length > 2, () => {
-                this.completeSelection(true);
-            }, ToolActionType.BUTTON)
-        ];
     }
 
     public drawSelection(selection: ChainSelection, color: string): void {
@@ -90,7 +77,6 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
             this.addSelection(this.selectedArea);
         }
         this.selectedArea = undefined;
-        this.selectingInProgress = undefined;
         this.requestRedraw();
     }
 
@@ -99,66 +85,88 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
         const x = (event.clientX) - this.canvasPosition.left;
         const y = (event.clientY) - this.canvasPosition.top;
 
-        if (this.selectingInProgress) {
-            const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-            const point = new Point(normalizedPoint.x, normalizedPoint.y);
-            this.selectedArea.points.push(point);
-            this.requestRedraw();
-        } else {
-            const currentSliceSelections = this.selections.get(this.currentSlice);
-            if (currentSliceSelections) {
-                currentSliceSelections.forEach((selection: ChainSelection) => {
-                    if (!selection.hidden) {
-                        for (const index in selection.points) {
-                            if (this.checkDistance(selection.points[index], x, y)) {
-                                this.selectedArea = selection;
-                                this.selectedAreaPointIndex = +index;
-                                return;
-                            }
-                        }
-                    }
-                });
-            }
+        if (event.button === 0) {
+            // left mouse button
+            if (this.selectedArea) {
+                if (this.checkDistance(this.selectedArea.points[0], x, y)) {
+                    this.selectedArea.points.splice(this.selectedArea.points.length - 1, 1);
+                    this.completeSelection(true);
+                    return;
+                }
 
-            if (!this.selectedArea) {
                 const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
                 const point = new Point(normalizedPoint.x, normalizedPoint.y);
-                this.selectedArea = new ChainSelection([point], false, this.currentSlice, this.currentTag);
-                this.selectingInProgress = true;
+                this.selectedArea.points.push(point);
                 this.requestRedraw();
+            } else {
+                const currentSliceSelections = this.selections.get(this.currentSlice);
+                if (currentSliceSelections) {
+                    currentSliceSelections.forEach((selection: ChainSelection) => {
+                        if (!selection.hidden) {
+                            for (const index in selection.points) {
+                                if (this.checkDistance(selection.points[index], x, y)) {
+                                    this.selectedArea = selection;
+                                    this.selectedAreaPointIndex = +index;
+                                }
+                            }
+                        }
+                    });
+                }
+
+                if (!this.selectedArea) {
+                    const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
+                    const point = new Point(normalizedPoint.x, normalizedPoint.y);
+                    this.selectedArea = new ChainSelection([point, point], false, this.currentSlice, this.currentTag);
+                    this.requestRedraw();
+                }
             }
+        } else if (event.button === 2 && this.selectedArea) {
+            // right mouse button
+            this.selectedArea.points.splice(this.selectedArea.points.length - 1, 1);
+            this.completeSelection(false);
         }
     }
 
     public onMouseMove(event: MouseEvent): void {
-        if (this.selectedArea && !this.selectingInProgress) {
+        if (this.selectedArea) {
             console.log('ChainTool | updateSelection | event: ', event);
-
             const newX = event.clientX - this.canvasPosition.left;
             const newY = event.clientY - this.canvasPosition.top;
-
             const normalizedValues: { x: number, y: number } = this.normalizeByView(newX, newY);
-
-            this.selectedArea.points[this.selectedAreaPointIndex] = new Point(normalizedValues.x, normalizedValues.y);
+            if (this.isMovingPoint()) {
+                this.selectedArea.points[this.selectedAreaPointIndex] = new Point(normalizedValues.x, normalizedValues.y);
+            } else {
+                if (this.checkDistance(this.selectedArea.points[0], newX, newY)) {
+                    this.selectedArea.points[this.selectedArea.points.length - 1] = this.selectedArea.points[0];
+                } else {
+                    this.selectedArea.points[this.selectedArea.points.length - 1] = new Point(normalizedValues.x, normalizedValues.y);
+                }
+            }
             this.requestRedraw();
         }
     }
 
     public onMouseUp(event: MouseEvent): void {
-        if (!this.selectingInProgress) {
+        if (this.isMovingPoint()) {
             this.selectedArea = undefined;
+            this.selectedAreaPointIndex = -1;
         }
     }
 
-    public deselect(): void {
-        this.completeSelection(false);
-    }
-
-    public canUseMouseWheel(): boolean {
-        return !this.selectingInProgress;
+    public canChangeSlice(): boolean {
+        return !this.selectedArea;
     }
 
     public getToolName(): string {
         return 'CHAIN';
+    }
+
+    public onToolChange(): void {
+        this.selectedArea = undefined;
+        this.requestRedraw();
+    }
+
+    private isMovingPoint(): boolean {
+        return this.selectedAreaPointIndex !== -1;
     }
 }

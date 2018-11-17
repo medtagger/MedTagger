@@ -320,7 +320,7 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
         return this.canvas.toDataURL() === blankCanvas.toDataURL();
     }
 
-    public canUseMouseWheel(): boolean {
+    public canChangeSlice(): boolean {
         return !this.mouseDrag;
     }
 

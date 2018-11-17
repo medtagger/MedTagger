@@ -63,10 +63,9 @@ export interface Tool<SliceSelection> {
 
     getActions(): Array<ToolAction>;
 
-    deselect(): void;
-
     isSingleSelectionPerSlice(): boolean;
 
-    // Used to check if using mouse wheel is safe with current tool
-    canUseMouseWheel(): boolean;
+    canChangeSlice(): boolean;
+
+    onToolChange(): void;
 }

@@ -4,14 +4,14 @@
         <canvas #canvas id="markerCanvas"></canvas>
     </div>
     <mat-slider #slider id="markerSlider"
-                (blur)="this.sliderFocus()"
+                (blur)="sliderFocus()"
                 [disabled]="false"
                 [max]="10"
                 [min]="0"
                 [step]="1"
                 [thumbLabel]="true"
                 [tickInterval]="1"
-                [value]="this.currentSlice"
+                [value]="currentSlice"
                 [vertical]="true">
     </mat-slider>
     <div *ngIf="downloadingScanInProgress || downloadingSlicesInProgress">
