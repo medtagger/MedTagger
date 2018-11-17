@@ -1,6 +1,6 @@
-import {Component, HostListener, OnInit, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {MarkerSlice} from '../../model/MarkerSlice';
-import {Subject, from} from 'rxjs';
+import {from, Subject} from 'rxjs';
 import {groupBy, toArray} from 'rxjs/operators';
 import {ScanMetadata} from '../../model/ScanMetadata';
 import {MatSlider} from '@angular/material';
@@ -16,6 +16,9 @@ import {LabelTag} from '../../model/labels/LabelTag';
 })
 export class ScanViewerComponent implements OnInit, AfterViewInit {
 
+    downloadingScanInProgress = false;
+    downloadingSlicesInProgress = false;
+
     currentImage: HTMLImageElement;
 
     @ViewChild('image')
@@ -30,8 +33,14 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         this.canvas = viewElement.nativeElement;
     }
 
-    @ViewChild('slider') slider: MatSlider;
+    imageContainer: HTMLDivElement;
 
+    @ViewChild('imageContainer')
+    set viewImageContainer(viewElement: ElementRef) {
+        this.imageContainer = viewElement.nativeElement;
+    }
+
+    @ViewChild('slider') slider: MatSlider;
 
     canvasWorkspace: HTMLDivElement;
 
@@ -50,10 +59,18 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
     protected tools: Array<Tool<SliceSelection>>;
     protected _currentTag;
 
-    focusable: boolean;
+    public focusable = true;
 
-    constructor() {
-        this.focusable = true;
+    protected _scale = 1.0;
+
+    set scale(scale: number) {
+        this._scale = scale;
+        this.resizeImageToCurrentWorkspace();
+        this.updateCanvasSize();
+    }
+
+    get scale(): number {
+        return this._scale;
     }
 
     @HostListener('window:resize', ['$event'])
@@ -79,7 +96,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         if (this.focusable) {
             // setTimeout() fixes slider focus issues in IE/Firefox
             window.setTimeout(() => {
-              this.slider._elementRef.nativeElement.focus();
+                this.slider._elementRef.nativeElement.focus();
             }, 10);
         }
     }
@@ -145,6 +162,14 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         return this._currentSlice;
     }
 
+    public setDownloadScanInProgress(isInProgress: boolean) {
+        this.downloadingScanInProgress = isInProgress;
+    }
+
+    public setDownloadSlicesInProgress(isInProgress: boolean) {
+        this.downloadingSlicesInProgress = isInProgress;
+    }
+
     public clearData(): void {
         this.slices = new Map<number, MarkerSlice>();
         this._currentSlice = undefined;
@@ -188,13 +213,25 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         });
     }
 
+    public updateCanvasPositionInTools(): void {
+        this.tools.forEach((selector) => selector.updateCanvasPosition(this.canvas.getBoundingClientRect()));
+    }
+
+    public selectMiddleSlice(): void {
+        const slicesCount = this.slider.max - this.slider.min + 1;
+        const middleSliceNumber = this.slider.min + Math.floor(slicesCount / 2);
+        this.slider.value = middleSliceNumber;
+        this.changeMarkerImage(middleSliceNumber);
+        this.drawSelections();
+    }
+
     ngOnInit() {
         console.log('ScanViewer | ngOnInit');
         console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
 
         this.slices = new Map<number, MarkerSlice>();
 
-        this.initializeCanvas();
+        this.updateCanvasPositionInTools();
 
         this.initializeImage(this.drawSelections);
 
@@ -264,33 +301,33 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
         const maxImageSize = Math.max(this.scanMetadata.width, this.scanMetadata.height);
         const minCanvasSize = Math.min(this.canvasWorkspace.clientWidth, this.canvasWorkspace.clientHeight);
-        const ratioScalar = (minCanvasSize / maxImageSize);
+        const ratioScalar = minCanvasSize * this.scale / maxImageSize;
 
         console.log('ScanViewer | resizeImageToCurrentWorkspace | ratioScalar: ', ratioScalar);
 
-        this.currentImage.style.maxWidth = (this.scanMetadata.width * ratioScalar) + 'px';
-        this.currentImage.style.maxHeight = (this.scanMetadata.height * ratioScalar) + 'px';
+        const imageSize = {
+            width: this.scanMetadata.width * ratioScalar,
+            height: this.scanMetadata.height * ratioScalar
+        };
 
-        this.currentImage.width = this.scanMetadata.width * ratioScalar;
-        this.currentImage.height = this.scanMetadata.height * ratioScalar;
+        this.currentImage.style.maxWidth = imageSize.width + 'px';
+        this.currentImage.style.maxHeight = imageSize.height + 'px';
 
-        this.centerImageAndCanvas();
-    }
+        this.currentImage.width = imageSize.width;
+        this.currentImage.height = imageSize.height;
 
-    protected centerImageAndCanvas(): void {
-        console.log('ScanViewer | centerImageAndCanvas');
-        const centerX = (this.canvasWorkspace.clientWidth / 2) - (this.currentImage.width / 2);
-        const centerY = (this.canvasWorkspace.clientHeight / 2) - (this.currentImage.height / 2);
+        if (imageSize.width < this.canvasWorkspace.clientWidth) {
+            const left = ((this.canvasWorkspace.clientWidth / 2) - (this.currentImage.width / 2)) + 'px';
+            this.currentImage.style.left = left;
+            this.canvas.style.left = left;
+        }
+        if (imageSize.height < this.canvasWorkspace.clientHeight) {
+            const top = ((this.canvasWorkspace.clientHeight / 2) - (this.currentImage.height / 2)) + 'px';
+            this.currentImage.style.top = top;
+            this.canvas.style.top = top;
+        }
 
-        console.log('ScanViewer | centerImageAndCanvas | centerX - centerY: ', centerX, centerY);
-
-        this.currentImage.style.left = centerX + 'px';
-        this.currentImage.style.top = centerY + 'px';
-
-        this.canvas.style.left = centerX + 'px';
-        this.canvas.style.top = centerY + 'px';
-
-        this.tools.forEach((tool) => tool.updateCanvasPosition(this.canvas.getBoundingClientRect()));
+        this.updateCanvasPositionInTools();
     }
 
     protected drawSelections(): void {

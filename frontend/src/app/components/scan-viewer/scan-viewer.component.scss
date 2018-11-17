@@ -1,15 +1,44 @@
 @import '../../../app-theme.scss';
 
 $canvas-size: 100%;
+$slider-offset: 20px;
+$spinner-radius: 50px;
 
 #markerCanvas {
     position: absolute;
     user-select: none;
 }
 
+#markerWrapper {
+    height: 100%;
+}
+
+#imageContainer {
+    position: absolute;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+}
+
+#markerBackgroundImage {
+    max-width: $canvas-size;
+    max-height: $canvas-size;
+    user-select: none;
+    background-color: black;
+    position: absolute;
+}
+
+#markerSpinner {
+    @extend #markerCanvas;
+    left: calc(#{$canvas-size} / 3 + #{$spinner-radius});
+    top: calc(#{$canvas-size} / 3 + #{$spinner-radius});
+}
+
 #markerSlider {
     position: absolute;
-    right: 0;
+    right: 14px;
+    top: 14px;
+    bottom: 14px;
 }
 
 #markerAcceptButton {
@@ -18,7 +47,7 @@ $canvas-size: 100%;
     top: $canvas-size;
 }
 
-// pretty neat workaround to always show slider thumb
+// pretty neat workaround to always show slider thumb and modified styles
 ::ng-deep {
     .mat-slider-thumb-label {
         transform: rotate(-45deg) !important;
@@ -31,6 +60,10 @@ $canvas-size: 100%;
 
     .mat-slider-thumb-label-text {
         opacity: 1 !important;
+    }
+
+    .mat-slider-track-background {
+      background-color: whitesmoke !important;
     }
 }
 
