@@ -26,7 +26,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -81,7 +81,7 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -132,7 +132,7 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -195,7 +195,7 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)
@@ -239,7 +239,7 @@ def test_add_label_with_tag_from_other_task(prepare_environment: Any, synchronou
 
     # Step 2. Add Scan to the system
     payload = {'dataset': 'KIDNEYS', 'number_of_slices': 3}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)

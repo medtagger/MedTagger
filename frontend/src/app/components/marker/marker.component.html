@@ -1,8 +1,10 @@
 <div #canvasWorkspace id="markerWrapper">
-    <img #image id="markerBackgroundImage"/>
-    <canvas #canvas id="markerCanvas"></canvas>
+    <div #imageContainer id="imageContainer" (scroll)="updateCanvasPositionInTools()" (wheel)="$event.preventDefault()">
+        <img #image id="markerBackgroundImage"/>
+        <canvas #canvas id="markerCanvas"></canvas>
+    </div>
     <mat-slider #slider id="markerSlider"
-                (blur)="this.sliderFocus()"
+                (blur)="sliderFocus()"
                 [disabled]="false"
                 [max]="10"
                 [min]="0"
@@ -17,4 +19,3 @@
         <mat-progress-spinner id="markerSpinner" mode="indeterminate" color="primary"></mat-progress-spinner>
     </div>
 </div>
-

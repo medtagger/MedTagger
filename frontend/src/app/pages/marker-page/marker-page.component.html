@@ -41,13 +41,17 @@
                     <mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon>
                 </button>
                 <button mat-mini-fab
+                    (click)="zoomIn()"
+                    [disabled]="currentZoomLevelIndex >= zoomLevels.length - 1"
                     [color]="isCurrentTool('ZOOM_IN') ? 'accent' : 'primary'"
-                    [ngClass]="{'active-button': isCurrentTool('ZOOM_IN')}" disabled>
+                    [ngClass]="{'active-button': isCurrentTool('ZOOM_IN')}">
                     <mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon>
                 </button>
                 <button mat-mini-fab
+                    (click)="zoomOut()"
+                    [disabled]="currentZoomLevelIndex <= 0"
                     [color]="isCurrentTool('ZOOM_OUT') ? 'accent' : 'primary'"
-                    disabled>
+                    [ngClass]="{'active-button': isCurrentTool('ZOOM_OUT')}">
                     <mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon>
                 </button>
             </div>

@@ -5,6 +5,7 @@ import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
 import {ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 
+import {API_URL} from '../utils/ApiUrl';
 import {environment} from '../../environments/environment';
 import {ScanSelection} from '../model/selections/ScanSelection';
 import {SliceSelection} from '../model/selections/SliceSelection';
@@ -73,13 +74,14 @@ export class ScanService {
         }
 
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label`, form).toPromise().then((response: Response) => {
-                console.log('ScanService | send3dSelection | response: ', response);
-                resolve(response);
-            }).catch((error: Response) => {
-                console.log('ScanService | send3dSelection | error: ', error);
-                reject(error);
-            });
+            this.http.post(environment.API_URL + API_URL.SCANS + `/${scanId}/${taskKey}/label`, form).toPromise()
+                .then((response: Response) => {
+                    console.log('ScanService | send3dSelection | response: ', response);
+                    resolve(response);
+                }).catch((error: Response) => {
+                    console.log('ScanService | send3dSelection | error: ', error);
+                    reject(error);
+                });
         });
     }
 
@@ -93,7 +95,7 @@ export class ScanService {
         }
 
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/${taskKey}/label?is_predefined=true`, form).toPromise()
+            this.http.post(environment.API_URL + API_URL.SCANS + `/${scanId}/${taskKey}/label?is_predefined=true`, form).toPromise()
                 .then((response: Response) => {
                     console.log('ScanService | sendPredefinedLabel | response: ', response);
                     resolve(response);
@@ -111,7 +113,7 @@ export class ScanService {
         return new Promise((resolve, reject) => {
             let params = new HttpParams();
             params = params.set('task', taskKey);
-            this.http.get<ScanResponse>(environment.API_URL + '/scans/random', {params: params})
+            this.http.get<ScanResponse>(environment.API_URL + API_URL.SCANS + '/random', {params: params})
                 .subscribe(
                     (response: ScanResponse) => {
                         console.log('ScanService | getRandomScan | response: ', response);
@@ -130,7 +132,7 @@ export class ScanService {
 
     getScanForScanId(scanId: string): Promise<ScanMetadata> {
         return new Promise((resolve, reject) => {
-            this.http.get<ScanResponse>(environment.API_URL + '/scans/' + scanId).toPromise().then(
+            this.http.get<ScanResponse>(environment.API_URL + API_URL.SCANS + '/' + scanId).toPromise().then(
                 (response: ScanResponse) => {
                     console.log('ScanService | getScanForScanId | response: ', response);
                     resolve(new ScanMetadata(response.scan_id, response.status, response.number_of_slices,
@@ -178,7 +180,7 @@ export class ScanService {
                 number_of_slices: numberOfSlices,
             };
             let retryAttempt = 0;
-            this.http.post<NewScanResponse>(environment.API_URL + '/scans/', payload)
+            this.http.post<NewScanResponse>(environment.API_URL + API_URL.SCANS, payload)
                 .pipe(
                     retryWhen((error: Observable<HttpErrorResponse>) => {
                         return error.pipe(
@@ -212,7 +214,7 @@ export class ScanService {
                 const form = new FormData();
                 form.append('image', file, file.name);
                 return defer(
-                    () => this.http.post(environment.API_URL + '/scans/' + scanId + '/slices', form)
+                    () => this.http.post(environment.API_URL + API_URL.SCANS + '/' + scanId + '/slices', form)
                         .pipe(
                             retryWhen((error: Observable<HttpErrorResponse>) => {
                                 return error.pipe(
@@ -235,7 +237,7 @@ export class ScanService {
 
     skipScan(scanId: string): Promise<Response> {
         return new Promise((resolve, reject) => {
-            this.http.post(environment.API_URL + `/scans/${scanId}/skip`, {}).toPromise().then((response: Response) => {
+            this.http.post(environment.API_URL + API_URL.SCANS + `/${scanId}/skip`, {}).toPromise().then((response: Response) => {
                 console.log('ScanService | skipScan | response: ', response);
                 resolve(response);
             }).catch((error: Response) => {

@@ -72,12 +72,20 @@ e2e__stop_medtagger:
 e2e__run:
 	make e2e__start_medtagger
 	sleep 30  # Let's wait a while for booting up of all services
-	cd $(E2E_DIRECTORY) && $(NODE_MODULES_BIN)/cypress run
+	@if make e2e__execute; then \
+		make e2e__stop_medtagger;\
+		echo "E2E Tests failed!";\
+		exit 1;\
+	fi
+	echo "E2E Tests passed!"
 	make e2e__stop_medtagger
 
 e2e__run_docker:
 	sleep 30  # Let's wait a while for booting up of all services
 	cd $(E2E_DIRECTORY) && CYPRESS_HOST_URL=http://localhost/ CYPRESS_API_URL=http://localhost/api/v1/ $(NODE_MODULES_BIN)/cypress run
+
+e2e__execute:
+	cd $(E2E_DIRECTORY) && $(NODE_MODULES_BIN)/cypress run
 
 e2e__delete_environment:
 	. $(E2E_DIRECTORY)/configuration.sh && cd backend && alembic downgrade base
