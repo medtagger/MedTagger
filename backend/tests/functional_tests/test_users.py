@@ -82,7 +82,7 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     assert len(admin_user_token) > 100
 
     # Step 2. Admin gets all users
-    response = api_client.get('/api/v1/users/', headers=get_headers(token=admin_user_token))
+    response = api_client.get('/api/v1/users', headers=get_headers(token=admin_user_token))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
@@ -132,7 +132,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
 
     # Step 3. Add Scan to the system
     payload = {'dataset': 'LUNGS', 'number_of_slices': 1}
-    response = api_client.post('/api/v1/scans/', data=json.dumps(payload),
+    response = api_client.post('/api/v1/scans', data=json.dumps(payload),
                                headers=get_headers(token=admin_user_token, json=True))
     assert response.status_code == 201
     json_response = json.loads(response.data)

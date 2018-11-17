@@ -14,7 +14,7 @@ from medtagger.api.security import login_required, role_required
 users_ns = api.namespace('users', 'Users management')
 
 
-@users_ns.route('/')
+@users_ns.route('')
 class GetUsers(Resource):
     """Get all users endpoint."""
 

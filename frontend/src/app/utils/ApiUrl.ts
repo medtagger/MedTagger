@@ -5,12 +5,12 @@ export enum API_URL {
     DATASETS = '/datasets',
     LABELS = '/labels',
     RANDOM_SCAN = '/scans/random',
-    SCANS = '/scans/',
+    SCANS = '/scans',
     SLICES = '/slices',
     SKIP = '/skip',
     TASK = '/tasks/',
     TASKS = '/tasks',
-    USERS = '/users/',
+    USERS = '/users',
     ROLE = '/role',
     SETTINGS = '/settings'
 }

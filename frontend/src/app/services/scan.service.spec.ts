@@ -34,12 +34,13 @@ describe('Service: ScanService', () => {
     };
 
     const SEND_SELECTION_API = API_URL.SCANS
+        + '/'
         + EXAMPLE_DATA.SCAN_ID
         + '/'
         + EXAMPLE_DATA.TASK_KEY
         + '/label';
 
-    const SKIP_SCAN_API = API_URL.SCANS + EXAMPLE_DATA.SCAN_ID + API_URL.SKIP;
+    const SKIP_SCAN_API = API_URL.SCANS + '/' + EXAMPLE_DATA.SCAN_ID + API_URL.SKIP;
 
     const MOCK_SCAN_METADATA: ScanMetadata = new ScanMetadata(EXAMPLE_DATA.SCAN_ID,
         EXAMPLE_DATA.STATUS, 50, 512, 512, null);
@@ -211,9 +212,9 @@ describe('Service: ScanService', () => {
             };
 
             backend.expectOne((req: HttpRequest<any>) => {
-                return req.url === environment.API_URL + API_URL.SCANS + EXAMPLE_DATA.SCAN_ID
+                return req.url === environment.API_URL + API_URL.SCANS + '/' + EXAMPLE_DATA.SCAN_ID
                     && req.method === 'GET';
-            }, `GET from ${API_URL.SCANS + EXAMPLE_DATA.SCAN_ID}`)
+            }, `GET from ${API_URL.SCANS + '/' + EXAMPLE_DATA.SCAN_ID}`)
                 .flush(response,
                     {status: 200, statusText: 'Ok'});
         }
@@ -226,9 +227,9 @@ describe('Service: ScanService', () => {
             });
 
             backend.expectOne((req: HttpRequest<any>) => {
-                return req.url === environment.API_URL + API_URL.SCANS + EXAMPLE_DATA.SCAN_ID
+                return req.url === environment.API_URL + API_URL.SCANS + '/' + EXAMPLE_DATA.SCAN_ID
                     && req.method === 'GET';
-            }, `GET from ${API_URL.SCANS + EXAMPLE_DATA.SCAN_ID}`)
+            }, `GET from ${API_URL.SCANS + '/' + EXAMPLE_DATA.SCAN_ID}`)
                 .flush({},
                     {status: 404, statusText: 'No Scans available'});
         }
@@ -342,7 +343,7 @@ describe('Service: ScanService', () => {
 
     it('should upload slices', async(inject([ScanService],
         (service: ScanService) => {
-            const apiUrl = environment.API_URL + API_URL.SCANS + EXAMPLE_DATA.SCAN_ID + API_URL.SLICES;
+            const apiUrl = environment.API_URL + API_URL.SCANS + '/' + EXAMPLE_DATA.SCAN_ID + API_URL.SLICES;
 
             spyOn(http, 'post').and.callFake((api: string, form: FormData) => {
                 if (api === apiUrl && form.has('image')) {

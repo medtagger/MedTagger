@@ -17,7 +17,7 @@ from medtagger.api.scans.serializers import elements_schema
 scans_ns = api.namespace('scans', 'Methods related with scans')
 
 
-@scans_ns.route('/')
+@scans_ns.route('')
 class Scans(Resource):
     """Endpoint that can create new scan."""
 
