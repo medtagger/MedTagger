@@ -50,7 +50,7 @@ def require_one_of_roles(required_roles: Set[str]) -> None:
 
 def hash_password(password: str) -> str:
     """Hash given password."""
-    return pwd_context.encrypt(password)
+    return pwd_context.hash(password)
 
 
 def verify_user_password(user: User, password: str) -> bool:
