@@ -42,6 +42,10 @@ e2e__prepare_environment:
 	. $(E2E_DIRECTORY)/configuration.sh && cd backend && ./$(SCRIPTS_DIRECTORY)/dev__prepare_backend.sh $(MEDTAGGER_CONFIGURATION)
 
 e2e__start_medtagger:
+	@if test -f "$(NG_SERVE_PID_FILE)" || test -f "$(REST_PID_FILE)" || test -f "$(WEBSOCKET_PID_FILE)" || test -f "$(WORKERS_PID_FILE)"; then\
+		echo "MedTagger is already running! Please stop it with \"make e2e__stop_medtagger\" first!";\
+		exit 1;\
+	fi
 	cd frontend && { ng serve -c local & echo $$! > ../$(NG_SERVE_PID_FILE); }
 	. $(E2E_DIRECTORY)/configuration.sh && cd backend && { make run_rest & echo $$! > ../$(REST_PID_FILE); }
 	. $(E2E_DIRECTORY)/configuration.sh && cd backend && { make run_websocket & echo $$! > ../$(WEBSOCKET_PID_FILE); }
@@ -82,7 +86,7 @@ e2e__run:
 
 e2e__run_docker:
 	sleep 30  # Let's wait a while for booting up of all services
-	cd $(E2E_DIRECTORY) && CYPRESS_HOST_URL=http://localhost/ CYPRESS_API_URL=http://localhost/api/v1/ $(NODE_MODULES_BIN)/cypress run
+	cd $(E2E_DIRECTORY) && CYPRESS_HOST_URL=http://localhost/ CYPRESS_API_URL=http://localhost/api/v1/ $(NODE_MODULES_BIN)/cypress run --parallel
 
 e2e__execute:
 	cd $(E2E_DIRECTORY) && $(NODE_MODULES_BIN)/cypress run
