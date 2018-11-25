@@ -51,7 +51,7 @@ Now, you can execute your tests multiple times very quickly!
 **TIP!** Logs from MedTagger may print to your console, so start your environemt in different
  terminal.
 
-**TIP!** Replase `make e2e__execute` with `cd e2e && npm start` to open Cypress interactive mode
+**TIP!** Replace `make e2e__execute` with `cd e2e && npm start` to open Cypress interactive mode
  in your browser.
 
 ## Manual run
