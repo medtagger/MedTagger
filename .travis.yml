@@ -1,3 +1,5 @@
+sudo: required
+
 before_install:
   - git remote set-branches --add origin master
   - git fetch
@@ -41,7 +43,6 @@ matrix:
     # Frontend - linters
     - language: node_js
       env: FRONTEND=linters_and_unit_tests
-      sudo: required
       addons:
         chrome: stable
       node_js:
