@@ -10,8 +10,6 @@ matrix:
     # E2E Tests
     - language: node_js
       name: "E2E Tests"
-      env:
-        - secure: Uol6Dz+G0fxqQIfnDOBT9mSpF8yXJExVITUkcFNPbjeBI3oNCDPYfJHPogFGnsQBA3xEJRdjCeWYLo8Ko87nlaYCrn8Ci1mghvUyJI8ZheplPaxjTZ22u8IFhnlgCgTlXo+ckV/dpBdJY0+sOEQBcsTwZ+nOFrUsfmVBN8FU0iksUuEmDRB3TV2q2uvN2tQusIHVEcCTrOi8WQFiQRLCjM9mKWe0/mbrRPl8nPjclS68DUjHOKDsG/UwEBEDt0QtLRPaEH8xvc+Si9+SxKTE8R+lrbiPtbzms4nd3y5z1q55rx8GXJctER/+7gZ4wiV7mcXH3Sq1qLPF1y5j02qpuvxEJeUuRtYE+kn1rDBqfK/PJAaoLgff977TB8DsghZ4e7i6Ie9kkXx65DfgZdbOTK9AymGQbM/2+zMaV0yflG/5T4m7z2rIlKrmzjqo5t2jWd4oTXobfUf+PZLs0PneI1mm+Hw+g/GmoCJ7pjSBdct05WwLOhvOIP5N7MSGEW8Wv+Q1DlY0y3rCfdvWrCSUKgocBvIaU/3MsJthMNLPqdwlrYMnkDGWXGk1XoqqSn4h876ccnOXaBon3HX8ANuw53aOTRNszi/tB0zQDSgdVhyDRqSIFGAIWos7InIl1PyByAN9YP1lGS4wXhI7cw6+hZy8T3+QCyt4E9gm0QYYKss=
       if: branch = master
       node_js:
         - "8"
