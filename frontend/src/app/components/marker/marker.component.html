@@ -1,7 +1,10 @@
-<div #canvasWorkspace id="markerWrapper">
-    <div #imageContainer id="imageContainer" (scroll)="updateCanvasPositionInTools()" (wheel)="$event.preventDefault()">
-        <img #image id="markerBackgroundImage"/>
-        <canvas #canvas id="markerCanvas"></canvas>
+<div #canvasWorkspace class="marker--container">
+    <div #imageContainer
+        id="imageContainer"
+        (scroll)="updateCanvasPositionInTools()"
+        (wheel)="$event.preventDefault()">
+        <img #image class="marker--scan"/>
+        <canvas #canvas class="marker--canvas"></canvas>
     </div>
     <mat-slider #slider id="markerSlider"
                 (blur)="sliderFocus()"
@@ -13,9 +16,15 @@
                 [tickInterval]="1"
                 [value]="this.currentSlice"
                 [vertical]="true"
+                class="marker--slider"
                 color="primary">
     </mat-slider>
-    <div *ngIf="downloadingScanInProgress || downloadingSlicesInProgress">
-        <mat-progress-spinner id="markerSpinner" mode="indeterminate" color="primary"></mat-progress-spinner>
+    <div
+        *ngIf="downloadingScanInProgress || downloadingSlicesInProgress"
+        class="marker--spinner-box">
+        <mat-progress-spinner
+            mode="indeterminate"
+            color="primary">
+        </mat-progress-spinner>
     </div>
 </div>

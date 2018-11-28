@@ -1,103 +1,113 @@
 <app-nav-bar>
+    <div class="marker-nav">
+        <div class="marker-nav--actions">
+            <button mat-mini-fab
+                (click)="zoomIn()"
+                [disabled]="currentZoomLevelIndex >= zoomLevels.length - 1"
+                [color]="isCurrentTool('ZOOM_IN') ? 'accent' : 'primary'">
+                <mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon>
+            </button>
+            <button mat-mini-fab
+                (click)="zoomOut()"
+                [disabled]="currentZoomLevelIndex <= 0"
+                [color]="isCurrentTool('ZOOM_OUT') ? 'accent' : 'primary'">
+                <mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon>
+            </button>
+            <div class="marker-nav--actions__comment">
+                <button mat-raised-button
+                    color="primary"
+                    (click)="addLabelComment()"
+                    [disabled]="this.labelExplorer.getLabelsLength() <= 0">
+                    <span *ngIf="this.labelComment !== ''">Modify existing comment</span>
+                    <span *ngIf="this.labelComment === ''">Add comment</span>
+                </button>
+            </div>
+        </div>
+        <div class="marker-nav--finish">
+            <button mat-raised-button
+                color="primary"
+                (click)="skipScan()">
+                Skip scan
+            </button>
+            <button *ngIf="this.labelExplorer.getLabelsLength() > 0"
+                mat-raised-button
+                color="accent"
+                (click)="sendCompleteLabel()"
+                data-cy="send-label">
+                Send label
+            </button>
+            <button *ngIf="this.labelExplorer.getLabelsLength() == 0"
+                mat-raised-button
+                color="accent"
+                (click)="sendEmptyLabel()">
+                Nothing to tag
+            </button>
+        </div>
+    </div>
 </app-nav-bar>
-<div class="marker-page">
+<div class="marker">
     <div class="marker-toolbox">
-        <div class="tags">
-            <h3 class="category__name">Tags</h3>
-            <mat-form-field>
-                <mat-select placeholder="Current Tag" [formControl]="taskTags" data-cy="tags">
+        <h3 class="marker-toolbox--header">Tools</h3>
+        <div class="marker-toolbox--content d-flex flex-column align-items-center">
+            <mat-form-field class="marker-toolbox--select">
+                <mat-select placeholder="Active tag" [formControl]="taskTags" data-cy="tags">
                     <mat-option *ngFor="let tag of (task ? task.tags : [])" [value]="tag" (click)="setTag(tag)">
                         {{ tag.name }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-        </div>
-
-        <div class="tools">
-            <h3 class="category__name">Tools</h3>
-            <div class="buttons">
+            <div class="marker-toolbox--buttons">
                 <button mat-mini-fab
-                        [color]="isCurrentTool('RECTANGLE') ? 'accent' : 'primary'"
-                        [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')" (click)="setTool('RECTANGLE')"
-                        data-cy="rectangle-tool">
+                    [color]="isCurrentTool('RECTANGLE') ? 'accent' : 'primary'"
+                    [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')" (click)="setTool('RECTANGLE')"
+                    data-cy="rectangle-tool">
                     <mat-icon [svgIcon]="getToolIconName('RECTANGLE')"></mat-icon>
                 </button>
                 <button mat-mini-fab
                     [color]="isCurrentTool('BRUSH') ? 'accent' : 'primary'"
                     [disabled]="!isToolSupportedByCurrentTag('BRUSH')" (click)="setTool('BRUSH')"
-                        data-cy="brush-tool">
+                    data-cy="brush-tool">
                     <mat-icon [svgIcon]="getToolIconName('BRUSH')"></mat-icon>
                 </button>
                 <button mat-mini-fab
-                        [color]="isCurrentTool('POINT') ? 'accent' : 'primary'"
-                        [disabled]="!isToolSupportedByCurrentTag('POINT')" (click)="setTool('POINT')"
-                        data-cy="point-tool">
+                    [color]="isCurrentTool('POINT') ? 'accent' : 'primary'"
+                    [disabled]="!isToolSupportedByCurrentTag('POINT')" (click)="setTool('POINT')"
+                    data-cy="point-tool">
                     <mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon>
                 </button>
                 <button mat-mini-fab
-                        [color]="isCurrentTool('CHAIN') ? 'accent' : 'primary'"
-                        [disabled]="!isToolSupportedByCurrentTag('CHAIN')" (click)="setTool('CHAIN')"
-                        data-cy="chain-tool">
+                    [color]="isCurrentTool('CHAIN') ? 'accent' : 'primary'"
+                    [disabled]="!isToolSupportedByCurrentTag('CHAIN')" (click)="setTool('CHAIN')"
+                    data-cy="chain-tool">
                     <mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon>
                 </button>
-                <button mat-mini-fab
-                    (click)="zoomIn()"
-                    [disabled]="currentZoomLevelIndex >= zoomLevels.length - 1"
-                    [color]="isCurrentTool('ZOOM_IN') ? 'accent' : 'primary'"
-                    [ngClass]="{'active-button': isCurrentTool('ZOOM_IN')}">
-                    <mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon>
-                </button>
-                <button mat-mini-fab
-                    (click)="zoomOut()"
-                    [disabled]="currentZoomLevelIndex <= 0"
-                    [color]="isCurrentTool('ZOOM_OUT') ? 'accent' : 'primary'"
-                    [ngClass]="{'active-button': isCurrentTool('ZOOM_OUT')}">
-                    <mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon>
-                </button>
-            </div>
-
-            <div *ngIf="toolActions.length > 0">
-                <h3 class="category__name">Actions</h3>
-                <div class="buttons action-buttons">
-                    <span *ngFor="let action of toolActions">
-                        <button mat-raised-button color="primary" *ngIf="action.type === ActionType.BUTTON"
-                                [ngClass]="{'active-button': action.isActive && action.enable()}"
-                                [disabled]="!action.enable()" (click)="action.trigger()">{{ action.name }}
-                        </button>
-                    </span>
-                </div>
             </div>
         </div>
 
-        <h3 class="category__name">Labels</h3>
-        <app-label-explorer></app-label-explorer>
+        <ng-container *ngIf="toolActions.length > 0">
+            <h3 class="marker-toolbox--header">Tool actions</h3>
+            <div class="marker-toolbox--content">
+                <mat-chip-list>
+                    <mat-chip
+                        *ngFor="let action of toolActions"
+                        [color]="action.isActive && action.enable() ? 'accent' : 'primary'"
+                        (click)="action.trigger()"
+                        selected>
+                        <ng-container *ngIf="action.type === ActionType.BUTTON">{{ action.name }}</ng-container>
+                    </mat-chip>
+                </mat-chip-list>
+            </div>
+        </ng-container>
 
-        <div class="actions">
-            <h3 class="category__name">Actions</h3>
-            <div class="buttons" *ngIf="this.labelExplorer.getLabelsLength() > 0">
-                <button mat-raised-button color="primary" (click)="addLabelComment()">
-                    <span *ngIf="this.labelComment !== ''">Modify existing comment</span>
-                    <span *ngIf="this.labelComment === ''">Add a comment to label</span>
-                </button>
-            </div>
-            <div class="buttons">
-                <button mat-raised-button color="primary" (click)="skipScan()">
-                    Skip scan
-                </button>
-                <button mat-raised-button color="accent" (click)="sendCompleteLabel()"
-                        *ngIf="this.labelExplorer.getLabelsLength() > 0" data-cy="send-label">
-                    Send label
-                </button>
-                <button mat-raised-button color="accent" (click)="sendEmptyLabel()"
-                        *ngIf="this.labelExplorer.getLabelsLength() == 0">
-                    Nothing to tag
-                </button>
-            </div>
+        <h3 class="marker-toolbox--header">Labels</h3>
+        <div class="marker-toolbox--content pt-1">
+            <app-label-explorer></app-label-explorer>
         </div>
     </div>
     <div class="marker-content">
-        <div class="innerElement canvasInterface">
-            <app-marker-component #marker></app-marker-component>
-        </div>
+        <app-marker-component #marker></app-marker-component>
     </div>
+</div>
+<div class="marker-info">
+    Please use bigger screen to start labeling.
 </div>

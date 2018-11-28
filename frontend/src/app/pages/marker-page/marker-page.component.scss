@@ -1,101 +1,101 @@
-@import '../../components/marker/marker.component.scss';
 @import "styles/mixins";
-@import '../../components/scan-viewer/scan-viewer.component.scss';
 
-$top-header-color: #0277bd;
 $toolbox-width: 300px;
 
-button {
-    margin: 5px;
+.mat-icon {
+    display: flex;
 }
 
-.category {
-    &__name {
-        padding: 0.8em 1em;
-        font-size: 1em;
-        font-weight: 300;
-        text-transform: uppercase;
+.mat-chip {
+    cursor: pointer;
+}
+
+.marker {
+    @include media-breakpoint-up(md){
+        display: flex;
     }
-}
-
-.marker-page {
-    display: grid;
-    grid-template-columns: $toolbox-width auto;
+    display: none;
     width: 100vw;
     height: calc(100vh - #{$size-height-nav});
-    overflow: hidden;
-}
 
-.marker-toolbox {
-    display: flex;
-    height: inherit;
-    flex-direction: column;
-    background-color: #fafafa;
-    border-right: 1px solid $top-header-color;
-    grid-column: 1;
-    grid-row: 1;
+    &-nav {
+        display: flex;
+        align-items: center;
+        height: 100%;
 
-    h3 {
-        color: white;
-        margin: 0px;
-        background-color: $top-header-color;
-    }
-
-    .tags {
-        mat-form-field {
-            width: $toolbox-width - 30px;
-            margin: 10px 15px 0px 15px;
-        }
-    }
-
-    .tools {
-        .buttons {
-            margin: 8px 16px;
-        }
-
-        .active-button {
-            background-color: mat-color($accent, 600);
-            .mat-icon{
-                color: color('white');
-            }
-        }
-
-        .action-buttons {
-            button {
-                font-size: 14px;
-                min-width: 0;
-                border-radius: 30px;
-            }
-        }
-    }
-
-    app-label-explorer {
-        overflow-y: auto;
-    }
-
-    .actions {
-        margin-top: auto;
-
-        .buttons {
+        &--actions {
             display: flex;
-
-            button {
-                flex-basis: 0;
-                flex-grow: 1;
+            align-items: center;
+            height: 100%;
+            border-right: 1px solid color('white', medium) ;
+            > * {
+                margin-right: 0.7em;
             }
         }
+
+        &--finish {
+            > * {
+                margin: 0 0.5em;
+            }
+        }
+
+        .mat-primary:not([disabled]) {
+            background-color: mat-color($primary, 500);
+        }
+    }
+    &-toolbox {
+        display: flex;
+        width: $toolbox-width;
+        height: inherit;
+        flex-direction: column;
+        background-color: color('card');
+
+        &--header {
+            padding: 0.8em 1em;
+            font-size: 1em;
+            font-weight: 300;
+            text-transform: uppercase;
+            color: white;
+            margin: 0px;
+            background-color: mat-color($primary, 800);
+        }
+
+        &--content {
+            padding: 1em 0.3em;
+        }
+
+        &--select {
+            width: 90%;
+        }
+
+        &--buttons {
+            flex-wrap: wrap;
+            display: flex;
+            padding: 0.5em 0.6em;
+            button {
+                margin: 0.3em;
+            }
+        }
+
+        app-label-explorer {
+            overflow-y: auto;
+        }
+    }
+
+    &-content {
+        background-color: black;
+        display: inline-grid;
+        flex-grow: 1;
+    }
+
+    &-info {
+        @include media-breakpoint-up(md){
+            display: none;
+        }
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: calc(100vh - #{$size-height-nav});
     }
 }
-
-.marker-content {
-    background-color: black;
-    display: inline-grid;
-    grid-column: 2;
-    grid-row: 1;
-}
-
-.canvasInterface {
-    position: relative;
-    width: $canvas-size;
-}
-
