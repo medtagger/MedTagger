@@ -17,6 +17,7 @@ $toolbox-width: 300px;
     display: none;
     width: 100vw;
     height: calc(100vh - #{$size-height-nav});
+    overflow: hidden;
 
     &-nav {
         display: flex;
@@ -51,9 +52,9 @@ $toolbox-width: 300px;
         background-color: color('card');
 
         &--header {
-            padding: 0.8em 1em;
+            padding: 0.6em 0.8em;
             font-size: 1em;
-            font-weight: 300;
+            font-weight: 500;
             text-transform: uppercase;
             color: white;
             margin: 0px;
@@ -62,6 +63,12 @@ $toolbox-width: 300px;
 
         &--content {
             padding: 1em 0.3em;
+            flex-shrink: 0;
+            overflow-y: auto;
+
+            &.label-explorer {
+                flex: 1;
+            }
         }
 
         &--select {
@@ -75,10 +82,6 @@ $toolbox-width: 300px;
             button {
                 margin: 0.3em;
             }
-        }
-
-        app-label-explorer {
-            overflow-y: auto;
         }
     }
 

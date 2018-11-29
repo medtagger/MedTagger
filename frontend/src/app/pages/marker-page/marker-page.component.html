@@ -18,8 +18,7 @@
                     color="primary"
                     (click)="addLabelComment()"
                     [disabled]="this.labelExplorer.getLabelsLength() <= 0">
-                    <span *ngIf="this.labelComment !== ''">Modify existing comment</span>
-                    <span *ngIf="this.labelComment === ''">Add comment</span>
+                    {{ this.labelComment === '' ? 'Add comment' : 'Modify existing comment'}}
                 </button>
             </div>
         </div>
@@ -58,26 +57,30 @@
             </mat-form-field>
             <div class="marker-toolbox--buttons">
                 <button mat-mini-fab
+                    (click)="setTool('RECTANGLE')"
                     [color]="isCurrentTool('RECTANGLE') ? 'accent' : 'primary'"
-                    [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')" (click)="setTool('RECTANGLE')"
+                    [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')"
                     data-cy="rectangle-tool">
                     <mat-icon [svgIcon]="getToolIconName('RECTANGLE')"></mat-icon>
                 </button>
                 <button mat-mini-fab
+                    (click)="setTool('BRUSH')"
                     [color]="isCurrentTool('BRUSH') ? 'accent' : 'primary'"
-                    [disabled]="!isToolSupportedByCurrentTag('BRUSH')" (click)="setTool('BRUSH')"
+                    [disabled]="!isToolSupportedByCurrentTag('BRUSH')"
                     data-cy="brush-tool">
                     <mat-icon [svgIcon]="getToolIconName('BRUSH')"></mat-icon>
                 </button>
                 <button mat-mini-fab
                     [color]="isCurrentTool('POINT') ? 'accent' : 'primary'"
-                    [disabled]="!isToolSupportedByCurrentTag('POINT')" (click)="setTool('POINT')"
+                    [disabled]="!isToolSupportedByCurrentTag('POINT')"
+                    (click)="setTool('POINT')"
                     data-cy="point-tool">
                     <mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon>
                 </button>
                 <button mat-mini-fab
+                    (click)="setTool('CHAIN')"
                     [color]="isCurrentTool('CHAIN') ? 'accent' : 'primary'"
-                    [disabled]="!isToolSupportedByCurrentTag('CHAIN')" (click)="setTool('CHAIN')"
+                    [disabled]="!isToolSupportedByCurrentTag('CHAIN')"
                     data-cy="chain-tool">
                     <mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon>
                 </button>
@@ -90,8 +93,8 @@
                 <mat-chip-list>
                     <mat-chip
                         *ngFor="let action of toolActions"
-                        [color]="action.isActive && action.enable() ? 'accent' : 'primary'"
                         (click)="action.trigger()"
+                        [color]="action.isActive && action.enable() ? 'accent' : 'primary'"
                         selected>
                         <ng-container *ngIf="action.type === ActionType.BUTTON">{{ action.name }}</ng-container>
                     </mat-chip>
@@ -100,7 +103,7 @@
         </ng-container>
 
         <h3 class="marker-toolbox--header">Labels</h3>
-        <div class="marker-toolbox--content pt-1">
+        <div class="marker-toolbox--content label-explorer pt-1">
             <app-label-explorer></app-label-explorer>
         </div>
     </div>

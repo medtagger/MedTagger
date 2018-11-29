@@ -1,34 +1,60 @@
-<div class="labels">
-    <mat-list dense>
-        <div *ngIf="getLabelsLength() > 0">
-            <div *ngFor="let tag of tags">
-                <h4 matSubheader>
-                    {{ tag.name }}
-                    <mat-icon *ngIf="!tag.hidden" (click)="tag.hidden = true;" class="clickable">arrow_drop_up</mat-icon>
-                    <mat-icon *ngIf="tag.hidden" (click)="tag.hidden = false;" class="clickable">arrow_drop_down</mat-icon>
-                </h4>
-                <div *ngIf="!tag.hidden">
-                    <h5 *ngIf="getLabelsForTag(tag).length == 0" class="no-labels-for-tag">No Labels for this Tag!</h5>
-                    <mat-list-item *ngFor="let label of getLabelsForTag(tag)"
-                                   (mouseenter)="label.hovered=true"
-                                   (mouseleave)="label.hovered=false">
-                        <p matLine><mat-icon class="smaller-svg" [svgIcon]="getToolIconName(label.toolName)"></mat-icon>Slice #{{ label.sliceIndex }} (Selection #{{ label.selectionId }})</p>
-                        <button mat-icon-button *ngIf="label.hovered" (click)="deleteLabel(label)">
-                            <mat-icon class="size-16px">delete</mat-icon>
-                        </button>
-                        <button mat-icon-button *ngIf="label.hovered || label.pinned" (click)="pinLabel(label, !label.pinned)">
-                            <mat-icon *ngIf="!label.pinned" class="smaller-svg" svgIcon="pin-off"></mat-icon>
-                            <mat-icon *ngIf="label.pinned" class="smaller-svg" svgIcon="pin"></mat-icon>
-                        </button>
-                        <button mat-icon-button (click)="hideLabel(label, !label.hidden)">
-                            <mat-icon *ngIf="!label.hidden" class="size-16px">visibility</mat-icon>
-                            <mat-icon *ngIf="label.hidden" class="size-16px">visibility_off</mat-icon>
-                        </button>
-                    </mat-list-item>
-                </div>
-                <mat-divider></mat-divider>
-            </div>
-        </div>
-        <h5 *ngIf="getLabelsLength() == 0" class="no-labels" data-cy="no-labels-added">No Labels have been added so far!</h5>
-    </mat-list>
-</div>
+<mat-list dense class="label-box">
+    <ng-container *ngIf="getLabelsLength() > 0">
+        <ng-container *ngFor="let tag of tags">
+            <h4 matSubheader
+                (click)="tag.hidden = !tag.hidden;"
+                class="label-tag__header">
+                {{ tag.name }}
+                <mat-icon
+                    [class.visible]="!tag.hidden"
+                    class="label-tag__header-icon">
+                    arrow_drop_down
+                </mat-icon>
+            </h4>
+            <ng-container *ngIf="!tag.hidden">
+                <h5
+                    *ngIf="getLabelsForTag(tag).length == 0"
+                    class="label-empty">
+                    There are no labels for this tag.
+                </h5>
+                <mat-list-item
+                    *ngFor="let label of getLabelsForTag(tag)"
+                    (mouseenter)="label.hovered=true"
+                    (mouseleave)="label.hovered=false"
+                    class="label-item__box">
+                    <mat-icon mat-list-icon
+                        class="label-item__tool-icon"
+                        [svgIcon]="getToolIconName(label.toolName)">
+                    </mat-icon>
+                    <p class="label-item__header" matLine>
+                        Slice #{{ label.sliceIndex }}
+                    </p>
+                    <p class="label-item__subheader" matLine>
+                        Selection #{{ label.selectionId }}
+                    </p>
+                    <button mat-icon-button
+                        *ngIf="label.hovered"
+                        (click)="deleteLabel(label)">
+                        <mat-icon class="small-size">delete</mat-icon>
+                    </button>
+                    <button mat-icon-button
+                        *ngIf="label.hovered || label.pinned"
+                        (click)="pinLabel(label, !label.pinned)">
+                        <mat-icon class="small-svg-size" svgIcon="{{label.pinned ? 'pin' : 'pin-off'}}"></mat-icon>
+                    </button>
+                    <button mat-icon-button
+                        (click)="hideLabel(label, !label.hidden)">
+                        <mat-icon class="small-size">{{label.hidden ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                </mat-list-item>
+            </ng-container>
+            <mat-divider></mat-divider>
+        </ng-container>
+    </ng-container>
+    <h5
+        *ngIf="getLabelsLength() == 0"
+        class="label-empty"
+        data-cy="no-labels-added">
+        No labels have been added so far. Please try adding labels with the tools.
+    </h5>
+</mat-list>
