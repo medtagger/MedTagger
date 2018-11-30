@@ -4,15 +4,12 @@ echo "Installing all APT packages..."
 apt install -y make
 if [ ! -e /usr/bin/python3.7 ]
 then
-    add-apt-repository ppa:jonathonf/python-3.7
+    add-apt-repository ppa:deadsnakes/ppa
     apt-get update
-    apt install -y python3.7
-    apt install -y python3.7-dev
-    apt install -y python3-pip
+    apt-get install -y python3.7
+    apt-get install -y python3.7-dev
+    apt-get install -y python3-pip
 fi
-
-# Fix https://github.com/pypa/pip/issues/5367
-apt-get install -y python3-distutils
 
 echo "Applying environment variables..."
 cd /vagrant/backend

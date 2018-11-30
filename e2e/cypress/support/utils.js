@@ -1,7 +1,3 @@
-export function waitForAnimation() {
-    cy.wait(250);
-}
-
 export function login(email, password) {
     cy.request('POST', Cypress.env('API_URL') + 'auth/sign-in', {
         email: email,
@@ -20,11 +16,6 @@ export function login(email, password) {
 
 export function loginAsAdmin() {
     login('admin@medtagger.com', 'medtagger1');
-}
-
-export function openSidebar() {
-    cy.get('[data-cy=sidebar]').click();
-    waitForAnimation();
 }
 
 export function setFilesInInput(filePath, fileCount = 1, selector = 'input[type="file"]') {
@@ -54,34 +45,28 @@ export function matSelect(selector, option) {
 }
 
 export function uploadScans(datasets, scansCount) {
+    // Watch on Label endpoint
+    cy.server();
+    cy.route('GET', '/api/v1/datasets').as('fetchDatasets');
+
+    // Upload Scans
     cy.visit(Cypress.env('HOST_URL'));
-    openSidebar();
-    cy.get('[data-cy=sidebar-upload]').click();
-    waitForAnimation();
+    cy.get('[data-cy=home-upload-button]').click();
+    cy.wait('@fetchDatasets');
     matSelect('[data-cy=datasets]', datasets);
     cy.get('[data-cy=datasets-submit]').click();
-    waitForAnimation();
     cy.get('[data-cy=single-scan]').click();
-    waitForAnimation();
     setFilesInInput('scans/scan.dcm', scansCount);
     cy.get('[data-cy=single-scan-upload]').click();
-    waitForAnimation();
     cy.contains(/Upload completed sucessfully!/, {timeout: 60000}); // uploading scan is time consuming so we must increase timeout
 }
 
 export function goToLabeling(task) {
     cy.visit(Cypress.env('HOST_URL'));
-    openSidebar();
-    cy.get('[data-cy=sidebar-labeling]').click();
-    waitForAnimation();
+    cy.get(`[data-cy=task]:contains(${task})`).click({force: true}); // clicking on svg has bug, https://github.com/cypress-io/cypress/issues/2245
     cy.get('[data-cy=next1]').click();
-    waitForAnimation();
     cy.get('[data-cy=next2]').click();
-    waitForAnimation();
     cy.get('[data-cy=next3]').click();
-    waitForAnimation();
     cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
     cy.get('[data-cy=next4]').click();
-    waitForAnimation();
-    cy.get(`[data-cy=task]:contains(${task})`).click({force: true}); // clicking on svg has bug, https://github.com/cypress-io/cypress/issues/2245
 }
