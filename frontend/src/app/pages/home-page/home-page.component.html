@@ -1,10 +1,14 @@
 <app-nav-bar>
-    <button mat-raised-button color="primary" id="dropdown-button" class="account-button" (click)="toggleDropdown()" [ngClass]="{ 'active' : isDropdownActive}">
+    <button mat-raised-button color="primary" id="dropdown-button" class="account-button" (click)="toggleDropdown()" [ngClass]="{ 'active' : isDropdownActive}" data-cy="navbar-user-dropdown">
         <mat-icon class="account-button__icon mr-2">{{isDropdownActive ? 'close' : 'person'}}</mat-icon>
         <span class="account-button__name">{{user.firstName + ' ' + user.lastName}}</span>
         <span *ngIf="isDropdownActive" [@displayDropdown]="isDropdownActive" class="account-button__options">
-            <a class="account-button__link" [routerLink]="settingsPage"><mat-icon class="mr-2">settings</mat-icon>Settings</a>
-            <a class="account-button__link" [routerLink]="loginPage" (click)="logOut()"><mat-icon class="mr-2">exit_to_app</mat-icon>Log out</a>
+            <a class="account-button__link" [routerLink]="settingsPage" data-cy="navbar-user-dropdown-settings-button">
+                <mat-icon class="mr-2">settings</mat-icon>Settings
+            </a>
+            <a class="account-button__link" [routerLink]="loginPage" (click)="logOut()" data-cy="navbar-user-dropdown-logout-button">
+                <mat-icon class="mr-2">exit_to_app</mat-icon>Log out
+            </a>
         </span>
     </button>
 </app-nav-bar>
@@ -16,7 +20,7 @@
     </div>
     <div class="home-upload" *ngIf="user.role !== 'volunteer'">
         <div class="home-upload__desc">Upload new scans</div>
-        <button mat-raised-button class="home-upload__button" (click)="goToUploadPage()" color="accent">
+        <button mat-raised-button class="home-upload__button" (click)="goToUploadPage()" color="accent" data-cy="home-upload-button">
             <mat-icon class="home-upload__icon" aria-label="Upload new labelling scans">cloud_upload</mat-icon>
             Start uploading new scans
         </button>

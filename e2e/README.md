@@ -41,7 +41,7 @@ $ make e2e__delete_environment
 ```bash
 $ make e2e__prepare_environment
 $ make e2e__start_medtagger
-$ make e2e__execure
+$ make e2e__execute
 $ make e2e__stop_medtagger
 $ make e2e__delete_environment
 ```
@@ -50,6 +50,9 @@ Now, you can execute your tests multiple times very quickly!
 
 **TIP!** Logs from MedTagger may print to your console, so start your environemt in different
  terminal.
+
+**TIP!** Replace `make e2e__execute` with `cd e2e && npm start` to open Cypress interactive mode
+ in your browser.
 
 ## Manual run
 
