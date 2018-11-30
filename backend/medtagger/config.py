@@ -6,10 +6,6 @@ from typing import Any
 class AppConfiguration:
     """Class that represents application configuration."""
 
-    def __init__(self) -> None:
-        """Initialize application configuration."""
-        pass
-
     @staticmethod
     def get(namespace: str, key: str, fallback: Any = None) -> Any:
         """Return value of a given configuration entry.
