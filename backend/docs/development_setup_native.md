@@ -8,8 +8,8 @@ less RAM, which may be needed if your PC has eg. 4GB of RAM.
 
 Here is a list of things that you need to run our backend natively:
  - Linux (recommended Ubuntu) / macOS,
- - Python 3.6,
- - Python 3.6-dev,
+ - Python 3.7,
+ - Python 3.7-dev,
  - Virtualenv,
  - Make,
  - Docker with Docker-Compose.
