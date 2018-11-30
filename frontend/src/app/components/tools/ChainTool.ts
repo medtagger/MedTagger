@@ -162,8 +162,10 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
     }
 
     public onToolChange(): void {
-        this.selectedArea = undefined;
-        this.requestRedraw();
+        // Pop to remove last 'moving' point 
+        this.selectedArea.points.pop();
+
+        this.completeSelection(false);
     }
 
     private isMovingPoint(): boolean {
