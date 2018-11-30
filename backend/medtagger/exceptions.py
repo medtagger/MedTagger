@@ -4,22 +4,22 @@
 class MedTaggerException(Exception):
     """Base class for all HTTP Exceptions."""
 
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 class UnsupportedActionException(MedTaggerException):
     """Exception for unsupported Action."""
 
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 class InvalidResponseException(MedTaggerException):
     """Exception for invalid Response."""
 
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 class InternalErrorException(MedTaggerException):
     """Exception designed to use to indicate internal errors (like DB/Storage error)."""
 
-    pass
+    pass  # pylint: disable=unnecessary-pass

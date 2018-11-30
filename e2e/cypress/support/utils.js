@@ -45,8 +45,14 @@ export function matSelect(selector, option) {
 }
 
 export function uploadScans(datasets, scansCount) {
+    // Watch on Label endpoint
+    cy.server();
+    cy.route('GET', '/api/v1/datasets').as('fetchDatasets');
+
+    // Upload Scans
     cy.visit(Cypress.env('HOST_URL'));
     cy.get('[data-cy=home-upload-button]').click();
+    cy.wait('@fetchDatasets');
     matSelect('[data-cy=datasets]', datasets);
     cy.get('[data-cy=datasets-submit]').click();
     cy.get('[data-cy=single-scan]').click();

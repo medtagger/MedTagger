@@ -34,7 +34,7 @@ describe('Basic flow', () => {
         uploadScans('Kidneys', 11);
         goToLabeling('Kidneys segmentation');
         matSelect('[data-cy=tags]', 'Left Kidney');
-        cy.get('[data-cy=rectangle-tool]').click({force: true});
+        cy.get('[data-cy=rectangle-tool]').click();
         cy.get('canvas').trigger('mousedown', 200, 200);
         cy.get('canvas').trigger('mousemove', 300, 300);
         cy.get('canvas').trigger('mouseup');
@@ -47,7 +47,7 @@ describe('Basic flow', () => {
         uploadScans('Lungs', 11);
         goToLabeling('Find middle of the Spine');
         matSelect('[data-cy=tags]', 'Middle of the Spine');
-        cy.get('[data-cy=point-tool]').click({force: true});
+        cy.get('[data-cy=point-tool]').click();
         cy.get('canvas').click(100, 100);
         cy.get('canvas').click(200, 100);
         cy.get('canvas').click(200, 200);
@@ -65,14 +65,14 @@ describe('Basic flow', () => {
         uploadScans('Heart', 11);
         goToLabeling('Find narrowings');
         matSelect('[data-cy=tags]', 'Narrowing (lenghtwise)');
-        cy.get('[data-cy=chain-tool]').click({force: true});
+        cy.get('[data-cy=chain-tool]').click();
  
         // Enter first Chain element
         cy.get('canvas').click(100, 100);
         cy.get('canvas').click(200, 100);
         cy.get('canvas').click(200, 200);
         // NOTE: Cannot use right click event, so as a work around we are changing Tool
-        cy.get('[data-cy=chain-tool]').click({force: true});
+        cy.get('[data-cy=chain-tool]').click();
  
         // Enter second Chain element
         cy.get('canvas').click(300, 300);
@@ -80,7 +80,7 @@ describe('Basic flow', () => {
         cy.get('canvas').click(300, 200);
         cy.get('canvas').click(300, 300);
         // NOTE: Cannot use right click event, so as a work around we are changing Tool
-        cy.get('[data-cy=chain-tool]').click({force: true});
+        cy.get('[data-cy=chain-tool]').click();
  
         // Send and check Label in backend
         cy.get('[data-cy=send-label]').click();
@@ -104,7 +104,7 @@ describe('Basic flow', () => {
         uploadScans('Heart', 11);
         goToLabeling('Find narrowings in Veins');
         matSelect('[data-cy=tags]', 'Narrowing (region)');
-        cy.get('[data-cy=brush-tool]').click({force: true});
+        cy.get('[data-cy=brush-tool]').click();
         cy.get('canvas').trigger('mousedown', 200, 200);
         cy.get('canvas').trigger('mousemove', 220, 200);
         cy.get('canvas').trigger('mousemove', 240, 200);
