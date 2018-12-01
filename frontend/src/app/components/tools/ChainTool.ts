@@ -162,7 +162,7 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
     }
 
     public onToolChange(): void {
-        // Pop to remove last 'moving' point 
+        // Pop to remove last 'moving' point
         this.selectedArea.points.pop();
 
         this.completeSelection(false);
