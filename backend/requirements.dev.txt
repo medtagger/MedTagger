@@ -16,4 +16,4 @@ pytest-mock==1.10.0
 
 # General purpose development tools/libraries
 jupyter==1.0.0
-matplotlib==3.0.1
+matplotlib==3.0.2
