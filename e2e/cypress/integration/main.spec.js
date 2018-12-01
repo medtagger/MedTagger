@@ -89,9 +89,7 @@ describe('Basic flow', () => {
             let token = window.sessionStorage.getItem('authorizationToken');
             cy.request({url: Cypress.env('API_URL') + `labels/${labelId}`, headers: {Authorization: `Bearer ${token}`}}).then(function(response) {
                 let labelElements = response.body.elements;
-                // TODO: There is a UI bug! There should be 2 Label Elements!
-                // Check this Issue for details: https://github.com/jpowie01/MedTagger/issues/497
-                expect(labelElements.length).equals(1);
+                expect(labelElements.length).equals(2);
             });
         });
  
