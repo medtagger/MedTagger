@@ -1,4 +1,7 @@
 {
+  "projectId": "3sfj4h",
+  "viewportWidth": 1200,
+  "viewportHeight": 800,
   "env": {
     "HOST_URL": "http://localhost:4200/",
     "API_URL": "http://localhost:51000/api/v1/"

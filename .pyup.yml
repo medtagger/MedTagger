@@ -1,15 +1,10 @@
 requirements:
   - backend/requirements.txt:
-      # update all dependencies and pin them
       update: all
       pin: True
   - backend/requirements.dev.txt:
-      # don't update dependencies, use global 'pin' default
-      update: False
-      pin: False
+      update: all
+      pin: True
 
-# set a global prefix for PRs
 pr_prefix: "[Backend Dependencies Update]"
-
-# add a label to pull requests, default is not set
 label_prs: Under%20Review%20%EF%B8%8F

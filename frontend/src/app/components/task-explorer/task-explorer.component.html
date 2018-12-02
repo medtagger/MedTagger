@@ -2,7 +2,7 @@
     <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
 </ng-container>
 <div *ngIf="!downloadingTasksInProgress && tasks?.length > 0" class="task-cards">
-    <mat-card class="task-card m-2 py-1" *ngFor="let task of tasks" (click)="goToLabelingPage(task)">
+    <mat-card class="task-card m-2 py-1" *ngFor="let task of tasks" (click)="goToLabelingPage(task)" data-cy="task">
         <div class="task-card__icon">
             <mat-icon svgIcon="{{task.key}}"></mat-icon>
         </div>
