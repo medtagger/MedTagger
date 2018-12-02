@@ -154,9 +154,20 @@ export class LoginPageComponent implements OnInit {
         this.registrationError = undefined;
         const formValue = this.registerForm.value;
         this.accountService.register(formValue['email'], formValue['password'], formValue['firstName'], formValue['lastName'])
-            .then(() => {
+            .then((userToken: string) => {
+                sessionStorage.setItem('authorizationToken', userToken);
+                return this.accountService.getCurrentUserInfo();
+            }, (error) => {
+                this.resetRegistration();
+                this.registrationError = error.error.details;
+            })
+            .then((userInfo) => {
                 this.registrationInProgress = false;
-                this.changePageMode(LoginPageMode.LOG_IN);
+                console.log(userInfo);
+                if (userInfo) {
+                    sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
+                    this.routerService.navigate([appRoutes.HOME]);
+                }
             }, (error) => {
                 this.resetRegistration();
                 this.registrationError = error.error.details;

@@ -24,7 +24,7 @@ export interface UserInfoResponse {
 export class AccountService {
     constructor(private http: HttpClient) {}
 
-    public register(email: string, password: string, firstName: string, lastName: string): Promise<void> {
+    public register(email: string, password: string, firstName: string, lastName: string): Promise<string> {
         const url = environment.API_URL + '/auth/register';
         const payload = {
             email: email,
@@ -32,11 +32,11 @@ export class AccountService {
             firstName: firstName,
             lastName: lastName
         };
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             this.http.post(url, payload).toPromise()
-                .then(response => {
+                .then((response: LogInResponse) => {
                     console.log('AccountService | register | response: ', response);
-                    resolve();
+                    resolve(response.token);
                 })
                 .catch(error => {
                     console.log('AccountService | register | error: ', error);
