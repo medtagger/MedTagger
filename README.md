@@ -77,19 +77,15 @@ More about setting up environment with Docker Compose can be found [here](/docs/
 Below screenshots show how MedTagger looks like:
 
 #### Login Page
-![Login Page](/docs/assets/login_page.png)
+![Login Page](/docs/assets/redesigned/login-page.png)
 
-#### Main Page
-![Main Page](/docs/assets/main_page.png)
-
-#### Navigation Sidebar
-![Navigation Sidebar](/docs/assets/navigation_sidebar.png)
-
-#### Datasets Page
-![Datasets Page](/docs/assets/datasets_page.png)
+#### Home Page
+![Home Page](/docs/assets/redesigned/home-page.png)
 
 #### Labeling Page
-![Labeling Page](/docs/assets/labeling_page.png)
+![Labeling Page](/docs/assets/redesigned/labeling-page.png)
+![Labeling Page](/docs/assets/redesigned/labeling-page-2.png)
 
 #### Upload Page
-![Upload Page](docs/assets/upload_page.png)
+![Upload Page](docs/assets/redesigned/upload-page-2.png)
+![Upload Page](docs/assets/redesigned/upload-page.png)
