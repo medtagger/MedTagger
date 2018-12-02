@@ -128,6 +128,12 @@ venv/
 .medtagger.yml
 !e2e/.medtagger.yml
 
+# MedTagger - E2E Tests
+ng_serve.pid
+rest.pid
+websocket.pid
+workers.pid
+
 # Others
 *.log
 *.swp
