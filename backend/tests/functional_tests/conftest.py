@@ -8,13 +8,12 @@ from cassandra.cqlengine.models import ModelMetaClass
 from medtagger import storage
 from medtagger.api import InvalidArgumentsException
 from medtagger.api.auth.business import create_user, sign_in_user
-from medtagger.api.security import get_user_by_token
-from medtagger.api.users.business import set_user_role
 from medtagger.api.rest import app
+from medtagger.api.users.business import set_user_role
 from medtagger.database import Base, session, db_session
 from medtagger.database.fixtures import apply_all_fixtures
-from medtagger.storage import models
 from medtagger.repositories import roles as RolesRepository
+from medtagger.storage import models
 
 logger = logging.getLogger(__name__)
 

@@ -4,14 +4,12 @@ from typing import Dict, Any
 
 from medtagger.api.auth.business import create_user
 from medtagger.api.users.business import set_user_role
-from medtagger.api.security import get_user_by_token
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
     datasets as DatasetsRepository,
     label_tags as LabelTagsRepository,
     tasks as TasksRepository,
 )
-
 from tests.functional_tests import get_api_client, get_headers
 
 EXAMPLE_USER_EMAIL = 'test@mail.com'
