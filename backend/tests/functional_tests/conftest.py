@@ -8,6 +8,7 @@ from cassandra.cqlengine.models import ModelMetaClass
 from medtagger import storage
 from medtagger.api import InvalidArgumentsException
 from medtagger.api.auth.business import create_user, sign_in_user
+from medtagger.api.security import get_user_by_token
 from medtagger.api.users.business import set_user_role
 from medtagger.api.rest import app
 from medtagger.database import Base, session, db_session
@@ -60,7 +61,8 @@ def get_token_for_logged_in_user(role: str) -> str:
     role = RolesRepository.get_role_with_name(role)
     if role is None:
         raise InvalidArgumentsException('Role does not exist.')
-    user_id = create_user(email, password, first_name, last_name)
+    user_token = create_user(email, password, first_name, last_name)
+    user_id = get_user_by_token(user_token).id
     set_user_role(user_id, role.name)
 
     with app.app_context():

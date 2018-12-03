@@ -4,6 +4,7 @@ from typing import Dict, Any
 
 from medtagger.api.auth.business import create_user
 from medtagger.api.users.business import set_user_role
+from medtagger.api.security import get_user_by_token
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
     datasets as DatasetsRepository,
@@ -36,14 +37,6 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
-
-    # Step 2. User logs in
-    payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}
-    response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
-                               headers=get_headers(json=True))
-    assert response.status_code == 200
-    json_response = json.loads(response.data)
-    assert isinstance(json_response, dict)
     user_token = json_response['token']
     assert isinstance(user_token, str)
     assert len(user_token) > 100
@@ -64,9 +57,13 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     """Test for upgrading volunteer's to doctor's role."""
     api_client = get_api_client()
 
-    admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
-    volunteer_id = create_user(EXAMPLE_USER_EMAIL, EXAMPLE_USER_PASSWORD, EXAMPLE_USER_FIRST_NAME,
-                               EXAMPLE_USER_LAST_NAME)
+    admin_token = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
+    volunteer_token = create_user(EXAMPLE_USER_EMAIL, EXAMPLE_USER_PASSWORD, EXAMPLE_USER_FIRST_NAME,
+                                  EXAMPLE_USER_LAST_NAME)
+
+    admin_id = get_user_by_token(admin_token).id
+    volunteer_id = get_user_by_token(volunteer_token).id
+
     set_user_role(admin_id, 'admin')
     set_user_role(volunteer_id, 'volunteer')
 
@@ -119,7 +116,8 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     DatasetsRepository.add_new_dataset('LUNGS', 'Lungs')
     task = TasksRepository.add_task('FIND_NODULES', 'Find Nodules', 'path/to/image', ['LUNGS'], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
-    admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
+    admin_token = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
+    admin_id = get_user_by_token(admin_token).id
     set_user_role(admin_id, 'admin')
 
     # Step 2. Admin user logs in

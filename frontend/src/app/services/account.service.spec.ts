@@ -71,8 +71,8 @@ describe('Service: AccountService', () => {
         (service: AccountService, backend: HttpTestingController) => {
 
             service.register(EXAMPLE_USER.EMAIL, EXAMPLE_USER.PASSWORD,
-                EXAMPLE_USER.FIRST_NAME, EXAMPLE_USER.LAST_NAME).then((result: void) => {
-                expect(result).toBeUndefined();
+                EXAMPLE_USER.FIRST_NAME, EXAMPLE_USER.LAST_NAME).then((result: string) => {
+                expect(result).toBe(EXAMPLE_USER.TOKEN);
             });
 
             backend.expectOne((req: HttpRequest<any>) => {
@@ -92,7 +92,7 @@ describe('Service: AccountService', () => {
                     && payload.firstName === EXAMPLE_USER.FIRST_NAME
                     && payload.lastName === EXAMPLE_USER.LAST_NAME;
             }, `POST to ${API_URL.REGISTER} with email, password, first and last name`)
-                .flush({},
+                .flush({token: EXAMPLE_USER.TOKEN},
                     {status: 201, statusText: 'Created'});
         })));
 
