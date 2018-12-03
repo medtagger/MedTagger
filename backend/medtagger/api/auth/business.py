@@ -3,9 +3,10 @@ from medtagger.api import InvalidArgumentsException
 from medtagger.api.security import hash_password, verify_user_password, generate_auth_token
 from medtagger.database.models import User
 from medtagger.repositories import roles as RolesRepository, users as UsersRepository
+from typing import Tuple
 
 
-def create_user(email: str, password: str, first_name: str, last_name: str) -> (int, str):
+def create_user(email: str, password: str, first_name: str, last_name: str) -> Tuple[int, str]:
     """Create user with the given user information. Password is being hashed.
 
     :param email: user email in string format
@@ -13,7 +14,7 @@ def create_user(email: str, password: str, first_name: str, last_name: str) -> (
     :param first_name: user first name in string format
     :param last_name: user last name in string format
 
-    :return: authentication token
+    :return: tuple with user id and authentication token
     """
     user = UsersRepository.get_user_by_email(email)
     if user:
