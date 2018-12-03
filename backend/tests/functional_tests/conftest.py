@@ -61,8 +61,7 @@ def get_token_for_logged_in_user(role: str) -> str:
     role = RolesRepository.get_role_with_name(role)
     if role is None:
         raise InvalidArgumentsException('Role does not exist.')
-    user_token = create_user(email, password, first_name, last_name)
-    user_id = get_user_by_token(user_token).id
+    user_id, _ = create_user(email, password, first_name, last_name)
     set_user_role(user_id, role.name)
 
     with app.app_context():

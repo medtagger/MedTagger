@@ -3,6 +3,11 @@ import {environment} from '../../environments/environment';
 import {UserInfo} from '../model/UserInfo';
 import {HttpClient} from '@angular/common/http';
 
+export interface RegisterResponse {
+    id: number;
+    token: string;
+}
+
 export interface LogInResponse {
     token: string;
 }
@@ -34,7 +39,7 @@ export class AccountService {
         };
         return new Promise<string>((resolve, reject) => {
             this.http.post(url, payload).toPromise()
-                .then((response: LogInResponse) => {
+                .then((response: RegisterResponse) => {
                     console.log('AccountService | register | response: ', response);
                     resolve(response.token);
                 })

@@ -57,12 +57,9 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     """Test for upgrading volunteer's to doctor's role."""
     api_client = get_api_client()
 
-    admin_token = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
-    volunteer_token = create_user(EXAMPLE_USER_EMAIL, EXAMPLE_USER_PASSWORD, EXAMPLE_USER_FIRST_NAME,
+    admin_id, _ = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
+    volunteer_id, _ = create_user(EXAMPLE_USER_EMAIL, EXAMPLE_USER_PASSWORD, EXAMPLE_USER_FIRST_NAME,
                                   EXAMPLE_USER_LAST_NAME)
-
-    admin_id = get_user_by_token(admin_token).id
-    volunteer_id = get_user_by_token(volunteer_token).id
 
     set_user_role(admin_id, 'admin')
     set_user_role(volunteer_id, 'volunteer')
@@ -116,8 +113,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     DatasetsRepository.add_new_dataset('LUNGS', 'Lungs')
     task = TasksRepository.add_task('FIND_NODULES', 'Find Nodules', 'path/to/image', ['LUNGS'], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
-    admin_token = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
-    admin_id = get_user_by_token(admin_token).id
+    admin_id, _ = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
     set_user_role(admin_id, 'admin')
 
     # Step 2. Admin user logs in

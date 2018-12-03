@@ -5,7 +5,7 @@ from medtagger.database.models import User
 from medtagger.repositories import roles as RolesRepository, users as UsersRepository
 
 
-def create_user(email: str, password: str, first_name: str, last_name: str) -> str:
+def create_user(email: str, password: str, first_name: str, last_name: str) -> (int, str):
     """Create user with the given user information. Password is being hashed.
 
     :param email: user email in string format
@@ -24,8 +24,9 @@ def create_user(email: str, password: str, first_name: str, last_name: str) -> s
     if not role:
         raise InvalidArgumentsException('Role does not exist.')
     new_user.roles.append(role)
-    UsersRepository.add_new_user(new_user)
-    return generate_auth_token(new_user)
+    user_id = UsersRepository.add_new_user(new_user)
+    user_token = generate_auth_token(new_user)
+    return user_id, user_token
 
 
 def sign_in_user(email: str, password: str) -> str:
