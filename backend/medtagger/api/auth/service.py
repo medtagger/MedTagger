@@ -21,8 +21,8 @@ class Register(Resource):
     def post() -> Any:
         """Register the user."""
         user = request.json
-        id, token = create_user(user['email'], user['password'], user['firstName'], user['lastName'])
-        return {'id': id, 'token': token}, 201
+        user_id, user_token = create_user(user['email'], user['password'], user['firstName'], user['lastName'])
+        return {'id': user_id, 'token': user_token}, 201
 
 
 @auth_ns.route('/sign-in')
