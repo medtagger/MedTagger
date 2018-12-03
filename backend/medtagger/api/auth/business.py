@@ -1,9 +1,9 @@
 """Module responsible for business logic in all Auth endpoint."""
+from typing import Tuple
 from medtagger.api import InvalidArgumentsException
 from medtagger.api.security import hash_password, verify_user_password, generate_auth_token
 from medtagger.database.models import User
 from medtagger.repositories import roles as RolesRepository, users as UsersRepository
-from typing import Tuple
 
 
 def create_user(email: str, password: str, first_name: str, last_name: str) -> Tuple[int, str]:
