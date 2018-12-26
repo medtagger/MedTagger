@@ -10,7 +10,6 @@ from medtagger.repositories import (
     label_tags as LabelTagsRepository,
     tasks as TasksRepository,
 )
-
 from tests.functional_tests import get_api_client, get_headers
 
 EXAMPLE_USER_EMAIL = 'test@mail.com'
@@ -36,14 +35,6 @@ def test_basic_user_flow(prepare_environment: Any) -> None:
     assert response.status_code == 201
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
-
-    # Step 2. User logs in
-    payload = {'email': EXAMPLE_USER_EMAIL, 'password': EXAMPLE_USER_PASSWORD}
-    response = api_client.post('/api/v1/auth/sign-in', data=json.dumps(payload),
-                               headers=get_headers(json=True))
-    assert response.status_code == 200
-    json_response = json.loads(response.data)
-    assert isinstance(json_response, dict)
     user_token = json_response['token']
     assert isinstance(user_token, str)
     assert len(user_token) > 100
@@ -64,9 +55,10 @@ def test_upgrade_to_doctor_role(prepare_environment: Any) -> None:
     """Test for upgrading volunteer's to doctor's role."""
     api_client = get_api_client()
 
-    admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
-    volunteer_id = create_user(EXAMPLE_USER_EMAIL, EXAMPLE_USER_PASSWORD, EXAMPLE_USER_FIRST_NAME,
-                               EXAMPLE_USER_LAST_NAME)
+    admin_id, _ = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
+    volunteer_id, _ = create_user(EXAMPLE_USER_EMAIL, EXAMPLE_USER_PASSWORD, EXAMPLE_USER_FIRST_NAME,
+                                  EXAMPLE_USER_LAST_NAME)
+
     set_user_role(admin_id, 'admin')
     set_user_role(volunteer_id, 'volunteer')
 
@@ -119,7 +111,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
     DatasetsRepository.add_new_dataset('LUNGS', 'Lungs')
     task = TasksRepository.add_task('FIND_NODULES', 'Find Nodules', 'path/to/image', ['LUNGS'], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
-    admin_id = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
+    admin_id, _ = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
     set_user_role(admin_id, 'admin')
 
     # Step 2. Admin user logs in
