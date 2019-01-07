@@ -9,7 +9,6 @@ body {
 }
 
 // Fluid font-types
-
 h1 {
     @include fluid-type(576px, 1200px, 33.184px, 50.512px);
 }

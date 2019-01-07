@@ -1,42 +1,41 @@
 @import '../../styles/app-theme';
+@import '../../styles/mixins';
 
 $canvas-size: 100%;
-$slider-offset: 20px;
-$spinner-radius: 50px;
 
-#markerCanvas {
-    position: absolute;
-    user-select: none;
-}
-
-#markerWrapper {
-    height: 100%;
-}
-
-#markerBackgroundImage {
-    max-width: $canvas-size;
-    max-height: $canvas-size;
-    user-select: none;
-    background-color: black;
-    position: absolute;
-}
-
-#markerSpinner {
-    @extend #markerCanvas;
-    left: calc(#{$canvas-size} / 3 + #{$spinner-radius});
-    top: calc(#{$canvas-size} / 3 + #{$spinner-radius});
-}
-
-#markerSlider {
-    position: absolute;
-    right: 0;
-    height: $canvas-size;
-}
-
-#markerAcceptButton {
-    position: absolute;
-    left: $canvas-size / 2;
-    top: $canvas-size;
+.marker {
+    &--container {
+        position: relative;
+        height: 100%;
+    }
+    &--scan {
+        position: absolute;
+        max-width: $canvas-size;
+        max-height: $canvas-size;
+        user-select: none;
+        background-color: color('black');
+    }
+    &--canvas {
+        position: absolute;
+        user-select: none;
+    }
+    &--slider {
+        position: absolute;
+        right: 0;
+        height: $canvas-size;
+    }
+    &--spinner {
+        &-box {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
 }
 
 // pretty neat workaround to always show slider thumb and modified styles
