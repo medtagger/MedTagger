@@ -91,7 +91,7 @@ resource "openstack_compute_keypair_v2" "medtagger_keypair_db" {
 }
 
 data "openstack_compute_keypair_v2" "app_public_key" {
-  name = "app-key"
+  name = "${openstack_compute_keypair_v2.medtagger_keypair_app.name}"
 }
 
 data "openstack_compute_keypair_v2" "db_public_key" {
