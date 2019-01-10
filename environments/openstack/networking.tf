@@ -99,6 +99,11 @@ data "openstack_compute_keypair_v2" "db_public_key" {
 }
 
 resource "local_file" "app_cert" {
-    content     = "${openstack_compute_keypair_v2.app_public_key.public_key}"
+    content     = "${data.openstack_compute_keypair_v2.app_public_key.public_key}"
     filename = "${path.module}/app.cert"
+}
+
+resource "local_file" "app_cert" {
+    content     = "${data.openstack_compute_keypair_v2.db_public_key.public_key}"
+    filename = "${path.module}/db.cert"
 }
