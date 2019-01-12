@@ -1,5 +1,5 @@
 [app_hosts]
-app_host 153.19.239.229 ansible_user=ubuntu ansible_ssh_private_key_file=../ansible/app.key
+app_host <HOST_IP> ansible_user=ubuntu ansible_ssh_private_key_file=app.key
 
 [db_hosts]
-db_host 192.168.0.4 ansible_user=ubuntu ansible_ssh_private_key_file=../ansible/db.key
+db_host <HOST_IP> ansible_user=ubuntu ansible_ssh_private_key_file=db.key
