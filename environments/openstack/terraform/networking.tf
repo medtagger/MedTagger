@@ -100,10 +100,10 @@ data "openstack_compute_keypair_v2" "db_public_key" {
 
 resource "local_file" "app_cert" {
     content     = "${data.openstack_compute_keypair_v2.app_public_key.public_key}"
-    filename = "${path.module}/app.cert"
+    filename = "../ansible/app.cert"
 }
 
-resource "local_file" "app_cert" {
+resource "local_file" "db_cert" {
     content     = "${data.openstack_compute_keypair_v2.db_public_key.public_key}"
-    filename = "${path.module}/db.cert"
+    filename = "../ansible/db.cert"
 }

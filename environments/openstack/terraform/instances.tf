@@ -79,3 +79,24 @@ resource "openstack_compute_volume_attach_v2" "psql_volume_attach" {
   instance_id = "${openstack_compute_instance_v2.db.id}"
   volume_id   = "${openstack_blockstorage_volume_v2.psql_volume.id}"
 }
+
+## Inventory ##
+
+data "template_file" "inventory" {
+  template = "${file("inventory.tpl")}"
+
+  vars {
+    host_ip = "${openstack_networking_floatingip_v2.floatip_1.address}"
+  }
+}
+
+resource "null_resource" "update_inventory" {
+
+    triggers {
+        template = "${data.template_file.inventory.rendered}"
+    }
+
+    provisioner "local-exec" {
+        command = "echo '${data.template_file.inventory.rendered}' > ../ansible/inventory"
+    }
+}
