@@ -143,3 +143,7 @@ workers.pid
 .terraform/
 *.tfstate
 *.tfstate.backup
+
+# Ansible
+inventory
+*.key
