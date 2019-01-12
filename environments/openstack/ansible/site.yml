@@ -1,0 +1,20 @@
+---
+
+- name: Apply common configuration on all nodes
+  hosts: all
+  
+  roles:
+  - common
+
+- name: Configure and deploy application
+  hosts: app_hosts
+
+  roles:
+   - app
+
+
+- name: Configure and deploy databases
+  hosts: db_hosts
+
+  roles:
+   - db

@@ -86,7 +86,11 @@ data "template_file" "inventory" {
   template = "${file("inventory.tpl")}"
 
   vars {
-    host_ip = "${openstack_networking_floatingip_v2.floatip_1.address}"
+    app_host_ip = "${openstack_networking_floatingip_v2.floatip_1.address}"
+    db_host_ip = "${openstack_compute_instance_v2.db.access_ip_v4}"
+    app_key_path = "app.key"
+    db_key_path = "db.key"
+    default_user = "${var.user}"
   }
 }
 

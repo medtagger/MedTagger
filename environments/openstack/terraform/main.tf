@@ -22,3 +22,15 @@ variable dns_list {
 variable ext_network_id {
     default = "a8f3db7d-cd3f-4941-94d3-2aaffd0a9175"
 }
+
+variable user {
+  default = "ubuntu"
+}
+
+variable app_key_path {
+  default = "../ansible/app.key"
+}
+
+variable db_key_path {
+  default = "../ansible/db.key"
+}

@@ -1,0 +1,24 @@
+## Inventory ##
+
+data "template_file" "inventory" {
+  template = "${file("inventory.tpl")}"
+
+  vars {
+    app_host_ip = "${openstack_networking_floatingip_v2.floatip_1.address}"
+    db_host_ip = "${openstack_compute_instance_v2.db.access_ip_v4}"
+    app_key_path = "app.key"
+    db_key_path = "db.key"
+    default_user = "${var.user}"
+  }
+}
+
+resource "null_resource" "update_inventory" {
+
+    triggers {
+        template = "${data.template_file.inventory.rendered}"
+    }
+
+    provisioner "local-exec" {
+        command = "echo '${data.template_file.inventory.rendered}' > ../ansible/inventory"
+    }
+}

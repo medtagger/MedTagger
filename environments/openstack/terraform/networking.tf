@@ -98,12 +98,12 @@ data "openstack_compute_keypair_v2" "db_public_key" {
   name = "${openstack_compute_keypair_v2.medtagger_keypair_db.name}"
 }
 
-resource "local_file" "app_cert" {
+resource "local_file" "app_key" {
     content     = "${data.openstack_compute_keypair_v2.app_public_key.public_key}"
-    filename = "../ansible/app.cert"
+    filename = "${var.app_key_path}"
 }
 
-resource "local_file" "db_cert" {
+resource "local_file" "db_key" {
     content     = "${data.openstack_compute_keypair_v2.db_public_key.public_key}"
-    filename = "../ansible/db.cert"
+    filename = "${var.db_key_path}"
 }
