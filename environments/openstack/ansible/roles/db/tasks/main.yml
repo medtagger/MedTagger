@@ -1,0 +1,5 @@
+---
+# TODO: set up cassandra, postgress
+
+- name: Execute the command in remote shell; stdout goes to the specified file on the remote.
+  shell: ls

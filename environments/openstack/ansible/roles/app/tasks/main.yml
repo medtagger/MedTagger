@@ -1,0 +1,11 @@
+---
+# TODO: set up UI, REST api, websockets
+
+- name: Copy db_host ssh key to app_host.
+  copy:
+    src: db-key.pem
+    dest: /home/ubuntu/
+    mode: 0600
+
+- name: Execute the command in remote shell; stdout goes to the specified file on the remote.
+  shell: ls

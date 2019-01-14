@@ -70,40 +70,12 @@ resource "openstack_networking_secgroup_rule_v2" "ssh_db" {
   security_group_id = "${openstack_networking_secgroup_v2.db_sec_group.id}"
 }
 
-resource "openstack_networking_secgroup_rule_v2" "cassandra_sec_group" {
-  direction         = "ingress"
-  ethertype         = "IPv4"
-  protocol          = "tcp"
-  port_range_min    = 9042
-  port_range_max    = 9042
-  remote_ip_prefix  = "0.0.0.0/0"
-  security_group_id = "${openstack_networking_secgroup_v2.db_sec_group.id}"
-}
-
-## Key pairs ##
-
-resource "openstack_compute_keypair_v2" "medtagger_keypair_app" {
-  name = "app-key"
-}
-
-resource "openstack_compute_keypair_v2" "medtagger_keypair_db" {
-  name = "db-key"
-}
-
-data "openstack_compute_keypair_v2" "app_public_key" {
-  name = "${openstack_compute_keypair_v2.medtagger_keypair_app.name}"
-}
-
-data "openstack_compute_keypair_v2" "db_public_key" {
-  name = "${openstack_compute_keypair_v2.medtagger_keypair_db.name}"
-}
-
-resource "local_file" "app_key" {
-    content     = "${data.openstack_compute_keypair_v2.app_public_key.public_key}"
-    filename = "${var.app_key_path}"
-}
-
-resource "local_file" "db_key" {
-    content     = "${data.openstack_compute_keypair_v2.db_public_key.public_key}"
-    filename = "${var.db_key_path}"
-}
+# resource "openstack_networking_secgroup_rule_v2" "cassandra_sec_group" {
+#   direction         = "ingress"
+#   ethertype         = "IPv4"
+#   protocol          = "tcp"
+#   port_range_min    = 9042
+#   port_range_max    = 9042
+#   remote_ip_prefix  = "0.0.0.0/0"
+#   security_group_id = "${openstack_networking_secgroup_v2.db_sec_group.id}"
+# }

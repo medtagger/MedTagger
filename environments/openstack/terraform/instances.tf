@@ -26,7 +26,7 @@ resource "openstack_compute_instance_v2" "app" {
   name      = "AppHost"
   image_id  = "${var.image_id}"
   flavor_id = "${var.flavor_id}"
-  key_pair  = "${openstack_compute_keypair_v2.medtagger_keypair_app.name}"
+  key_pair  = "${var.app_key_name}"
 
   security_groups = [
     "default",
@@ -53,7 +53,7 @@ resource "openstack_compute_instance_v2" "db" {
   name      = "DbHost"
   image_id  = "${var.image_id}"
   flavor_id = "${var.flavor_id}"
-  key_pair  = "${openstack_compute_keypair_v2.medtagger_keypair_db.name}"
+  key_pair  = "${var.db_key_name}"
 
   security_groups = [
     "default",

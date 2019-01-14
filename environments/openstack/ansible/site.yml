@@ -1,14 +1,7 @@
 ---
 
-- name: Apply common configuration on all hosts
-  hosts: all
-  
-  roles:
-  - common
-
-- name: Configure and deploy application
+- name: Configure and prepare application host
   hosts: app_hosts
-
   roles:
    - app
 

@@ -146,4 +146,5 @@ workers.pid
 
 # Ansible
 inventory
-*.key
+*.pem
+*.retry

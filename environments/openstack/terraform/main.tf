@@ -27,10 +27,10 @@ variable user {
   default = "ubuntu"
 }
 
-variable app_key_path {
-  default = "../ansible/app.key"
+variable app_key_name {
+  default = "app-key"
 }
 
-variable db_key_path {
-  default = "../ansible/db.key"
+variable db_key_name {
+  default = "db-key"
 }
