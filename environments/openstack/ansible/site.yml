@@ -1,13 +1,20 @@
 ---
 
-- name: Configure and prepare application host
-  hosts: app_hosts
+- name: Install needed dependencies and configure hosts
+  hosts: all
+  become: true
   roles:
-   - app
+   - common
 
 
-- name: Configure and deploy databases
-  hosts: db_hosts
+# - name: Configure and prepare application host
+#   hosts: app_hosts
+#   roles:
+#    - app
 
-  roles:
-   - db
+
+# - name: Configure and deploy databases
+#   hosts: db_hosts
+
+#   roles:
+#    - db

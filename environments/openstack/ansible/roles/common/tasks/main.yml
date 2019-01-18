@@ -1,6 +1,42 @@
 ---
-# TODO: install docker, docker compose
 
-- name: Execute the command in remote shell; stdout goes to the specified file on the remote.
-  shell: ls
+- name: Update and upgrade apt packages
+  apt:
+    upgrade: yes
 
+- name: Install Docker CE prerequisites
+  apt: name={{item}} update_cache=yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg2
+    - software-properties-common
+
+- name: Add Docker GPG key
+  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+
+- name: Install Docker
+  apt: name=docker-ce
+
+- name: Add Docker group
+  group:
+    name: docker
+    state: present
+
+- name: Add user to the Docker group
+  user: 
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+
+- name: Install Docker Compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_machine }}"
+    dest: "/usr/local/bin/docker-compose"
+    mode: "u=rwx,g=rx,o=rx"
+    
