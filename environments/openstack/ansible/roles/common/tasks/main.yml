@@ -4,7 +4,7 @@
   apt:
     upgrade: yes
 
-- name: Install Docker CE prerequisites
+- name: Install dependecies
   apt: name={{item}} update_cache=yes
   with_items:
     - apt-transport-https
@@ -12,6 +12,14 @@
     - curl
     - gnupg2
     - software-properties-common
+    - python3-pip
+
+- name: Install Python dependencies (docker_service)
+  pip:
+    name: 
+      - docker
+      - docker-compose
+      - PyYAML 
 
 - name: Add Docker GPG key
   apt_key: url=https://download.docker.com/linux/ubuntu/gpg
@@ -40,18 +48,10 @@
     dest: "/usr/local/bin/docker-compose"
     mode: "u=rwx,g=rx,o=rx"
 
-- name: Copy MedTagger zip
-  copy:
+- name: Copy and unarchive MedTagger archive
+  unarchive:
     src: "{{ project_folder_path }}.tar.xz"
     dest: "/home/{{ ansible_user }}"
   become: yes
   become_user: "{{ ansible_user }}"
-  tags: k
 
-- name: Unarchive MedTagger zip
-  unarchive:
-    src: "/home/ubuntu/MedTagger.tar.xz"
-    dest: "/home/ubuntu/MedTagger"
-  become: yes
-  become_user: "{{ ansible_user }}"
-  tags: k

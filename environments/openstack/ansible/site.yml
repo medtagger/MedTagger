@@ -6,12 +6,12 @@
   roles:
    - common
 
-- name: Configure and prepare application host
-  hosts: app_hosts
-  roles:
-   - app
-
-- name: Configure and deploy databases
+- name: Deploy databases
   hosts: db_hosts
   roles:
    - db
+
+- name: Deploy application components
+  hosts: app_hosts
+  roles:
+   - app

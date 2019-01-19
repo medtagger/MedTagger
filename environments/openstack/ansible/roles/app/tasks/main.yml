@@ -1,11 +1,23 @@
 ---
 
-# UI, api, websocket
+- name: Prepare database migration 
+  docker_service:
+    project_src: "{{ project_remote_path }}/"
+    services:
+        - medtagger_backend_database_migrations
+    state: present
+    dependencies: no
+    debug: yes
 
-
-# - name: Set up UI with Docker Compose
-#   docker_service:
-#     project_src: /path/to/dir/containing/docker-compose.yml
-#     services:
-#         - medtagger_backend_rest
-#     state: present
+- name: Set up UI with Docker Compose
+  docker_service:
+    project_src: "{{ project_remote_path }}/"
+    services:
+        - reverse-proxy
+        - medtagger_frontend
+        - medtagger_backend_rest
+        - medtagger_backend_websocket
+        - medtagger_backend_worker
+    state: present
+    dependencies: no
+    debug: yes

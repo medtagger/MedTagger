@@ -1,2 +1,12 @@
 ---
 
+- name: Set up databases with Docker Compose
+  docker_service:
+    project_src: "{{ project_remote_path }}/"
+    services:
+        - rabbitmq
+        - postgres
+        - cassandra
+    state: present
+    dependencies: no
+    debug: yes
