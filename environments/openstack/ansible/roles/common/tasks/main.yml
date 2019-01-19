@@ -39,4 +39,19 @@
     url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_machine }}"
     dest: "/usr/local/bin/docker-compose"
     mode: "u=rwx,g=rx,o=rx"
-    
+
+- name: Copy MedTagger zip
+  copy:
+    src: "{{ project_folder_path }}.tar.xz"
+    dest: "/home/{{ ansible_user }}"
+  become: yes
+  become_user: "{{ ansible_user }}"
+  tags: k
+
+- name: Unarchive MedTagger zip
+  unarchive:
+    src: "/home/ubuntu/MedTagger.tar.xz"
+    dest: "/home/ubuntu/MedTagger"
+  become: yes
+  become_user: "{{ ansible_user }}"
+  tags: k
