@@ -1,5 +1,5 @@
 # Linters and code style checkers
-mypy==0.650
+mypy==0.660
 mypy-extensions==0.4.1
 pylint==2.2.2
 flake8==3.6.0
