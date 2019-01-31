@@ -44,13 +44,11 @@ matrix:
       node_js:
         - "8"
       script:
-        - export DISPLAY=:99.0
-        - sh -e /etc/init.d/xvfb start
         - ./.travis/run_tests_if_subproject_changed.py frontend --command="
            cd frontend/ &&
            npm i &&
            ng lint &&
-           ng test --watch=false"
+           ng test --browsers ChromeHeadless --watch=false"
 
     # Frontend - build production Docker
     - language: node_js
