@@ -14,11 +14,11 @@ data "template_file" "inventory" {
 
 resource "null_resource" "update_inventory" {
 
-    triggers {
-        template = "${data.template_file.inventory.rendered}"
-    }
+  triggers {
+    template = "${data.template_file.inventory.rendered}"
+  }
 
-    provisioner "local-exec" {
-        command = "echo '${data.template_file.inventory.rendered}' > ../ansible/inventory"
-    }
+  provisioner "local-exec" {
+    command = "echo '${data.template_file.inventory.rendered}' > ../ansible/inventory"
+  }
 }

@@ -4,5 +4,3 @@ docker_compose_version: "1.21.2"
 
 project_folder_path: "/home/karolina/MedTagger"
 project_remote_path: "/home/{{ ansible_user }}/MedTagger"
-
-docker_compose_path: "{{ project_remote_path }}/docker-compose.yml"
