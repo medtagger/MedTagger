@@ -49,8 +49,16 @@
     &__box {
       user-select: none;
 
+      .hidden-btn {
+        visibility: hidden;
+      }
+
       &:hover {
         background-color: color('black', low);
+
+        .hidden-btn {
+            visibility: visible;
+        }
       }
     }
 

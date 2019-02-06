@@ -1,16 +1,19 @@
 <div #canvasWorkspace class="marker--container">
     <div #imageContainer
-        id="imageContainer"
-        (scroll)="updateCanvasPositionInTools()"
-        (wheel)="$event.preventDefault()">
+         id="imageContainer">
         <img #image class="marker--scan"/>
-        <canvas #canvas class="marker--canvas"></canvas>
+        <canvas #canvas class="marker--canvas"
+                (mousedown)="onMouseDown($event)"
+                (mouseup)="onMouseUp($event)"
+                (mousemove)="onMouseMove($event)"
+                (mousewheel)="onWheel($event)"></canvas>
     </div>
     <mat-slider #slider id="markerSlider"
-                (blur)="sliderFocus()"
+                (change)="changeSlice($event.value)"
+                (blur)="setSliderFocus(true)"
                 [disabled]="false"
-                [max]="10"
-                [min]="0"
+                [max]="getMaxSliceIndex()"
+                [min]="getMinSliceIndex"
                 [step]="1"
                 [thumbLabel]="true"
                 [tickInterval]="1"

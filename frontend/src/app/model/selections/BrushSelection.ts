@@ -1,40 +1,39 @@
-import {SliceSelection} from './SliceSelection';
+import {SliceSelection, SliceSelectionType} from './SliceSelection';
 import {BinaryConverter} from '../../utils/BinaryConverter';
 import {LabelTag} from '../labels/LabelTag';
 import {isUndefined} from 'util';
 
 export class BrushSelection extends SliceSelection {
-    _selectionLayer: HTMLImageElement;
+    selectionLayer: HTMLImageElement;
     isReady: Promise<void>;
 
-    constructor(selectionLayer: string, depth: number, tag: LabelTag, id?: number) {
-        super();
-        this._selectionLayer = new Image();
+    constructor(image: string, depth: number, tag: LabelTag, type: SliceSelectionType) {
+        super(depth, 'BRUSH', tag, type);
+        this.selectionLayer = new Image();
 
         this.isReady = new Promise((resolve, reject) => {
-            this._selectionLayer.onload = () => resolve();
-            this._selectionLayer.onerror = () => reject();
+            this.selectionLayer.onload = () => resolve();
+            this.selectionLayer.onerror = () => reject();
 
-            if (!isUndefined(selectionLayer)) {
-                this._selectionLayer.src = selectionLayer;
+            if (image) {
+                this.selectionLayer.src = image;
             }
         });
-
-
-        this.sliceIndex = depth;
-        this.label_tag = tag;
-        this.label_tool = 'BRUSH';
-
-        if (id) {
-            this.setId(id);
-        }
     }
 
     public getSelectionLayer(): Promise<HTMLImageElement | Error> {
         return this.isReady.then( () => {
-            return this._selectionLayer;
+            return this.selectionLayer;
         }).catch( () => {
             return new Error('Cannot load image (BrushSelection)');
+        });
+    }
+
+    public setImage(image: string): Promise<void | Error> {
+        return this.isReady.then( () => {
+            this.selectionLayer.src = image;
+        }).catch( () => {
+            return new Error('Cannot set image (BrushSelection)');
         });
     }
 
@@ -44,14 +43,14 @@ export class BrushSelection extends SliceSelection {
             'height': 1,
             'image_key': this.getId().toString(),
             'slice_index': this.sliceIndex,
-            'tag': this.label_tag.key,
-            'tool': this.label_tool
+            'tag': this.labelTag.key,
+            'tool': this.labelTool
         };
     }
 
     getAdditionalData(): Object {
         const additionalData: Object = {};
-        additionalData[this.getId().toString()] = BinaryConverter.base64toBlob(this._selectionLayer.src);
+        additionalData[this.getId().toString()] = BinaryConverter.base64toBlob(this.selectionLayer.src);
         return additionalData;
     }
 }

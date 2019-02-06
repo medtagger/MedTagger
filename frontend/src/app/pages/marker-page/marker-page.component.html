@@ -2,6 +2,16 @@
     <div class="marker-nav">
         <div class="marker-nav--actions">
             <button mat-mini-fab
+                (click)="undo()"
+                [disabled]="canUndo()">
+                <mat-icon [svgIcon]="getToolIconName('UNDO')"></mat-icon>
+            </button>
+            <button mat-mini-fab
+                (click)="redo()"
+                [disabled]="canRedo()">
+                <mat-icon [svgIcon]="getToolIconName('REDO')"></mat-icon>
+            </button>
+            <button mat-mini-fab
                 (click)="zoomIn()"
                 [disabled]="currentZoomLevelIndex >= zoomLevels.length - 1"
                 [color]="isCurrentTool('ZOOM_IN') ? 'accent' : 'primary'">
@@ -17,7 +27,7 @@
                 <button mat-raised-button
                     color="primary"
                     (click)="addLabelComment()"
-                    [disabled]="this.labelExplorer.getLabelsLength() <= 0">
+                    [disabled]="!isAnyNonDraftSelection()">
                     {{ this.labelComment === '' ? 'Add comment' : 'Modify existing comment'}}
                 </button>
             </div>
@@ -28,14 +38,14 @@
                 (click)="skipScan()">
                 Skip scan
             </button>
-            <button *ngIf="this.labelExplorer.getLabelsLength() > 0"
+            <button *ngIf="isAnyNonDraftSelection()"
                 mat-raised-button
                 color="accent"
                 (click)="sendCompleteLabel()"
                 data-cy="send-label">
                 Send label
             </button>
-            <button *ngIf="this.labelExplorer.getLabelsLength() == 0"
+            <button *ngIf="!isAnyNonDraftSelection()"
                 mat-raised-button
                 color="accent"
                 (click)="sendEmptyLabel()">
@@ -49,7 +59,7 @@
         <h3 class="marker-toolbox--header">Tools</h3>
         <div class="marker-toolbox--content d-flex flex-column align-items-center">
             <mat-form-field class="marker-toolbox--select">
-                <mat-select placeholder="Active tag" [formControl]="taskTags" data-cy="tags">
+                <mat-select placeholder="Active tag" data-cy="tags">
                     <mat-option *ngFor="let tag of (task ? task.tags : [])" [value]="tag" (click)="setTag(tag)">
                         {{ tag.name }}
                     </mat-option>
@@ -104,11 +114,15 @@
 
         <h3 class="marker-toolbox--header">Labels</h3>
         <div class="marker-toolbox--content label-explorer pt-1">
-            <app-label-explorer></app-label-explorer>
+            <app-label-explorer [selections]=selections></app-label-explorer>
         </div>
     </div>
     <div class="marker-content">
-        <app-marker-component #marker></app-marker-component>
+        <app-marker-component #marker
+                              [selections]="selections"
+                              [tools]="tools"
+                              [currentTool]="currentTool"
+                              [currentTag]="currentTag"></app-marker-component>
     </div>
 </div>
 <div class="marker-info">

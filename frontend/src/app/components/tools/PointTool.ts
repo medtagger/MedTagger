@@ -1,42 +1,43 @@
-import {ToolBase} from './ToolBase';
-import {PointSelection} from '../../model/selections/PointSelection';
-import {Tool} from './Tool';
+import { ToolBase } from './ToolBase';
+import { PointSelection } from '../../model/selections/PointSelection';
+import { Tool } from './Tool';
+import { SliceSelectionType } from '../../model/selections/SliceSelection';
 
 export class PointTool extends ToolBase<PointSelection> implements Tool<PointSelection> {
-
-    constructor(canvas: HTMLCanvasElement) {
-        super(canvas);
-    }
+    private draggedSelection: PointSelection;
 
     protected getStyle(): any {
         return {
             ...super.getStyle(),
             RADIUS: 10,
-            SELECTION_FONT_COLOR: '#ffffff',
+            SELECTION_FONT_COLOR: '#ffffff'
         };
     }
 
-    public drawSelection(selection: PointSelection, color: string): void {
+    public drawSelection(selection: PointSelection): void {
         console.log('PointTool | drawSelection | selection: ', selection);
-        this.canvasCtx.fillStyle = color;
+        this.canvasCtx.fillStyle = this.getColorForSelection(selection);
 
-        const scaledPointPosition: { x: number, y: number } = this.scaleToView(selection.positionX, selection.positionY);
+        const scaledPointPosition: { x: number; y: number } = this.scaleToView(selection.x, selection.y);
 
         this.canvasCtx.beginPath();
-        this.canvasCtx.arc(scaledPointPosition.x , scaledPointPosition.y, this.getStyle().RADIUS, 0, 2 * Math.PI);
+        this.canvasCtx.arc(scaledPointPosition.x, scaledPointPosition.y, this.getStyle().RADIUS, 0, 2 * Math.PI);
         this.canvasCtx.fill();
 
         const fontSize = this.getStyle().SELECTION_FONT_SIZE;
         this.canvasCtx.font = `${fontSize}px Arial`;
         this.canvasCtx.fillStyle = this.getStyle().SELECTION_FONT_COLOR;
         this.canvasCtx.textAlign = 'center';
-        this.canvasCtx.fillText(selection.getId().toString(), scaledPointPosition.x,
-            scaledPointPosition.y + this.getStyle().SELECTION_FONT_SIZE * 0.25);
+        this.canvasCtx.fillText(
+            selection.getId().toString(),
+            scaledPointPosition.x,
+            scaledPointPosition.y + this.getStyle().SELECTION_FONT_SIZE * 0.25
+        );
         this.canvasCtx.closePath();
     }
 
     private checkDistance(point: PointSelection, x: number, y: number) {
-        const scaledPoint: { x: number, y: number } = this.scaleToView(point.positionX, point.positionY);
+        const scaledPoint: { x: number; y: number } = this.scaleToView(point.x, point.y);
         const distance = Math.sqrt(Math.pow(scaledPoint.x - x, 2) + Math.pow(scaledPoint.y - y, 2));
 
         return distance < this.getStyle().RADIUS;
@@ -44,50 +45,33 @@ export class PointTool extends ToolBase<PointSelection> implements Tool<PointSel
 
     public onMouseDown(event: MouseEvent): void {
         console.log('PointTool | onMouseDown | event: ', event);
-        const x = (event.clientX) - this.canvasPosition.left;
-        const y = (event.clientY) - this.canvasPosition.top;
+        const x = event.clientX - this.canvasPosition.left;
+        const y = event.clientY - this.canvasPosition.top;
 
-        const currentSliceSelections = this.selections.get(this.currentSlice);
-        if (currentSliceSelections) {
-            currentSliceSelections.forEach((selection: PointSelection) => {
-                if (!selection.hidden && this.checkDistance(selection, x, y)) {
-                    this.selectedArea = selection;
-                    return;
-                }
-            });
-        }
+        this.draggedSelection = this.getOwnSelectionsOnCurrentSlice().find(
+            (selection: PointSelection) => !selection.hidden && this.checkDistance(selection, x, y)
+        );
 
-        if (!this.selectedArea) {
-            const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
-            this.addSelection(new PointSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag));
-            this.requestRedraw();
+        if (!this.draggedSelection) {
+            const { x: normalizedX, y: normalizedY } = this.normalizeByView(x, y);
+            this.addSelection(new PointSelection(normalizedX, normalizedY, this.currentSlice, this.currentTag, SliceSelectionType.NORMAL));
         }
     }
 
-    public onMouseMove(mouseEvent: MouseEvent): void {
-        if (this.selectedArea) {
-            console.log('PointTool | drawSelectionRectangle | onmousemove clienXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            this.updateSelection(mouseEvent);
-            this.requestRedraw();
-        }
-    }
-
-    public updateSelection(event: MouseEvent): void {
-        console.log('PointTool | updateSelection | event: ', event);
-
-        if (this.selectedArea) {
+    public onMouseMove(event: MouseEvent): void {
+        if (this.draggedSelection) {
             const newX = event.clientX - this.canvasPosition.left;
             const newY = event.clientY - this.canvasPosition.top;
+            const normalizedValues: { x: number; y: number } = this.normalizeByView(newX, newY);
 
-            const normalizedValues: { x: number, y: number } = this.normalizeByView(newX, newY);
-
-            this.selectedArea.updatePositionX(normalizedValues.x);
-            this.selectedArea.updatePositionY(normalizedValues.y);
+            this.draggedSelection.x = normalizedValues.x;
+            this.draggedSelection.y = normalizedValues.y;
+            this.draggedSelection = this.updateSelection(this.draggedSelection);
         }
     }
 
-    public onMouseUp(event: MouseEvent): void {
-        this.selectedArea = undefined;
+    public onMouseUp(): void {
+        this.draggedSelection = undefined;
     }
 
     public getToolName(): string {

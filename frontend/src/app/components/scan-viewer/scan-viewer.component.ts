@@ -1,23 +1,37 @@
-import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
-import {MarkerSlice} from '../../model/MarkerSlice';
-import {from, Subject} from 'rxjs';
-import {groupBy, toArray} from 'rxjs/operators';
-import {ScanMetadata} from '../../model/ScanMetadata';
-import {MatSlider} from '@angular/material';
-import {Tool} from '../tools/Tool';
-import {SliceRequest} from '../../model/SliceRequest';
-import {SliceSelection} from '../../model/selections/SliceSelection';
-import {LabelTag} from '../../model/labels/LabelTag';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    HostListener,
+    Input,
+    OnChanges,
+    OnInit,
+    SimpleChanges,
+    ViewChild,
+    Output,
+    EventEmitter
+} from '@angular/core';
+import { MatSlider } from '@angular/material';
+import { Subject } from 'rxjs';
+import { MarkerSlice } from '../../model/MarkerSlice';
+import { ScanMetadata } from '../../model/ScanMetadata';
+import { SliceSelection } from '../../model/selections/SliceSelection';
+import { SliceRequest } from '../../model/SliceRequest';
+import { DrawingContext } from '../tools/DrawingContext';
+import { Tool } from '../tools/Tool';
+import { List } from 'immutable';
 
 @Component({
     selector: 'app-scan-viewer',
     templateUrl: './scan-viewer.component.html',
     styleUrls: ['./scan-viewer.component.scss']
 })
-export class ScanViewerComponent implements OnInit, AfterViewInit {
+export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
+    @Input() selections: List<SliceSelection>;
 
-    downloadingScanInProgress = false;
-    downloadingSlicesInProgress = false;
+    @Input() tools: List<Tool<SliceSelection>>;
+
+    @Output() selectionsChange: EventEmitter<List<SliceSelection>> = new EventEmitter();
 
     currentImage: HTMLImageElement;
 
@@ -49,18 +63,14 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         this.canvasWorkspace = viewElement.nativeElement;
     }
 
+    public downloadingScanInProgress = false;
+    public downloadingSlicesInProgress = false;
     public scanMetadata: ScanMetadata;
-    public slices: Map<number, MarkerSlice>;
-    protected _currentSlice;
-
+    public slices: Map<number, MarkerSlice> = new Map();
     public observableSliceRequest: Subject<SliceRequest>;
+
     protected sliceBatchSize: number;
-
-    protected tools: Array<Tool<SliceSelection>>;
-    protected _currentTag;
-
-    public focusable = true;
-
+    protected drawingContext: DrawingContext;
     protected _scale = 1.0;
 
     set scale(scale: number) {
@@ -73,6 +83,15 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         return this._scale;
     }
 
+    ngOnChanges(changes: SimpleChanges) {
+        if ((changes.selections || changes.tools) && this.drawingContext) {
+            this.tools.forEach(tool => {
+                tool.setDrawingContext(this.drawingContext);
+            });
+            this.redrawSelections();
+        }
+    }
+
     @HostListener('window:resize', ['$event'])
     onResize() {
         this.resizeImageToCurrentWorkspace();
@@ -81,85 +100,29 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     protected updateCanvasSize(): void {
         console.log('ScanViewer | updateCanvasSize');
-        this.setCanvasWidth(this.currentImage.width);
-        this.setCanvasHeight(this.currentImage.height);
+        this.canvas.width = this.currentImage.width;
+        this.canvas.height = this.currentImage.height;
+        this.refreshDrawingContext();
         this.drawSelections();
     }
 
     ngAfterViewInit() {
         console.log('ScanViewer | ngAfterViewInit');
-        this.sliderFocus();
+        // setTimeout() fixes slider focus issues in IE/Firefox
+        window.setTimeout(() => this.setSliderFocus(true), 10);
         SliceSelection.resetIdCounter();
     }
 
-    public sliderFocus() {
-        if (this.focusable) {
-            // setTimeout() fixes slider focus issues in IE/Firefox
-            window.setTimeout(() => {
-                this.slider._elementRef.nativeElement.focus();
-            }, 10);
-        }
-    }
-
-    public setFocusable(focusable: boolean) {
-        this.focusable = focusable;
-        if (!this.focusable) {
+    public setSliderFocus(focus: boolean) {
+        if (focus) {
             this.slider._elementRef.nativeElement.focus();
         } else {
             this.slider._elementRef.nativeElement.blur();
         }
     }
 
-    public setTools(newTools: Array<Tool<SliceSelection>>) {
-        this.clearCanvasSelections();
-        this.tools = newTools.slice();
-        this.tools.forEach((tool) => {
-            tool.updateCanvasPosition(this.canvas.getBoundingClientRect());
-            tool.updateCurrentSlice(this._currentSlice);
-            tool.updateCanvasWidth(this.canvas.width);
-            tool.updateCanvasHeight(this.canvas.height);
-            tool.drawSelections();
-        });
-    }
-
-    public setCurrentTagForTool(tool: Tool<SliceSelection>, tag: LabelTag) {
-        console.log('Updating tag for tool: ', tool);
-        tool.updateCurrentTag(tag);
-    }
-
-    public setCurrentTag(tag: LabelTag) {
-        this._currentTag = tag;
-    }
-
-    public setArchivedSelections(selections: Array<SliceSelection>): void {
-        console.log('ScanViewer | setArchivedSelections: ', selections);
-        from(selections).pipe(groupBy((selection) => selection.label_tool)).subscribe(selectionGroup => {
-            const tool = this.tools.find((s) => s.getToolName() === selectionGroup.key);
-            if (tool !== undefined) {
-                selectionGroup.pipe(toArray()).subscribe((s) => tool.archiveSelections(tool.formArchivedSelections(s)));
-            } else {
-                console.warn(`ScanViewer | setArchivedSelections | '${selectionGroup.key}' tool doesn't exist`);
-            }
-        });
-
-    }
-
-    public getCanvas(): HTMLCanvasElement {
-        return this.canvas;
-    }
-
-    public setCanvasWidth(newWidth: number): void {
-        this.canvas.width = newWidth;
-        this.tools.forEach((tool) => tool.updateCanvasWidth(this.canvas.width));
-    }
-
-    public setCanvasHeight(newHeight: number): void {
-        this.canvas.height = newHeight;
-        this.tools.forEach((tool) => tool.updateCanvasHeight(this.canvas.height));
-    }
-
-    get currentSlice() {
-        return this._currentSlice;
+    public get currentSlice(): number | undefined {
+        return this.drawingContext && this.drawingContext.currentSlice;
     }
 
     public setDownloadScanInProgress(isInProgress: boolean) {
@@ -172,18 +135,16 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
 
     public clearData(): void {
         this.slices = new Map<number, MarkerSlice>();
-        this._currentSlice = undefined;
-        this.tools.forEach((tool) => tool.clearData());
+        this.drawingContext = undefined;
         SliceSelection.resetIdCounter();
     }
 
     public feedData(newSlice: MarkerSlice): void {
         console.log('ScanViewer | feedData: ', newSlice);
-        if (!this._currentSlice) {
-            this._currentSlice = newSlice.index;
-            this.tools.forEach((tool) => tool.updateCurrentSlice(this._currentSlice));
+        if (!this.drawingContext) {
+            this.refreshDrawingContext();
         }
-        this.addSlice(newSlice);
+        this.slices.set(newSlice.index, newSlice);
         this.updateSliderRange();
     }
 
@@ -197,76 +158,61 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         this.slider.max = sortedKeys[sortedKeys.length - 1];
     }
 
-    protected addSlice(newSlice: MarkerSlice) {
-        this.slices.set(newSlice.index, newSlice);
-    }
-
     public setScanMetadata(scanMetadata: ScanMetadata): void {
         this.scanMetadata = scanMetadata;
     }
 
     public hookUpSliceObserver(sliceBatchSize: number): Promise<boolean> {
         this.sliceBatchSize = sliceBatchSize;
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             this.observableSliceRequest = new Subject<SliceRequest>();
             resolve(true);
         });
-    }
-
-    public updateCanvasPositionInTools(): void {
-        this.tools.forEach((selector) => selector.updateCanvasPosition(this.canvas.getBoundingClientRect()));
-    }
-
-    public selectMiddleSlice(): void {
-        const slicesCount = this.slider.max - this.slider.min + 1;
-        const middleSliceNumber = this.slider.min + Math.floor(slicesCount / 2);
-        this.slider.value = middleSliceNumber;
-        this.changeMarkerImage(middleSliceNumber);
-        this.drawSelections();
     }
 
     ngOnInit() {
         console.log('ScanViewer | ngOnInit');
         console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
 
-        this.slices = new Map<number, MarkerSlice>();
+        this.changeSlice(0);
 
-        this.updateCanvasPositionInTools();
+        this.refreshDrawingContext();
 
-        this.initializeImage(this.drawSelections);
-
-        this.setCanvasImage();
-
-        this.slider.registerOnChange((sliderValue: number) => {
-            console.log('ScanViewer init | slider change: ', sliderValue);
-
-            this.tools.forEach((tool) => tool.updateCurrentSlice(sliderValue));
-            this.requestSlicesIfNeeded(sliderValue);
-
-            this.changeMarkerImage(sliderValue);
-
-            this.drawSelections();
-        });
+        this.initializeImage(() => this.drawSelections());
     }
 
-    protected requestSlicesIfNeeded(sliderValue: number): void {
-        console.log('ScanViewer | requestSlicesIfNeeded sliderValue: ', sliderValue);
-        let requestSliceIndex;
-        if (this.slider.max === sliderValue) {
-            requestSliceIndex = sliderValue + 1;
-            console.log('ScanViewer | requestSlicesIfNeeded more (higher indexes): ', requestSliceIndex);
-            this.observableSliceRequest.next(new SliceRequest(requestSliceIndex));
-        }
-        if (this.slider.min === sliderValue) {
-            requestSliceIndex = sliderValue - 1;
-            console.log('ScanViewer | requestSlicesIfNeeded more (lower indexes): ', requestSliceIndex);
-            this.observableSliceRequest.next(new SliceRequest(requestSliceIndex, true));
+    public selectMiddleSlice(): void {
+        this.changeSlice((this.getMinSliceIndex() + this.getMaxSliceIndex()) / 2);
+    }
+
+    public changeSlice(sliceIndex: number): void {
+        if (this.currentSlice !== sliceIndex) {
+            this.drawingContext.currentSlice = sliceIndex;
+            this.currentImage.src = (this.slices.get(sliceIndex) && this.slices.get(sliceIndex).source) || '';
+            this.resizeImageToCurrentWorkspace();
+            this.redrawSelections();
+            this.requestSlicesIfNeeded();
         }
     }
 
-    protected initializeCanvas(): void {
-        this.canvas.oncontextmenu = (e) => e.preventDefault();
-        this.tools.forEach((tool) => tool.updateCanvasPosition(this.canvas.getBoundingClientRect()));
+    public getMinSliceIndex(): number {
+        return Math.min(...this.slices.keys());
+    }
+
+    public getMaxSliceIndex(): number {
+        return Math.max(...this.slices.keys());
+    }
+
+    protected requestSlicesIfNeeded(): void {
+        console.log('ScanViewer | requestSlicesIfNeeded sliceIndex: ', this.currentSlice);
+        if (this.getMaxSliceIndex() === this.currentSlice) {
+            console.log('ScanViewer | requestSlicesIfNeeded more (higher indexes): ', this.currentSlice + 1);
+            this.observableSliceRequest.next(new SliceRequest(this.currentSlice + 1));
+        }
+        if (this.getMinSliceIndex() === this.currentSlice) {
+            console.log('ScanViewer | requestSlicesIfNeeded more (lower indexes): ', this.currentSlice - 1);
+            this.observableSliceRequest.next(new SliceRequest(this.currentSlice - 1, true));
+        }
     }
 
     protected initializeImage(afterImageLoad?: () => void): void {
@@ -278,30 +224,17 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         };
     }
 
-    protected changeMarkerImage(sliceID: number): void {
-        this._currentSlice = sliceID;
-        this.tools.forEach((tool) => tool.updateCurrentSlice(this._currentSlice));
-
-        this.clearCanvasSelections();
-        this.setCanvasImage();
-    }
-
-    protected setCanvasImage(): void {
-        if (this.slices.has(this._currentSlice)) {
-            this.currentImage.src = this.slices.get(this._currentSlice).source;
-            this.resizeImageToCurrentWorkspace();
-        }
-    }
-
     protected resizeImageToCurrentWorkspace(): void {
-        console.log('ScanViewer | resizeImageToCurrentWorkspace | scanMetadata (width, height): ',
-            this.scanMetadata.width, this.scanMetadata.height);
-        console.log('ScanViewer | resizeImageToCurrentWorkspace | canvasWorkspace (client rect): ',
-            this.canvasWorkspace.getClientRects());
+        console.log(
+            'ScanViewer | resizeImageToCurrentWorkspace | scanMetadata (width, height): ',
+            this.scanMetadata.width,
+            this.scanMetadata.height
+        );
+        console.log('ScanViewer | resizeImageToCurrentWorkspace | canvasWorkspace (client rect): ', this.canvasWorkspace.getClientRects());
 
         const maxImageSize = Math.max(this.scanMetadata.width, this.scanMetadata.height);
         const minCanvasSize = Math.min(this.canvasWorkspace.clientWidth, this.canvasWorkspace.clientHeight);
-        const ratioScalar = minCanvasSize * this.scale / maxImageSize;
+        const ratioScalar = (minCanvasSize * this.scale) / maxImageSize;
 
         console.log('ScanViewer | resizeImageToCurrentWorkspace | ratioScalar: ', ratioScalar);
 
@@ -317,29 +250,54 @@ export class ScanViewerComponent implements OnInit, AfterViewInit {
         this.currentImage.height = imageSize.height;
 
         if (imageSize.width < this.canvasWorkspace.clientWidth) {
-            const left = ((this.canvasWorkspace.clientWidth / 2) - (this.currentImage.width / 2)) + 'px';
+            const left = this.canvasWorkspace.clientWidth / 2 - this.currentImage.width / 2 + 'px';
             this.currentImage.style.left = left;
             this.canvas.style.left = left;
         }
         if (imageSize.height < this.canvasWorkspace.clientHeight) {
-            const top = ((this.canvasWorkspace.clientHeight / 2) - (this.currentImage.height / 2)) + 'px';
+            const top = this.canvasWorkspace.clientHeight / 2 - this.currentImage.height / 2 + 'px';
             this.currentImage.style.top = top;
             this.canvas.style.top = top;
         }
 
-        this.updateCanvasPositionInTools();
+        this.refreshDrawingContext();
     }
 
     protected drawSelections(): void {
-        this.tools.forEach((tool) => tool.drawSelections());
+        this.selections.forEach(selection => {
+            const isOnCurrentSlice = selection.sliceIndex === this.currentSlice;
+            if ((selection.pinned || isOnCurrentSlice) && !selection.hidden) {
+                const tool: Tool<SliceSelection> = this.getToolByName(selection.labelTool);
+                tool.drawSelection(selection);
+            }
+        });
     }
 
-    protected clearCanvasSelections(): void {
+    protected clearCanvas(): void {
         this.canvas.getContext('2d').clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     protected redrawSelections(): void {
-        this.clearCanvasSelections();
+        this.clearCanvas();
         this.drawSelections();
+    }
+
+    protected refreshDrawingContext(): void {
+        this.drawingContext = this.createDrawingContext();
+        this.tools.forEach(tool => tool.setDrawingContext(this.drawingContext));
+    }
+
+    protected createDrawingContext(): DrawingContext {
+        const currentSlice = this.currentSlice || this.slices.keys().next().value;
+        return new DrawingContext(this.canvas, this.selections, currentSlice, null, this.updateSelections.bind(this));
+    }
+
+    protected getToolByName(toolName: string): Tool<SliceSelection> {
+        return this.tools.find(x => x.getToolName() === toolName);
+    }
+
+    private updateSelections(selections: List<SliceSelection>) {
+        this.drawingContext.selections = selections;
+        this.selectionsChange.emit(selections);
     }
 }
