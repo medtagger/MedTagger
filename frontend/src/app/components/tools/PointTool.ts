@@ -14,6 +14,10 @@ export class PointTool extends ToolBase<PointSelection> implements Tool<PointSel
         };
     }
 
+    public reset(): void {
+        this.draggedSelection = undefined;
+    }
+
     public drawSelection(selection: PointSelection): void {
         console.log('PointTool | drawSelection | selection: ', selection);
         this.canvasCtx.fillStyle = this.getColorForSelection(selection);
@@ -66,7 +70,7 @@ export class PointTool extends ToolBase<PointSelection> implements Tool<PointSel
 
             this.draggedSelection.x = normalizedValues.x;
             this.draggedSelection.y = normalizedValues.y;
-            this.draggedSelection = this.updateSelection(this.draggedSelection);
+            this.redraw();
         }
     }
 

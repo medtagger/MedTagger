@@ -1,13 +1,14 @@
-import { LabelTag } from './../../model/labels/LabelTag';
-import {Component, EventEmitter, OnInit, Input} from '@angular/core';
+import { List } from 'immutable';
+import { Component, Input, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { SliceSelection } from '../../model/selections/SliceSelection';
+import { LabelTag } from './../../model/labels/LabelTag';
 
 @Component({
     selector: 'app-label-explorer',
     templateUrl: './label-explorer.component.html',
-    styleUrls: ['./label-explorer.component.scss']
+    styleUrls: ['./label-explorer.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-
 export class LabelExplorerComponent {
 
     static readonly toolIconNames: Map<string, string> = new Map([
@@ -22,18 +23,20 @@ export class LabelExplorerComponent {
         ['REDO', 'redo']
     ]);
 
-    @Input() selections: Array<SliceSelection>;
+    @Input() selections: List<SliceSelection>;
 
-    private hiddenTags: Array<String> = [];
+    @Output() selectionsChange: EventEmitter<List<SliceSelection>> = new EventEmitter();
 
-    public getTags(): Array<LabelTag> {
+    private hiddenTags: List<String> = List([]);
+
+    public getTags(): List<LabelTag> {
         return this.selections
             .map(selection => selection.labelTag)
             .filter((tag, index, tags) => tags.findIndex(x => x.key === tag.key) === index)
             .sort((x, y) => x.name.localeCompare(y.name));
     }
 
-    public getSelectionsForTag(tag: LabelTag): Array<SliceSelection> {
+    public getSelectionsForTag(tag: LabelTag): List<SliceSelection> {
         return this.selections
             .filter(selection => selection.labelTag.key === tag.key)
             .sort((x, y) => x.getId() - y.getId())
@@ -45,18 +48,28 @@ export class LabelExplorerComponent {
     }
 
     public removeSelection(selection: SliceSelection): void {
-        this.selections.splice(this.selections.indexOf(selection), 1);
+        this.selectionsChange.emit(this.selections.remove(this.selections.indexOf(selection)));
     }
 
-    public isTagHidden(tag: LabelTag) {
+    public toggleSelectionPinning(selection: SliceSelection): void {
+        selection.pinned = !selection.pinned;
+        this.selectionsChange.emit(List(this.selections.toArray()));
+    }
+
+    public toggleSelectionVisibility(selection: SliceSelection): void {
+        selection.hidden = !selection.hidden;
+        this.selectionsChange.emit(List(this.selections.toArray()));
+    }
+
+    public isTagHidden(tag: LabelTag): boolean {
         return this.hiddenTags.indexOf(tag.key) > -1;
     }
 
     public toggleTagVisibility(tag: LabelTag) {
         if (this.isTagHidden(tag)) {
-            this.hiddenTags.splice(this.hiddenTags.indexOf(tag.key), 1);
+            this.hiddenTags = this.hiddenTags.remove(this.hiddenTags.indexOf(tag.key));
         } else {
-            this.hiddenTags.push(tag.key);
+            this.hiddenTags = this.hiddenTags.push(tag.key);
         }
     }
 }

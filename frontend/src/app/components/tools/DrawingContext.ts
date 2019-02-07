@@ -12,12 +12,14 @@ export class DrawingContext {
     public currentSlice: number;
     public currentTag: LabelTag;
     public updateSelections: (selections: List<SliceSelection>) => void;
+    public redraw: () => void;
 
     public constructor(canvas: HTMLCanvasElement,
                        selections: List<SliceSelection>,
                        currentSlice: number,
                        currentTag: LabelTag,
-                       updateSelections: (selections: List<SliceSelection>) => void) {
+                       updateSelections: (selections: List<SliceSelection>) => void,
+                       redraw: () => void) {
 
         this.canvas = canvas;
         this.canvasCtx = canvas.getContext('2d');
@@ -30,5 +32,6 @@ export class DrawingContext {
         this.currentSlice = currentSlice;
         this.currentTag = currentTag;
         this.updateSelections = updateSelections;
+        this.redraw = redraw;
     }
 }

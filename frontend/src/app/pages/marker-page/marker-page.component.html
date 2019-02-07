@@ -2,18 +2,8 @@
     <div class="marker-nav">
         <div class="marker-nav--actions">
             <button mat-mini-fab
-                (click)="undo()"
-                [disabled]="canUndo()">
-                <mat-icon [svgIcon]="getToolIconName('UNDO')"></mat-icon>
-            </button>
-            <button mat-mini-fab
-                (click)="redo()"
-                [disabled]="canRedo()">
-                <mat-icon [svgIcon]="getToolIconName('REDO')"></mat-icon>
-            </button>
-            <button mat-mini-fab
                 (click)="zoomIn()"
-                [disabled]="currentZoomLevelIndex >= zoomLevels.length - 1"
+                [disabled]="currentZoomLevelIndex >= zoomLevels.size - 1"
                 [color]="isCurrentTool('ZOOM_IN') ? 'accent' : 'primary'">
                 <mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon>
             </button>
@@ -27,7 +17,7 @@
                 <button mat-raised-button
                     color="primary"
                     (click)="addLabelComment()"
-                    [disabled]="!isAnyNonDraftSelection()">
+                    [disabled]="selections.isEmpty()">
                     {{ this.labelComment === '' ? 'Add comment' : 'Modify existing comment'}}
                 </button>
             </div>
@@ -38,14 +28,14 @@
                 (click)="skipScan()">
                 Skip scan
             </button>
-            <button *ngIf="isAnyNonDraftSelection()"
+            <button *ngIf="!selections.isEmpty()"
                 mat-raised-button
                 color="accent"
                 (click)="sendCompleteLabel()"
                 data-cy="send-label">
                 Send label
             </button>
-            <button *ngIf="!isAnyNonDraftSelection()"
+            <button *ngIf="selections.isEmpty()"
                 mat-raised-button
                 color="accent"
                 (click)="sendEmptyLabel()">
@@ -97,7 +87,7 @@
             </div>
         </div>
 
-        <ng-container *ngIf="toolActions.length > 0">
+        <ng-container *ngIf="!toolActions.isEmpty()">
             <h3 class="marker-toolbox--header">Tool actions</h3>
             <div class="marker-toolbox--content">
                 <mat-chip-list>
@@ -114,12 +104,12 @@
 
         <h3 class="marker-toolbox--header">Labels</h3>
         <div class="marker-toolbox--content label-explorer pt-1">
-            <app-label-explorer [selections]=selections></app-label-explorer>
+            <app-label-explorer [(selections)]=selections></app-label-explorer>
         </div>
     </div>
     <div class="marker-content">
         <app-marker-component #marker
-                              [selections]="selections"
+                              [(selections)]="selections"
                               [tools]="tools"
                               [currentTool]="currentTool"
                               [currentTag]="currentTag"></app-marker-component>

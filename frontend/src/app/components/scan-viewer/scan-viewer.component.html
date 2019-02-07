@@ -1,6 +1,6 @@
 <div #canvasWorkspace class="marker--container">
     <div #imageContainer
-        id="imageContainer">
+         id="imageContainer">
         <img #image class="marker--scan"/>
         <canvas #canvas class="marker--canvas"></canvas>
     </div>
@@ -16,6 +16,7 @@
                 [value]="currentSlice"
                 [vertical]="true"
                 class="marker--slider"
+                [class.zoom]="scale > 1"
                 color="primary">
     </mat-slider>
     <div

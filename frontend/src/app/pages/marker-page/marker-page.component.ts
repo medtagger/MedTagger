@@ -25,7 +25,6 @@ import { LabelService } from '../../services/label.service';
 import { ScanService } from '../../services/scan.service';
 import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
-import { MarkerAction } from './marker-actions/MarkerAction';
 
 @Component({
     selector: 'app-marker-page',
@@ -34,6 +33,7 @@ import { MarkerAction } from './marker-actions/MarkerAction';
     styleUrls: ['./marker-page.component.scss']
 })
 export class MarkerPageComponent implements OnInit {
+
     private static readonly SLICE_BATCH_SIZE = 10;
     private static readonly HOME_PAGE = '/' + HOME;
 
@@ -48,8 +48,6 @@ export class MarkerPageComponent implements OnInit {
     tools: List<Tool<SliceSelection>>;
     currentTool: Tool<SliceSelection>;
     currentTag: LabelTag;
-    markerActions: List<MarkerAction> = List();
-    toolActions: List<ToolAction> = List();
     labelComment: string;
     isInitialSliceLoad: boolean;
 
@@ -134,7 +132,6 @@ export class MarkerPageComponent implements OnInit {
             );
         });
 
-        // Brush tool should be first on the list to avoid canvas shenanigans
         this.tools = List([new BrushTool(), new RectangleTool(), new PointTool(), new ChainTool()]);
 
         this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
@@ -170,12 +167,16 @@ export class MarkerPageComponent implements OnInit {
 
     public zoomIn(): void {
         this.currentZoomLevelIndex++;
-        this.marker.scale = this.zoomLevels[this.currentZoomLevelIndex];
+        this.marker.scale = this.zoomLevels.get(this.currentZoomLevelIndex);
     }
 
     public zoomOut(): void {
         this.currentZoomLevelIndex--;
-        this.marker.scale = this.zoomLevels[this.currentZoomLevelIndex];
+        this.marker.scale = this.zoomLevels.get(this.currentZoomLevelIndex);
+    }
+
+    public get toolActions(): List<ToolAction> {
+        return this.currentTool ? List(this.currentTool.getActions()) : List();
     }
 
     private requestScan(): void {
@@ -295,20 +296,4 @@ export class MarkerPageComponent implements OnInit {
                 this.marker.setSliderFocus(true);
             });
     }
-
-    public isAnyNonDraftSelection(): boolean {
-        return !!this.selections.find(selection => selection.type !== SliceSelectionType.DRAFT);
-    }
-
-    public canUndo(): boolean {
-        return true;
-    }
-
-    public undo(): void {}
-
-    public canRedo(): boolean {
-        return true;
-    }
-
-    public redo(): void {}
 }

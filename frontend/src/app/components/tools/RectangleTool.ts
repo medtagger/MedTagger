@@ -15,6 +15,13 @@ export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<
         };
     }
 
+    public reset(): void {
+        if (this.currentSelection) {
+            this.removeSelection(this.currentSelection);
+            this.currentSelection = undefined;
+        }
+    }
+
     public drawSelection(selection: RectangleSelection): void {
         console.log('RectangleTool | drawSelection | selection: ', selection);
         const color = this.getColorForSelection(selection);
@@ -44,7 +51,8 @@ export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<
 
         const { x, y } = this.normalizeByView(selectionStartX, selectionStartY);
 
-        this.addSelection(new RectangleSelection(x, y, this.currentSlice, this.currentTag, SliceSelectionType.NORMAL));
+        this.currentSelection = new RectangleSelection(x, y, this.currentSlice, this.currentTag, SliceSelectionType.NORMAL);
+        this.addSelection(this.currentSelection);
     }
 
     public onMouseMove(event: MouseEvent): void {
@@ -58,7 +66,7 @@ export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<
 
             this.currentSelection.width = normalizedValues.x;
             this.currentSelection.height = normalizedValues.y;
-            this.currentSelection = this.updateSelection(this.currentSelection);
+            this.redraw();
         }
     }
 

@@ -27,11 +27,9 @@ import { List } from 'immutable';
     styleUrls: ['./scan-viewer.component.scss']
 })
 export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
-    @Input() selections: List<SliceSelection>;
-
     @Input() tools: List<Tool<SliceSelection>>;
 
-    @Output() selectionsChange: EventEmitter<List<SliceSelection>> = new EventEmitter();
+    @Input() selections: List<SliceSelection>;
 
     currentImage: HTMLImageElement;
 
@@ -45,6 +43,9 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
     @ViewChild('canvas')
     set viewCanvas(viewElement: ElementRef) {
         this.canvas = viewElement.nativeElement;
+        this.canvas.oncontextmenu = function(e) {
+            e.preventDefault();
+        };
     }
 
     imageContainer: HTMLDivElement;
@@ -85,9 +86,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if ((changes.selections || changes.tools) && this.drawingContext) {
-            this.tools.forEach(tool => {
-                tool.setDrawingContext(this.drawingContext);
-            });
+            this.refreshDrawingContext();
             this.redrawSelections();
         }
     }
@@ -264,13 +263,14 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     protected drawSelections(): void {
-        this.selections.forEach(selection => {
-            const isOnCurrentSlice = selection.sliceIndex === this.currentSlice;
-            if ((selection.pinned || isOnCurrentSlice) && !selection.hidden) {
-                const tool: Tool<SliceSelection> = this.getToolByName(selection.labelTool);
-                tool.drawSelection(selection);
-            }
-        });
+        this.selections
+            .forEach(selection => {
+                const isOnCurrentSlice = selection.sliceIndex === this.currentSlice;
+                if ((selection.pinned || isOnCurrentSlice) && !selection.hidden) {
+                    const tool: Tool<SliceSelection> = this.getToolByName(selection.labelTool);
+                    tool.drawSelection(selection);
+                }
+            });
     }
 
     protected clearCanvas(): void {
@@ -289,15 +289,10 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
 
     protected createDrawingContext(): DrawingContext {
         const currentSlice = this.currentSlice || this.slices.keys().next().value;
-        return new DrawingContext(this.canvas, this.selections, currentSlice, null, this.updateSelections.bind(this));
+        return new DrawingContext(this.canvas, this.selections, currentSlice, null, null, this.redrawSelections.bind(this));
     }
 
     protected getToolByName(toolName: string): Tool<SliceSelection> {
         return this.tools.find(x => x.getToolName() === toolName);
-    }
-
-    private updateSelections(selections: List<SliceSelection>) {
-        this.drawingContext.selections = selections;
-        this.selectionsChange.emit(selections);
     }
 }

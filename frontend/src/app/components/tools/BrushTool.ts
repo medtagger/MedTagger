@@ -10,23 +10,32 @@ export enum BrushMode {
 }
 
 export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSelection> {
-
     private mouseDrag = false;
     private mode: BrushMode = BrushMode.BRUSH;
-    private actions: Array<ToolAction>;
+    private readonly actions: Array<ToolAction>;
 
     constructor() {
         super();
 
         this.actions = [
-            new ToolAction(BrushMode.BRUSH, () => true, () => {
-                this.changeToolMode(BrushMode.BRUSH);
-                this.deactivateOtherActions(BrushMode.BRUSH);
-            }, ToolActionType.BUTTON, true),
-            new ToolAction(BrushMode.ERASER, () => !!this.getCurrentBrushSelection(), () => {
-                this.changeToolMode(BrushMode.ERASER);
-                this.deactivateOtherActions(BrushMode.ERASER);
-            }, ToolActionType.BUTTON, false)
+            new ToolAction(
+                BrushMode.BRUSH,
+                () => true,
+                () => {
+                    this.changeToolMode(BrushMode.BRUSH);
+                },
+                ToolActionType.BUTTON,
+                true
+            ),
+            new ToolAction(
+                BrushMode.ERASER,
+                () => !!this.getCurrentBrushSelection(),
+                () => {
+                    this.changeToolMode(BrushMode.ERASER);
+                },
+                ToolActionType.BUTTON,
+                false
+            )
         ];
         console.log('BrushTool created!');
     }
@@ -60,6 +69,10 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
         return this.actions;
     }
 
+    public reset(): void {
+        this.mouseDrag = false;
+    }
+
     public deactivateOtherActions(currentAction: string): void {
         this.actions.forEach(action => {
             if (action.isActive !== undefined) {
@@ -73,28 +86,29 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
         this.deactivateOtherActions(newMode);
     }
 
-    drawSelection(selection: BrushSelection): any {
+    public drawSelection(selection: BrushSelection): any {
         console.log('BrushTool | drawSelection | selection: ', selection);
 
         const color = this.getColorForSelection(selection);
-        selection.getSelectionLayer().then((selectionLayerImage: HTMLImageElement) => {
-            this.canvasCtx.drawImage(selectionLayerImage, 0, 0, this.canvasSize.width, this.canvasSize.height);
+        selection.getSelectionLayer().then(
+            (selectionLayerImage: HTMLImageElement) => {
+                this.canvasCtx.drawImage(selectionLayerImage, 0, 0, this.canvasSize.width, this.canvasSize.height);
 
-            // Recoloring of original selection
-            if (selection.sliceIndex !== this.currentSlice) {
-                this.canvasCtx.fillStyle = color;
-                this.canvasCtx.globalCompositeOperation = 'source-in';
-                this.canvasCtx.fillRect(0, 0, this.canvasSize.width, this.canvasSize.height);
-                this.canvasCtx.globalCompositeOperation = 'source-over';
+                // Recoloring of original selection
+                if (selection.sliceIndex !== this.currentSlice) {
+                    this.canvasCtx.fillStyle = color;
+                    this.canvasCtx.globalCompositeOperation = 'source-in';
+                    this.canvasCtx.fillRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+                    this.canvasCtx.globalCompositeOperation = 'source-over';
+                }
+            },
+            (error: Error) => {
+                console.error('Error while drawing brush selections!: ', error);
             }
-
-        }, (error: Error) => {
-            console.error('Error while drawing brush selections!: ', error);
-        });
-
+        );
     }
 
-    onMouseDown(event: MouseEvent): void {
+    public onMouseDown(event: MouseEvent): void {
         console.log('BrushTool | onMouseDown | event: ', event);
 
         // starting new brush selection needs temporary canvas clear
@@ -106,8 +120,8 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
             this.canvasCtx.drawImage(currentSelection.selectionLayer, 0, 0, this.canvasSize.width, this.canvasSize.height);
         }
 
-        const x = (event.clientX) - this.canvasPosition.left;
-        const y = (event.clientY) - this.canvasPosition.top;
+        const x = event.clientX - this.canvasPosition.left;
+        const y = event.clientY - this.canvasPosition.top;
 
         this.mouseDrag = true;
         this.canvasCtx.lineWidth = this.getStyle().LINE_WIDTH;
@@ -118,20 +132,22 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
 
         this.canvasCtx.beginPath();
         this.canvasCtx.moveTo(x, y);
+        this.canvasCtx.lineTo(x, y);
+        this.canvasCtx.stroke();
     }
 
-    onMouseMove(event: MouseEvent): void {
+    public onMouseMove(event: MouseEvent): void {
         if (this.mouseDrag) {
             console.log('BrushTool | onMove | event: ', event);
-            const x = (event.clientX) - this.canvasPosition.left;
-            const y = (event.clientY) - this.canvasPosition.top;
+            const x = event.clientX - this.canvasPosition.left;
+            const y = event.clientY - this.canvasPosition.top;
 
             this.canvasCtx.lineTo(x, y);
             this.canvasCtx.stroke();
         }
     }
 
-    onMouseUp(event: MouseEvent): void {
+    public onMouseUp(event: MouseEvent): void {
         if (this.mouseDrag) {
             console.log('BrushTool | onUp | event: ', event);
             this.canvasCtx.globalCompositeOperation = this.getStyle().SAVING_COMPOSITE_OPERATION;
@@ -151,9 +167,14 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
 
                 if (currentSelection) {
                     currentSelection.setImage(image);
-                    this.updateSelection(currentSelection);
+                    currentSelection.isReady.then(() => {
+                        this.redraw();
+                    });
                 } else {
-                    this.addSelection(new BrushSelection(image, this.currentSlice, this.currentTag, SliceSelectionType.NORMAL));
+                    const newSelections = new BrushSelection(image, this.currentSlice, this.currentTag, SliceSelectionType.NORMAL);
+                    newSelections.isReady.then(() => {
+                        this.addSelection(newSelections);
+                    });
                 }
             }
         }
@@ -177,10 +198,11 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
     }
 
     private getCurrentBrushSelection(): BrushSelection {
-        return this.selections.find(selection =>
-            selection.labelTool === this.getToolName() &&
-            selection.sliceIndex === this.currentSlice &&
-            selection.labelTag === this.currentTag
+        return this.selections.find(
+            selection =>
+                selection.labelTool === this.getToolName() &&
+                selection.sliceIndex === this.currentSlice &&
+                selection.labelTag === this.currentTag
         ) as BrushSelection;
     }
 }

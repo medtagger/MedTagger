@@ -10,15 +10,7 @@ export class BrushSelection extends SliceSelection {
     constructor(image: string, depth: number, tag: LabelTag, type: SliceSelectionType) {
         super(depth, 'BRUSH', tag, type);
         this.selectionLayer = new Image();
-
-        this.isReady = new Promise((resolve, reject) => {
-            this.selectionLayer.onload = () => resolve();
-            this.selectionLayer.onerror = () => reject();
-
-            if (image) {
-                this.selectionLayer.src = image;
-            }
-        });
+        this.setImage(image);
     }
 
     public getSelectionLayer(): Promise<HTMLImageElement | Error> {
@@ -29,11 +21,14 @@ export class BrushSelection extends SliceSelection {
         });
     }
 
-    public setImage(image: string): Promise<void | Error> {
-        return this.isReady.then( () => {
-            this.selectionLayer.src = image;
-        }).catch( () => {
-            return new Error('Cannot set image (BrushSelection)');
+    public setImage(image: string): void {
+        this.isReady = new Promise((resolve, reject) => {
+            this.selectionLayer.onload = () => resolve();
+            this.selectionLayer.onerror = () => reject();
+
+            if (image) {
+                this.selectionLayer.src = image;
+            }
         });
     }
 

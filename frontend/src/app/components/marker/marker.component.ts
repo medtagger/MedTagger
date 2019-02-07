@@ -1,10 +1,11 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { LabelTag } from '../../model/labels/LabelTag';
 import { SliceSelection } from '../../model/selections/SliceSelection';
 import { ScanViewerComponent } from '../scan-viewer/scan-viewer.component';
 import { Tool } from '../tools/Tool';
 import { DrawingContext } from './../tools/DrawingContext';
+import { List } from 'immutable';
 
 @Component({
     selector: 'app-marker-component',
@@ -17,6 +18,8 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
 
     @Input() currentTag: LabelTag;
 
+    @Output() selectionsChange: EventEmitter<List<SliceSelection>> = new EventEmitter();
+
     constructor(private snackBar: MatSnackBar) {
         super();
     }
@@ -26,6 +29,14 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
 
         if (changes.currentTag) {
             this.refreshDrawingContext();
+        }
+
+        if (changes.currentTool && changes.currentTool.previousValue) {
+            // timeout is needed to avoid ExpressionChangedAfterItHasBeenCheckedError
+            setTimeout(() => {
+                changes.currentTool.previousValue.reset();
+                this.redrawSelections();
+            });
         }
     }
 
@@ -79,6 +90,12 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
     protected createDrawingContext(): DrawingContext {
         const drawingContext = super.createDrawingContext();
         drawingContext.currentTag = this.currentTag;
+        drawingContext.updateSelections = this.updateSelections.bind(this);
         return drawingContext;
+    }
+
+    private updateSelections(selections: List<SliceSelection>) {
+        this.drawingContext.selections = selections;
+        this.selectionsChange.emit(selections);
     }
 }

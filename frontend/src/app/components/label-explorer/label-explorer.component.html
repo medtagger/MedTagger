@@ -1,8 +1,8 @@
 <mat-list dense class="label-box">
-    <ng-container *ngIf="selections.length > 0">
+    <ng-container *ngIf="!selections.isEmpty()">
         <ng-container *ngFor="let tag of getTags()">
             <h4 matSubheader
-                (click)="toggleTagVisibility(tag);"
+                (click)="toggleTagVisibility(tag)"
                 class="label-tag__header">
                 {{ tag.name }}
                 <mat-icon
@@ -39,12 +39,12 @@
                     </button>
                     <button mat-icon-button
                         [style.visibility]="label.pinned ? 'visible' : undefined"
-                        (click)="label.pinned = !label.pinned"
+                        (click)="toggleSelectionPinning(label)"
                         class="hidden-btn">
                         <mat-icon class="small-svg-size" svgIcon="{{label.pinned ? 'pin' : 'pin-off'}}"></mat-icon>
                     </button>
                     <button mat-icon-button
-                        (click)="label.hidden = !label.hidden">
+                        (click)="toggleSelectionVisibility(label)">
                         <mat-icon class="small-size">{{label.hidden ? 'visibility_off' : 'visibility'}}</mat-icon>
                     </button>
                 </mat-list-item>
@@ -53,7 +53,7 @@
         </ng-container>
     </ng-container>
     <h5
-        *ngIf="selections.length === 0"
+        *ngIf="selections.isEmpty()"
         class="label-empty"
         data-cy="no-labels-added">
         No labels have been added so far. Please try adding labels with the tools.

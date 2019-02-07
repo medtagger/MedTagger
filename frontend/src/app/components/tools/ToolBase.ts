@@ -6,7 +6,6 @@ import { DrawingContext } from './DrawingContext';
 import { Tool } from './Tool';
 
 export abstract class ToolBase<CustomSliceSelection extends SliceSelection> implements Tool<CustomSliceSelection> {
-
     protected drawingContext: DrawingContext;
 
     public setDrawingContext(drawingContext: DrawingContext): void {
@@ -22,14 +21,14 @@ export abstract class ToolBase<CustomSliceSelection extends SliceSelection> impl
         };
     }
 
-    protected normalizeByView(paramX: number, paramY: number): { x: number, y: number } {
+    protected normalizeByView(paramX: number, paramY: number): { x: number; y: number } {
         return {
             x: paramX / this.drawingContext.canvasSize.width,
             y: paramY / this.drawingContext.canvasSize.height
         };
     }
 
-    protected scaleToView(paramX: number, paramY: number): { x: number, y: number } {
+    protected scaleToView(paramX: number, paramY: number): { x: number; y: number } {
         return {
             x: paramX * this.drawingContext.canvasSize.width,
             y: paramY * this.drawingContext.canvasSize.height
@@ -43,6 +42,8 @@ export abstract class ToolBase<CustomSliceSelection extends SliceSelection> impl
     public canChangeSlice(): boolean {
         return true;
     }
+
+    public reset(): void {}
 
     public abstract drawSelection(selection: CustomSliceSelection): any;
 
@@ -76,14 +77,8 @@ export abstract class ToolBase<CustomSliceSelection extends SliceSelection> impl
         this.drawingContext.updateSelections(this.selections.splice(selectionIndexToDelete, 1));
     }
 
-    protected updateSelection<T extends SliceSelection>(selection: T): T {
-        const selectionIndexToReplace = this.selections.findIndex(x => x.getId() === selection.getId());
-        // objects must not be reference equal to detect change
-        if (selection === this.selections.get(selectionIndexToReplace)) {
-            selection = Object.create(selection);
-        }
-        this.drawingContext.updateSelections(this.selections.set(selectionIndexToReplace, selection));
-        return selection;
+    protected redraw(): void {
+        this.drawingContext.redraw();
     }
 
     protected get canvas(): HTMLCanvasElement {
@@ -106,7 +101,7 @@ export abstract class ToolBase<CustomSliceSelection extends SliceSelection> impl
         return this.drawingContext.canvasPosition;
     }
 
-    protected get canvasSize(): { width: number, height: number } {
+    protected get canvasSize(): { width: number; height: number } {
         return this.drawingContext.canvasSize;
     }
 
@@ -114,4 +109,3 @@ export abstract class ToolBase<CustomSliceSelection extends SliceSelection> impl
         return this.drawingContext.selections;
     }
 }
-

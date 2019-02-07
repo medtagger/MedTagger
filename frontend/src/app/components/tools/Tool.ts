@@ -19,4 +19,6 @@ export interface Tool<CustomSliceSelection extends SliceSelection> {
     getActions(): Array<ToolAction>;
 
     canChangeSlice(): boolean;
+
+    reset(): void;
 }

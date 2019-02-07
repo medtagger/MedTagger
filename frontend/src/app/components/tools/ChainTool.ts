@@ -19,6 +19,14 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
         };
     }
 
+    public reset(): void {
+        if (this.currentSelection) {
+            this.removeSelection(this.currentSelection);
+            this.currentSelection = undefined;
+        }
+        this.draggedPointIndex = -1;
+    }
+
     public drawSelection(selection: ChainSelection): void {
         console.log('ChainTool | drawSelection | selection: ', selection);
         const color = this.getColorForSelection(selection);
@@ -73,7 +81,7 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
         if (this.currentSelection) {
             if (this.currentSelection.points.length > 1) {
                 this.currentSelection.loop = isLoop;
-                this.currentSelection = this.updateSelection(this.currentSelection);
+                this.redraw();
             } else {
                 this.removeSelection(this.currentSelection);
             }
@@ -98,7 +106,7 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
                 const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
                 const point = new Point(normalizedPoint.x, normalizedPoint.y);
                 this.currentSelection.points.push(point);
-                this.currentSelection = this.updateSelection(this.currentSelection);
+                this.redraw();
             } else {
                 this.getOwnSelectionsOnCurrentSlice().forEach((selection: ChainSelection) => {
                     if (!selection.hidden) {
@@ -142,7 +150,7 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
                     this.currentSelection.points[lastIndex] = new Point(normalizedValues.x, normalizedValues.y);
                 }
             }
-            this.currentSelection = this.updateSelection(this.currentSelection);
+            this.redraw();
         }
     }
 
