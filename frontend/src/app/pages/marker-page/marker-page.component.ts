@@ -217,6 +217,8 @@ export class MarkerPageComponent implements OnInit {
     public nextScan(): void {
         this.marker.setDownloadScanInProgress(true);
         this.labelComment = '';
+        this.selections = List();
+        this.currentTool = undefined;
         this.requestScan();
     }
 

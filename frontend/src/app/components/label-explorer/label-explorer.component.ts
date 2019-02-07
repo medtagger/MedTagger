@@ -18,9 +18,7 @@ export class LabelExplorerComponent {
         ['CHAIN', 'vector-polyline'],
         ['ERASER', 'eraser'],
         ['ZOOM_IN', 'magnify-plus-outline'],
-        ['ZOOM_OUT', 'magnify-minus-outline'],
-        ['UNDO', 'undo'],
-        ['REDO', 'redo']
+        ['ZOOM_OUT', 'magnify-minus-outline']
     ]);
 
     @Input() selections: List<SliceSelection>;

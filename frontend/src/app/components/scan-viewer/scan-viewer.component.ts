@@ -108,8 +108,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
 
     ngAfterViewInit() {
         console.log('ScanViewer | ngAfterViewInit');
-        // setTimeout() fixes slider focus issues in IE/Firefox
-        window.setTimeout(() => this.slider._elementRef.nativeElement.focus(), 10);
+        this.tryFocusSlider();
         SliceSelection.resetIdCounter();
     }
 
@@ -124,7 +123,8 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
 
     public tryFocusSlider(): void {
         if (this.isSliderFocused) {
-            this.slider._elementRef.nativeElement.focus();
+            // setTimeout() fixes slider focus issues in IE/Firefox
+            window.setTimeout(() => this.slider._elementRef.nativeElement.focus(), 10);
         }
     }
 
