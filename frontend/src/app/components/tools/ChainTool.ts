@@ -1,13 +1,12 @@
-import {Tool} from './Tool';
-import {ToolBase} from './ToolBase';
-import {Point} from '../../model/Point';
-import {ChainSelection} from '../../model/selections/ChainSelection';
+import { Tool } from './Tool';
+import { ToolBase } from './ToolBase';
+import { Point } from '../../model/Point';
+import { ChainSelection } from '../../model/selections/ChainSelection';
 import { SliceSelectionType } from '../../model/selections/SliceSelection';
 
 export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSelection> {
-
     private currentSelection: ChainSelection;
-    private draggedPointIndex: number;
+    private draggedPointIndex = -1;
 
     protected getStyle(): any {
         return {
@@ -15,16 +14,16 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
             RADIUS: 10,
             SELECTION_LINE_DENSITY: [0],
             SELECTION_LINE_WIDTH: 3,
-            SELECTION_FONT_COLOR: '#ffffff',
+            SELECTION_FONT_COLOR: '#ffffff'
         };
     }
 
     public reset(): void {
         if (this.currentSelection) {
-            this.removeSelection(this.currentSelection);
-            this.currentSelection = undefined;
+            this.currentSelection.points.splice(this.currentSelection.points.length - 1, 1);
+            this.completeSelection(false);
+            this.draggedPointIndex = -1;
         }
-        this.draggedPointIndex = -1;
     }
 
     public drawSelection(selection: ChainSelection): void {
@@ -34,9 +33,9 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
         this.canvasCtx.strokeStyle = color;
         this.canvasCtx.setLineDash(this.getStyle().SELECTION_LINE_DENSITY);
         this.canvasCtx.lineWidth = this.getStyle().SELECTION_LINE_WIDTH;
-        let lastPosition: { x: number, y: number };
+        let lastPosition: { x: number; y: number };
         for (const point of selection.points) {
-            const scaledPointPosition: { x: number, y: number } = this.scaleToView(point.x, point.y);
+            const scaledPointPosition: { x: number; y: number } = this.scaleToView(point.x, point.y);
 
             this.canvasCtx.beginPath();
             this.canvasCtx.arc(scaledPointPosition.x, scaledPointPosition.y, this.getStyle().RADIUS, 0, 2 * Math.PI);
@@ -52,7 +51,7 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
             lastPosition = scaledPointPosition;
         }
         if (selection.loop) {
-            const scaledPointPosition: { x: number, y: number } = this.scaleToView(selection.points[0].x, selection.points[0].y);
+            const scaledPointPosition: { x: number; y: number } = this.scaleToView(selection.points[0].x, selection.points[0].y);
             this.canvasCtx.beginPath();
             this.canvasCtx.moveTo(lastPosition.x, lastPosition.y);
             this.canvasCtx.lineTo(scaledPointPosition.x, scaledPointPosition.y);
@@ -64,14 +63,17 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
         this.canvasCtx.fillStyle = this.getStyle().SELECTION_FONT_COLOR;
         this.canvasCtx.textAlign = 'center';
         for (const point of selection.points) {
-            const scaledPointPosition: { x: number, y: number } = this.scaleToView(point.x, point.y);
-            this.canvasCtx.fillText(selection.getId().toString(), scaledPointPosition.x,
-                scaledPointPosition.y + this.getStyle().SELECTION_FONT_SIZE * 0.25);
+            const scaledPointPosition: { x: number; y: number } = this.scaleToView(point.x, point.y);
+            this.canvasCtx.fillText(
+                selection.getId().toString(),
+                scaledPointPosition.x,
+                scaledPointPosition.y + this.getStyle().SELECTION_FONT_SIZE * 0.25
+            );
         }
     }
 
     private checkDistance(point: Point, x: number, y: number) {
-        const scaledPoint: { x: number, y: number } = this.scaleToView(point.x, point.y);
+        const scaledPoint: { x: number; y: number } = this.scaleToView(point.x, point.y);
         const distance = Math.sqrt(Math.pow(scaledPoint.x - x, 2) + Math.pow(scaledPoint.y - y, 2));
 
         return distance < this.getStyle().RADIUS;
@@ -91,8 +93,8 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
 
     public onMouseDown(event: MouseEvent): void {
         console.log('ChainTool | onMouseDown | event: ', event);
-        const x = (event.clientX) - this.canvasPosition.left;
-        const y = (event.clientY) - this.canvasPosition.top;
+        const x = event.clientX - this.canvasPosition.left;
+        const y = event.clientY - this.canvasPosition.top;
 
         if (event.button === 0) {
             // left mouse button
@@ -103,7 +105,7 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
                     return;
                 }
 
-                const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
+                const normalizedPoint: { x: number; y: number } = this.normalizeByView(x, y);
                 const point = new Point(normalizedPoint.x, normalizedPoint.y);
                 this.currentSelection.points.push(point);
                 this.redraw();
@@ -120,10 +122,15 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
                 });
 
                 if (!this.currentSelection) {
-                    const normalizedPoint: { x: number, y: number } = this.normalizeByView(x, y);
+                    const normalizedPoint: { x: number; y: number } = this.normalizeByView(x, y);
                     const point = new Point(normalizedPoint.x, normalizedPoint.y);
-                    this.currentSelection = new ChainSelection([point, point], false, this.currentSlice, this.currentTag,
-                        SliceSelectionType.NORMAL);
+                    this.currentSelection = new ChainSelection(
+                        [point, point],
+                        false,
+                        this.currentSlice,
+                        this.currentTag,
+                        SliceSelectionType.NORMAL
+                    );
                     this.addSelection(this.currentSelection);
                 }
             }
@@ -139,7 +146,7 @@ export class ChainTool extends ToolBase<ChainSelection> implements Tool<ChainSel
             console.log('ChainTool | updateSelection | event: ', event);
             const newX = event.clientX - this.canvasPosition.left;
             const newY = event.clientY - this.canvasPosition.top;
-            const normalizedValues: { x: number, y: number } = this.normalizeByView(newX, newY);
+            const normalizedValues: { x: number; y: number } = this.normalizeByView(newX, newY);
             if (this.isMovingPoint()) {
                 this.currentSelection.points[this.draggedPointIndex] = new Point(normalizedValues.x, normalizedValues.y);
             } else {

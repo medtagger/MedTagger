@@ -69,6 +69,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
     public scanMetadata: ScanMetadata;
     public slices: Map<number, MarkerSlice> = new Map();
     public observableSliceRequest: Subject<SliceRequest>;
+    public isSliderFocused = true;
 
     protected sliceBatchSize: number;
     protected drawingContext: DrawingContext;
@@ -108,15 +109,22 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
     ngAfterViewInit() {
         console.log('ScanViewer | ngAfterViewInit');
         // setTimeout() fixes slider focus issues in IE/Firefox
-        window.setTimeout(() => this.setSliderFocus(true), 10);
+        window.setTimeout(() => this.slider._elementRef.nativeElement.focus(), 10);
         SliceSelection.resetIdCounter();
     }
 
-    public setSliderFocus(focus: boolean) {
-        if (focus) {
+    public setSliderFocus(focus: boolean): void {
+        this.isSliderFocused = focus;
+        if (this.isSliderFocused) {
             this.slider._elementRef.nativeElement.focus();
         } else {
             this.slider._elementRef.nativeElement.blur();
+        }
+    }
+
+    public tryFocusSlider(): void {
+        if (this.isSliderFocused) {
+            this.slider._elementRef.nativeElement.focus();
         }
     }
 
@@ -181,7 +189,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     public selectMiddleSlice(): void {
-        this.changeSlice((this.getMinSliceIndex() + this.getMaxSliceIndex()) / 2);
+        this.changeSlice(Math.round((this.getMinSliceIndex() + this.getMaxSliceIndex()) / 2));
     }
 
     public changeSlice(sliceIndex: number): void {

@@ -33,7 +33,6 @@ import { BrushSelection } from './../../model/selections/BrushSelection';
     styleUrls: ['./marker-page.component.scss']
 })
 export class MarkerPageComponent implements OnInit {
-
     private static readonly SLICE_BATCH_SIZE = 10;
     private static readonly HOME_PAGE = '/' + HOME;
 
@@ -48,7 +47,7 @@ export class MarkerPageComponent implements OnInit {
     tools: List<Tool<SliceSelection>>;
     currentTool: Tool<SliceSelection>;
     currentTag: LabelTag;
-    labelComment: string;
+    labelComment = '';
     isInitialSliceLoad: boolean;
 
     ActionType = ToolActionType;
@@ -66,7 +65,6 @@ export class MarkerPageComponent implements OnInit {
         private labelService: LabelService
     ) {
         console.log('MarkerPage constructor', this.marker);
-        this.labelComment = '';
         this.isInitialSliceLoad = true;
     }
 
@@ -292,7 +290,9 @@ export class MarkerPageComponent implements OnInit {
             )
             .afterClosed()
             .subscribe(comment => {
-                this.labelComment = comment;
+                if (comment !== undefined) {
+                    this.labelComment = comment;
+                }
                 this.marker.setSliderFocus(true);
             });
     }

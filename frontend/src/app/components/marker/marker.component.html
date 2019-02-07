@@ -10,7 +10,7 @@
     </div>
     <mat-slider #slider id="markerSlider"
                 (change)="changeSlice($event.value)"
-                (blur)="setSliderFocus(true)"
+                (blur)="tryFocusSlider()"
                 [disabled]="false"
                 [max]="getMaxSliceIndex()"
                 [min]="getMinSliceIndex"

@@ -2,7 +2,6 @@ import { LabelTag } from './../labels/LabelTag';
 
 export enum SliceSelectionType {
     NORMAL,
-    DRAFT,
     ARCHIVED
 }
 
