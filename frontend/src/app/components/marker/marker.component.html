@@ -25,7 +25,8 @@
     </mat-slider>
     <div
         *ngIf="downloadingScanInProgress || downloadingSlicesInProgress"
-        class="marker--spinner-box">
+        class="marker--spinner-box"
+        data-cy="spinner">
         <mat-progress-spinner
             mode="indeterminate"
             color="primary">
