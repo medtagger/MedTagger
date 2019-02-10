@@ -9,7 +9,7 @@ flask-cors==3.0.7
 flask-login==0.4.1
 Flask-HTTPAuth==3.2.4
 passlib==1.7.1
-uWSGI==2.0.17.1
+uWSGI==2.0.18
 gevent==1.4.0
 cassandra-driver==3.16.0
 SimpleITK==1.2.0
