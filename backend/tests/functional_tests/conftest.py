@@ -5,7 +5,8 @@ from typing import Any
 import pytest
 from cassandra.cqlengine.models import ModelMetaClass
 
-from medtagger import storage
+from medtagger.storage import Storage
+from medtagger.storage.cassandra import CassandraStorageBackend
 from medtagger.api import InvalidArgumentsException
 from medtagger.api.auth.business import create_user, sign_in_user
 from medtagger.api.rest import app
@@ -75,9 +76,11 @@ def _clear_databases() -> None:
     session.close_all()
 
     logger.info('Removing all data from Cassandra.')
-    storage_session = storage.create_session()
-    storage_session.set_keyspace(storage.MEDTAGGER_KEYSPACE)
-    for model_name in dir(models):
-        model = getattr(models, model_name)
-        if issubclass(model.__class__, ModelMetaClass) and model.__table_name__:
-            storage_session.execute('TRUNCATE {}'.format(model.__table_name__))
+    storage = Storage()
+    if isinstance(storage.storage_backend, CassandraStorageBackend):
+        storage_session = storage.create_session()
+        storage_session.set_keyspace(storage.MEDTAGGER_KEYSPACE)
+        for model_name in dir(models):
+            model = getattr(models, model_name)
+            if issubclass(model.__class__, ModelMetaClass) and model.__table_name__:
+                storage_session.execute('TRUNCATE {}'.format(model.__table_name__))

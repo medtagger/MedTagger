@@ -7,6 +7,7 @@ from medtagger.database import db_session
 from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement, BrushLabelElement, \
     PointLabelElement, ChainLabelElement, ChainLabelElementPoint, Task, Scan
 from medtagger.definitions import LabelVerificationStatus
+from medtagger.storage import Storage
 from medtagger.storage.models import BrushLabelElement as BrushLabelElementStorage
 from medtagger.types import LabelID, LabelPosition, LabelShape, LabelElementID, ScanID, LabelingTime, Point
 
@@ -124,7 +125,7 @@ def add_new_brush_label_element(label_id: LabelID, slice_index: int, width: int,
         brush_label_element = BrushLabelElement(slice_index, width, height, label_tag)
         brush_label_element.label_id = label_id
         session.add(brush_label_element)
-    BrushLabelElementStorage.create(id=brush_label_element.id, image=image)
+    Storage().create(BrushLabelElementStorage, id=brush_label_element.id, image=image)
     return brush_label_element.id
 
 

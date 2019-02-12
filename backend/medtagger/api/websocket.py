@@ -22,7 +22,7 @@ from medtagger.api import blueprint, web_socket  # noqa
 from medtagger.config import AppConfiguration  # noqa
 from medtagger.database import session  # noqa
 from medtagger.database.models import User, Role  # noqa
-from medtagger.storage import create_connection  # noqa
+from medtagger.storage import Storage  # noqa
 
 # Import all WebSocket services
 from medtagger.api.scans.service_web_socket import Slices as slices_websocket_ns  # noqa
@@ -42,7 +42,8 @@ CORS(app)
 app.secret_key = configuration.get('api', 'secret_key', fallback='')
 web_socket.init_app(app)
 
-create_connection(use_gevent=True)
+# Create a single Storage
+Storage(use_gevent=True)
 
 
 @app.teardown_appcontext

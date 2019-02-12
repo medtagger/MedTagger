@@ -15,6 +15,7 @@ from medtagger.repositories import (
     slices as SliceRepository,
 )
 from medtagger.types import ScanID, SliceID
+from medtagger.storage import Storage
 from medtagger.storage.models import BrushLabelElement, OriginalSlice, ProcessedSlice
 from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
@@ -122,6 +123,7 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')
     user_token = get_token_for_logged_in_user('admin')
+    storage = Storage()
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -236,7 +238,7 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     label_element_id = json_response['elements'][1]['label_element_id']
-    brush_label_element = BrushLabelElement.get(id=label_element_id)
+    brush_label_element = storage.get(BrushLabelElement, id=label_element_id)
     assert brush_label_element.image
 
     # Step 7. Delete scan from the system
@@ -253,11 +255,11 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
 
     # Step 10. Check that slices original image has been deleted from storage
     with pytest.raises(DoesNotExist):
-        OriginalSlice.get(id=slice_id)
+        storage.get(OriginalSlice, id=slice_id)
 
     # Step 11. Check that slices processed image has been deleted from storage
     with pytest.raises(DoesNotExist):
-        ProcessedSlice.get(id=slice_id)
+        storage.get(ProcessedSlice, id=slice_id)
 
     # Step 12. Check that labels has been deleted
     response = api_client.get('/api/v1/labels/{}'.format(label_id),
@@ -266,4 +268,4 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
 
     # Step 13. Check that Brush Label was deleted from storage
     with pytest.raises(DoesNotExist):
-        BrushLabelElement.get(id=label_element_id)
+        storage.get(BrushLabelElement, id=label_element_id)

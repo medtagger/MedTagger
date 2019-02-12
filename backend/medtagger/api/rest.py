@@ -23,7 +23,7 @@ from medtagger.api import blueprint  # noqa
 from medtagger.config import AppConfiguration  # noqa
 from medtagger.database import session  # noqa
 from medtagger.database.models import User, Role  # noqa
-from medtagger.storage import create_connection  # noqa
+from medtagger.storage import Storage  # noqa
 
 # Import all REST services
 from medtagger.api.core.service import core_ns as core_rest_ns  # noqa
@@ -61,13 +61,13 @@ try:
     from uwsgidecorators import postfork  # noqa
 
     @postfork
-    def connect_to_cassandra() -> None:
-        """Create a single Session to Cassandra after fork to multiple processes by uWSGI."""
-        create_connection()
+    def prepare_storage() -> None:
+        """Create a single Storage after fork to multiple processes by uWSGI."""
+        Storage()
 except ModuleNotFoundError:
-    # It seems that application is not running inside uWSGI server, so let's initialize session
+    # It seems that application is not running inside uWSGI server, so let's initialize Storage
     # in current process as it is highly probable that we are running in Flask's dev server
-    create_connection()
+    Storage()
 
 
 @app.teardown_appcontext
