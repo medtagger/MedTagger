@@ -76,10 +76,10 @@ def _clear_databases() -> None:
     session.close_all()
 
     storage = Storage()
-    if isinstance(storage.storage_backend, CassandraStorageBackend):
+    if isinstance(storage.backend, CassandraStorageBackend):
         logger.info('Removing all data from Cassandra.')
-        storage_session = storage.storage_backend.create_session()
-        storage_session.set_keyspace(storage.storage_backend.MEDTAGGER_KEYSPACE)
+        storage_session = storage.backend.create_session()
+        storage_session.set_keyspace(storage.backend.MEDTAGGER_KEYSPACE)
         for model_name in dir(models):
             model = getattr(models, model_name)
             if issubclass(model.__class__, ModelMetaClass) and model.__table_name__:

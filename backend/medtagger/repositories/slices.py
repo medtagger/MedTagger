@@ -54,7 +54,7 @@ def get_slice_converted_image(slice_id: SliceID) -> bytes:
 
 def store_original_image(slice_id: SliceID, image: bytes) -> None:
     """Store original image into Storage."""
-    Storage().create(OriginalSlice, id=slice_id, image=image) 
+    Storage().create(OriginalSlice, id=slice_id, image=image)
 
 
 def store_converted_image(slice_id: SliceID, image: bytes) -> None:

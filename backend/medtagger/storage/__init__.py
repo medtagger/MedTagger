@@ -7,32 +7,38 @@ from medtagger.storage.backend import StorageBackend
 
 
 class Storage:
+    """Unified storage mechanism."""
 
-    storage_backend: StorageBackend = None
+    backend: StorageBackend = None
     available_backends: Dict[str, type] = {
         'filesystem': filesystem.FileSystemStorageBackend,
         'cassandra': cassandra.CassandraStorageBackend,
     }
     
-    def __init__(self, *args, **kwargs) -> None:
-        if self.storage_backend:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize Storage against backend defined in the configuration."""
+        if self.backend:
             return  # Do not initialize storage backend twice...
 
-        # Fetch configuration and prepare backend
+        # Fetch configuration and prepare storage backend
         configuration = AppConfiguration()
         backend = configuration.get('storage', 'backend', 'filesystem')
         if backend not in self.available_backends:
             raise ValueError('Invalid backend set in the MedTagger configuration file!')
-        self.storage_backend = self.available_backends[backend](*args, **kwargs)
+        self.backend = self.available_backends[backend](*args, **kwargs)
 
     def is_alive(self) -> bool:
-        return self.storage_backend.is_alive()
+        """Check if Storage backend is still alive or not."""
+        return self.backend.is_alive()
 
-    def get(self, model: type, **filters):
-        return self.storage_backend.get(model, **filters)
+    def get(self, model: StorageModel, **filters: Any) -> StorageModel:
+        """Fetch entry for a given model using passed filters."""
+        return self.backend.get(model, **filters)
 
-    def create(self, model: type, **filters):
-        return self.storage_backend.create(model, **filters)
+    def create(self, model: StorageModel, **data: Any) -> StorageModel:
+        """Create new entry for a given model and passed data."""
+        return self.backend.create(model, **data)
 
-    def delete(self, model: type, **filters) -> None:
-        return self.storage_backend.delete(model, **filters)
+    def delete(self, model: StorageModel, **filters: Any) -> None:
+        """Delete an entry for a given model using passed filters."""
+        self.backend.delete(model, **filters)
