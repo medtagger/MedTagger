@@ -2,7 +2,6 @@
 import json
 from typing import Any
 
-from cassandra.cqlengine.query import DoesNotExist
 from sqlalchemy.orm.exc import NoResultFound
 import pytest
 
@@ -15,7 +14,7 @@ from medtagger.repositories import (
     slices as SliceRepository,
 )
 from medtagger.types import ScanID, SliceID
-from medtagger.storage import Storage
+from medtagger.storage import Storage, exceptions
 from medtagger.storage.models import BrushLabelElement, OriginalSlice, ProcessedSlice
 from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
 from tests.functional_tests.conftest import get_token_for_logged_in_user
@@ -254,11 +253,11 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
         SliceRepository.get_slice_by_id(slice_id)
 
     # Step 10. Check that slices original image has been deleted from storage
-    with pytest.raises(DoesNotExist):
+    with pytest.raises(exceptions.NotFound):
         storage.get(OriginalSlice, id=slice_id)
 
     # Step 11. Check that slices processed image has been deleted from storage
-    with pytest.raises(DoesNotExist):
+    with pytest.raises(exceptions.NotFound):
         storage.get(ProcessedSlice, id=slice_id)
 
     # Step 12. Check that labels has been deleted
@@ -267,5 +266,5 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
     assert response.status_code == 404
 
     # Step 13. Check that Brush Label was deleted from storage
-    with pytest.raises(DoesNotExist):
+    with pytest.raises(exceptions.NotFound):
         storage.get(BrushLabelElement, id=label_element_id)

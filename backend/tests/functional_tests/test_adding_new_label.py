@@ -2,6 +2,7 @@
 import json
 from typing import Any
 
+from medtagger.storage import Storage
 from medtagger.storage.models import BrushLabelElement
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
@@ -18,6 +19,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     """Test for adding a Label made with Brush tool."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
+    storage = Storage()
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -65,7 +67,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     label_element_id = json_response['elements'][0]['label_element_id']
-    brush_label_element = BrushLabelElement.get(id=label_element_id)
+    brush_label_element = storage.get(BrushLabelElement, id=label_element_id)
     assert brush_label_element.image
 
 

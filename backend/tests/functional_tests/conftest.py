@@ -75,11 +75,11 @@ def _clear_databases() -> None:
             sess.execute('TRUNCATE TABLE "{}" RESTART IDENTITY CASCADE;'.format(table.name))
     session.close_all()
 
-    logger.info('Removing all data from Cassandra.')
     storage = Storage()
     if isinstance(storage.storage_backend, CassandraStorageBackend):
-        storage_session = storage.create_session()
-        storage_session.set_keyspace(storage.MEDTAGGER_KEYSPACE)
+        logger.info('Removing all data from Cassandra.')
+        storage_session = storage.storage_backend.create_session()
+        storage_session.set_keyspace(storage.storage_backend.MEDTAGGER_KEYSPACE)
         for model_name in dir(models):
             model = getattr(models, model_name)
             if issubclass(model.__class__, ModelMetaClass) and model.__table_name__:

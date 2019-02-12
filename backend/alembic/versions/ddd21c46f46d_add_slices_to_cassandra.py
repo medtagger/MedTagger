@@ -20,7 +20,7 @@ storage = Storage()
 def upgrade():
     # Create structure in Cassandra
     if isinstance(storage.storage_backend, CassandraStorageBackend):
-        session = storage.create_session()
+        session = storage.storage_backend.create_session()
 
         # Create key space
         session.execute("""
@@ -47,7 +47,7 @@ def upgrade():
 def downgrade():
     # Remove structure from Cassandra
     if isinstance(storage.storage_backend, CassandraStorageBackend):
-        session = storage.create_session()
+        session = storage.storage_backend.create_session()
 
         # Remove all tables
         session.set_keyspace('medtagger')

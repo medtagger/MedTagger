@@ -1,13 +1,14 @@
 from typing import Dict
 
 from cassandra.cluster import Cluster, Session, NoHostAvailable  # pylint: disable=no-name-in-module
-from cassandra.policies import RoundRobinPolicy
 from cassandra.cqlengine import connection
+from cassandra.cqlengine.query import DoesNotExist
 from cassandra.io.asyncorereactor import AsyncoreConnection
 from cassandra.io.geventreactor import GeventConnection
+from cassandra.policies import RoundRobinPolicy
 
 from medtagger.config import AppConfiguration
-from medtagger.storage import models as unified_models
+from medtagger.storage import models as unified_models, exceptions
 from medtagger.storage.cassandra import models as cassandra_models
 from medtagger.storage.backend import StorageBackend
 
@@ -42,16 +43,22 @@ class CassandraStorageBackend(StorageBackend):
             return False
 
     def get(self, model: type, **filters):
-        cassandra_model = self._get_cassandra_model(model)
-        return cassandra_model.get(**filters).as_unified_model()
+        try:
+            cassandra_model = self._get_cassandra_model(model)
+            return cassandra_model.get(**filters).as_unified_model()
+        except DoesNotExist:
+            raise exceptions.NotFound('Did not found requested entry!')
 
     def create(self, model: type, **data):
         cassandra_model = self._get_cassandra_model(model)
         cassandra_model.create(**data)
 
     def delete(self, model: type, **filters) -> None:
-        cassandra_model = self._get_cassandra_model(model)
-        cassandra_model.filter(**filters).delete()
+        try:
+            cassandra_model = self._get_cassandra_model(model)
+            cassandra_model.filter(**filters).delete()
+        except DoesNotExist:
+            raise exceptions.NotFound('Did not found requested entry!')
 
     def _get_cassandra_model(self, model: type):
         cassandra_model = self.model_mapping.get(model)

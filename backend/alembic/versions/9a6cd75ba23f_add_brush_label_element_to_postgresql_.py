@@ -48,7 +48,7 @@ def upgrade():
 
     # Create table in Cassandra
     if isinstance(storage.storage_backend, CassandraStorageBackend):
-        session = storage.create_session()
+        session = storage.storage_backend.create_session()
         session.set_keyspace('medtagger')
         session.execute("""
             CREATE TABLE IF NOT EXISTS brush_label_elements (
@@ -62,7 +62,7 @@ def downgrade():
     # Remove all tables - both in PostgreSQL and Cassandra
     op.drop_table('BrushLabelElements')
     if isinstance(storage.storage_backend, CassandraStorageBackend):
-        session = storage.create_session()
+        session = storage.storage_backend.create_session()
         session.set_keyspace('medtagger')
         session.execute('DROP TABLE brush_label_elements')
 

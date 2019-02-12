@@ -1,5 +1,7 @@
 import os
 
+from medtagger.storage import exceptions
+
 
 class FileSystemModel:
 
@@ -7,8 +9,11 @@ class FileSystemModel:
 
     @classmethod
     def get(cls, filesystem_directory, **filters):
-        with open(cls._get_file_location(filesystem_directory, filters['id']), 'rb') as opened_file:
-            return cls.from_file(opened_file)
+        try:
+            with open(cls._get_file_location(filesystem_directory, filters['id']), 'rb') as opened_file:
+                return cls.from_file(opened_file)
+        except FileNotFoundError:
+            raise exceptions.NotFound('Did not found requested entry!')
 
     @classmethod
     def create(cls, filesystem_directory, **data):
@@ -20,7 +25,10 @@ class FileSystemModel:
 
     @classmethod
     def delete(cls, filesystem_directory, **filters):
-        os.remove(cls._get_file_location(filesystem_directory, filters['id']))
+        try:
+            os.remove(cls._get_file_location(filesystem_directory, filters['id']))
+        except FileNotFoundError:
+            raise exceptions.NotFound('Did not found requested entry!')
 
     @classmethod
     def _get_file_location(cls, directory: str, id: str) -> str:
