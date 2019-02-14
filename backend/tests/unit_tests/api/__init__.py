@@ -11,7 +11,7 @@ def get_test_application(mocker: Any) -> FlaskClient:
     :return: application for testing purpose
     """
     # IMPORTANT: Mock Cassandra Connection BEFORE(!) importing Flask application
-    mocker.patch('medtagger.storage.create_connection')
+    mocker.patch('medtagger.storage.cassandra.CassandraStorageBackend._create_connection')
 
     from medtagger.api.rest import app
 

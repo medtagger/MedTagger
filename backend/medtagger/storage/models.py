@@ -6,7 +6,7 @@ from typing import TypeVar
 StorageModelTypeVar = TypeVar('StorageModelTypeVar', bound='StorageModel')
 
 
-class InternalStorageModel(abc.ABC):
+class InternalStorageModel:
     """Internal representation of a Storage Model."""  # pylint: disable=too-few-public-methods
 
     def as_unified_model(self) -> 'StorageModel':
