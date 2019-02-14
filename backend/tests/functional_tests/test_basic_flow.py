@@ -2,6 +2,8 @@
 import json
 from typing import Any
 
+import pytest
+
 from medtagger.definitions import LabelVerificationStatus, LabelElementStatus, LabelTool
 from medtagger.repositories import (
     datasets as DatasetsRepository,
@@ -9,16 +11,19 @@ from medtagger.repositories import (
     tasks as TasksRepository,
 )
 
-from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
+from tests.functional_tests import get_api_client, get_web_socket_client, get_headers, get_storage
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
 # pylint: disable=too-many-locals
-def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
+@pytest.mark.parametrize('storage_backend_configuration', ['cassandra', 'filesystem'])
+def test_basic_flow(mocker: Any, prepare_environment: Any, synchronous_celery: Any,
+                    storage_backend_configuration: str) -> None:
     """Test application with basic flow."""
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')
     user_token = get_token_for_logged_in_user('admin')
+    _ = get_storage(mocker, storage_backend_configuration)  # Initialize Storage with mock
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -140,11 +145,14 @@ def test_basic_flow(prepare_environment: Any, synchronous_celery: Any) -> None:
 
 
 # pylint: disable=too-many-locals
-def test_basic_flow_with_predefined_label(prepare_environment: Any, synchronous_celery: Any) -> None:
+@pytest.mark.parametrize('storage_backend_configuration', ['cassandra', 'filesystem'])
+def test_basic_flow_with_predefined_label(mocker: Any, prepare_environment: Any, synchronous_celery: Any,
+                                          storage_backend_configuration: str) -> None:
     """Test application with basic flow that uses Predefined Label in Scan."""
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')
     user_token = get_token_for_logged_in_user('admin')
+    _ = get_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')

@@ -1,6 +1,8 @@
 """Tests Labels Repository."""
 from typing import Any
 
+import pytest
+
 from medtagger.database.models import User
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
@@ -12,6 +14,8 @@ from medtagger.repositories import (
     users as UsersRepository,
 )
 from medtagger.types import LabelingTime
+
+from tests.functional_tests import get_storage
 
 
 def test_get_predefined_label_for_scan_in_task__no_predefined_label(prepare_environment: Any) -> None:
@@ -88,8 +92,12 @@ def test_get_predefined_label_for_scan_in_task__predefined_label_for_given_task(
     assert predefined_label.id == label_right.id
 
 
-def test_get_predefined_brush_label_elements(prepare_environment: Any) -> None:
+@pytest.mark.parametrize('storage_backend_configuration', ['cassandra', 'filesystem'])
+def test_get_predefined_brush_label_elements(mocker: Any, prepare_environment: Any,
+                                             storage_backend_configuration: str) -> None:
     """Test for fetching Predefined Brush Label Elements."""
+    _ = get_storage(mocker, storage_backend_configuration)
+
     # Step 1. Prepare a structure for the test
     dataset = DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
     task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])

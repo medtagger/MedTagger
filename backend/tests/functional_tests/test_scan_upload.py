@@ -14,15 +14,18 @@ from medtagger.repositories import (
     datasets as DatasetsRepository,
 )
 
-from tests.functional_tests import get_api_client, get_headers
+from tests.functional_tests import get_api_client, get_headers, get_storage
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
 # pylint: disable=too-many-locals
-def test_scan_upload_and_conversion(prepare_environment: Any, synchronous_celery: Any) -> None:
+@pytest.mark.parametrize('storage_backend_configuration', ['cassandra', 'filesystem'])
+def test_scan_upload_and_conversion(mocker: Any, prepare_environment: Any, synchronous_celery: Any,
+                                    storage_backend_configuration: str) -> None:
     """Test application for Scan upload and conversion."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
+    _ = get_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -72,11 +75,13 @@ def fixture_problems_with_storage(mocker: Any) -> Any:
     return mocker.patch.object(SlicesRepository, 'store_original_image')
 
 
-def test_scan_upload_with_retrying(fixture_problems_with_storage: Any, prepare_environment: Any,
-                                   synchronous_celery: Any) -> None:
+@pytest.mark.parametrize('storage_backend_configuration', ['cassandra', 'filesystem'])
+def test_scan_upload_with_retrying(mocker: Any, fixture_problems_with_storage: Any, prepare_environment: Any,
+                                   synchronous_celery: Any, storage_backend_configuration: str) -> None:
     """Test application for Scan upload with retrying."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
+    _ = get_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
