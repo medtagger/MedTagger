@@ -2,7 +2,10 @@
 
 ### Preparing ssh keys
 
-TODO: automate this, somehow
+Proceed to Openstack Instance - Computations - Security - Create new key-pair
+remember to name it as the same as in main.tf
+
+Download the private keys, place them in Ansible dir.
 
 ### Machines provisioning
 

@@ -4,6 +4,7 @@
   copy:
     src: db-key.pem
     dest: "/home/{{ ansible_user }}/"
+    mode: 0600
 
 
 - name: Start database migrations

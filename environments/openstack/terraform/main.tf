@@ -3,7 +3,7 @@ provider "openstack" {
 }
 
 variable image_id {
-  default = "23e4701c-dbfb-49a1-bc83-96c4f30d91a6"
+  default = "bfb95819-9d93-47bf-ba97-5a60968fbdc0"
 }
 
 variable flavor_id {
