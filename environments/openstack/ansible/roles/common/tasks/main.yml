@@ -16,10 +16,10 @@
 
 - name: Install Python dependencies (docker_service)
   pip:
-    name: 
+    name:
       - docker
       - docker-compose
-      - PyYAML 
+      - PyYAML
 
 - name: Add Docker GPG key
   apt_key: url=https://download.docker.com/linux/ubuntu/gpg
@@ -37,7 +37,7 @@
     state: present
 
 - name: Add user to the Docker group
-  user: 
+  user:
     name: "{{ ansible_user }}"
     groups: docker
     append: yes
@@ -54,4 +54,16 @@
     dest: "/home/{{ ansible_user }}"
   become: yes
   become_user: "{{ ansible_user }}"
+
+- name: Copy db host key
+  when: inventory_hostname in groups['app_hosts']
+  copy:
+    src: db-key.pem
+    dest: "/home/{{ ansible_user }}/"
+    mode: 0600
+
+- name: Start docker-swarm
+  command: docker stack deploy --compose-file docker-compose.yml medtagger
+  args:
+    chdir: "{{ project_remote_path }}"
 
