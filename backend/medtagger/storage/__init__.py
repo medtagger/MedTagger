@@ -1,5 +1,5 @@
 """Definition of storage for MedTagger."""
-from typing import Dict, Any
+from typing import Any, Dict, Type, Optional
 
 from medtagger import config
 from medtagger.storage import filesystem, cassandra, backend as storage_backend, models
@@ -8,8 +8,8 @@ from medtagger.storage import filesystem, cassandra, backend as storage_backend,
 class Storage:
     """Unified storage mechanism."""
 
-    backend: storage_backend.StorageBackend = None
-    available_backends: Dict[str, type] = {
+    backend: Optional[storage_backend.StorageBackend] = None
+    available_backends: Dict[str, Type[storage_backend.StorageBackend]] = {
         'filesystem': filesystem.FileSystemStorageBackend,
         'cassandra': cassandra.CassandraStorageBackend,
     }
@@ -28,18 +28,20 @@ class Storage:
 
     def is_alive(self) -> bool:
         """Check if Storage backend is still alive or not."""
+        assert self.backend, 'Invalid backend!'
         return self.backend.is_alive()
 
-    def get(self, model: models.StorageModel, **filters: Any) -> models.StorageModel:
+    def get(self, model: Type[models.StorageModelTypeVar], **filters: Any) -> models.StorageModelTypeVar:
         """Fetch entry for a given model using passed filters."""
-        internal_model = self.backend.get(model, **filters)
-        return internal_model.as_unified_model()
+        assert self.backend, 'Invalid backend!'
+        return self.backend.get(model, **filters)
 
-    def create(self, model: models.StorageModel, **data: Any) -> models.StorageModel:
+    def create(self, model: Type[models.StorageModel], **data: Any) -> models.StorageModel:
         """Create new entry for a given model and passed data."""
-        internal_model = self.backend.create(model, **data)
-        return internal_model.as_unified_model()
+        assert self.backend, 'Invalid backend!'
+        return self.backend.create(model, **data)
 
-    def delete(self, model: models.StorageModel, **filters: Any) -> None:
+    def delete(self, model: Type[models.StorageModel], **filters: Any) -> None:
         """Delete an entry for a given model using passed filters."""
+        assert self.backend, 'Invalid backend!'
         self.backend.delete(model, **filters)

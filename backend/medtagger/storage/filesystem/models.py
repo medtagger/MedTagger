@@ -1,7 +1,6 @@
 """Module responsible for handling File System internal representation of each model."""
-import io
 import os
-from typing import Any
+from typing import Any, BinaryIO
 
 from medtagger.storage import exceptions, models
 
@@ -9,7 +8,7 @@ from medtagger.storage import exceptions, models
 class FileSystemModel(models.InternalStorageModel):
     """Internal representation of a File System model."""
 
-    MODEL_DIRECTORY = None
+    MODEL_DIRECTORY = 'UNKNOWN'
 
     @classmethod
     def get(cls, filesystem_directory: str, **filters: Any) -> 'FileSystemModel':
@@ -52,7 +51,7 @@ class FileSystemModel(models.InternalStorageModel):
             raise exceptions.NotFound('Did not found requested entry!')
 
     @classmethod
-    def from_file(cls, opened_file: io.BytesIO) -> 'FileSystemModel':
+    def from_file(cls, opened_file: BinaryIO) -> 'FileSystemModel':
         """Create an instance of a File System Model based on opened binary file.
 
         :param opened_file: file opened in binary mode
@@ -61,11 +60,12 @@ class FileSystemModel(models.InternalStorageModel):
         raise NotImplementedError('Model cannot create its instance based on file!')
 
     @classmethod
-    def to_file(cls, opened_file: io.BytesIO, **data: Any) -> None:
+    def to_file(cls, opened_file: BinaryIO, **data: Any) -> 'FileSystemModel':
         """Save a new instance of a given model into opened file with given data.
 
         :param opened_file: file opened in binary mode
         :param data: key-value arguments representing all data that will be used to create an instance of a given model
+        :return: instance of a given File System Model
         """
         raise NotImplementedError('Model cannot save data to the file!')
 
@@ -91,7 +91,7 @@ class FileSystemOriginalSlice(FileSystemModel):
         self.image = image
 
     @classmethod
-    def from_file(cls, opened_file: io.BytesIO) -> 'FileSystemOriginalSlice':
+    def from_file(cls, opened_file: BinaryIO) -> 'FileSystemOriginalSlice':
         """Create an instance of a Original Slice as an internal representation based on opened binary file.
 
         :param opened_file: file opened in binary mode
@@ -102,13 +102,15 @@ class FileSystemOriginalSlice(FileSystemModel):
         return cls(_id, image)
 
     @classmethod
-    def to_file(cls, opened_file: io.BytesIO, **data: Any) -> None:
+    def to_file(cls, opened_file: BinaryIO, **data: Any) -> 'FileSystemOriginalSlice':
         """Save a new instance of a File System Original Slice model into opened file with given data.
 
         :param opened_file: file opened in binary mode
         :param data: key-value arguments representing all data
+        :return: instance of a given File System Original Slice model
         """
         opened_file.write(data['image'])
+        return cls(_id=data['id'], image=data['image'])
 
     def as_unified_model(self) -> models.OriginalSlice:
         """Convert internal model representation into unified model."""
@@ -126,7 +128,7 @@ class FileSystemProcessedSlice(FileSystemModel):
         self.image = image
 
     @classmethod
-    def from_file(cls, opened_file: io.BytesIO) -> 'FileSystemProcessedSlice':
+    def from_file(cls, opened_file: BinaryIO) -> 'FileSystemProcessedSlice':
         """Create an instance of a Processed Slice as an internal representation based on opened binary file.
 
         :param opened_file: file opened in binary mode
@@ -137,13 +139,15 @@ class FileSystemProcessedSlice(FileSystemModel):
         return cls(_id, image)
 
     @classmethod
-    def to_file(cls, opened_file: io.BytesIO, **data: Any) -> None:
+    def to_file(cls, opened_file: BinaryIO, **data: Any) -> 'FileSystemProcessedSlice':
         """Save a new instance of a File System Processed Slice model into opened file with given data.
 
         :param opened_file: file opened in binary mode
         :param data: key-value arguments representing all data
+        :return: instance of a given File System Processed Slice model
         """
         opened_file.write(data['image'])
+        return cls(_id=data['id'], image=data['image'])
 
     def as_unified_model(self) -> models.ProcessedSlice:
         """Convert internal model representation into unified model."""
@@ -161,7 +165,7 @@ class FileSystemBrushLabelElement(FileSystemModel):
         self.image = image
 
     @classmethod
-    def from_file(cls, opened_file: io.BytesIO) -> 'FileSystemBrushLabelElement':
+    def from_file(cls, opened_file: BinaryIO) -> 'FileSystemBrushLabelElement':
         """Create an instance of a Brush Label Element as an internal representation based on opened binary file.
 
         :param opened_file: file opened in binary mode
@@ -172,13 +176,15 @@ class FileSystemBrushLabelElement(FileSystemModel):
         return cls(_id, image)
 
     @classmethod
-    def to_file(cls, opened_file: io.BytesIO, **data: Any) -> None:
+    def to_file(cls, opened_file: BinaryIO, **data: Any) -> 'FileSystemBrushLabelElement':
         """Save a new instance of a File System Brush Label Element model into opened file with given data.
 
         :param opened_file: file opened in binary mode
         :param data: key-value arguments representing all data
+        :return: instance of a given File System Brush Label Element model
         """
         opened_file.write(data['image'])
+        return cls(_id=data['id'], image=data['image'])
 
     def as_unified_model(self) -> models.BrushLabelElement:
         """Convert internal model representation into unified model."""

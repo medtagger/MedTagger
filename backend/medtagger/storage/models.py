@@ -1,5 +1,9 @@
 """Unified models that can be found in the Storage."""
 import abc
+from typing import TypeVar
+
+
+StorageModelTypeVar = TypeVar('StorageModelTypeVar', bound='StorageModel')
 
 
 class InternalStorageModel(abc.ABC):

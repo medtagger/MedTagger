@@ -1,8 +1,9 @@
 """Module for description of a Cassandra backend for Storage."""
-from typing import Any, Dict
+from typing import Any, Dict, Type
 
 from cassandra.cluster import Cluster, Session, NoHostAvailable  # pylint: disable=no-name-in-module
 from cassandra.cqlengine import connection
+from cassandra.cqlengine.models import Model
 from cassandra.cqlengine.query import DoesNotExist
 from cassandra.io.asyncorereactor import AsyncoreConnection
 from cassandra.io.geventreactor import GeventConnection
@@ -18,7 +19,7 @@ class CassandraStorageBackend(backend.StorageBackend):
 
     MEDTAGGER_KEYSPACE = 'medtagger'
 
-    model_mapping: Dict[unified_models.StorageModel, unified_models.InternalStorageModel] = {
+    model_mapping: Dict[Type[unified_models.StorageModel], Type[Model]] = {
         unified_models.OriginalSlice: cassandra_models.CassandraOriginalSlice,
         unified_models.ProcessedSlice: cassandra_models.CassandraProcessedSlice,
         unified_models.BrushLabelElement: cassandra_models.CassandraBrushLabelElement,
@@ -48,7 +49,8 @@ class CassandraStorageBackend(backend.StorageBackend):
         except NoHostAvailable:
             return False
 
-    def get(self, model: unified_models.StorageModel, **filters: Any) -> unified_models.StorageModel:
+    def get(self, model: Type[unified_models.StorageModelTypeVar], **filters: Any) \
+            -> unified_models.StorageModelTypeVar:
         """Fetch entry for a given model using passed filters."""
         try:
             cassandra_model = self._get_cassandra_model(model)
@@ -56,12 +58,12 @@ class CassandraStorageBackend(backend.StorageBackend):
         except DoesNotExist:
             raise exceptions.NotFound('Did not found requested entry!')
 
-    def create(self, model: unified_models.StorageModel, **data: Any) -> unified_models.StorageModel:
+    def create(self, model: Type[unified_models.StorageModel], **data: Any) -> unified_models.StorageModel:
         """Create new entry for a given model and passed data."""
         cassandra_model = self._get_cassandra_model(model)
-        cassandra_model.create(**data)
+        return cassandra_model.create(**data)
 
-    def delete(self, model: unified_models.StorageModel, **filters: Any) -> None:
+    def delete(self, model: Type[unified_models.StorageModel], **filters: Any) -> None:
         """Delete an entry for a given model using passed filters."""
         try:
             cassandra_model = self._get_cassandra_model(model)
@@ -69,7 +71,7 @@ class CassandraStorageBackend(backend.StorageBackend):
         except DoesNotExist:
             raise exceptions.NotFound('Did not found requested entry!')
 
-    def _get_cassandra_model(self, model: unified_models.StorageModel) -> unified_models.InternalStorageModel:
+    def _get_cassandra_model(self, model: Type[unified_models.StorageModel]) -> Type[Model]:
         """Convert unified Storage model into internal Storage model."""
         cassandra_model = self.model_mapping.get(model)
         if not cassandra_model:
