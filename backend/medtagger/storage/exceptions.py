@@ -3,4 +3,5 @@
 
 class NotFound(Exception):
     """Exception thrown if looking entry does not exist in the Storage."""
-    pass
+
+    pass  # pylint: disable=unnecessary-pass

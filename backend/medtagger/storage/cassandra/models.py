@@ -7,7 +7,7 @@ from medtagger.storage import models
 MEDTAGGER_KEYSPACE = 'medtagger'
 
 
-class CassandraOriginalSlice(Model):
+class CassandraOriginalSlice(Model, models.InternalStorageModel):
     """Model representing original Slice image."""
 
     __table_name__ = 'original_slices'
@@ -17,10 +17,11 @@ class CassandraOriginalSlice(Model):
     image = Blob()
 
     def as_unified_model(self) -> models.OriginalSlice:
-        return models.OriginalSlice(id=self.id, image=self.image)
+        """Convert internal model representation into unified model."""
+        return models.OriginalSlice(_id=self.id, image=self.image)
 
 
-class CassandraProcessedSlice(Model):
+class CassandraProcessedSlice(Model, models.InternalStorageModel):
     """Model representing processed Slice image."""
 
     __table_name__ = 'processed_slices'
@@ -30,10 +31,11 @@ class CassandraProcessedSlice(Model):
     image = Blob()
 
     def as_unified_model(self) -> models.ProcessedSlice:
-        return models.ProcessedSlice(id=self.id, image=self.image)
+        """Convert internal model representation into unified model."""
+        return models.ProcessedSlice(_id=self.id, image=self.image)
 
 
-class CassandraBrushLabelElement(Model):
+class CassandraBrushLabelElement(Model, models.InternalStorageModel):
     """Model representing Label Element made with Brush Tool."""
 
     __table_name__ = 'brush_label_elements'
@@ -43,4 +45,5 @@ class CassandraBrushLabelElement(Model):
     image = Blob()
 
     def as_unified_model(self) -> models.BrushLabelElement:
-        return models.BrushLabelElement(id=self.id, image=self.image)
+        """Convert internal model representation into unified model."""
+        return models.BrushLabelElement(_id=self.id, image=self.image)

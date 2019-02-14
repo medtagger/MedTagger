@@ -40,6 +40,7 @@ def delete_slice(_slice: Slice) -> None:
     Storage().delete(OriginalSlice, id=slice_id)
     Storage().delete(ProcessedSlice, id=slice_id)
 
+
 def get_slice_original_image(slice_id: SliceID) -> bytes:
     """Return original Dicom image as bytes."""
     original_slice = Storage().get(OriginalSlice, id=slice_id)

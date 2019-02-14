@@ -2,46 +2,54 @@
 import abc
 
 
-class StorageModel(abc.ABC):
-    """Model definition that can be used by Storage."""
+class InternalStorageModel(abc.ABC):
+    """Internal representation of a Storage Model."""  # pylint: disable=too-few-public-methods
 
-    pass
+    def as_unified_model(self) -> 'StorageModel':
+        """Convert internal model representation into unified model."""
+        raise NotImplementedError('This model does not implement conversion to Unified Model!')
+
+
+class StorageModel(abc.ABC):
+    """Model definition that can be used by Storage."""  # pylint: disable=too-few-public-methods
+
+    pass  # pylint: disable=unnecessary-pass
 
 
 class OriginalSlice(StorageModel):
-    """Model for Original DICOM Slices."""
+    """Model for Original DICOM Slices."""  # pylint: disable=too-few-public-methods
 
-    def __init__(self, id: str, image: bytes) -> None:
+    def __init__(self, _id: str, image: bytes) -> None:
         """Initialize model.
 
         :param id: GUID that is the same as for Slice object in the SQL DB
         :param image: bytes representing Original DICOM image
         """
-        self.id = id
+        self.id = _id
         self.image = image
 
 
 class ProcessedSlice(StorageModel):
-    """Model for Processed DICOM Slices."""
+    """Model for Processed DICOM Slices."""  # pylint: disable=too-few-public-methods
 
-    def __init__(self, id: str, image: bytes) -> None:
+    def __init__(self, _id: str, image: bytes) -> None:
         """Initialize model.
 
         :param id: GUID that is the same as for Slice object in the SQL DB
         :param image: bytes representing Processed DICOM image
         """
-        self.id = id
+        self.id = _id
         self.image = image
 
 
 class BrushLabelElement(StorageModel):
-    """Model for Brush Label Element's image."""
+    """Model for Brush Label Element's image."""  # pylint: disable=too-few-public-methods
 
-    def __init__(self, id: str, image: bytes) -> None:
+    def __init__(self, _id: str, image: bytes) -> None:
         """Initialize model.
 
         :param id: GUID that is the same as for Slice object in the SQL DB
         :param image: bytes representing Brush label as an image
         """
-        self.id = id
+        self.id = _id
         self.image = image
