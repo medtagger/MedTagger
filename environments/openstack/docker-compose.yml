@@ -73,8 +73,8 @@ services:
           - node.hostname == apphost
     restart: unless-stopped
     build:
-      context: ../../frontend
-      dockerfile: ../../frontend/Dockerfile
+      context: frontend
+      dockerfile: Dockerfile
       args:
         - PRODUCTION=${MEDTAGGER__FRONTEND_PRODUCTION}
         - SUBDIRECTORY=${MEDTAGGER__HOST_ON_SUBDIRECTORY}
@@ -92,10 +92,10 @@ services:
           - node.hostname == apphost
     restart: unless-stopped
     env_file:
-      - ../../backend/docker/backend.env
+      - ./backend/docker/backend.env
     build:
-      context: ../../backend
-      dockerfile: ../../backend/docker/Dockerfile_rest
+      context: backend
+      dockerfile: docker/Dockerfile_rest
       args:
         - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
         - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
@@ -120,10 +120,10 @@ services:
           - node.hostname == apphost
     restart: unless-stopped
     env_file:
-      - ../../backend/docker/backend.env
+      - ./backend/docker/backend.env
     build:
-      context: ../../backend
-      dockerfile: ../../backend/docker/Dockerfile_websocket
+      context: backend
+      dockerfile: docker/Dockerfile_websocket
       args:
         - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
         - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
@@ -148,10 +148,10 @@ services:
           - node.hostname == apphost
     restart: unless-stopped
     env_file:
-      - ../../backend/docker/backend.env
+      - ./backend/docker/backend.env
     build:
-      context: ../../backend
-      dockerfile: ../../backend/docker/Dockerfile_worker
+      context: backend
+      dockerfile: docker/Dockerfile_worker
       args:
         - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
         - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
@@ -172,10 +172,10 @@ services:
         constraints:
           - node.hostname == apphost
     env_file:
-      - ../../backend/docker/backend.env
+      - ./backend/docker/backend.env
     build:
-      context: ../../backend
-      dockerfile: ../../backend/docker/Dockerfile_database_migrations
+      context: backend
+      dockerfile: docker/Dockerfile_database_migrations
       args:
         - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
         - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}

@@ -31,6 +31,7 @@ resource "openstack_compute_instance_v2" "app" {
   security_groups = [
     "default",
     "${openstack_networking_secgroup_v2.app_sec_group.name}",
+    "${openstack_networking_secgroup_v2.docker_swarm_sec_group.name}",
   ]
 
   network {
@@ -58,6 +59,7 @@ resource "openstack_compute_instance_v2" "db" {
   security_groups = [
     "default",
     "${openstack_networking_secgroup_v2.db_sec_group.name}",
+    "${openstack_networking_secgroup_v2.docker_swarm_sec_group.name}",
   ]
 
   network {

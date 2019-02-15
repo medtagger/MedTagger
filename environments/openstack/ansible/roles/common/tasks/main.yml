@@ -1,59 +1,57 @@
 ---
 
-- name: Update and upgrade apt packages
-  apt:
-    upgrade: yes
+#- name: Create MedTagger archive
+#  local_action: archive path="{{ project_local_path }}" dest="{{ tar_archive_file_name }}"
+#  become: yes
+#  become_user: "{{ local_user }}"
+#  run_once: True
 
-- name: Install dependecies
-  apt: name={{item}} update_cache=yes
-  with_items:
-    - apt-transport-https
-    - ca-certificates
-    - curl
-    - gnupg2
-    - software-properties-common
-    - python3-pip
+#- name: Update and upgrade apt packages
+#  apt:
+#    upgrade: yes
+#
+#- name: Install dependecies
+#  apt: name={{item}} update_cache=yes
+#  with_items:
+#    - apt-transport-https
+#    - ca-certificates
+#    - curl
+#    - gnupg2
+#    - software-properties-common
+#    - python3-pip
+#
+#- name: Install Python dependencies
+#  pip:
+#    name:
+#      - docker
+#
+#- name: Add Docker GPG key
+#  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+#
+#- name: Add Docker APT repository
+#  apt_repository:
+#    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+#
+#- name: Install Docker
+#  apt: name=docker-ce
+#
+#- name: Add Docker group
+#  group:
+#    name: docker
+#    state: present
+#
+#- name: Add user to the Docker group
+#  user:
+#    name: "{{ ansible_user }}"
+#    groups: docker
+#    append: yes
 
-- name: Install Python dependencies (docker_service)
-  pip:
-    name:
-      - docker
-      - docker-compose
-      - PyYAML
-
-- name: Add Docker GPG key
-  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
-
-- name: Add Docker APT repository
-  apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
-
-- name: Install Docker
-  apt: name=docker-ce
-
-- name: Add Docker group
-  group:
-    name: docker
-    state: present
-
-- name: Add user to the Docker group
-  user:
-    name: "{{ ansible_user }}"
-    groups: docker
-    append: yes
-
-- name: Install Docker Compose
-  get_url:
-    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_machine }}"
-    dest: "/usr/local/bin/docker-compose"
-    mode: "u=rwx,g=rx,o=rx"
-
-- name: Copy and unarchive MedTagger archive
-  unarchive:
-    src: "{{ project_folder_path }}.tar.xz"
-    dest: "/home/{{ ansible_user }}"
-  become: yes
-  become_user: "{{ ansible_user }}"
+#- name: Copy and unarchive MedTagger archive
+#  unarchive:
+#    src: "{{ tar_archive_file_name }}"
+#    dest: "/home/{{ ansible_user }}"
+#  become: yes
+#  become_user: "{{ ansible_user }}"
 
 - name: Copy db host key
   when: inventory_hostname in groups['app_hosts']
@@ -61,9 +59,13 @@
     src: db-key.pem
     dest: "/home/{{ ansible_user }}/"
     mode: 0600
+    owner: "{{ ansible_user }}"
 
-- name: Start docker-swarm
-  command: docker stack deploy --compose-file docker-compose.yml medtagger
-  args:
-    chdir: "{{ project_remote_path }}"
+#- name: Switch backend.env file
+#  when: inventory_hostname in groups['app_hosts']
+#  command: mv "{{ project_remote_path }}"/environments/openstack/backend.env "{{ project_remote_path }}"/backend/docker/backend.env
+
+#- name: Switch docker-compose.yml file
+#  when: inventory_hostname in groups['app_hosts']
+#  command: cp "{{ project_remote_path }}"/environments/openstack/docker-compose.yml "{{ project_remote_path }}"/docker-compose.yml
 

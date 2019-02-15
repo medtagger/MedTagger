@@ -1,7 +1,46 @@
 ---
 
-- name: Install needed dependencies and configure hosts
-  hosts: all
-  become: true
-  roles:
-    - common
+#- name: Install needed dependencies and configure hosts
+#  hosts: all
+#  become: true
+#  roles:
+#    - common
+
+
+- hosts: app_hosts
+  tasks:
+    - name: Init a new swarm with default parameters
+      docker_swarm:
+        state: present
+
+    - name: Get the node join token
+      command: docker swarm join-token worker -q
+      register: docker_join_token
+
+    - name: Save token
+      set_fact:
+        token: "{{ docker_join_token.stdout }}"
+
+    - name: Get leader address
+      shell: docker node inspect self --pretty | grep Address | awk 'NR==1{print $2}'
+      register: docker_leader_address
+
+    - name: Save manager address
+      set_fact:
+        address: "{{ docker_leader_address.stdout }}"
+
+- hosts: db_hosts
+  tasks:
+    - name: Add node
+      docker_swarm:
+        state: join
+        join_token: "{{ hostvars[groups['app_hosts'][0]]['token'] }}"
+        advertise_addr: "{{ hostvars[groups['app_hosts'][0]]['address'] }}"
+        remote_addrs: ["{{ hostvars[groups['app_hosts'][0]]['address'] }}"]
+
+- hosts: app_hosts
+  tasks:
+    - name: Start docker-swarm
+      command: docker stack deploy --compose-file docker-compose.yml medtagger
+      args:
+        chdir: "{{ project_remote_path }}"

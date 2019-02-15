@@ -109,3 +109,48 @@ resource "openstack_networking_secgroup_rule_v2" "rabbit_sec_group_2" {
   remote_ip_prefix = "0.0.0.0/0"
   security_group_id = "${openstack_networking_secgroup_v2.db_sec_group.id}"
 }
+
+resource "openstack_networking_secgroup_v2" "docker_swarm_sec_group" {
+  name = "docker-swarm"
+  description = "Security group for docker-swarm configuration for MedTagger"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "docker_1" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "tcp"
+  port_range_min = 2377
+  port_range_max = 2377
+  remote_ip_prefix = "0.0.0.0/0"
+  security_group_id = "${openstack_networking_secgroup_v2.docker_swarm_sec_group.id}"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "docker_2" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "tcp"
+  port_range_min = 7946
+  port_range_max = 7946
+  remote_ip_prefix = "0.0.0.0/0"
+  security_group_id = "${openstack_networking_secgroup_v2.docker_swarm_sec_group.id}"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "docker_3" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "udp"
+  port_range_min = 7946
+  port_range_max = 7946
+  remote_ip_prefix = "0.0.0.0/0"
+  security_group_id = "${openstack_networking_secgroup_v2.docker_swarm_sec_group.id}"
+}
+
+resource "openstack_networking_secgroup_rule_v2" "docker_4" {
+  direction = "ingress"
+  ethertype = "IPv4"
+  protocol = "udp"
+  port_range_min = 4789
+  port_range_max = 4789
+  remote_ip_prefix = "0.0.0.0/0"
+  security_group_id = "${openstack_networking_secgroup_v2.docker_swarm_sec_group.id}"
+}

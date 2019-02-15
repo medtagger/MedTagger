@@ -1,6 +1,7 @@
 ---
 
-docker_compose_version: "1.21.2"
+local_user: karolina
 
-project_folder_path: "/home/karolina/MedTagger"
+project_local_path: "/home/karolina/MedTagger"
 project_remote_path: "/home/{{ ansible_user }}/MedTagger"
+tar_archive_file_name: "MedTagger.tar.xz"
