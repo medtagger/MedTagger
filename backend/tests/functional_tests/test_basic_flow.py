@@ -11,7 +11,7 @@ from medtagger.repositories import (
     tasks as TasksRepository,
 )
 
-from tests.functional_tests import get_api_client, get_web_socket_client, get_headers, get_storage
+from tests.functional_tests import get_api_client, get_web_socket_client, get_headers, init_storage
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
@@ -23,7 +23,7 @@ def test_basic_flow(mocker: Any, prepare_environment: Any, synchronous_celery: A
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')
     user_token = get_token_for_logged_in_user('admin')
-    _ = get_storage(mocker, storage_backend_configuration)  # Initialize Storage with mock
+    init_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -152,7 +152,7 @@ def test_basic_flow_with_predefined_label(mocker: Any, prepare_environment: Any,
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')
     user_token = get_token_for_logged_in_user('admin')
-    _ = get_storage(mocker, storage_backend_configuration)
+    init_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')

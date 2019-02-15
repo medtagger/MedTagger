@@ -15,7 +15,7 @@ from medtagger.repositories import (
 )
 from medtagger.types import LabelingTime
 
-from tests.functional_tests import get_storage
+from tests.functional_tests import init_storage
 
 
 def test_get_predefined_label_for_scan_in_task__no_predefined_label(prepare_environment: Any) -> None:
@@ -96,7 +96,7 @@ def test_get_predefined_label_for_scan_in_task__predefined_label_for_given_task(
 def test_get_predefined_brush_label_elements(mocker: Any, prepare_environment: Any,
                                              storage_backend_configuration: str) -> None:
     """Test for fetching Predefined Brush Label Elements."""
-    _ = get_storage(mocker, storage_backend_configuration)
+    init_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     dataset = DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')

@@ -5,8 +5,8 @@ from gevent import monkey
 monkey.patch_all()
 
 # Put all MedTagger imports **after** gevent monkey patching
-from medtagger import config  # pylint: disable=wrong-import-position
-from medtagger.storage import Storage  # pylint: disable=wrong-import-position
+from medtagger import config  # noqa  # pylint: disable=wrong-import-position
+from medtagger.storage import Storage  # noqa  # pylint: disable=wrong-import-position
 
 
 def get_api_client() -> Any:
@@ -30,7 +30,7 @@ def get_storage(mocker: Any, storage_backend_configuration: str) -> Storage:
         """Wrap `get` method for Application Configuration and follow up to original implementation if needed."""
         if namespace == 'storage' and entry == 'backend':
             return storage_backend_configuration
-        return get_method(namespace, entry, fallback=fallback)
+        return get_method(namespace, entry, fallback)
 
     # Mock configuration by wrapping `get` method with above function and return Storage object at the end
     configuration = config.AppConfiguration()
@@ -38,6 +38,9 @@ def get_storage(mocker: Any, storage_backend_configuration: str) -> Storage:
                                                storage_backend_configuration, configuration.get)
     mocker.patch.object(config.AppConfiguration, 'get', wraps=mocked_storage_backend)
     return Storage()
+
+
+init_storage = get_storage  # An alias that will be more readable if someone would like only to initialize mock
 
 
 def get_headers(**kwargs: Any) -> Mapping:

@@ -14,7 +14,7 @@ from medtagger.repositories import (
     datasets as DatasetsRepository,
 )
 
-from tests.functional_tests import get_api_client, get_headers, get_storage
+from tests.functional_tests import get_api_client, get_headers, init_storage
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
@@ -25,7 +25,7 @@ def test_scan_upload_and_conversion(mocker: Any, prepare_environment: Any, synch
     """Test application for Scan upload and conversion."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
-    _ = get_storage(mocker, storage_backend_configuration)
+    init_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -81,7 +81,7 @@ def test_scan_upload_with_retrying(mocker: Any, fixture_problems_with_storage: A
     """Test application for Scan upload with retrying."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
-    _ = get_storage(mocker, storage_backend_configuration)
+    init_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')

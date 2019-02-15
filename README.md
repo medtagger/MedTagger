@@ -26,7 +26,7 @@ Documentation for the MedTagger can be found [here](/docs).
  - [Flask](http://flask.pocoo.org/) with [Flask-RESTPlus](http://flask-restplus.readthedocs.io/) as a REST API framework,
  - [Celery](http://www.celeryproject.org/) workers using [RabbitMQ](https://www.rabbitmq.com/) for communication,
  - [PostgreSQL](https://www.postgresql.org/) as a storage for metadata,
- - [Cassandra](http://cassandra.apache.org/) as a storage for images,
+ - [Cassandra](http://cassandra.apache.org/) or regular File System as a storage for images,
  - [Docker](http://docker.com/) containers for production setup,
  - [Traefik](https://traefik.io/) as a reverse proxy and load balancer for Docker containers,
  - [Vagrant](https://www.vagrantup.com) for development environment,

@@ -17,7 +17,7 @@ from medtagger.types import ScanID, SliceID
 from medtagger.storage import exceptions
 from medtagger.storage.models import BrushLabelElement, OriginalSlice, ProcessedSlice
 
-from tests.functional_tests import get_api_client, get_web_socket_client, get_headers, get_storage
+from tests.functional_tests import get_api_client, get_web_socket_client, get_headers, init_storage, get_storage
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
@@ -27,7 +27,7 @@ def test_delete_scan_without_slices(mocker: Any, prepare_environment: Any, synch
     """Test deleting scan without any slices."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
-    _ = get_storage(mocker, storage_backend_configuration)
+    init_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -69,7 +69,7 @@ def test_delete_scan_with_slices(mocker: Any, prepare_environment: Any, synchron
     """Test deleting scan with at least 1 slice."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
-    _ = get_storage(mocker, storage_backend_configuration)
+    init_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
