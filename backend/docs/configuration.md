@@ -24,7 +24,7 @@ Current configuration variables are:
 | `MEDTAGGER__DB_DATABASE_URI`            | postgresql://medtagger_user:MedTa99er!@localhost/medtagger |
 | `MEDTAGGER__DB_CONNECTION_POOL_SIZE`    | 25                                                         |
 | `MEDTAGGER__STORAGE_BACKEND`            | filesystem                                                 |
-| `MEDTAGGER__FILESYSTEM_DIRECTORY`       | /tmp/medtagger                                             |
+| `MEDTAGGER__FILESYSTEM_DIRECTORY`       | /var/medtagger/storage                                     |
 | `MEDTAGGER__CASSANDRA_ADDRESSES`        | localhost                                                  |
 | `MEDTAGGER__CASSANDRA_PORT`             | 9042                                                       |
 | `MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT`  | 30                                                         |
