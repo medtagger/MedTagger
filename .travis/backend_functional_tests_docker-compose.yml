@@ -21,7 +21,7 @@ services:
     image: medtagger_backend/functional_tests
     env_file:
       - ../backend/docker/backend.env
-    env:
+    environment:
       # Cassandra is needed in order to wait for its dependency
       - MEDTAGGER__STORAGE_BACKEND=cassandra
     build:
