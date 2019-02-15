@@ -69,5 +69,4 @@ export function goToLabeling(task) {
     cy.get('[data-cy=next3]').click();
     cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
     cy.get('[data-cy=next4]').click();
-    cy.get('[data-cy=marker-loading-spinner]', {timeout: 10000}).should('not.be.visible')  // Loading Scan may take a while
 }

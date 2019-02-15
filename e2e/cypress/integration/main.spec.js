@@ -35,6 +35,7 @@ describe('Basic flow', () => {
         goToLabeling('Kidneys segmentation');
         matSelect('[data-cy=tags]', 'Left Kidney');
         cy.get('[data-cy=rectangle-tool]').click();
+        cy.get('[data-cy=marker-loading-spinner]', {timeout: 10000}).should('not.be.visible')  // Loading Scan may take a while
         cy.get('canvas').trigger('mousedown', 200, 200);
         cy.get('canvas').trigger('mousemove', 300, 300);
         cy.get('canvas').trigger('mouseup');
@@ -48,6 +49,7 @@ describe('Basic flow', () => {
         goToLabeling('Find middle of the Spine');
         matSelect('[data-cy=tags]', 'Middle of the Spine');
         cy.get('[data-cy=point-tool]').click();
+        cy.get('[data-cy=marker-loading-spinner]', {timeout: 10000}).should('not.be.visible')  // Loading Scan may take a while
         cy.get('canvas').click(100, 100);
         cy.get('canvas').click(200, 100);
         cy.get('canvas').click(200, 200);
@@ -68,6 +70,7 @@ describe('Basic flow', () => {
         cy.get('[data-cy=chain-tool]').click();
  
         // Enter first Chain element
+        cy.get('[data-cy=marker-loading-spinner]', {timeout: 10000}).should('not.be.visible')  // Loading Scan may take a while
         cy.get('canvas').click(100, 100);
         cy.get('canvas').click(200, 100);
         cy.get('canvas').click(200, 200);
@@ -103,6 +106,7 @@ describe('Basic flow', () => {
         goToLabeling('Find narrowings in Veins');
         matSelect('[data-cy=tags]', 'Narrowing (region)');
         cy.get('[data-cy=brush-tool]').click();
+        cy.get('[data-cy=marker-loading-spinner]', {timeout: 10000}).should('not.be.visible')  // Loading Scan may take a while
         cy.get('canvas').trigger('mousedown', 200, 200);
         cy.get('canvas').trigger('mousemove', 220, 200);
         cy.get('canvas').trigger('mousemove', 240, 200);
