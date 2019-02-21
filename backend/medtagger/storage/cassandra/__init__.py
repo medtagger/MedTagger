@@ -56,7 +56,7 @@ class CassandraStorageBackend(backend.StorageBackend):
             cassandra_model = self._get_cassandra_model(model)
             return cassandra_model.get(**filters).as_unified_model()
         except DoesNotExist:
-            raise exceptions.NotFound('Did not found requested entry!')
+            raise exceptions.NotFound('Not found requested entry!')
 
     def create(self, model: Type[unified_models.StorageModel], **data: Any) -> unified_models.StorageModel:
         """Create new entry for a given model and passed data."""
@@ -69,7 +69,7 @@ class CassandraStorageBackend(backend.StorageBackend):
             cassandra_model = self._get_cassandra_model(model)
             cassandra_model.filter(**filters).delete()
         except DoesNotExist:
-            raise exceptions.NotFound('Did not found requested entry!')
+            raise exceptions.NotFound('Not found requested entry!')
 
     def _get_cassandra_model(self, model: Type[unified_models.StorageModel]) -> Type[Model]:
         """Convert unified Storage model into internal Storage model."""

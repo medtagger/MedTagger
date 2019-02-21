@@ -22,7 +22,7 @@ class FileSystemModel(models.InternalStorageModel):
             with open(cls._get_file_location(filesystem_directory, filters['id']), 'rb') as opened_file:
                 return cls.from_file(opened_file)
         except FileNotFoundError:
-            raise exceptions.NotFound('Did not found requested entry!')
+            raise exceptions.NotFound('Not found requested entry!')
 
     @classmethod
     def create(cls, filesystem_directory: str, **data: Any) -> 'FileSystemModel':
@@ -48,7 +48,7 @@ class FileSystemModel(models.InternalStorageModel):
         try:
             os.remove(cls._get_file_location(filesystem_directory, filters['id']))
         except FileNotFoundError:
-            raise exceptions.NotFound('Did not found requested entry!')
+            raise exceptions.NotFound('Not found requested entry!')
 
     @classmethod
     def from_file(cls, opened_file: BinaryIO) -> 'FileSystemModel':
