@@ -138,13 +138,3 @@ workers.pid
 *.log
 *.swp
 .gitignore.bak
-
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.backup
-
-# Ansible
-inventory
-*.pem
-*.retry
