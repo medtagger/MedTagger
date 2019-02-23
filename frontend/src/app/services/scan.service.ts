@@ -52,7 +52,6 @@ export class ScanService {
     retries = 5;
 
     constructor(private http: HttpClient, private socket: MedTaggerWebSocket) {
-        console.log('CREATED SOCKET!', this.websocket, socket);
         this.websocket = socket;
     }
 
