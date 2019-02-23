@@ -12,7 +12,7 @@ from medtagger.api.exceptions import UnauthorizedException, InvalidArgumentsExce
 
 logger = logging.getLogger(__name__)
 
-# Definition of the API
+# Definition of the REST API
 authorizations = {
     'token': {
         'type': 'apiKey',
@@ -23,7 +23,13 @@ authorizations = {
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 api = Api(blueprint, version='0.1', title='Backend API', description='Documentation for Backend API',
           default='core', default_label='Core methods', authorizations=authorizations, validate=True)
-web_socket = SocketIO(logger=True, engineio_logger=True)
+
+# Definition of the WebSocket API
+configuration = AppConfiguration()
+websocket_ping_timeout = configuration.getint('api', 'websocket_ping_timeout', fallback=5)
+websocket_ping_interval = configuration.getint('api', 'websocket_ping_interval', fallback=3)
+web_socket = SocketIO(logger=True, engineio_logger=True, ping_timeout=websocket_ping_timeout,
+                      ping_interval=websocket_ping_interval)
 
 
 @api.errorhandler

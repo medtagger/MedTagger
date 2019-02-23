@@ -46,6 +46,8 @@ services:
       POSTGRES_DB: medtagger
       POSTGRES_USER: medtagger_user
       POSTGRES_PASSWORD: MedTa99er!
+    # Increase maximum number of connections to give more space for application
+    command: postgres -c 'max_connections=500'
     labels:
       - "traefik.enable=false"
 
