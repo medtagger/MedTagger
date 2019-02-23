@@ -28,9 +28,9 @@ variable user {
 }
 
 variable app_key_name {
-  default = "app-key"
+  default = "app-key-dev"
 }
 
 variable db_key_name {
-  default = "db-key"
+  default = "db-key-dev"
 }

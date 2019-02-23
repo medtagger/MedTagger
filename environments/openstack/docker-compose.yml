@@ -8,7 +8,10 @@ services:
         constraints:
           - node.hostname == apphost
     restart: unless-stopped
-    command: --configFile=/var/traefik/traefik.toml
+    command:
+      - "--configFile=/var/traefik/traefik.toml"
+      - "--docker"
+      - "--docker.swarmMode"
     ports:
       - 80:80
       - 52000:8080
@@ -171,6 +174,8 @@ services:
       placement:
         constraints:
           - node.hostname == apphost
+      restart_policy:
+        condition: on-failure
     env_file:
       - ./backend/docker/backend.env
     build:

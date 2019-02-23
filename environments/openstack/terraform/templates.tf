@@ -22,3 +22,24 @@ resource "null_resource" "update_inventory" {
     command = "echo '${data.template_file.inventory.rendered}' > ../ansible/inventory"
   }
 }
+
+## Backend.env ##
+
+data "template_file" "env" {
+  template = "${file("backend.env.tpl")}"
+
+  vars {
+    db_host_ip = "${openstack_compute_instance_v2.db.access_ip_v4}"
+  }
+}
+
+resource "null_resource" "update_env_file" {
+
+  triggers {
+    template = "${data.template_file.env.rendered}"
+  }
+
+  provisioner "local-exec" {
+    command = "echo '${data.template_file.env.rendered}' > ../backend.env"
+  }
+}

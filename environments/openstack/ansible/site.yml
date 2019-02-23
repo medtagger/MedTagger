@@ -6,15 +6,18 @@
 #  roles:
 #    - common
 
-
 - hosts: app_hosts
   tasks:
+    - name: Build services
+      shell: docker-compose build
+      args:
+        chdir: "{{ project_remote_path }}"
+
     - name: Init a new swarm with default parameters
-      docker_swarm:
-        state: present
+      shell: docker swarm init
 
     - name: Get the node join token
-      command: docker swarm join-token worker -q
+      shell: docker swarm join-token worker -q
       register: docker_join_token
 
     - name: Save token
@@ -32,15 +35,11 @@
 - hosts: db_hosts
   tasks:
     - name: Add node
-      docker_swarm:
-        state: join
-        join_token: "{{ hostvars[groups['app_hosts'][0]]['token'] }}"
-        advertise_addr: "{{ hostvars[groups['app_hosts'][0]]['address'] }}"
-        remote_addrs: ["{{ hostvars[groups['app_hosts'][0]]['address'] }}"]
+      shell: docker swarm join --token "{{ hostvars[groups['app_hosts'][0]]['token'] }}" "{{ hostvars[groups['app_hosts'][0]]['address'] }}:2377"
 
 - hosts: app_hosts
   tasks:
     - name: Start docker-swarm
-      command: docker stack deploy --compose-file docker-compose.yml medtagger
+      shell: docker stack deploy --compose-file docker-compose.yml medtagger
       args:
         chdir: "{{ project_remote_path }}"
