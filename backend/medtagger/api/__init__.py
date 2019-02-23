@@ -7,6 +7,7 @@ from flask import Blueprint
 from flask_restplus import Api
 from flask_socketio import SocketIO, emit
 
+from medtagger import config
 from medtagger.api.exceptions import UnauthorizedException, InvalidArgumentsException, NotFoundException, \
     AccessForbiddenException
 
@@ -25,7 +26,7 @@ api = Api(blueprint, version='0.1', title='Backend API', description='Documentat
           default='core', default_label='Core methods', authorizations=authorizations, validate=True)
 
 # Definition of the WebSocket API
-configuration = AppConfiguration()
+configuration = config.AppConfiguration()
 websocket_ping_timeout = configuration.getint('api', 'websocket_ping_timeout', fallback=5)
 websocket_ping_interval = configuration.getint('api', 'websocket_ping_interval', fallback=3)
 web_socket = SocketIO(logger=True, engineio_logger=True, ping_timeout=websocket_ping_timeout,

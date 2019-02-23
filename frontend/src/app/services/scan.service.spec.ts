@@ -9,7 +9,7 @@ import {ScanMetadata} from '../model/ScanMetadata';
 import {MarkerSlice} from '../model/MarkerSlice';
 import {LabelTag} from '../model/labels/LabelTag';
 import {of} from 'rxjs';
-import {WrappedSocket} from 'ngx-socket-io/dist/src/socket-io.service';
+import {WrappedSocket} from 'ngx-socket-io/src/socket-io.service';
 import {SelectedScan} from '../components/upload-scans-selector/upload-scans-selector.component';
 import {SelectionMock} from '../mocks/selection.mock';
 import {API_URL} from '../utils/ApiUrl';
