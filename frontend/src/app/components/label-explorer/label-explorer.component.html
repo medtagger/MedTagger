@@ -18,34 +18,34 @@
                     There are no labels for this tag.
                 </h5>
                 <mat-list-item
-                    *ngFor="let label of getSelectionsForTag(tag)"
-                    (mouseenter)="label.hovered=true"
-                    (mouseleave)="label.hovered=false"
+                    *ngFor="let selection of getSelectionsForTag(tag)"
+                    (mouseenter)="selection.hovered=true"
+                    (mouseleave)="selection.hovered=false"
                     class="label-item__box">
                     <mat-icon mat-list-icon
                         class="label-item__tool-icon"
-                        [svgIcon]="getToolIconName(label.toolName)">
+                        [svgIcon]="getToolIconName(selection.toolName)">
                     </mat-icon>
                     <p class="label-item__header" matLine>
-                        Slice #{{ label.sliceIndex }}
+                        Slice #{{ selection.sliceIndex }}
                     </p>
                     <p class="label-item__subheader" matLine>
-                        Selection #{{ label.getId() }}
+                        Selection #{{ selection.getId() }}
                     </p>
                     <button mat-icon-button
-                        (click)="removeSelection(label)"
+                        (click)="removeSelection(selection)"
                         class="hidden-btn">
                         <mat-icon class="small-size">delete</mat-icon>
                     </button>
                     <button mat-icon-button
-                        [style.visibility]="label.pinned ? 'visible' : undefined"
-                        (click)="toggleSelectionPinning(label)"
+                        [style.visibility]="selection.pinned ? 'visible' : undefined"
+                        (click)="toggleSelectionPinning(selection)"
                         class="hidden-btn">
-                        <mat-icon class="small-svg-size" svgIcon="{{label.pinned ? 'pin' : 'pin-off'}}"></mat-icon>
+                        <mat-icon class="small-svg-size" svgIcon="{{selection.pinned ? 'pin' : 'pin-off'}}"></mat-icon>
                     </button>
                     <button mat-icon-button
-                        (click)="toggleSelectionVisibility(label)">
-                        <mat-icon class="small-size">{{label.hidden ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        (click)="toggleSelectionVisibility(selection)">
+                        <mat-icon class="small-size">{{selection.hidden ? 'visibility_off' : 'visibility'}}</mat-icon>
                     </button>
                 </mat-list-item>
             </ng-container>
