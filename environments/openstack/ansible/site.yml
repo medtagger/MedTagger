@@ -1,10 +1,10 @@
 ---
 
-#- name: Install needed dependencies and configure hosts
-#  hosts: all
-#  become: true
-#  roles:
-#    - common
+- name: Install needed dependencies and configure hosts
+  hosts: all
+  become: true
+  roles:
+    - common
 
 - hosts: app_hosts
   tasks:
