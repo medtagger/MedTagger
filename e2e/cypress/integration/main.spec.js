@@ -80,8 +80,7 @@ describe('Basic flow', () => {
         cy.get('canvas').moveAndClick(100, 100);
         cy.get('canvas').moveAndClick(200, 100);
         cy.get('canvas').moveAndClick(200, 200);
-        // NOTE: cannot simulate right click to stop drawing chain
-        //       but sending label will have the same effect
+        // NOTE: cannot simulate right click to stop drawing chain but sending label will have the same effect
 
         // Send and check Label in backend
         cy.get('[data-cy=send-label]').click();
