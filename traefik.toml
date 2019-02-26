@@ -1,10 +1,10 @@
+defaultEntryPoints = ["http", "https", "ws", "wss"]
+
 [traefikLog]
 filePath = "/var/traefik/traefik.log"
 
 [accessLog]
 logLevel = "INFO"
-
-defaultEntryPoints = ["http", "https", "ws", "wss"]
 
 [api]
 dashboard = true
@@ -20,3 +20,5 @@ watch = true
   [entryPoints.http]
   address = ":80"
 
+  [entryPoints.https]
+  address = ":443"

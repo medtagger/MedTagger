@@ -5,7 +5,7 @@ const MEDTAGGER_INSTANCE_REST_URL = 'http://localhost:51000';
 const MEDTAGGER_INSTANCE_WEBSOCKET_URL = 'http://localhost:51001';
 const MEDTAGGER_USER = 'admin@medtagger.com';
 const MEDTAGGER_PASSWORD = 'medtagger1';
-const DATASET = 'LUNGS';
+const TASK = 'FIND_MIDDLE_OF_THE_SPINE';
 const SCAN_BEGIN = 0;
 const SCAN_COUNT = 10;
 const STICKY_SESSION = 0;  // 0 - false, 1 - true
@@ -20,7 +20,7 @@ for (var client = 1; client <= NUMBER_OF_CLIENTS; client++) {
         MEDTAGGER_INSTANCE_WEBSOCKET_URL,
         MEDTAGGER_USER,
         MEDTAGGER_PASSWORD,
-        DATASET,
+        TASK,
         SCAN_BEGIN,
         SCAN_COUNT,
         STICKY_SESSION
