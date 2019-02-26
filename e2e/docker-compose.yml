@@ -35,6 +35,8 @@ services:
       POSTGRES_PASSWORD: MedTa99er!
     ports:
       - 52002:5432
+    # Increase maximum number of connections to give more space for application
+    command: postgres -c 'max_connections=500'
     labels:
       - "traefik.enable=false"
 
@@ -97,6 +99,8 @@ services:
       - ${PWD}/e2e/.medtagger.yml:/medtagger_backend/.medtagger.yml
     labels:
       - "traefik.backend=medtagger_backend_websocket"
+      - "traefik.backend.maxconn.amount=100"
+      - "traefik.backend.maxconn.extractorfunc=client.ip"
       - "traefik.backend.loadbalancer.stickiness=true"
       - "traefik.backend.loadbalancer.stickiness.cookieName=MEDTAGER_WEBSOCKET_NODE"
       - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}/socket.io; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) $$1"
