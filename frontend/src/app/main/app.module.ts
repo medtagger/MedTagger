@@ -2,7 +2,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
-import {SocketIoModule} from 'ng-socket-io';
+import {SocketIoModule} from 'ngx-socket-io';
 
 import {AppComponent} from './app.component';
 import {LoginPageComponent} from '../pages/login-page/login-page.component';
