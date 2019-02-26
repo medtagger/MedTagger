@@ -14,21 +14,23 @@ MEDTAGGER__[NAMESPACE]_[ENTRY-NAME]
 
 Current configuration variables are:
 
-| Environment variable name               | Default value                                              |
-| --------------------------------------- | ---------------------------------------------------------- |
-| `MEDTAGGER__API_HOST`                   | 0.0.0.0                                                    |
-| `MEDTAGGER__API_REST_PORT`              | 51000                                                      |
-| `MEDTAGGER__API_WEBSOCKET_PORT`         | 51001                                                      |
-| `MEDTAGGER__API_DEBUG`                  | 1                                                          |
-| `MEDTAGGER__API_SECRET_KEY`             | SECRET_KEY                                                 |
-| `MEDTAGGER__DB_DATABASE_URI`            | postgresql://medtagger_user:MedTa99er!@localhost/medtagger |
-| `MEDTAGGER__DB_CONNECTION_POOL_SIZE`    | 25                                                         |
-| `MEDTAGGER__STORAGE_BACKEND`            | filesystem                                                 |
-| `MEDTAGGER__FILESYSTEM_DIRECTORY`       | /var/medtagger/storage                                     |
-| `MEDTAGGER__CASSANDRA_ADDRESSES`        | localhost                                                  |
-| `MEDTAGGER__CASSANDRA_PORT`             | 9042                                                       |
-| `MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT`  | 30                                                         |
-| `MEDTAGGER__CELERY_BROKER`              | pyamqp://guest:guest@localhost//                           |
+| Environment variable name                | Default value                                              |
+| ---------------------------------------- | ---------------------------------------------------------- |
+| `MEDTAGGER__API_HOST`                    | 0.0.0.0                                                    |
+| `MEDTAGGER__API_REST_PORT`               | 51000                                                      |
+| `MEDTAGGER__API_WEBSOCKET_PORT`          | 51001                                                      |
+| `MEDTAGGER__API_WEBSOCKET_PING_TIMEOUT`  | 5                                                          |
+| `MEDTAGGER__API_WEBSOCKET_PING_INTERVAL` | 3                                                          |
+| `MEDTAGGER__API_DEBUG`                   | 1                                                          |
+| `MEDTAGGER__API_SECRET_KEY`              | SECRET_KEY                                                 |
+| `MEDTAGGER__DB_DATABASE_URI`             | postgresql://medtagger_user:MedTa99er!@localhost/medtagger |
+| `MEDTAGGER__DB_CONNECTION_POOL_SIZE`     | 25                                                         |
+| `MEDTAGGER__STORAGE_BACKEND`             | filesystem                                                  |
+| `MEDTAGGER__FILESYSTEM_DIRECTORY`        | /var/medtagger/storage                                      |
+| `MEDTAGGER__CASSANDRA_ADDRESSES`         | localhost                                                  |
+| `MEDTAGGER__CASSANDRA_PORT`              | 9042                                                       |
+| `MEDTAGGER__CASSANDRA_DEFAULT_TIMEOUT`   | 30                                                         |
+| `MEDTAGGER__CELERY_BROKER`               | pyamqp://guest:guest@localhost//                           |
 
 Default values are applied by `scripts/dev__configuration.sh` script that runs inside of
  `devenv.sh` script.

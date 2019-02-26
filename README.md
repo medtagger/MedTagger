@@ -14,9 +14,9 @@ Contact with us directly in case you want to use our work :)
 
 Documentation for the MedTagger can be found [here](/docs).
 
-[![Build Status](https://travis-ci.org/jpowie01/MedTagger.svg?branch=master)](https://travis-ci.org/jpowie01/MedTagger)
+[![Build Status](https://travis-ci.org/medtagger/MedTagger.svg?branch=master)](https://travis-ci.org/medtagger/MedTagger)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/jpowie01/MedTagger.svg?columns=Backlog,Sprint,In%20Progress,Under%20Review%20%EF%B8%8F,Done)](https://waffle.io/jpowie01/MedTagger)
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/medtagger/MedTagger.svg?columns=Backlog,Sprint,In%20Progress,Under%20Review%20%EF%B8%8F,Done)](https://waffle.io/medtagger/MedTagger)
 
 ## Our technology stack
 

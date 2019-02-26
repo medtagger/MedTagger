@@ -19,7 +19,7 @@ Here is a list of things that you've got to install:
 Once you've installed your VirtualBox with Vagrant, it's time to clone this repository:
 
 ```bash
-$ git clone git@github.com:jpowie01/MedTagger.git
+$ git clone git@github.com:medtagger/MedTagger.git
 ```
 
 You can create virtual machine directly from command line or using Vagrant plugin inside of PyCharm:
