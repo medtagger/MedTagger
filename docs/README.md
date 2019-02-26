@@ -27,10 +27,3 @@ You can also setup native development environments for each of the projects! For
 MedTagger can be setup with Docker-Compose easily. More about it can be found
  [here](/docs/setup_with_docker_compose.md).
 
-## Monitoring
-
-Your MedTagger instance can be monitored with [NetData](https://docs.netdata.cloud).
- Default configuration was defined in the Docker-Compose file, so it will be run
- together with all other Docker containers. If needed, NetData can be used to collect
- data from multiple nodes in your cluster, which required additional configuration
- as described [here](https://docs.netdata.cloud/streaming/#monitoring-ephemeral-nodes).
