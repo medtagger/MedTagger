@@ -164,12 +164,19 @@ export class ScanService {
 
     requestSlices(scanId: string, taskKey: string, begin: number, count: number, reversed: boolean = false): void {
         console.log('ScanService | requestSlices | begin:', begin);
-        this.websocket.emit('request_slices', {
+        const request = {
             scan_id: scanId,
             task_key: taskKey,
             begin: begin,
             count: count,
             reversed: reversed,
+        };
+        // Send request immediately
+        this.websocket.emit('request_slices', request);
+
+        // And request it again in case of WebSocket failure
+        this.websocket.on('reconnect', () => {
+            this.websocket.emit('request_slices', request);
         });
     }
 
