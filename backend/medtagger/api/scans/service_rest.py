@@ -34,7 +34,11 @@ class Scans(Resource):
         args = serializers.args__scans.parse_args(request)
         dataset_key = args.dataset_key
         page = args.page
+        if page < 1:
+            raise InvalidArgumentsException('Page cannot be smaller than 1.')
         per_page = args.per_page
+        if per_page > 100:
+            raise InvalidArgumentsException('Cannot fetch more than 100 entries at once.')
 
         scans, total = business.get_paginated_scans(dataset_key=dataset_key, page=page, per_page=per_page)
         return {
