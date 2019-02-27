@@ -277,6 +277,17 @@ def add_new_slice(scan_id: ScanID, image: bytes) -> Slice:
     return _slice
 
 
+def get_paginated_scans(dataset_key: str = None, page: int = 1, per_page: int = 25) -> Tuple[List[Scan], int]:
+    """Get paginated Scans for given filters.
+
+    :param dataset_key: (optional) key for Dataset that should be used as a filter
+    :param page: (optional) page number which should be fetched
+    :param per_page: (optional) number of entries per page
+    :return: tuple of list of Scans and total number of entries available
+    """
+    return ScansRepository.get_paginated_scans(dataset_key=dataset_key, page=page, per_page=per_page)
+
+
 def get_scan(scan_id: ScanID) -> Scan:
     """Return Scan for given scan_id.
 

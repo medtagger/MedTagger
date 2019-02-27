@@ -24,6 +24,31 @@ class Scans(Resource):
     @staticmethod
     @login_required
     @role_required('doctor', 'admin')
+    @scans_ns.expect(serializers.args__scans)
+    @scans_ns.marshal_with(serializers.out__scans_paginated)
+    @scans_ns.doc(security='token')
+    @scans_ns.doc(description='Return list of available scans.')
+    @scans_ns.doc(responses={200: 'Success'})
+    def get() -> Any:
+        """Get list of all Scans."""
+        args = serializers.args__scans.parse_args(request)
+        dataset_key = args.dataset_key
+        page = args.page
+        per_page = args.per_page
+
+        scans, total = business.get_paginated_scans(dataset_key=dataset_key, page=page, per_page=per_page)
+        return {
+            'scans': scans,
+            'pagination': {
+                'total': total,
+                'page': page,
+                'per_page': per_page,
+            },
+        }
+
+    @staticmethod
+    @login_required
+    @role_required('doctor', 'admin')
     @scans_ns.expect(serializers.in__new_scan)
     @scans_ns.marshal_with(serializers.out__new_scan)
     @scans_ns.doc(security='token')
