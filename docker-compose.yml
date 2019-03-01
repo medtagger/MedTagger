@@ -52,7 +52,7 @@ services:
       - "traefik.enable=false"
 
   medtagger_frontend:
-    image: medtagger_frontend/web
+    image: medtagger/frontend_ui:${MEDTAGGER_VERSION}
     restart: unless-stopped
     build:
       context: frontend
@@ -67,7 +67,7 @@ services:
       - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) $$1"
 
   medtagger_backend_rest:
-    image: medtagger_backend/rest
+    image: medtagger/backend_rest:${MEDTAGGER_VERSION}
     restart: unless-stopped
     env_file:
       - ./backend/docker/backend.env
@@ -91,7 +91,7 @@ services:
       - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}/api/v1/,${MEDTAGGER__HOST_ON_SUBDIRECTORY}/swaggerui/; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) $$1"
 
   medtagger_backend_websocket:
-    image: medtagger_backend/websocket
+    image: medtagger/backend_websocket:${MEDTAGGER_VERSION}
     restart: unless-stopped
     env_file:
       - ./backend/docker/backend.env
@@ -115,7 +115,7 @@ services:
       - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}/socket.io; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) $$1"
 
   medtagger_backend_worker:
-    image: medtagger_backend/worker
+    image: medtagger/backend_worker:${MEDTAGGER_VERSION}
     restart: unless-stopped
     env_file:
       - ./backend/docker/backend.env
@@ -136,7 +136,7 @@ services:
       - "traefik.enable=false"
 
   medtagger_backend_database_migrations:
-    image: medtagger_backend/database_migrations
+    image: medtagger/backend_database_migrations:${MEDTAGGER_VERSION}
     env_file:
       - ./backend/docker/backend.env
     build:
