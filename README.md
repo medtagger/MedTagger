@@ -59,8 +59,8 @@ $ vagrant up
 ```
 
 Then follow up with our [documentation](/docs). Default development account is:
- - email: `admin@medtagger.com`,
- - password: `medtagger1`.
+ - email: `admin@medtagger`,
+ - password: `medtagger`.
 
 ### Dockerized environment
 
@@ -83,9 +83,6 @@ Below screenshots show how MedTagger looks like:
 ![Home Page](/docs/assets/home-page.png)
 
 #### Labeling Page
-![Labeling Page](/docs/assets/labeling-page.png)
+![Labeling Page](/docs/assets/labeling-page-1.png)
 ![Labeling Page](/docs/assets/labeling-page-2.png)
-
-#### Upload Page
-![Upload Page](docs/assets/upload-page-2.png)
-![Upload Page](docs/assets/upload-page.png)
+![Labeling Page](/docs/assets/labeling-page-3.png)
