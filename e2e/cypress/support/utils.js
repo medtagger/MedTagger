@@ -14,6 +14,12 @@ export function login(email, password) {
     });
 }
 
+export function endTutorial() {
+    cy.visit(Cypress.env('HOST_URL'));
+    cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
+    cy.get('[data-cy=end-tutorial').click();
+}
+
 export function loginAsAdmin() {
     login('admin@medtagger.com', 'medtagger1');
 }
@@ -50,7 +56,6 @@ export function uploadScans(datasets, scansCount) {
     cy.route('GET', '/api/v1/datasets').as('fetchDatasets');
 
     // Upload Scans
-    cy.visit(Cypress.env('HOST_URL'));
     cy.get('[data-cy=home-upload-button]').click();
     cy.wait('@fetchDatasets');
     matSelect('[data-cy=datasets]', datasets);

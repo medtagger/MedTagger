@@ -1,0 +1,29 @@
+.tutorial {
+    flex-direction: column;
+    display: flex;
+    margin-top: 4em;
+    align-items: center;
+
+    &-video {
+        &__content {
+            width: 800px;
+            height: 450px;
+        }
+    }
+
+    &-info {
+        margin-top: 1em;
+        display: flex;
+        flex-direction: column;
+
+        &__next {
+            margin-top: 1em;
+
+        }
+
+        &__hide {
+            margin-top: 1em;
+        }
+    }
+}
+
