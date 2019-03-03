@@ -19,7 +19,7 @@ Here is a list of things that you need to run our backend natively:
 Let's start! At first, please clone this repository somewhere on your computer:
 
 ```bash
-$ git clone git@github.com:jpowie01/MedTagger.git
+$ git clone git@github.com:medtagger/MedTagger.git
 $ cd MedTagger
 ```
 

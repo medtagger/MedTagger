@@ -7,4 +7,4 @@ requirements:
       pin: True
 
 pr_prefix: "[Backend Dependencies Update]"
-label_prs: Under%20Review%20%EF%B8%8F
+label_prs: "Under Review ❗️"
