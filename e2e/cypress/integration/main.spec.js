@@ -67,7 +67,7 @@ describe('Basic flow', () => {
         matSelect('[data-cy=tags]', 'Narrowing (lenghtwise)');
         cy.get('[data-cy=chain-tool]').click();
 
-        cy.get('[data-cy=spinner]').should('not.exist');
+        cy.get('[data-cy=spinner]').should('not.exist', {timeout: 15000});
  
         // Enter first Chain element
         cy.get('canvas').moveAndClick(300, 300);
