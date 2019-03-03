@@ -86,6 +86,7 @@ services:
     command: bash -c "./scripts/wait_for_dependencies.sh && make run_rest_production"
     volumes:
       - ${PWD}/.medtagger.yml:/medtagger_backend/.medtagger.yml
+      - storage-data:/var/medtagger/storage
     labels:
       - "traefik.backend=medtagger_backend_rest"
       - "traefik.frontend.rule=PathPrefix: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}/api/v1/,${MEDTAGGER__HOST_ON_SUBDIRECTORY}/swaggerui/; ReplacePathRegex: ${MEDTAGGER__HOST_ON_SUBDIRECTORY}(.*) $$1"
@@ -108,6 +109,7 @@ services:
     command: bash -c "./scripts/wait_for_dependencies.sh && make run_websocket_production"
     volumes:
       - ${PWD}/.medtagger.yml:/medtagger_backend/.medtagger.yml
+      - storage-data:/var/medtagger/storage
     labels:
       - "traefik.backend=medtagger_backend_websocket"
       - "traefik.backend.loadbalancer.stickiness=true"
@@ -132,6 +134,7 @@ services:
     command: bash -c "./scripts/wait_for_dependencies.sh && make run_workers"
     volumes:
       - ${PWD}/.medtagger.yml:/medtagger_backend/.medtagger.yml
+      - storage-data:/var/medtagger/storage
     labels:
       - "traefik.enable=false"
 
@@ -152,6 +155,7 @@ services:
     command: bash -c "./scripts/dev__prepare_backend.sh"
     volumes:
       - ${PWD}/.medtagger.yml:/medtagger_backend/.medtagger.yml
+      - storage-data:/var/medtagger/storage
     labels:
       - "traefik.enable=false"
 
@@ -159,3 +163,4 @@ volumes:
   cassandra-data:
   rabbitmq-data:
   postgres-data:
+  storage-data:

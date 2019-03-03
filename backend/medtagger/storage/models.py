@@ -1,35 +1,59 @@
-"""Definition of storage for MedTagger."""
-from cassandra.cqlengine.models import Model
-from cassandra.cqlengine.columns import Text, Blob
-
-from medtagger.storage import MEDTAGGER_KEYSPACE
+"""Unified models that can be found in the Storage."""
+import abc
+from typing import TypeVar
 
 
-class OriginalSlice(Model):
-    """Model representing original Slice image."""
-
-    __table_name__ = 'original_slices'
-    __keyspace__ = MEDTAGGER_KEYSPACE
-
-    id = Text(primary_key=True)
-    image = Blob()
+StorageModelTypeVar = TypeVar('StorageModelTypeVar', bound='StorageModel')
 
 
-class ProcessedSlice(Model):
-    """Model representing processed Slice image."""
+class InternalStorageModel:
+    """Internal representation of a Storage Model."""  # pylint: disable=too-few-public-methods
 
-    __table_name__ = 'processed_slices'
-    __keyspace__ = MEDTAGGER_KEYSPACE
-
-    id = Text(primary_key=True)
-    image = Blob()
+    def as_unified_model(self) -> 'StorageModel':
+        """Convert internal model representation into unified model."""
+        raise NotImplementedError('This model does not implement conversion to Unified Model!')
 
 
-class BrushLabelElement(Model):
-    """Model representing Label Element made with Brush Tool."""
+class StorageModel(abc.ABC):
+    """Model definition that can be used by Storage."""  # pylint: disable=too-few-public-methods
 
-    __table_name__ = 'brush_label_elements'
-    __keyspace__ = MEDTAGGER_KEYSPACE
+    pass  # pylint: disable=unnecessary-pass
 
-    id = Text(primary_key=True)
-    image = Blob()
+
+class OriginalSlice(StorageModel):
+    """Model for Original DICOM Slices."""  # pylint: disable=too-few-public-methods
+
+    def __init__(self, _id: str, image: bytes) -> None:
+        """Initialize model.
+
+        :param id: GUID that is the same as for Slice object in the SQL DB
+        :param image: bytes representing Original DICOM image
+        """
+        self.id = _id
+        self.image = image
+
+
+class ProcessedSlice(StorageModel):
+    """Model for Processed DICOM Slices."""  # pylint: disable=too-few-public-methods
+
+    def __init__(self, _id: str, image: bytes) -> None:
+        """Initialize model.
+
+        :param id: GUID that is the same as for Slice object in the SQL DB
+        :param image: bytes representing Processed DICOM image
+        """
+        self.id = _id
+        self.image = image
+
+
+class BrushLabelElement(StorageModel):
+    """Model for Brush Label Element's image."""  # pylint: disable=too-few-public-methods
+
+    def __init__(self, _id: str, image: bytes) -> None:
+        """Initialize model.
+
+        :param id: GUID that is the same as for Slice object in the SQL DB
+        :param image: bytes representing Brush label as an image
+        """
+        self.id = _id
+        self.image = image

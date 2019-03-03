@@ -21,6 +21,7 @@ from medtagger.repositories import (
     datasets as DatasetsRepository,
     tasks as TasksRepository,
 )
+from medtagger.storage import Storage
 from medtagger.storage.models import BrushLabelElement as StorageBrushLabelElement
 from medtagger.workers.storage import parse_dicom_and_update_slice
 from medtagger.types import ScanID, LabelPosition, LabelShape, LabelingTime, LabelID, Point
@@ -105,7 +106,7 @@ def get_predefined_brush_label_elements(scan_id: ScanID, task_id: int,
     """
     label_elements = LabelsRepository.get_predefined_brush_label_elements(scan_id, task_id, begin, count)
     for label_element in label_elements:
-        storage_brush_label_element = StorageBrushLabelElement.get(id=label_element.id)
+        storage_brush_label_element = Storage().get(StorageBrushLabelElement, id=label_element.id)
         yield label_element, storage_brush_label_element.image
 
 

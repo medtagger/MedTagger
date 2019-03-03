@@ -3,6 +3,7 @@ from typing import List
 
 from medtagger.database import db_session
 from medtagger.database.models import Slice, SliceOrientation, Scan
+from medtagger.storage import Storage
 from medtagger.storage.models import OriginalSlice, ProcessedSlice
 from medtagger.types import SliceID, ScanID
 
@@ -36,27 +37,27 @@ def delete_slice(_slice: Slice) -> None:
         query.update({'declared_number_of_slices': Scan.declared_number_of_slices - 1})
         session.query(Slice).filter(Slice.id == slice_id).delete()
 
-    OriginalSlice.filter(id=slice_id).delete()
-    ProcessedSlice.filter(id=slice_id).delete()
+    Storage().delete(OriginalSlice, id=slice_id)
+    Storage().delete(ProcessedSlice, id=slice_id)
 
 
 def get_slice_original_image(slice_id: SliceID) -> bytes:
     """Return original Dicom image as bytes."""
-    original_slice = OriginalSlice.get(id=slice_id)
+    original_slice = Storage().get(OriginalSlice, id=slice_id)
     return original_slice.image
 
 
 def get_slice_converted_image(slice_id: SliceID) -> bytes:
     """Return converted image as bytes."""
-    original_slice = ProcessedSlice.get(id=slice_id)
-    return original_slice.image
+    converted_slice = Storage().get(ProcessedSlice, id=slice_id)
+    return converted_slice.image
 
 
 def store_original_image(slice_id: SliceID, image: bytes) -> None:
     """Store original image into Storage."""
-    OriginalSlice.create(id=slice_id, image=image)
+    Storage().create(OriginalSlice, id=slice_id, image=image)
 
 
 def store_converted_image(slice_id: SliceID, image: bytes) -> None:
     """Store converted image into Storage."""
-    ProcessedSlice.create(id=slice_id, image=image)
+    Storage().create(ProcessedSlice, id=slice_id, image=image)

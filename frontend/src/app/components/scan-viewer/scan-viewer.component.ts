@@ -16,8 +16,8 @@ import {LabelTag} from '../../model/labels/LabelTag';
 })
 export class ScanViewerComponent implements OnInit, AfterViewInit {
 
-    downloadingScanInProgress = false;
-    downloadingSlicesInProgress = false;
+    downloadingScanInProgress = true;
+    downloadingSlicesInProgress = true;
 
     currentImage: HTMLImageElement;
 

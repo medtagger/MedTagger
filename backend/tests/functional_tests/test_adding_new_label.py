@@ -2,6 +2,8 @@
 import json
 from typing import Any
 
+import pytest
+
 from medtagger.storage.models import BrushLabelElement
 from medtagger.definitions import LabelTool
 from medtagger.repositories import (
@@ -10,14 +12,18 @@ from medtagger.repositories import (
     tasks as TasksRepository,
 )
 
-from tests.functional_tests import get_api_client, get_headers
+from tests.functional_tests import get_api_client, get_headers, get_storage
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
-def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> None:
+# pylint: disable=too-many-locals
+@pytest.mark.parametrize('storage_backend_configuration', ['cassandra', 'filesystem'])
+def test_add_brush_label(mocker: Any, prepare_environment: Any, synchronous_celery: Any,
+                         storage_backend_configuration: str) -> None:
     """Test for adding a Label made with Brush tool."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
+    storage = get_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -65,7 +71,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     label_element_id = json_response['elements'][0]['label_element_id']
-    brush_label_element = BrushLabelElement.get(id=label_element_id)
+    brush_label_element = storage.get(BrushLabelElement, id=label_element_id)
     assert brush_label_element.image
 
 

@@ -9,8 +9,8 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import ENUM
 
-from medtagger.storage import create_session
-
+from medtagger.storage import Storage
+from medtagger.storage.cassandra import CassandraStorageBackend
 
 # revision identifiers, used by Alembic.
 revision = '9a6cd75ba23f'
@@ -18,7 +18,7 @@ down_revision = '39c660178412'
 branch_labels = None
 depends_on = None
 
-session = create_session()
+storage = Storage()
 old_label_tool_enum = ENUM('RECTANGLE', name='label_tool', create_type=False)
 tmp_label_tool_enum = ENUM('RECTANGLE', 'BRUSH', name='label_tool_', create_type=False)
 new_label_tool_enum = ENUM('RECTANGLE', 'BRUSH', name='label_tool', create_type=False)
@@ -47,20 +47,24 @@ def upgrade():
                     )
 
     # Create table in Cassandra
-    session.set_keyspace('medtagger')
-    session.execute("""
-        CREATE TABLE IF NOT EXISTS brush_label_elements (
-            id text PRIMARY KEY,
-            image blob
-        )
-    """)
+    if isinstance(storage.backend, CassandraStorageBackend):
+        session = storage.backend.create_session()
+        session.set_keyspace('medtagger')
+        session.execute("""
+            CREATE TABLE IF NOT EXISTS brush_label_elements (
+                id text PRIMARY KEY,
+                image blob
+            )
+        """)
 
 
 def downgrade():
     # Remove all tables - both in PostgreSQL and Cassandra
     op.drop_table('BrushLabelElements')
-    session.set_keyspace('medtagger')
-    session.execute('DROP TABLE brush_label_elements')
+    if isinstance(storage.backend, CassandraStorageBackend):
+        session = storage.backend.create_session()
+        session.set_keyspace('medtagger')
+        session.execute('DROP TABLE brush_label_elements')
 
     # Remove all elements that were labeled with Brush
     label_elements_table = sa.sql.table('LabelElements', sa.Column('tool', new_label_tool_enum, nullable=False))

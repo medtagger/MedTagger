@@ -2,7 +2,6 @@
 import json
 from typing import Any
 
-from cassandra.cqlengine.query import DoesNotExist
 from sqlalchemy.orm.exc import NoResultFound
 import pytest
 
@@ -15,15 +14,20 @@ from medtagger.repositories import (
     slices as SliceRepository,
 )
 from medtagger.types import ScanID, SliceID
+from medtagger.storage import exceptions
 from medtagger.storage.models import BrushLabelElement, OriginalSlice, ProcessedSlice
-from tests.functional_tests import get_api_client, get_web_socket_client, get_headers
+
+from tests.functional_tests import get_api_client, get_web_socket_client, get_headers, init_storage, get_storage
 from tests.functional_tests.conftest import get_token_for_logged_in_user
 
 
-def test_delete_scan_without_slices(prepare_environment: Any, synchronous_celery: Any) -> None:
+@pytest.mark.parametrize('storage_backend_configuration', ['cassandra', 'filesystem'])
+def test_delete_scan_without_slices(mocker: Any, prepare_environment: Any, synchronous_celery: Any,
+                                    storage_backend_configuration: str) -> None:
     """Test deleting scan without any slices."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
+    init_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -59,10 +63,13 @@ def test_delete_scan_without_slices(prepare_environment: Any, synchronous_celery
     assert response.status_code == 404
 
 
-def test_delete_scan_with_slices(prepare_environment: Any, synchronous_celery: Any) -> None:
+@pytest.mark.parametrize('storage_backend_configuration', ['cassandra', 'filesystem'])
+def test_delete_scan_with_slices(mocker: Any, prepare_environment: Any, synchronous_celery: Any,
+                                 storage_backend_configuration: str) -> None:
     """Test deleting scan with at least 1 slice."""
     api_client = get_api_client()
     user_token = get_token_for_logged_in_user('admin')
+    init_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -117,11 +124,14 @@ def test_delete_scan_with_slices(prepare_environment: Any, synchronous_celery: A
 
 
 # pylint: disable=too-many-locals
-def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: Any) -> None:
+@pytest.mark.parametrize('storage_backend_configuration', ['cassandra', 'filesystem'])
+def test_delete_scan_with_labels(mocker: Any, prepare_environment: Any, synchronous_celery: Any,
+                                 storage_backend_configuration: str) -> None:
     """Test deleting scan with at least 1 slice and with labels made with all tools."""
     api_client = get_api_client()
     web_socket_client = get_web_socket_client(namespace='/slices')
     user_token = get_token_for_logged_in_user('admin')
+    storage = get_storage(mocker, storage_backend_configuration)
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
@@ -236,7 +246,7 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
     label_element_id = json_response['elements'][1]['label_element_id']
-    brush_label_element = BrushLabelElement.get(id=label_element_id)
+    brush_label_element = storage.get(BrushLabelElement, id=label_element_id)
     assert brush_label_element.image
 
     # Step 7. Delete scan from the system
@@ -252,12 +262,12 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
         SliceRepository.get_slice_by_id(slice_id)
 
     # Step 10. Check that slices original image has been deleted from storage
-    with pytest.raises(DoesNotExist):
-        OriginalSlice.get(id=slice_id)
+    with pytest.raises(exceptions.NotFound):
+        storage.get(OriginalSlice, id=slice_id)
 
     # Step 11. Check that slices processed image has been deleted from storage
-    with pytest.raises(DoesNotExist):
-        ProcessedSlice.get(id=slice_id)
+    with pytest.raises(exceptions.NotFound):
+        storage.get(ProcessedSlice, id=slice_id)
 
     # Step 12. Check that labels has been deleted
     response = api_client.get('/api/v1/labels/{}'.format(label_id),
@@ -265,5 +275,5 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
     assert response.status_code == 404
 
     # Step 13. Check that Brush Label was deleted from storage
-    with pytest.raises(DoesNotExist):
-        BrushLabelElement.get(id=label_element_id)
+    with pytest.raises(exceptions.NotFound):
+        storage.get(BrushLabelElement, id=label_element_id)

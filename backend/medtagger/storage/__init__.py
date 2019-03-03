@@ -1,45 +1,47 @@
 """Definition of storage for MedTagger."""
-from cassandra.cluster import Cluster, Session, NoHostAvailable  # pylint: disable=no-name-in-module
-from cassandra.policies import RoundRobinPolicy
-from cassandra.cqlengine import connection
-from cassandra.io.asyncorereactor import AsyncoreConnection
-from cassandra.io.geventreactor import GeventConnection
+from typing import Any, Dict, Type, Optional
 
-from medtagger.config import AppConfiguration
+from medtagger import config
+from medtagger.storage import filesystem, cassandra, backend as storage_backend, models
 
 
-MEDTAGGER_KEYSPACE = 'medtagger'
+class Storage:
+    """Unified storage mechanism."""
 
-configuration = AppConfiguration()
-addresses = configuration.get('cassandra', 'addresses', 'localhost').split(',')
-port = configuration.getint('cassandra', 'port', 9042)
-default_timeout = configuration.getint('cassandra', 'default_timeout', 20)
-connect_timeout = configuration.getint('cassandra', 'connect_timeout', 20)
+    backend: Optional[storage_backend.StorageBackend] = None
+    available_backends: Dict[str, Type[storage_backend.StorageBackend]] = {
+        'filesystem': filesystem.FileSystemStorageBackend,
+        'cassandra': cassandra.CassandraStorageBackend,
+    }
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize Storage against backend defined in the configuration."""
+        if self.backend:
+            return  # Do not initialize storage backend twice...
 
-def create_session(use_gevent: bool = False) -> Session:
-    """Create a Session object for above Cluster."""
-    connection_class = GeventConnection if use_gevent else AsyncoreConnection
-    cluster = Cluster(addresses, port=port, load_balancing_policy=RoundRobinPolicy(), connection_class=connection_class,
-                      connect_timeout=connect_timeout)
-    session = cluster.connect()
-    session.default_timeout = default_timeout
-    return session
+        # Fetch configuration and prepare storage backend
+        configuration = config.AppConfiguration()
+        backend = configuration.get('storage', 'backend', 'filesystem')
+        if backend not in self.available_backends:
+            raise ValueError('Invalid backend set in the MedTagger configuration file!')
+        self.backend = self.available_backends[backend](*args, **kwargs)
 
+    def is_alive(self) -> bool:
+        """Check if Storage backend is still alive or not."""
+        assert self.backend, 'Invalid backend!'
+        return self.backend.is_alive()
 
-def create_connection(use_gevent: bool = False) -> None:
-    """Create a Session object for above Cluster."""
-    connection_class = GeventConnection if use_gevent else AsyncoreConnection
-    connection.setup(addresses, MEDTAGGER_KEYSPACE, port=port, load_balancing_policy=RoundRobinPolicy(),
-                     connection_class=connection_class, connect_timeout=connect_timeout)
-    session = connection.get_session()
-    session.default_timeout = default_timeout
+    def get(self, model: Type[models.StorageModelTypeVar], **filters: Any) -> models.StorageModelTypeVar:
+        """Fetch entry for a given model using passed filters."""
+        assert self.backend, 'Invalid backend!'
+        return self.backend.get(model, **filters)
 
+    def create(self, model: Type[models.StorageModel], **data: Any) -> models.StorageModel:
+        """Create new entry for a given model and passed data."""
+        assert self.backend, 'Invalid backend!'
+        return self.backend.create(model, **data)
 
-def is_alive() -> bool:
-    """Return boolean information if Cassandra is alive or not."""
-    try:
-        create_session()
-        return True
-    except NoHostAvailable:
-        return False
+    def delete(self, model: Type[models.StorageModel], **filters: Any) -> None:
+        """Delete an entry for a given model using passed filters."""
+        assert self.backend, 'Invalid backend!'
+        self.backend.delete(model, **filters)
