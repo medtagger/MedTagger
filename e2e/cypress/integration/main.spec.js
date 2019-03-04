@@ -1,4 +1,4 @@
-import {goToLabeling, loginAsAdmin, matSelect, uploadScans, endTutorial} from '../support/utils';
+import {goToLabeling, loginAsAdmin, matSelect, uploadScans} from '../support/utils';
 
 describe('Basic flow', () => {
 
