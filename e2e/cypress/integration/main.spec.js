@@ -28,13 +28,11 @@ describe('Basic flow', () => {
 
     it('Upload scan', () => {
         loginAsAdmin();
-        endTutorial();
         uploadScans('Kidneys', 1);
     });
 
     it('Rectangle selector', () => {
         loginAsAdmin();
-        endTutorial();
         uploadScans('Kidneys', 11);
         goToLabeling('Kidneys segmentation');
         matSelect('[data-cy=tags]', 'Left Kidney');
@@ -48,7 +46,6 @@ describe('Basic flow', () => {
 
     it('Point selector', () => {
         loginAsAdmin();
-        endTutorial();
         uploadScans('Lungs', 11);
         goToLabeling('Find middle of the Spine');
         matSelect('[data-cy=tags]', 'Middle of the Spine');
@@ -67,7 +64,6 @@ describe('Basic flow', () => {
 
         // Prepare for labeling
         loginAsAdmin();
-        endTutorial();
         uploadScans('Heart', 11);
         goToLabeling('Find narrowings');
         matSelect('[data-cy=tags]', 'Narrowing (lenghtwise)');
@@ -105,7 +101,6 @@ describe('Basic flow', () => {
 
     it('Brush selector', () => {
         loginAsAdmin();
-        endTutorial();
         uploadScans('Heart', 11);
         goToLabeling('Find narrowings in Veins');
         matSelect('[data-cy=tags]', 'Narrowing (region)');

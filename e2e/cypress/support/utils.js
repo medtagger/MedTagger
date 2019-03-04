@@ -14,12 +14,6 @@ export function login(email, password) {
     });
 }
 
-export function endTutorial() {
-    cy.visit(Cypress.env('HOST_URL'));
-    cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
-    cy.get('[data-cy=end-tutorial').click();
-}
-
 export function loginAsAdmin() {
     login('admin@medtagger.com', 'medtagger1');
 }
@@ -56,6 +50,7 @@ export function uploadScans(datasets, scansCount) {
     cy.route('GET', '/api/v1/datasets').as('fetchDatasets');
 
     // Upload Scans
+    cy.visit(Cypress.env('HOST_URL'));
     cy.get('[data-cy=home-upload-button]').click();
     cy.wait('@fetchDatasets');
     matSelect('[data-cy=datasets]', datasets);
@@ -69,9 +64,4 @@ export function uploadScans(datasets, scansCount) {
 export function goToLabeling(task) {
     cy.visit(Cypress.env('HOST_URL'));
     cy.get(`[data-cy=task]:contains(${task})`).click({force: true}); // clicking on svg has bug, https://github.com/cypress-io/cypress/issues/2245
-    cy.get('[data-cy=next1]').click();
-    cy.get('[data-cy=next2]').click();
-    cy.get('[data-cy=next3]').click();
-    cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
-    cy.get('[data-cy=next4]').click();
 }
