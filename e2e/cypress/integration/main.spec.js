@@ -15,8 +15,8 @@ describe('Basic flow', () => {
 
     it('Login as admin and logout', () => {
         cy.visit(Cypress.env('HOST_URL'));
-        cy.get('[data-cy=login-email]').type('admin@medtagger.com');
-        cy.get('[data-cy=login-password]').type('medtagger1');
+        cy.get('[data-cy=login-email]').type('admin@medtagger');
+        cy.get('[data-cy=login-password]').type('medtagger');
         cy.get('[data-cy=submit]').click();
         cy.url().should('eq', Cypress.env('HOST_URL') + 'home');
         cy.get('[data-cy=navbar-user-dropdown]').click();
