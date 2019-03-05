@@ -15,7 +15,7 @@ export function login(email, password) {
 }
 
 export function loginAsAdmin() {
-    login('admin@medtagger.com', 'medtagger1');
+    login('admin@medtagger', 'medtagger');
 }
 
 export function setFilesInInput(filePath, fileCount = 1, selector = 'input[type="file"]') {
