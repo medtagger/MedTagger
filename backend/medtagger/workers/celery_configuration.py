@@ -6,6 +6,7 @@ from typing import List, Any
 from celery.signals import setup_logging, worker_process_init
 
 from medtagger.config import AppConfiguration
+from medtagger.database import engine
 from medtagger.storage import create_connection
 
 
@@ -30,12 +31,9 @@ def setup_logging_handler(*args: List[Any], **kwargs: List[Any]) -> None:  # pyl
 def process_initialization(*args: List[Any], **kwargs: List[Any]) -> None:  # pylint: disable=unused-argument
     """Initialize given Celery process."""
     create_connection()
+    engine.dispose()  # Recreate SQL Pool
 
 
 configuration = AppConfiguration()
 broker_url = configuration.get('celery', 'broker', fallback='pyamqp://guest:guest@localhost//')
 imports = get_all_modules_with_tasks()
-
-# The default serializers for Celery >=3.1 is JSON, which doesn't make sense if we send binary data to task
-task_serializer = 'pickle'
-accept_content = {'pickle'}
