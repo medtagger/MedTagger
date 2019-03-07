@@ -20,7 +20,7 @@ from flask_cors import CORS  # noqa
 
 from medtagger.api import blueprint, web_socket  # noqa
 from medtagger.config import AppConfiguration  # noqa
-from medtagger.database import session  # noqa
+from medtagger.database import engine, session  # noqa
 from medtagger.database.models import User, Role  # noqa
 from medtagger.storage import create_connection  # noqa
 
@@ -42,7 +42,19 @@ CORS(app)
 app.secret_key = configuration.get('api', 'secret_key', fallback='')
 web_socket.init_app(app)
 
-create_connection(use_gevent=True)
+try:
+    # This will raise ModuleNotFoundError if app was not run inside uWSGI server
+    from uwsgidecorators import postfork  # noqa
+
+    @postfork
+    def connect_to_db_and_storage() -> None:
+        """Create a single Session to DB and Storage after fork to multiple processes by uWSGI."""
+        create_connection(use_gevent=True)
+        engine.dispose()  # Recreate SQL Pool
+except ModuleNotFoundError:
+    # It seems that application is not running inside uWSGI server, so let's initialize session
+    # in current process as it is highly probable that we are running in Flask's dev server
+    create_connection(use_gevent=True)
 
 
 @app.teardown_appcontext
