@@ -57,7 +57,6 @@ except ModuleNotFoundError:
     create_connection(use_gevent=True)
 
 
-
 @app.teardown_appcontext
 def shutdown_session(exception: Any = None) -> None:  # pylint: disable=unused-argument
     """Remove Session on each Request end."""
