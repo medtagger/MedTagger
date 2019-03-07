@@ -26,7 +26,8 @@ out__task = api.model('Task model', {
     'key': fields.String(),
     'name': fields.String(),
     'image_path': fields.String(),
-    'tags': fields.List(fields.Nested(out__label_tag), attribute='available_tags'),
+    'tags': fields.List(fields.Nested(out__label_tag), attribute=lambda task: sorted(task.available_tags,
+                                                                                     key=lambda tag: tag.name)),
     'datasets_keys': fields.List(fields.String(), attribute=lambda task: [dataset.key for dataset in task.datasets]),
 })
 

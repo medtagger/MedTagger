@@ -12,6 +12,8 @@ It is also a great entry point for running this app. To do so, you can use:
 # pylint: disable=wrong-import-position;  Python logging should be configured ASAP
 import logging.config
 from typing import Any
+from gevent import monkey
+monkey.patch_all()
 
 # Setup logging as fast as possible, so imported libraries __init__.py will
 # be able to log using our configuration of logging

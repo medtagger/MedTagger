@@ -2,13 +2,13 @@ import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
-import {SocketIoModule} from 'ng-socket-io';
+import {SocketIoModule} from 'ngx-socket-io';
 
 import {AppComponent} from './app.component';
 import {LoginPageComponent} from '../pages/login-page/login-page.component';
 import {HomePageComponent} from '../pages/home-page/home-page.component';
 import {MarkerPageComponent} from '../pages/marker-page/marker-page.component';
-import {MarkerTutorialPageComponent} from '../pages/marker-tutorial-page/marker-tutorial-page.component';
+import {TutorialPageComponent} from '../pages/tutorial-page/tutorial-page.component';
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
@@ -72,7 +72,7 @@ import {HttpAuthenticationInterceptor} from '../interceptors/http-authentication
         MarkerComponent,
         LabelExplorerComponent,
         ScanViewerComponent,
-        MarkerTutorialPageComponent,
+        TutorialPageComponent,
         UploadScansSelectorComponent,
         UploadPageComponent,
         SettingsPageComponent,
