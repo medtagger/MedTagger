@@ -1,7 +1,7 @@
 """Module responsible for definition of SlicesRepository."""
 from typing import List
 
-from medtagger.database import db_session
+from medtagger.database import db_connection_session, db_transaction_session
 from medtagger.database.models import Slice, SliceOrientation, Scan
 from medtagger.storage.models import OriginalSlice, ProcessedSlice
 from medtagger.types import SliceID, ScanID
@@ -9,14 +9,13 @@ from medtagger.types import SliceID, ScanID
 
 def get_slice_by_id(slice_id: SliceID) -> Slice:
     """Fetch Slice from database."""
-    with db_session() as session:
-        _slice = session.query(Slice).filter(Slice.id == slice_id).one()
-    return _slice
+    with db_connection_session() as session:
+        return session.query(Slice).filter(Slice.id == slice_id).one()
 
 
 def get_slices_by_scan_id(scan_id: ScanID, orientation: SliceOrientation = SliceOrientation.Z) -> List[Slice]:
     """Fetch Slice from database."""
-    with db_session() as session:
+    with db_connection_session() as session:
         query = session.query(Slice)
         query = query.join(Scan)
         query = query.filter(Scan.id == scan_id)
@@ -31,7 +30,7 @@ def delete_slice(_slice: Slice) -> None:
     slice_id = _slice.id
     scan_id = _slice.scan_id
 
-    with db_session() as session:
+    with db_transaction_session() as session:
         query = session.query(Scan).filter(Scan.id == scan_id)
         query.update({'declared_number_of_slices': Scan.declared_number_of_slices - 1})
         session.query(Slice).filter(Slice.id == slice_id).delete()
