@@ -1,9 +1,10 @@
 """Module responsible for defining ORM layer."""
+import os
 from datetime import datetime
 from typing import Generator
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, func, MetaData, Column, DateTime
+from sqlalchemy import create_engine, event, exc, func, MetaData, Column, DateTime
 from sqlalchemy.orm import scoped_session, sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -23,14 +24,14 @@ class MedTaggerBase:  # pylint: disable=too-few-public-methods
 
     def save(self) -> None:
         """Save the model into the database after changes."""
-        with db_session() as _session:
+        with db_transaction_session() as _session:
             _session.add(self)
 
 
 configuration = AppConfiguration()
 db_uri = configuration.get('db', 'database_uri')
 db_pool_size = configuration.getint('db', 'connection_pool_size')
-engine = create_engine(db_uri, pool_size=db_pool_size, convert_unicode=True, pool_pre_ping=True)
+engine = create_engine(db_uri, pool_size=db_pool_size, pool_recycle=1800, convert_unicode=True, pool_pre_ping=True)
 session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 convention = {
@@ -47,6 +48,20 @@ Base = declarative_base(cls=MedTaggerBase, metadata=metadata)
 Base.query = session.query_property()
 
 
+@event.listens_for(engine, "connect")
+def connect(dbapi_connection, connection_record):
+    connection_record.info['pid'] = os.getpid()
+
+
+@event.listens_for(engine, "checkout")
+def checkout(dbapi_connection, connection_record, connection_proxy):
+    pid = os.getpid()
+    if connection_record.info['pid'] != pid:
+        connection_record.connection = connection_proxy.connection = None
+        raise exc.DisconnectionError(f"Connection record belongs to PID {connection_record.info['pid']}, "
+                                     f"attempting to check out in PID {pid}")
+
+
 def is_alive() -> bool:
     """Return boolean information if database is alive or not."""
     try:
@@ -57,7 +72,13 @@ def is_alive() -> bool:
 
 
 @contextmanager
-def db_session() -> Generator[Session, None, None]:
+def db_connection_session() -> Generator[Session, None, None]:
+    """Provide a transactional scope around a series of operations."""
+    yield session
+
+
+@contextmanager
+def db_transaction_session() -> Generator[Session, None, None]:
     """Provide a transactional scope around a series of operations."""
     try:
         yield session

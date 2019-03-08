@@ -5,7 +5,7 @@ import logging.config
 from sqlalchemy import exists
 
 from medtagger.api.security import hash_password
-from medtagger.database import db_session
+from medtagger.database import db_transaction_session
 from medtagger.database.models import User, Role
 
 logging.config.fileConfig('logging.conf')
@@ -18,7 +18,7 @@ def insert_admin_account() -> None:
     password = 'medtagger'
     password_hash = hash_password(password)
 
-    with db_session() as session:
+    with db_transaction_session() as session:
         user_exists = session.query(exists().where(User.email == user_email)).scalar()
         if user_exists:
             logger.warning('Admin user already exists with email "%s"', user_email)

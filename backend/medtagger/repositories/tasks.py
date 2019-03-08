@@ -1,7 +1,7 @@
 """Module responsible for definition of TaskRepository."""
 from typing import List
 
-from medtagger.database import db_session
+from medtagger.database import db_connection_session, db_transaction_session
 from medtagger.database.models import Task, LabelTag, Dataset
 from medtagger.exceptions import InternalErrorException
 
@@ -20,7 +20,7 @@ def get_task_by_key(key: str) -> Task:
     :param key: key for a Task
     :return: Task object
     """
-    with db_session() as session:
+    with db_connection_session() as session:
         task = session.query(Task).filter(Task.key == key).first()
     return task
 
@@ -35,7 +35,7 @@ def add_task(key: str, name: str, image_path: str, datasets_keys: List[str], tag
     :param tags: Label Tags that will be created and assigned to Task
     :return: Task object
     """
-    with db_session() as session:
+    with db_transaction_session() as session:
         task = Task(key, name, image_path)
         datasets = Dataset.query.filter(Dataset.key.in_(datasets_keys)).all()  # type: ignore
         task.datasets = datasets
@@ -50,10 +50,10 @@ def assign_label_tag(tag: LabelTag, task_key: str) -> None:
     :param tag: tag that should be assigned to Task
     :param task_key: key that will identify such Task
     """
-    with db_session():
+    with db_transaction_session() as session:
         task = Task.query.filter(Task.key == task_key).one()
         task.available_tags.append(tag)
-        task.save()
+        session.add(task)
 
 
 def unassign_label_tag(tag: LabelTag, task_key: str) -> None:
@@ -62,10 +62,10 @@ def unassign_label_tag(tag: LabelTag, task_key: str) -> None:
     :param tag: tag that should be unassigned from Task
     :param task_key: key that will identify such Task
     """
-    with db_session():
+    with db_transaction_session() as session:
         task = Task.query.filter(Task.key == task_key).one()
         task.available_tags.remove(tag)
-        task.save()
+        session.add(task)
 
 
 def update(task_key: str, name: str = None, image_path: str = None, datasets_keys: List[str] = None) -> Task:
@@ -76,7 +76,7 @@ def update(task_key: str, name: str = None, image_path: str = None, datasets_key
     :param image_path: (optional) new path to the image which shows on the UI
     :param datasets_keys: (optional) keys of Datasets which should have this Task
     """
-    with db_session():
+    with db_transaction_session() as session:
         task = Task.query.filter(Task.key == task_key).one()
         if name:
             task.name = name
@@ -85,20 +85,23 @@ def update(task_key: str, name: str = None, image_path: str = None, datasets_key
         if datasets_keys:
             datasets = Dataset.query.filter(Dataset.key.in_(datasets_keys)).all()  # type: ignore
             task.datasets = datasets
+        session.add(task)
     return task
 
 
 def disable(task_key: str) -> None:
     """Disable existing Task."""
-    disabling_query = Task.query.filter(Task.key == task_key)
-    updated = disabling_query.update({'disabled': True}, synchronize_session='fetch')
-    if not updated:
-        raise InternalErrorException(f'Task "{task_key}" was not disabled due to unknown database error.')
+    with db_transaction_session():
+        disabling_query = Task.query.filter(Task.key == task_key)
+        updated = disabling_query.update({'disabled': True}, synchronize_session='fetch')
+        if not updated:
+            raise InternalErrorException(f'Task "{task_key}" was not disabled due to unknown database error.')
 
 
 def enable(task_key: str) -> None:
     """Enable existing Task."""
-    enabling_query = Task.query.filter(Task.key == task_key)
-    updated = enabling_query.update({'disabled': False}, synchronize_session='fetch')
-    if not updated:
-        raise InternalErrorException(f'Task "{task_key}" was not enabled due to unknown database error.')
+    with db_transaction_session():
+        enabling_query = Task.query.filter(Task.key == task_key)
+        updated = enabling_query.update({'disabled': False}, synchronize_session='fetch')
+        if not updated:
+            raise InternalErrorException(f'Task "{task_key}" was not enabled due to unknown database error.')

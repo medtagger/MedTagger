@@ -42,6 +42,7 @@ CORS(app)
 app.secret_key = configuration.get('api', 'secret_key', fallback='')
 web_socket.init_app(app)
 
+
 try:
     # This will raise ModuleNotFoundError if app was not run inside uWSGI server
     from uwsgidecorators import postfork  # noqa
