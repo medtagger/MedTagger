@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from sqlalchemy.sql.expression import func
 
-from medtagger.database import db_session
+from medtagger.database import db_transaction_session
 from medtagger.database.models import Label, LabelTag, User, RectangularLabelElement, BrushLabelElement, \
     PointLabelElement, ChainLabelElement, ChainLabelElementPoint, Task, Scan
 from medtagger.definitions import LabelVerificationStatus
@@ -82,10 +82,11 @@ def add_new_label(scan_id: ScanID, task_key: str, user: User, labeling_time: Lab
     :param is_predefined: (optional) mark this Label as predefined
     :return: Label object
     """
-    with db_session() as session:
-        label = Label(user, labeling_time, comment, is_predefined)
-        label.scan_id = scan_id
-        label.task = Task.query.filter(Task.key == task_key).one()
+    label = Label(user, labeling_time, comment, is_predefined)
+    label.scan_id = scan_id
+    label.task = Task.query.filter(Task.key == task_key).one()
+
+    with db_transaction_session() as session:
         session.add(label)
     return label
 
@@ -100,11 +101,11 @@ def add_new_rectangular_label_element(label_id: LabelID, position: LabelPosition
     :param label_tag: Label Tag object
     :return: ID of a Element
     """
-    with db_session() as session:
-        rectangular_label_element = RectangularLabelElement(position, shape, label_tag)
-        rectangular_label_element.label_id = label_id
-        session.add(rectangular_label_element)
+    rectangular_label_element = RectangularLabelElement(position, shape, label_tag)
+    rectangular_label_element.label_id = label_id
 
+    with db_transaction_session() as session:
+        session.add(rectangular_label_element)
     return rectangular_label_element.id
 
 
@@ -120,9 +121,10 @@ def add_new_brush_label_element(label_id: LabelID, slice_index: int, width: int,
     :param label_tag: Label Tag object
     :return: ID of a Element
     """  # pylint: disable=too-many-arguments
-    with db_session() as session:
-        brush_label_element = BrushLabelElement(slice_index, width, height, label_tag)
-        brush_label_element.label_id = label_id
+    brush_label_element = BrushLabelElement(slice_index, width, height, label_tag)
+    brush_label_element.label_id = label_id
+
+    with db_transaction_session() as session:
         session.add(brush_label_element)
     BrushLabelElementStorage.create(id=brush_label_element.id, image=image)
     return brush_label_element.id
@@ -136,11 +138,11 @@ def add_new_point_label_element(label_id: LabelID, position: LabelPosition, labe
     :param label_tag: Label Tag object
     :return: ID of a Element
     """
-    with db_session() as session:
-        point_label_element = PointLabelElement(position, label_tag)
-        point_label_element.label_id = label_id
-        session.add(point_label_element)
+    point_label_element = PointLabelElement(position, label_tag)
+    point_label_element.label_id = label_id
 
+    with db_transaction_session() as session:
+        session.add(point_label_element)
     return point_label_element.id
 
 
@@ -155,9 +157,9 @@ def add_new_chain_label_element(label_id: LabelID, slice_index: int, label_tag: 
     :param loop: true if first and last points are connected
     :return: ID of a Element
     """
-    with db_session() as session:
-        chain_label_element = ChainLabelElement(slice_index, label_tag, loop)
-        chain_label_element.label_id = label_id
+    chain_label_element = ChainLabelElement(slice_index, label_tag, loop)
+    chain_label_element.label_id = label_id
+    with db_transaction_session() as session:
         session.add(chain_label_element)
 
         for order, point in enumerate(points):
