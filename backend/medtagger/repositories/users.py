@@ -1,7 +1,7 @@
 """Module responsible for definition of UsersRepository."""
 from typing import List, Optional
 
-from medtagger.database import db_session
+from medtagger.database import db_transaction_session
 from medtagger.database.models import User
 
 
@@ -10,7 +10,7 @@ def add_new_user(new_user: User) -> int:
 
     :return: id of the new user
     """
-    with db_session() as session:
+    with db_transaction_session() as session:
         session.add(new_user)
     return new_user.id
 
@@ -35,7 +35,7 @@ def get_user_by_id(user_id: int) -> User:
 
 def set_user_info(user: User, first_name: str, last_name: str) -> None:
     """Set user's info."""
-    with db_session() as session:
+    with db_transaction_session() as session:
         user.first_name = first_name
         user.last_name = last_name
         session.add(user)
@@ -43,6 +43,6 @@ def set_user_info(user: User, first_name: str, last_name: str) -> None:
 
 def set_user_settings(user: User, name: str, value: object) -> None:
     """Set user's settings parameter of specified name to provided value."""
-    with db_session() as session:
+    with db_transaction_session() as session:
         setattr(user.settings, name, value)
         session.add(user.settings)

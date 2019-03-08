@@ -42,6 +42,9 @@ install_dev_packages:
 # Running MedTagger
 #
 
+sync_configuration:
+	PYTHONPATH=`pwd` $(PYTHON) scripts/sync_configuration.py
+
 run_rest:
 	PYTHONPATH=`pwd` $(PYTHON) medtagger/api/rest.py
 
@@ -137,4 +140,4 @@ clean:
 	find . -name '*.pyc' -delete
 	find . -name '*.log' -delete
 
-.PHONY: venv install_packages run_api run_workers start_dependencies stop_dependencies update_dependencies clean test test_pylint test_flake8 test_mypy unit_tests functional_tests
+.PHONY: venv install_packages sync_configuration run_api run_workers start_dependencies stop_dependencies update_dependencies clean test test_pylint test_flake8 test_mypy unit_tests functional_tests

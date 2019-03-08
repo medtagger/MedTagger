@@ -1,7 +1,7 @@
 """Module responsible for definition of LabelTagRepository."""
 from typing import List
 
-from medtagger.database import db_session
+from medtagger.database import db_transaction_session
 from medtagger.database.models import LabelTag
 from medtagger.definitions import LabelTool
 from medtagger.exceptions import InternalErrorException
@@ -30,16 +30,16 @@ def add_new_tag(key: str, name: str, tools: List[LabelTool], task_id: TaskID) ->
     :param task_id: id of Task that owns this Label Tag
     :return: Label Tag object
     """
-    with db_session() as session:
-        label_tag = LabelTag(key, name, tools)
-        label_tag.task_id = task_id
+    label_tag = LabelTag(key, name, tools)
+    label_tag.task_id = task_id
+    with db_transaction_session() as session:
         session.add(label_tag)
     return label_tag
 
 
 def delete_tag_by_key(key: str) -> None:
     """Remove Label Tag from database."""
-    with db_session() as session:
+    with db_transaction_session() as session:
         session.query(LabelTag).filter(LabelTag.key == key).delete()
 
 
@@ -52,14 +52,14 @@ def update(key: str, name: str = None, tools: List[LabelTool] = None, task_id: T
     :param task_id: (optional) Task ID for another Task which should be linked to this Label Tag
     :return: Label Tag object
     """
-    with db_session() as session:
-        label_tag = get_label_tag_by_key(key)
-        if name:
-            label_tag.name = name
-        if tools:
-            label_tag.tools = tools
-        if task_id:
-            label_tag.task_id = task_id
+    label_tag = get_label_tag_by_key(key)
+    if name:
+        label_tag.name = name
+    if tools:
+        label_tag.tools = tools
+    if task_id:
+        label_tag.task_id = task_id
+    with db_transaction_session() as session:
         session.add(label_tag)
     return label_tag
 
