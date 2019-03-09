@@ -1,5 +1,5 @@
 import {UploadPageComponent} from '../pages/upload-page/upload-page.component';
-import {MarkerTutorialPageComponent} from '../pages/marker-tutorial-page/marker-tutorial-page.component';
+import {TutorialPageComponent} from '../pages/tutorial-page/tutorial-page.component';
 import {HomePageComponent} from '../pages/home-page/home-page.component';
 import {ValidationPageComponent} from '../pages/validation-page/validation-page.component';
 import {SettingsPageComponent} from '../pages/settings-page/settings-page.component';
@@ -18,9 +18,9 @@ export const labelingRoutes: Routes = [
         canActivate: [AuthGuard]
     },
     {
-        path: appRoutes.LABELING_TUTORIAL,
-        component: MarkerTutorialPageComponent,
-        data: {title: 'Marker tutorial'},
+        path: appRoutes.TUTORIAL,
+        component: TutorialPageComponent,
+        data: {title: 'Tutorial'},
         canActivate: [AuthGuard]
     },
 ];

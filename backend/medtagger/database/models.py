@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.mapper import Mapper
 
 from medtagger.database.utils import ArrayOfEnum
-from medtagger.database import Base, db_session
+from medtagger.database import Base, db_transaction_session
 from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
     LabelElementStatus, LabelTool
 from medtagger.storage.models import BrushLabelElement as StorageBrushLabelElement, OriginalSlice, ProcessedSlice
@@ -225,9 +225,9 @@ class Scan(Base):
 
         :return: ID of a Slice
         """
-        with db_session() as session:
-            new_slice = Slice(orientation)
-            new_slice.scan = self
+        new_slice = Slice(orientation)
+        new_slice.scan = self
+        with db_transaction_session() as session:
             session.add(new_slice)
         return new_slice
 

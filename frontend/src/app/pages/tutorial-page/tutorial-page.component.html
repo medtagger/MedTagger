@@ -1,0 +1,21 @@
+<app-nav-bar>
+</app-nav-bar>
+
+<div class="container">
+    <div class="tutorial">
+        <div class="tutorial-video">
+            <iframe class="tutorial-video__content" src="https://www.youtube.com/embed/3WM0qtMMvdA" frameborder="0"
+                    allowfullscreen></iframe>
+        </div>
+        <div class="tutorial-info">
+            <button mat-raised-button class="tutorial-info__next" (click)="endTutorial()" data-cy="end-tutorial"
+                    color="primary">
+                <mat-icon>home</mat-icon>
+                Proceed to home page
+            </button>
+            <mat-checkbox class="tutorial-info__hide" [formControl]="doNotShowAgain" data-cy="not-show">
+                Do not show this tutorial again
+            </mat-checkbox>
+        </div>
+    </div>
+</div>
