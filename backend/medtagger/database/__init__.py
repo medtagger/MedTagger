@@ -31,7 +31,9 @@ class MedTaggerBase:  # pylint: disable=too-few-public-methods
 configuration = AppConfiguration()
 db_uri = configuration.get('db', 'database_uri')
 db_pool_size = configuration.getint('db', 'connection_pool_size')
-engine = create_engine(db_uri, pool_size=db_pool_size, pool_recycle=1800, convert_unicode=True, pool_pre_ping=True)
+db_pool_recycle = configuration.getint('db', 'connection_pool_recycle')
+engine = create_engine(db_uri, pool_size=db_pool_size, pool_recycle=db_pool_recycle,
+                       convert_unicode=True, pool_pre_ping=True)
 Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 convention = {
