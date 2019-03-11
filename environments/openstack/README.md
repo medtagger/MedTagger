@@ -14,7 +14,7 @@ and `db-key`. If you want to use different names, please change them in `main.tf
 `group_vars/all.yml` files.
 
 The download of the private keys should start automatically after creating them. If not,
-download private keys manually and place then in **Ansible directory.**
+download private keys manually and place then in **environments/openstack/ansible** directory.
 
 Remember to change file mode:
 
@@ -28,7 +28,7 @@ After this step you will have:
 - 2 (Ubuntu 18) instances (AppHost and DbHost) available on OpenStack,
 - AppHost will have externally available IP address,
 - Network connectivity between your App and Db host,
-- 4 volumes set up (App, PostgreSQL, Db and Cassandra),
+- 4 volumes set up (App Host, DB Host, PostgreSQL and Storage),
 - Security Groups enabling certain ports for different services.
 
 **Important**: Head to the `main.tf` file to see which of them are configurable. Keep in mind that
@@ -66,7 +66,7 @@ without actually applying them.
 If not, you will have to create the `inventory` and `backend.env` files manually. 
 Head to terraform folder and look at the `inventory.tpl` and `backend.env.tpl` files to 
 learn how does their look like,
-- the 2 private keys are placed in the Ansible folder.
+- the 2 private keys are placed in the `environments/openstack/ansible` folder.
 
 After this step you will have:
 - MedTagger source code on both of machines,
@@ -78,7 +78,7 @@ section to learn what changed)
 Before we run this script head to the `group_vars/all.yml` file to 
 make sure that the variables are set properly!
 
-To install all dependencies and start the docker containers run (from the Ansible directory): 
+To install all dependencies and start the docker containers run (from the `environments/openstack/ansible` directory): 
 ```bash
 $ ansible-playbook site.yml -i inventory
 ```
@@ -103,21 +103,7 @@ in our default docker-compose.yml.
               - node.hostname == apphost
     ```
 
-2. Enabling Docker Swarm mode in Traefik.
-
-    To be able to use Traefik we need to enable Docker Swarm mode. You can
-    read more about it [here](https://docs.traefik.io/user-guide/cluster-docker-consul/).
-    To do so we need to add `--docker` and `--docker.swarmMode` to our commands.
-    ```
-    image: traefik
-    [...]
-    command:
-      - [...]
-      - "--docker"
-      - "--docker.swarmMode"
-     ```
-     
-3. Set new restart policy for database_migrations.
+2. Set new restart policy for database_migrations.
 
     Docker Swarm wants to make sure that all services replicas are set to 1,
     since we did not set any restart policy for database_migrations, docker swarm
