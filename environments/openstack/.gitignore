@@ -2,6 +2,7 @@
 .terraform/
 *.tfstate
 *.tfstate.backup
+main.tf
 
 # Ansible
 inventory

@@ -10,8 +10,6 @@ services:
     restart: unless-stopped
     command:
       - "--configFile=/var/traefik/traefik.toml"
-      - "--docker"
-      - "--docker.swarmMode"
     ports:
       - 80:80
       - 52000:8080

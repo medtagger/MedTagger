@@ -3,6 +3,23 @@
 In this tutorial you will learn how to set up MedTagger on OpenStack
 using Terraform and Ansible. 
 
+### Creating main.tf file
+
+As you can see from the `.example.main.tf` there are several variables that are 
+used in this deployment. To be able to deploy MedTagger onto your Openstack instance,
+you would have to:
+
+1. Rename the file to `main.tf`,
+2. Fill it with your own variables.
+
+### Creating custom configuration
+
+MedTagger instance can be configurable depending on you needs regarding
+the tasks, tags and tools. Head to the `.example.medtagger.yml` to see
+the configuration. Make any changes that are needed and then rename the file
+to `.medtagger.yml`.  
+
+
 ### Generating SSH keys
 
 Proceed to your OpenStack Instance and go to **Computations - Access and Security - Key pairs** tab.
@@ -30,11 +47,6 @@ After this step you will have:
 - Network connectivity between your App and Db host,
 - 4 volumes set up (App Host, DB Host, PostgreSQL and Storage),
 - Security Groups enabling certain ports for different services.
-
-**Important**: Head to the `main.tf` file to see which of them are configurable. Keep in mind that
-`image_id`, `flavor_id` and `external_net` properties will be different across
-OpenStack instances. So you need to set them **manually**!
-
 
 To start with the provisioning we firstly need to download 
 the [`Openstack RC file`](https://docs.openstack.org/zh_CN/user-guide/common/cli-set-environment-variables-using-openstack-rc.html) 
@@ -66,14 +78,11 @@ without actually applying them.
 If not, you will have to create the `inventory` and `backend.env` files manually. 
 Head to terraform folder and look at the `inventory.tpl` and `backend.env.tpl` files to 
 learn how does their look like,
-- the 2 private keys are placed in the `environments/openstack/ansible` folder.
+- the 2 private keys are placed in the `environments/openstack/ansible` folder,
+- .medtagger.yml is placed in the `environments/openstack/ansible` folder.
 
-After this step you will have:
-- MedTagger source code on both of machines,
-- Private key to DbHost copied to AppHost,
-- Docker and Docker-compose installed on both of machines,
-- `backend.env` and `docker-compose.yml` swapped (head to the next
-section to learn what changed)
+After this step you will have running MedTagger with the chosen configuration (as 
+defined by .medtagger.yaml) on the Docker Swarm.
 
 Before we run this script head to the `group_vars/all.yml` file to 
 make sure that the variables are set properly!

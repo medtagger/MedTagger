@@ -60,6 +60,9 @@
 - name: Switch docker-compose.yml file
   command: cp "{{ project_remote_path }}"/environments/openstack/docker-compose.yml "{{ project_remote_path }}"/docker-compose.yml
 
+- name: Switch .medtagger.yml file
+  command: mv "{{ project_remote_path }}"/environments/openstack/.medtagger.yml "{{ project_remote_path }}"/.medtagger.yml
+
 - name: Copy db host key
   when: inventory_hostname in groups['app_hosts']
   copy:
