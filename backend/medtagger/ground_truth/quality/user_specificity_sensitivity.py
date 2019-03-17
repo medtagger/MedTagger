@@ -1,5 +1,6 @@
+"""Implementation of a Specificity and Sensitivity measure calculation."""
 import collections
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Tuple
 
 import numpy as np
 
@@ -11,10 +12,20 @@ from medtagger.ground_truth.algorithms.base import GeneratorAlgorithm
 INTERSECTION_OVER_UNION_THRESHOLD = 0.4
 
 
-def compute_specificity_and_sensitivity_for_users(algorithm: GeneratorAlgorithm,
-                                                  users: Set[models.User],
-                                                  label_elements: List[models.LabelElement],
-                                                  ground_truth: Dict[str, np.ndarray]):
+def compute_specificity_and_sensitivity_for_users(
+        algorithm: GeneratorAlgorithm, users: Set[models.User], label_elements: List[models.LabelElement],
+        ground_truth: Dict[str, np.ndarray]) -> Tuple[Dict[str, float], Dict[str, float], Dict[str, float]]:
+    """Compute Specificity and Sensitivity measure for each User.
+
+    Specificity = True Negative / Negative
+    Sensitivity = True Positive / Positive
+
+    :param algorithm: algorithm used during Ground Truth generation
+    :param users: set of Users that took part in data set generation
+    :param label_elements: list of Label Elements used for data set generation
+    :param ground_truth: Ground Truth data set as mapping of SliceID to numpy representation
+    :return: tuple with mappings of specificities, sensitivities and scores for each UserID
+    """
     specificity = collections.defaultdict(lambda: 0)
     sensitivity = collections.defaultdict(lambda: 0)
     scores = collections.defaultdict(lambda: 0)
@@ -54,7 +65,7 @@ def compute_specificity_and_sensitivity_for_users(algorithm: GeneratorAlgorithm,
                 continue  # Doesn't make sense to do any computations, let's move on
 
             parser = parsers.get_parser(type(label_elements[0]))
-            user_annotation = parser.convert_to_numpy([user_label_element], algorithm.require_image_resize)[0]
+            user_annotation = parser.convert_to_numpy([user_label_element], algorithm.REQUIRE_IMAGE_RESIZE)[0]
             ground_truth_annotation = ground_truth[slice_id]
             metric = parser.compute_intersection_over_union(user_annotation, ground_truth_annotation)
 

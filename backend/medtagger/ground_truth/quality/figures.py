@@ -1,3 +1,4 @@
+"""Module with some useful figures."""
 from typing import Dict, List
 
 import numpy as np
@@ -9,6 +10,11 @@ from medtagger.database import models
 
 
 def specificity_vs_sensitivity(users_specificity: Dict[str, np.ndarray], users_sensitivity: Dict[str, np.ndarray]) -> None:
+    """Display figure that compares Specificity and Sensitivity metric.
+
+    :param users_specificity: Specificity for each UserID
+    :param users_sensitivity: Sensitivity for each UserID
+    """
     plt.figure()
     plt.title('Specificity vs. Sensitivity')
     plt.scatter(1 - np.array(list(users_specificity.values())), np.array(list(users_sensitivity.values())))
@@ -20,6 +26,13 @@ def specificity_vs_sensitivity(users_specificity: Dict[str, np.ndarray], users_s
 
 
 def mean_labeling_time_vs_score(label_elements: List[models.LabelElement], users_scores: Dict[str, np.ndarray]) -> None:
+    """Display figure that compares Mean Labeling Time and Score metric.
+
+    This method also shows trend line computed with Linear Regression.
+
+    :param label_elements: list of Label Elements used for Ground Truth data set generation
+    :param users_scores: Score for each User ID
+    """
     scans_ids = {label_element.label.scan_id for label_element in label_elements}
     query = models.Label.query.with_entities(models.Label.owner_id, func.avg(models.Label.labeling_time))
     query = query.filter(models.Label.scan_id.in_(scans_ids)).group_by(models.Label.owner_id)
