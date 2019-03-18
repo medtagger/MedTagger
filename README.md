@@ -32,18 +32,6 @@ Documentation for the MedTagger can be found [here](/docs).
  - [Vagrant](https://www.vagrantup.com) for development environment,
  - [Travis](http://travis-ci.org/) for Continuous Integration.
 
-## What are we doing now?
-
- - [x] Labeling using multiple tools
-   - [x] Rectangle
-   - [x] Points
-   - [x] Connected Points
-   - [x] Brush
- - [ ] Zoom for labeling small objects
- - [ ] Surveys as additional actions for provided labels
- - [ ] Validation mechanism
- - [ ] On-demand datasets generation
-
 ## MedTagger setup
 
 MedTagger consists of two main parts:
@@ -62,7 +50,7 @@ Then follow up with our [documentation](/docs). Default development account is:
  - email: `admin@medtagger`,
  - password: `medtagger`.
 
-### Dockerized environment
+### Docker environment
 
 MedTagger can be set up easily with Docker-Compose:
 
@@ -70,7 +58,14 @@ MedTagger can be set up easily with Docker-Compose:
 $ docker-compose up
 ```
 
-More about setting up environment with Docker Compose can be found [here](/docs/setup_with_docker_compose.md).
+More about setting up environment with Docker-Compose can be found [here](/docs/setup_with_docker_compose.md).
+
+### Data Analysis with Jupyter Notebook
+
+Together with Docker-Compose setup, you can use Jupyter Notebook server to easily analyse collected annotations.
+ [Here](/examples/data_analysis) you can find some examples that shows how to do so.
+
+More information about setting up local Jupyter Notebook session can be found [here](/docs/jupyter_notebook.md).
 
 ## User Interface
 
