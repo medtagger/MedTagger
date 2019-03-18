@@ -6,12 +6,13 @@ import numpy as np
 
 from medtagger.types import SliceID
 from medtagger.database import models
+from medtagger.repositories import slices as SlicesRepository
 from medtagger.ground_truth import parsers
 from medtagger.ground_truth.algorithms.base import GeneratorAlgorithm
 
 
 class DataSetGenerator:
-    """Generator for the Ground Truth data set based on entered labels."""
+    """Generator for the Ground Truth data set based on entered labels."""  # pylint: disable=too-few-public-methods
 
     def __init__(self, algorithm: GeneratorAlgorithm) -> None:
         """Initialize generator with given algorithm.
@@ -26,17 +27,13 @@ class DataSetGenerator:
         :param label_elements: list of all Label Elements that should be taken into consideration during generation
         :return: Ground Truth label for each Slice ID in labelled Scans
         """
-        label_elements_for_slice_id = collections.defaultdict(list)
+        label_elements_for_slice_id: Dict[SliceID, List[models.LabelElement]] = collections.defaultdict(list)
         for label_element in label_elements:
             labeled_slice = label_element.label.scan.slices[label_element.slice_index]
             label_elements_for_slice_id[labeled_slice.id].append(label_element)
 
-        # Fetch all Slices that are in Scans that were labeled using passed Label Elements
-        scans_ids = {label_element.label.scan_id for label_element in label_elements}
-        slices = models.Slice.query.with_entities(models.Slice.id).filter(models.Slice.scan_id.in_(scans_ids)).all()
-        slices_ids = {_slice.id for _slice in slices}
-
-        ground_truth_per_slice_id = {}
+        ground_truth_per_slice_id: Dict[SliceID, np.ndarray] = {}
+        slices_ids = SlicesRepository.get_slices_ids_for_labeled_scans(label_elements)
         for slice_id in slices_ids:
             label_elements = label_elements_for_slice_id[slice_id]
             if len(label_elements) < 2:

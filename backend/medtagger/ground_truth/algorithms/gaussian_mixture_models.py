@@ -5,7 +5,7 @@ from sklearn import mixture
 from medtagger.ground_truth.algorithms.base import GeneratorAlgorithm
 
 
-class GaussianMixtureModelsAlgorithm(GeneratorAlgorithm):
+class GaussianMixtureModelsAlgorithm(GeneratorAlgorithm):  # pylint: disable=too-few-public-methods
     """Gaussian Mixture Models Algorithm implementation."""
 
     REQUIRE_IMAGE_RESIZE = True
@@ -14,10 +14,6 @@ class GaussianMixtureModelsAlgorithm(GeneratorAlgorithm):
     INIT_PARAMS = 'random'
     REG_COVAR = 1e-2
     COVARIANCE_TYPE = 'spherical'
-
-    def __init__(self) -> None:
-        """Initialize algorithm."""
-        super(GaussianMixtureModelsAlgorithm, self).__init__()
 
     def get_ground_truth(self, data: np.ndarray) -> np.ndarray:
         """Calculate output Ground Truth label using Gaussian Mixture Models algorithm.
@@ -51,4 +47,3 @@ class GaussianMixtureModelsAlgorithm(GeneratorAlgorithm):
                 return components - 1  # Previous component was better, so let's use it
             previous_bic_value = value
         return min(self.MAX_NUMBER_OF_COMPONENTS, data.shape[0])
-

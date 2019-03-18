@@ -4,14 +4,10 @@ import numpy as np
 from medtagger.ground_truth.algorithms.base import GeneratorAlgorithm
 
 
-class MajorityVotingAlgorithm(GeneratorAlgorithm):
+class MajorityVotingAlgorithm(GeneratorAlgorithm):  # pylint: disable=too-few-public-methods
     """Majority Voting Algorithm implementation."""
 
     REQUIRE_IMAGE_RESIZE = False
-
-    def __init__(self) -> None:
-        """Initialize algorithm."""
-        super(MajorityVotingAlgorithm, self).__init__()
 
     def get_ground_truth(self, data: np.ndarray) -> np.ndarray:
         """Calculate output Ground Truth label using Majority Voting algorithm.

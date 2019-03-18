@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 from sqlalchemy import func
 from sklearn import linear_model
 
+from medtagger.types import UserID
 from medtagger.database import models
 
 
-def specificity_vs_sensitivity(users_specificity: Dict[str, np.ndarray], users_sensitivity: Dict[str, np.ndarray]) -> None:
+def specificity_vs_sensitivity(users_specificity: Dict[UserID, float], users_sensitivity: Dict[UserID, float]) -> None:
     """Display figure that compares Specificity and Sensitivity metric.
 
     :param users_specificity: Specificity for each UserID
@@ -25,7 +26,7 @@ def specificity_vs_sensitivity(users_specificity: Dict[str, np.ndarray], users_s
     plt.show()
 
 
-def mean_labeling_time_vs_score(label_elements: List[models.LabelElement], users_scores: Dict[str, np.ndarray]) -> None:
+def mean_labeling_time_vs_score(label_elements: List[models.LabelElement], users_scores: Dict[UserID, float]) -> None:
     """Display figure that compares Mean Labeling Time and Score metric.
 
     This method also shows trend line computed with Linear Regression.
@@ -35,7 +36,8 @@ def mean_labeling_time_vs_score(label_elements: List[models.LabelElement], users
     """
     scans_ids = {label_element.label.scan_id for label_element in label_elements}
     query = models.Label.query.with_entities(models.Label.owner_id, func.avg(models.Label.labeling_time))
-    query = query.filter(models.Label.scan_id.in_(scans_ids)).group_by(models.Label.owner_id)
+    query = query.filter(models.Label.scan_id.in_(scans_ids))  # type: ignore  # "ScanID" doesn't have "in_"
+    query = query.group_by(models.Label.owner_id)
     labeling_time_for_user_id = dict(query.all())
 
     user_ids = list(users_scores.keys())

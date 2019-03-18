@@ -7,7 +7,7 @@ from sklearn import cluster
 from medtagger.ground_truth.algorithms.base import GeneratorAlgorithm
 
 
-class DBSCANAlgorithm(GeneratorAlgorithm):
+class DBSCANAlgorithm(GeneratorAlgorithm):  # pylint: disable=too-few-public-methods
     """DBSCAN Algorithm implementation."""
 
     REQUIRE_IMAGE_RESIZE = False
@@ -16,10 +16,6 @@ class DBSCANAlgorithm(GeneratorAlgorithm):
     # NOTE: Find better parameters automatically
     EPS = 0.5
     MIN_SAMPLES = 2
-
-    def __init__(self) -> None:
-        """Initialize algorithm."""
-        super(DBSCANAlgorithm, self).__init__()
 
     def get_ground_truth(self, data: np.ndarray) -> np.ndarray:
         """Calculate output Ground Truth label using DBSCAN algorithm.
@@ -34,6 +30,6 @@ class DBSCANAlgorithm(GeneratorAlgorithm):
         labels = [label for label in model.labels_ if label != self.NOISE_LABEL] or [0]
         most_common_cluster = collections.Counter(labels).most_common(1)[0][0]
         best_points_idx = {idx for idx in model.core_sample_indices_ if model.labels_[idx] == most_common_cluster}
-        best_points_idx = best_points_idx or {0}  # In case all Labels were marked as noise - let's use first Label Element
+        best_points_idx = best_points_idx or {0}  # In case all Labels were noise - let's use first Label Element
         best_points = [data[idx] for idx in best_points_idx]
         return np.mean(best_points, axis=0)

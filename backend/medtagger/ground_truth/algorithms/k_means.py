@@ -7,15 +7,11 @@ from sklearn import cluster
 from medtagger.ground_truth.algorithms.base import GeneratorAlgorithm
 
 
-class KMeansAlgorithm(GeneratorAlgorithm):
+class KMeansAlgorithm(GeneratorAlgorithm):  # pylint: disable=too-few-public-methods
     """K-Means Algorithm implementation."""
 
     REQUIRE_IMAGE_RESIZE = True
     MAX_NUMBER_OF_CLUSTERS = 5
-
-    def __init__(self) -> None:
-        """Initialize algorithm."""
-        super(KMeansAlgorithm, self).__init__()
 
     def get_ground_truth(self, data: np.ndarray) -> np.ndarray:
         """Calculate output Ground Truth label using K-Means algorithm.

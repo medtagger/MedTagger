@@ -12,13 +12,12 @@ from medtagger.ground_truth.parsers import base
 class ChainLabelElementParser(base.LabelElementParser):
     """Parser for Chain Label Element."""
 
+    DEFAULT_WIDTH = 512
+    DEFAULT_HEIGHT = 512
     IMAGE_AFTER_RESHAPE = (100, 100)
 
-    def __init__(self) -> None:
-        """Initialize parser."""
-        super(ChainLabelElementParser, self).__init__()
-
-    def convert_to_numpy(self, label_elements: List[models.ChainLabelElement], resize_image: bool = False) -> np.ndarray:
+    def convert_to_numpy(self, label_elements: List[models.ChainLabelElement], resize_image: bool = False) \
+            -> np.ndarray:
         """Convert given list of Chain Label Elements to numpy array.
 
         :param label_elements: list of Chain Label Elements that should be converted
@@ -27,8 +26,10 @@ class ChainLabelElementParser(base.LabelElementParser):
         """
         masks = []
         for element in label_elements:
-            mask = np.zeros((element.label.scan.width, element.label.scan.height), 'uint8')
-            poly = np.array([(p.x * element.label.scan.width, p.y * element.label.scan.height) for p in element.points])
+            scan_width = element.label.scan.width or self.DEFAULT_WIDTH
+            scan_height = element.label.scan.height or self.DEFAULT_HEIGHT
+            mask = np.zeros((scan_width, scan_height), 'uint8')
+            poly = np.array([(p.x * scan_width, p.y * scan_height) for p in element.points])
             rr, cc = draw.polygon(poly[:, 1], poly[:, 0], mask.shape)
             mask[rr, cc] = 1.0
             masks.append(mask)
@@ -36,7 +37,8 @@ class ChainLabelElementParser(base.LabelElementParser):
         # Some methods require to resize images in order to properly generate Ground Truth data set
         # It is mostly required due to performance reasons (e.g. DBSCAN or K-Means)
         if resize_image:
-            resized_masks = np.array([np.array(Image.fromarray(mask).resize(self.IMAGE_AFTER_RESHAPE)) for mask in masks])
+            resized_masks = np.array([np.array(Image.fromarray(mask).resize(self.IMAGE_AFTER_RESHAPE))
+                                      for mask in masks])
         else:
             resized_masks = np.array(masks)
 
@@ -45,7 +47,8 @@ class ChainLabelElementParser(base.LabelElementParser):
         all_masks_flattened = np.reshape(resized_masks, desired_shape)
         return all_masks_flattened
 
-    def compute_intersection_over_union(self, first_label_element: np.ndarray, second_label_element: np.ndarray) -> float:
+    def compute_intersection_over_union(self, first_label_element: np.ndarray, second_label_element: np.ndarray) \
+            -> float:
         """Compute metric for Intersection over Union (IoU).
 
         :param first_label_element: first Label Element as numpy array
