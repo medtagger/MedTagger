@@ -35,7 +35,7 @@ class KMeansAlgorithm(GeneratorAlgorithm):  # pylint: disable=too-few-public-met
         :return: number of clusters that should be used and will work best for given data
         """
         previous_difference = 0
-        for number_of_clusters in range(1, min(self.MAX_NUMBER_OF_CLUSTERS, data.shape[0]) + 1):
+        for number_of_clusters in range(2, min(self.MAX_NUMBER_OF_CLUSTERS, data.shape[0]) + 1):
             model = cluster.KMeans(n_clusters=number_of_clusters)
             model.fit(data)
             current_difference = model.inertia_ - previous_difference

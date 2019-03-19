@@ -10,11 +10,12 @@ At any time, you can use Jupyter Notebooks to analyse data collected with MedTag
 If you have set up you environment with Docker Compose, you're lucky! That's because Jupyter
  Notebooks are already set up for you. A separate Jupyter Notebook server has been set up in
  one of MedTagger's containers. All you need to do is go to your browser at `localhost:52001`
- and `medtagger` as a password to the Jupyter.
+ and use `medtagger` as a default password to the Jupyter.
 
-**NOTE:** Please change the default password after first use!
+**NOTE:** Please change the default password after first use
  [Here](https://jupyter-notebook.readthedocs.io/en/stable/public_server.html) you can find
- more information about it.
+ more information about it. You can also change the password during image creation using
+ `JUPYTER_NOTEBOOK_PASSWORD` environment variable.
 
 ## Vagrant & Native setup
 

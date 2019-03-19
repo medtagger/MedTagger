@@ -168,6 +168,7 @@ services:
       args:
         - CASS_DRIVER_NO_CYTHON=${CASSANDRA_DRIVER__DISABLE_CYTHON}
         - CASS_DRIVER_NO_EXTENSIONS=${CASSANDRA_DRIVER__DISABLE_EXTENTIONS}
+        - JUPYTER_NOTEBOOK_PASSWORD=${JUPYTER_NOTEBOOK_PASSWORD}
     command: bash -c "cd /medtagger/ && jupyter notebook --ip 0.0.0.0 --port 52001 --no-browser --allow-root"
     volumes:
       - ${PWD}:/medtagger/

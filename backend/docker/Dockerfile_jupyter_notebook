@@ -24,8 +24,9 @@ ARG CASS_DRIVER_NO_EXTENSIONS
 RUN pip install -r requirements.txt
 RUN pip install -r requirements.dev.txt
 
+ARG JUPYTER_NOTEBOOK_PASSWORD
 RUN jupyter notebook --generate-config
-RUN echo "c.NotebookApp.password='sha1:49261fd86f30:f06b38ac65c155ed52b69739b7027bf5ac57ab31'" >> /root/.jupyter/jupyter_notebook_config.py
+RUN echo "c.NotebookApp.password='$JUPYTER_NOTEBOOK_PASSWORD'" >> /root/.jupyter/jupyter_notebook_config.py
 
 EXPOSE 52001
 CMD ["make", "install_dev_packages"]

@@ -30,7 +30,7 @@ class ChainLabelElementParser(base.LabelElementParser):
             scan_height = element.label.scan.height or self.DEFAULT_HEIGHT
             mask = np.zeros((scan_width, scan_height), 'uint8')
             poly = np.array([(p.x * scan_width, p.y * scan_height) for p in element.points])
-            rr, cc = draw.polygon(poly[:, 1], poly[:, 0], mask.shape)
+            rr, cc = draw.polygon(poly[:, 1], poly[:, 0], mask.shape)  # NOTE: Assumes loop for now
             mask[rr, cc] = 1.0
             masks.append(mask)
 

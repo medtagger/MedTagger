@@ -46,4 +46,4 @@ class RectangleLabelElementParser(base.LabelElementParser):
         second_label_field = second_width * second_height
         union = first_label_field + second_label_field - intersection
 
-        return intersection / union
+        return float(np.nan_to_num(intersection / union))

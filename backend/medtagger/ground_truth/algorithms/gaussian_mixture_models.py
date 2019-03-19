@@ -38,7 +38,7 @@ class GaussianMixtureModelsAlgorithm(GeneratorAlgorithm):  # pylint: disable=too
         :return: number of components that should be used and will work best for given data
         """
         previous_bic_value = 0
-        for components in range(1, min(self.MAX_NUMBER_OF_COMPONENTS, data.shape[0]) + 1):
+        for components in range(2, min(self.MAX_NUMBER_OF_COMPONENTS, data.shape[0]) + 1):
             model = mixture.GaussianMixture(n_components=components, init_params=self.INIT_PARAMS,
                                             reg_covar=self.REG_COVAR, covariance_type=self.COVARIANCE_TYPE)
             model.fit(data)
