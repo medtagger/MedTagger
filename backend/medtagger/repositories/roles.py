@@ -5,7 +5,7 @@ from sqlalchemy import exists
 from sqlalchemy.orm.exc import NoResultFound
 
 from medtagger.api import InvalidArgumentsException
-from medtagger.database import db_session
+from medtagger.database import db_connection_session, db_transaction_session
 from medtagger.database.models import Role
 from medtagger.repositories import users as UsersRepository
 
@@ -31,20 +31,20 @@ def set_user_role(user_id: int, role_name: str) -> None:
         role = get_role_with_name(role_name)
     except NoResultFound:
         raise InvalidArgumentsException('Role with this name does not exist.')
-    with db_session() as session:
+    with db_transaction_session() as session:
         user.roles = [role]
         session.add(user)
 
 
 def role_exists(role_name: str) -> bool:
     """Check if such Role with given name exists."""
-    with db_session() as session:
+    with db_connection_session() as session:
         return session.query(exists().where(Role.name == role_name)).scalar()
 
 
 def add_role(role_name: str) -> Role:
     """Add new Role to the database."""
-    with db_session() as session:
-        role = Role(name=role_name)
+    role = Role(name=role_name)
+    with db_transaction_session() as session:
         session.add(role)
     return role

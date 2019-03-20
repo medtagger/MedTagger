@@ -39,7 +39,7 @@ Structure presented above is temporary. Watch out for updates.
 - Run `ng serve --env=local` for a dev server. Navigate to `http://localhost:4200/`. 
 
 - In case you want to use custom host and port, use `--host` and `--port` flags.  
- Example: `ng serve --env=local --host 0.0.0.0 --port 4201`   
+ Example: `ng serve --configuration=local --host 0.0.0.0 --port 4201`   
  The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
