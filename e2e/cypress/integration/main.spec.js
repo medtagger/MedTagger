@@ -15,10 +15,12 @@ describe('Basic flow', () => {
 
     it('Login as admin and logout', () => {
         cy.visit(Cypress.env('HOST_URL'));
-        cy.get('[data-cy=login-email]').type('admin@medtagger.com');
-        cy.get('[data-cy=login-password]').type('medtagger1');
+        cy.get('[data-cy=login-email]').type('admin@medtagger');
+        cy.get('[data-cy=login-password]').type('medtagger');
         cy.get('[data-cy=submit]').click();
-        cy.url().should('eq', Cypress.env('HOST_URL') + 'home');
+        cy.url().should('eq', Cypress.env('HOST_URL') + 'tutorial');
+        cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
+        cy.get('[data-cy=end-tutorial').click();
         cy.get('[data-cy=navbar-user-dropdown]').click();
         cy.get('[data-cy=navbar-user-dropdown-logout-button]').click();
         cy.url().should('eq', Cypress.env('HOST_URL') + 'login');
@@ -59,7 +61,7 @@ describe('Basic flow', () => {
         // Watch on Label endpoint
         cy.server();
         cy.route('POST', '/api/v1/scans/*/*/label').as('addLabel');
- 
+
         // Prepare for labeling
         loginAsAdmin();
         uploadScans('Heart', 11);
