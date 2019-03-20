@@ -15,10 +15,12 @@ describe('Basic flow', () => {
 
     it('Login as admin and logout', () => {
         cy.visit(Cypress.env('HOST_URL'));
-        cy.get('[data-cy=login-email]').type('admin@medtagger.com');
-        cy.get('[data-cy=login-password]').type('medtagger1');
+        cy.get('[data-cy=login-email]').type('admin@medtagger');
+        cy.get('[data-cy=login-password]').type('medtagger');
         cy.get('[data-cy=submit]').click();
-        cy.url().should('eq', Cypress.env('HOST_URL') + 'home');
+        cy.url().should('eq', Cypress.env('HOST_URL') + 'tutorial');
+        cy.get('[data-cy=not-show]').click(); // unchecked "Do not show this tutorial again", we want execute the same steps every time
+        cy.get('[data-cy=end-tutorial').click();
         cy.get('[data-cy=navbar-user-dropdown]').click();
         cy.get('[data-cy=navbar-user-dropdown-logout-button]').click();
         cy.url().should('eq', Cypress.env('HOST_URL') + 'login');
@@ -59,21 +61,21 @@ describe('Basic flow', () => {
         // Watch on Label endpoint
         cy.server();
         cy.route('POST', '/api/v1/scans/*/*/label').as('addLabel');
- 
+
         // Prepare for labeling
         loginAsAdmin();
         uploadScans('Heart', 11);
         goToLabeling('Find narrowings');
         matSelect('[data-cy=tags]', 'Narrowing (lenghtwise)');
         cy.get('[data-cy=chain-tool]').click();
- 
+
         // Enter first Chain element
         cy.get('canvas').click(100, 100, {timeout: 15000});
         cy.get('canvas').click(200, 100);
         cy.get('canvas').click(200, 200);
         // NOTE: Cannot use right click event, so as a work around we are changing Tool
         cy.get('[data-cy=chain-tool]').click();
- 
+
         // Enter second Chain element
         cy.get('canvas').click(300, 300);
         cy.get('canvas').click(200, 300);
@@ -81,7 +83,7 @@ describe('Basic flow', () => {
         cy.get('canvas').click(300, 300);
         // NOTE: Cannot use right click event, so as a work around we are changing Tool
         cy.get('[data-cy=chain-tool]').click();
- 
+
         // Send and check Label in backend
         cy.get('[data-cy=send-label]').click();
         cy.wait('@addLabel').then(function(xhr) {
@@ -92,7 +94,7 @@ describe('Basic flow', () => {
                 expect(labelElements.length).equals(2);
             });
         });
- 
+
         // UI should be empty once again
         cy.get('[data-cy=no-labels-added]');
     });

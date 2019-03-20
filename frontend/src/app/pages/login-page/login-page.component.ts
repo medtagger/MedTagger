@@ -4,6 +4,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {passwordValidator} from '../validators/password-validator.directive';
 import {AccountService} from '../../services/account.service';
 import * as appRoutes from '../../constants/routes';
+import {UserInfo} from '../../model/UserInfo';
 
 enum LoginPageMode {
     LOG_IN,
@@ -24,6 +25,8 @@ export class LoginPageComponent implements OnInit {
     loginPageMode: LoginPageMode = LoginPageMode.LOG_IN;
     registerForm: FormGroup;
     loginForm: FormGroup;
+
+    user: UserInfo;
 
     loggingInProgress: boolean;
     loggingInError: string;
@@ -78,7 +81,8 @@ export class LoginPageComponent implements OnInit {
                 console.log(userInfo);
                 if (userInfo) {
                     sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-                    this.routerService.navigate([appRoutes.HOME]);
+                    this.user = JSON.parse(sessionStorage.getItem('userInfo'));
+                    this.routerService.navigate([this.user.settings.skipTutorial ? appRoutes.HOME : appRoutes.TUTORIAL]);
                 }
             }, (error) => {
                 this.loggingInProgress = false;
@@ -166,7 +170,8 @@ export class LoginPageComponent implements OnInit {
                 console.log(userInfo);
                 if (userInfo) {
                     sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
-                    this.routerService.navigate([appRoutes.HOME]);
+                    this.user = JSON.parse(sessionStorage.getItem('userInfo'));
+                    this.routerService.navigate([this.user.settings.skipTutorial ? appRoutes.HOME : appRoutes.TUTORIAL]);
                 }
             }, (error) => {
                 this.resetRegistration();

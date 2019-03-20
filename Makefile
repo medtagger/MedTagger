@@ -21,8 +21,8 @@ e2e:
 		echo "E2E Tests failed!";\
 		exit 1;\
 	fi
-	echo "E2E Tests passed!"
 	make e2e__delete_environment
+	echo "E2E Tests passed!"
 
 e2e_docker:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) up --build -d
@@ -33,8 +33,8 @@ e2e_docker:
 		echo "E2E Tests failed!";\
 		exit 1;\
 	fi
-	echo "E2E Tests passed!"
 	docker-compose -f $(E2E_DOCKER_COMPOSE) down
+	echo "E2E Tests passed!"
 
 e2e__prepare_environment:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d e2e_cassandra e2e_postgres e2e_rabbitmq
@@ -76,13 +76,13 @@ e2e__stop_medtagger:
 e2e__run:
 	make e2e__start_medtagger
 	sleep 30  # Let's wait a while for booting up of all services
-	@if make e2e__execute; then \
+	@if ! make e2e__execute; then \
 		make e2e__stop_medtagger;\
 		echo "E2E Tests failed!";\
 		exit 1;\
 	fi
-	echo "E2E Tests passed!"
 	make e2e__stop_medtagger
+	echo "E2E Tests passed!"
 
 e2e__run_docker:
 	sleep 30  # Let's wait a while for booting up of all services
