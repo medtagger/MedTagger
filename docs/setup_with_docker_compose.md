@@ -87,6 +87,16 @@ $ export MEDTAGGER__HOST_ON_SUBDIRECTORY=/medtagger
 $ docker-compose up ...
 ```
 
+### Monitoring
+
+Your MedTagger instance can be monitored with [Netdata](https://docs.netdata.cloud).
+ Default configuration was defined in the Docker-Compose file, so it will be run
+ together with all other Docker containers. If needed, Netdata can be used to collect
+ data from multiple nodes in your cluster, which required additional configuration
+ as described [here](https://docs.netdata.cloud/streaming/#monitoring-ephemeral-nodes).
+
+Netdata UI will be available under `http://localhost:19999/`.
+
 ### How to speed up Cassandra Driver?
 
 By default MedTagger will use only Python implementation for Cassandra Driver. But authors of this
