@@ -23,6 +23,13 @@ $canvas-size: 100%;
         position: absolute;
         right: 0;
         height: $canvas-size;
+
+        &.zoom {
+            right: 18px;
+            top: 3px;
+            bottom: 18px;
+            height: auto;
+        }
     }
     &--spinner {
         &-box {

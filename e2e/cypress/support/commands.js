@@ -23,3 +23,9 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add("moveAndClick", { prevSubject: 'element' }, (subject, x, y) => {
+    return cy.wrap(subject)
+        .trigger('mousemove', x, y)
+        .click(x, y);
+});

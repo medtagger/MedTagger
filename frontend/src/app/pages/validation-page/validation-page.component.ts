@@ -33,8 +33,6 @@ export class ValidationPageComponent implements OnInit {
     ngOnInit() {
         console.log('ValidationPage init', this.scanViewer);
 
-        this.scanViewer.setTools([new RectangleTool(this.scanViewer.getCanvas())]);
-
         this.requestSlicesWithLabel();
         this.scanService.slicesObservable().subscribe((slice: MarkerSlice) => {
             this.scanViewer.feedData(slice);
@@ -76,7 +74,6 @@ export class ValidationPageComponent implements OnInit {
         // TODO: Unify with Marker Page...
         this.labelService.getRandomLabel(undefined).then((label: Label) => {
             this.label = label;
-            this.scanViewer.setArchivedSelections(this.label.labelSelections);
 
             this.scanService.getScanForScanId(this.label.scanId).then((scan: ScanMetadata) => {
                 this.scan = scan;
