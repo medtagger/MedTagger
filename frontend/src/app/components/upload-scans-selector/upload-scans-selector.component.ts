@@ -5,12 +5,12 @@ const FILE_SIZE_LIMIT = 5;  // MB
 
 export class SelectedScan {
     directory = '';
-    files: File[] = [];
+    files: WebkitFile[] = [];
     predefinedLabels: Array<PredefinedLabelToUpload> = [];
     predefinedLabelsTasks: Array<string> = [];
     additionalData: Object = {};
 
-    constructor(directory = '', files: File[] = [], predefinedLabels: Array<PredefinedLabelToUpload> = [],
+    constructor(directory = '', files: WebkitFile[] = [], predefinedLabels: Array<PredefinedLabelToUpload> = [],
                 predefinedLabelsTasks: Array<string> = [], additionalData: Object = {}) {
         this.directory = directory;
         this.files = files;
@@ -59,6 +59,11 @@ export class UserFiles {
     }
 }
 
+// Workaround class, refactor in issue #635
+export class WebkitFile extends File {
+    webkitRelativePath: string;
+}
+
 @Component({
     selector: 'app-upload-scans-selector',
     templateUrl: './upload-scans-selector.component.html'
@@ -69,7 +74,7 @@ export class UploadScansSelectorComponent {
 
     public ACCEPTED_FILE_TYPES = ['.dcm', '.png', '.json'].join(',');
     @ViewChild('inputFile') nativeInputFile: ElementRef;
-    private userSelectedFiles: File[] = [];
+    private userSelectedFiles: WebkitFile[] = [];
 
     public scans: SelectedScan[] = [];
     public totalNumberOfSlices = 0;
@@ -111,7 +116,7 @@ export class UploadScansSelectorComponent {
                 const fileReader: FileReader = new FileReader();
 
                 fileReader.onloadend = (e: ProgressEvent) => {
-                    const fileHeaderBytes = new Uint8Array(fileReader.result);
+                    const fileHeaderBytes = new Uint8Array(fileReader.result as ArrayBuffer);
 
                     const singatureBytesValues: string[] = [];
 
