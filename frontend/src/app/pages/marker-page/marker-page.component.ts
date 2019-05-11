@@ -1,5 +1,5 @@
 import { List } from 'immutable';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LabelExplorerComponent } from '../../components/label-explorer/label-explorer.component';
@@ -25,12 +25,29 @@ import { LabelService } from '../../services/label.service';
 import { ScanService } from '../../services/scan.service';
 import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
+import {
+    trigger,
+    style,
+    animate,
+    transition
+} from '@angular/animations';
 
 @Component({
     selector: 'app-marker-page',
     templateUrl: './marker-page.component.html',
     providers: [ScanService, LabelService],
-    styleUrls: ['./marker-page.component.scss']
+    styleUrls: ['./marker-page.component.scss'],
+    animations: [
+        trigger('displayDropdown', [
+            transition('void => *', [
+                style({transform: 'translateY(-10%)', opacity: 1}),
+                animate(200)
+            ]),
+            transition('* => void', [
+                animate(200, style({transform: 'translateY(10%)'}))
+            ])
+        ])
+    ]
 })
 export class MarkerPageComponent implements OnInit {
     private static readonly SLICE_BATCH_SIZE = 10;
@@ -49,6 +66,10 @@ export class MarkerPageComponent implements OnInit {
     currentTag: LabelTag;
     labelComment = '';
     isInitialSliceLoad: boolean;
+
+    public colorWindowPanelActive: boolean = false;
+    public colorWindowWidth: number = 1;
+    public colorWindowCenter: number = 0;
 
     ActionType = ToolActionType;
 
@@ -302,5 +323,55 @@ export class MarkerPageComponent implements OnInit {
                 }
                 this.marker.setSliderFocus(true);
             });
+    }
+
+    public toggleColorWindowPanel(): void {
+        this.colorWindowPanelActive = !this.colorWindowPanelActive;
+    }
+
+    public changeImageWindowWidth(newValue: number): void {
+        console.log('changeImageWindowWidth');
+        this.colorWindowWidth = newValue;
+        this.rescaleImageColorWindow();
+    }
+
+    public changeImageWindowCenter(newValue: number): void {
+        console.log('changeImageWindowWidth');
+        this.colorWindowCenter = newValue;
+        this.rescaleImageColorWindow();
+    }
+
+    private rescaleImageColorWindow(): void {
+        this.marker.modifyViewerImage(this.applyWindowScaling.bind(this));
+    }
+
+    private applyWindowScaling(imageRGBBytes: Uint8ClampedArray): Uint8ClampedArray {
+        let lowestVisibleValue = this.colorWindowCenter - (this.colorWindowWidth / 2);
+        let highestVisibleValue = this.colorWindowCenter + (this.colorWindowWidth / 2);
+
+        for (let i = 0; i < imageRGBBytes.length; i += 4) {
+            
+            let greyScaleValue = imageRGBBytes[i]; // red channel here, same as the next two beeing greyscale image
+            let alpha = imageRGBBytes[i + 3];
+
+            if (alpha == 0) {
+                continue;
+            }
+
+            let pixelValue;
+            if (greyScaleValue <= lowestVisibleValue) {
+                pixelValue = 0;
+            } else if (greyScaleValue > highestVisibleValue) {
+                pixelValue = 255;
+            } else {
+                pixelValue = (((greyScaleValue - (this.colorWindowCenter - 0.5)) / (this.colorWindowWidth - 1)) + 0.5) * 255;
+            }
+
+
+            imageRGBBytes[i] = imageRGBBytes[i + 1] = imageRGBBytes[i + 2] = pixelValue;
+            imageRGBBytes[i + 3] = 255;
+        }
+
+        return imageRGBBytes;
     }
 }

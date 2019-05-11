@@ -10,6 +10,30 @@ $toolbox-width: 300px;
     cursor: pointer;
 }
 
+.color-window-panel {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    transform:translateY(65%);
+
+    &--card {
+        &__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        &__content {
+            display: flex;
+            flex-direction: column;
+
+            mat-slider {
+                width: 300px;
+            }
+        }
+    }
+}
+
 .marker {
     @include media-breakpoint-up(md){
         display: flex;

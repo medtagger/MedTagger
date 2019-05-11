@@ -1,6 +1,43 @@
 <app-nav-bar>
     <div class="marker-nav">
         <div class="marker-nav--actions">
+            <button mat-mini-fab color="primary" class="window-change-button" (click)="toggleColorWindowPanel()">
+                <mat-icon [svgIcon]="'contrast-box'"></mat-icon>
+            </button>
+            <div *ngIf="colorWindowPanelActive" id="color-window-panel" class="color-window-panel">
+                <mat-card class="color-window-panel--card">
+                    <mat-card-header class="color-window-panel--card__header">
+                        <mat-card-title>Image Window</mat-card-title>
+                        <button mat-icon-button (click)="toggleColorWindowPanel()">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </mat-card-header>
+                    <mat-card-content class="color-window-panel--card__content">
+                        <span>
+                            Window width: {{colorWindowWidth}} 
+                        </span>
+                        <mat-slider (change)="changeImageWindowWidth($event.value)"
+                                    [disabled]="false"
+                                    [max]="255"
+                                    [min]="1" 
+                                    [step]="1" 
+                                    [tickInterval]="1" 
+                                    [value]="colorWindowWidth">
+                        </mat-slider>
+                        <span>
+                            Window center: {{colorWindowCenter}}
+                        </span>
+                        <mat-slider (change)="changeImageWindowCenter($event.value)"
+                                    [disabled]="false"
+                                    [max]="255"
+                                    [min]="0" 
+                                    [step]="1" 
+                                    [tickInterval]="1" 
+                                    [value]="colorWindowCenter">
+                        </mat-slider>
+                    </mat-card-content>
+                </mat-card>
+            </div>
             <button mat-mini-fab
                 (click)="zoomIn()"
                 [disabled]="currentZoomLevelIndex >= zoomLevels.size - 1"
