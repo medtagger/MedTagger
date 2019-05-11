@@ -8,11 +8,13 @@
                 <mat-card class="color-window-panel--card">
                     <mat-card-header class="color-window-panel--card__header">
                         <mat-card-title>Image Window</mat-card-title>
+                        <mat-card-subtitle>Correct image brightness and contrast by tuning parameters below</mat-card-subtitle>
                         <button mat-icon-button (click)="toggleColorWindowPanel()">
                             <mat-icon>close</mat-icon>
                         </button>
                     </mat-card-header>
                     <mat-card-content class="color-window-panel--card__content">
+                        <mat-divider [inset]="true"></mat-divider>
                         <span>
                             Window width: {{colorWindowWidth}} 
                         </span>

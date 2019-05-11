@@ -14,13 +14,19 @@ $toolbox-width: 300px;
     display: block;
     position: fixed;
     z-index: 1;
-    transform:translateY(65%);
+    transform:translateY(60%);
 
     &--card {
+        width: 400px;
+        
         &__header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
+
+            .mat-card-header-text {
+                margin: 0 0 0 0;
+            }
         }
 
         &__content {
@@ -29,6 +35,11 @@ $toolbox-width: 300px;
 
             mat-slider {
                 width: 300px;
+            }
+
+            mat-divider {
+                margin-top: 10px;
+                margin-bottom: 20px;
             }
         }
 
