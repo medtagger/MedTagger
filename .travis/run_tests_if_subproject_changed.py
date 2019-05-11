@@ -18,13 +18,17 @@ def get_root_dir(path):
 
 
 def run(command):
-    logging.info('Let\'s run the CI!')
-    p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print('=============================')
     print('        TESTS OUTPUT         ')
     print('=============================')
-    for stdout_line in iter(p.stdout.readline, ""):
-        print(stdout_line, end="")
+    process = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
+    while True:
+        output = process.stdout.readline()
+        if output == '' and process.poll() is not None:
+            break
+        if output:
+            print(output.strip())
     print('=============================')
     p.stdout.close()
     return_code = p.wait()
