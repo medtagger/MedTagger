@@ -275,6 +275,11 @@ export class MarkerPageComponent implements OnInit {
         if (this.currentTool && !this.isToolSupportedByCurrentTag(this.currentTool.getToolName())) {
             this.setTool(undefined);
         }
+
+        const supportedTools = this.tools.filter((tool: Tool<SliceSelection>) => this.isToolSupportedByCurrentTag(tool.getToolName()));
+        if (supportedTools.size === 1) {
+            this.setTool(supportedTools.get(0).getToolName());
+        }
     }
 
     public getToolIconName(iconName: string): string {
