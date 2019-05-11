@@ -1,5 +1,5 @@
 import { List } from 'immutable';
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LabelExplorerComponent } from '../../components/label-explorer/label-explorer.component';
@@ -16,7 +16,7 @@ import { MarkerSlice } from '../../model/MarkerSlice';
 import { PredefinedBrushLabelElement } from '../../model/PredefinedBrushLabelElement';
 import { ScanMetadata } from '../../model/ScanMetadata';
 import { Selection3D } from '../../model/selections/Selection3D';
-import { SliceSelection, SliceSelectionType } from '../../model/selections/SliceSelection';
+import { SliceSelection } from '../../model/selections/SliceSelection';
 import { SliceRequest } from '../../model/SliceRequest';
 import { Task } from '../../model/Task';
 import { ToolAction, ToolActionType } from '../../model/ToolAction';
@@ -25,29 +25,12 @@ import { LabelService } from '../../services/label.service';
 import { ScanService } from '../../services/scan.service';
 import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
-import {
-    trigger,
-    style,
-    animate,
-    transition
-} from '@angular/animations';
 
 @Component({
     selector: 'app-marker-page',
     templateUrl: './marker-page.component.html',
     providers: [ScanService, LabelService],
-    styleUrls: ['./marker-page.component.scss'],
-    animations: [
-        trigger('displayDropdown', [
-            transition('void => *', [
-                style({transform: 'translateY(-10%)', opacity: 1}),
-                animate(200)
-            ]),
-            transition('* => void', [
-                animate(200, style({transform: 'translateY(10%)'}))
-            ])
-        ])
-    ]
+    styleUrls: ['./marker-page.component.scss']
 })
 export class MarkerPageComponent implements OnInit {
     private static readonly SLICE_BATCH_SIZE = 10;
