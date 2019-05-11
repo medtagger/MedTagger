@@ -1,16 +1,17 @@
 import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@angular/core';
 import {PredefinedLabelToUpload, handlePredefinedLabelFile} from '../../utils/PredefinedLabelHandler';
+import { deprecate } from 'util';
 
 const FILE_SIZE_LIMIT = 5;  // MB
 
 export class SelectedScan {
     directory = '';
-    files: WebkitFile[] = [];
+    files: File[] = [];
     predefinedLabels: Array<PredefinedLabelToUpload> = [];
     predefinedLabelsTasks: Array<string> = [];
     additionalData: Object = {};
 
-    constructor(directory = '', files: WebkitFile[] = [], predefinedLabels: Array<PredefinedLabelToUpload> = [],
+    constructor(directory = '', files: File[] = [], predefinedLabels: Array<PredefinedLabelToUpload> = [],
                 predefinedLabelsTasks: Array<string> = [], additionalData: Object = {}) {
         this.directory = directory;
         this.files = files;
@@ -59,11 +60,6 @@ export class UserFiles {
     }
 }
 
-// Workaround class, refactor in issue #635
-export class WebkitFile extends File {
-    webkitRelativePath: string;
-}
-
 @Component({
     selector: 'app-upload-scans-selector',
     templateUrl: './upload-scans-selector.component.html'
@@ -74,7 +70,7 @@ export class UploadScansSelectorComponent {
 
     public ACCEPTED_FILE_TYPES = ['.dcm', '.png', '.json'].join(',');
     @ViewChild('inputFile') nativeInputFile: ElementRef;
-    private userSelectedFiles: WebkitFile[] = [];
+    private userSelectedFiles: File[] = [];
 
     public scans: SelectedScan[] = [];
     public totalNumberOfSlices = 0;
@@ -148,12 +144,7 @@ export class UploadScansSelectorComponent {
             return Promise.resolve();
         }
 
-        // User selected single scan upload
-        if (!this.multipleScans) {
-            return this.prepareSingleScan();
-        }
-
-        return this.prepareMultipleScans();
+        return this.prepareSingleScan();
     }
 
     private prepareSingleScan(): Promise<void> {
@@ -191,11 +182,14 @@ export class UploadScansSelectorComponent {
         });
     }
 
+    /**
+    * @deprecated To be adressed in future upload refactor
+    */
     private prepareMultipleScans(): Promise<void> {
         const promises: Array<Promise<any>> = [];
 
         for (const selectedFile of this.userSelectedFiles) {
-            const slicePath = selectedFile.webkitRelativePath;
+            const slicePath = ''; // selectedFile.webkitRelativePath;
             const currentScanDirectory = slicePath.split('/').slice(0, -1).join('/');
             let scanForThisSlice = this.scans.find((scan: SelectedScan) => {
                 return scan.directory === currentScanDirectory;
