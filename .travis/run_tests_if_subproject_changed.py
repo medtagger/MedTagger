@@ -24,14 +24,14 @@ def run(command):
     process = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
     while True:
-        output = process.stdout.readline()
+        output = process.stdout.readline().decode()
         if output == '' and process.poll() is not None:
             break
         if output:
             print(output.strip())
     print('=============================')
-    p.stdout.close()
-    return_code = p.wait()
+    process.stdout.close()
+    return_code = process.poll()
     exit(return_code)
 
 
