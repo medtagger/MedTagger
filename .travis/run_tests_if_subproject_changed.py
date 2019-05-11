@@ -14,7 +14,7 @@ BRANCHES_WITH_FULL_TESTS = ['master']
 
 
 def get_root_dir(path):
-    return os.path.dirname(path).split('/')[0]
+    return os.path.dirname(path).decode().split('/')[0]
 
 
 def run(command):
