@@ -1,10 +1,7 @@
-#!/usr/bin/env python
-from __future__ import print_function
-import logging
-import os
 import argparse
+import os
+import logging
 import subprocess
-from subprocess import Popen, PIPE, STDOUT
 
 
 logging.basicConfig(level=logging.INFO)
@@ -17,20 +14,24 @@ BRANCHES_WITH_FULL_TESTS = ['master']
 
 
 def get_root_dir(path):
-    return os.path.dirname(path).split('/')[0]
+    return os.path.dirname(path).decode().split('/')[0]
 
 
 def run(command):
-    logging.info('Let\'s run the CI!')
-    p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
     print('=============================')
     print('        TESTS OUTPUT         ')
     print('=============================')
-    for stdout_line in iter(p.stdout.readline, ""):
-        print(stdout_line, end="")
+    process = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
+    while True:
+        output = process.stdout.readline().decode()
+        if output == '' and process.poll() is not None:
+            break
+        if output:
+            print(output.strip())
     print('=============================')
-    p.stdout.close()
-    return_code = p.wait()
+    process.stdout.close()
+    return_code = process.poll()
     exit(return_code)
 
 
@@ -39,7 +40,8 @@ def do_not_run():
     exit(0)
 
 
-logging.info('This is a CI on branch %s.', os.environ.get('TRAVIS_BRANCH'))
+branch_name = os.environ.get('TRAVIS_BRANCH')
+logging.info('Running CI tests on branch "%s".', branch_name)
 logging.info('Full testing on all subprojects run on these branches: %s.', BRANCHES_WITH_FULL_TESTS)
 if os.environ.get('TRAVIS_BRANCH') not in BRANCHES_WITH_FULL_TESTS:
     logging.info('This is not a fully testing branch, so we will run tests only for changed subprojects.')
