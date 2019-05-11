@@ -31,6 +31,15 @@ $toolbox-width: 300px;
                 width: 300px;
             }
         }
+
+        &__actions {
+            display: flex;
+            flex-direction: column;
+
+            button {
+                color: white;
+            }
+        }
     }
 }
 

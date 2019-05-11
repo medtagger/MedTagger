@@ -51,6 +51,8 @@ import {
 })
 export class MarkerPageComponent implements OnInit {
     private static readonly SLICE_BATCH_SIZE = 10;
+    private static readonly DEFAULT_COLOR_WINDOW_WIDTH = 255;
+    private static readonly DEFAULT_COLOR_WINDOW_CENTER = 128;
     private static readonly HOME_PAGE = '/' + HOME;
 
     @ViewChild(MarkerComponent) marker: MarkerComponent;
@@ -67,9 +69,9 @@ export class MarkerPageComponent implements OnInit {
     labelComment = '';
     isInitialSliceLoad: boolean;
 
-    public colorWindowPanelActive: boolean = false;
-    public colorWindowWidth: number = 1;
-    public colorWindowCenter: number = 0;
+    public colorWindowPanelActive = false;
+    public colorWindowWidth: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_WIDTH;
+    public colorWindowCenter: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_CENTER;
 
     ActionType = ToolActionType;
 
@@ -329,14 +331,18 @@ export class MarkerPageComponent implements OnInit {
         this.colorWindowPanelActive = !this.colorWindowPanelActive;
     }
 
+    public resetColorWindowPanel(): void {
+        this.colorWindowWidth = MarkerPageComponent.DEFAULT_COLOR_WINDOW_WIDTH;
+        this.colorWindowCenter = MarkerPageComponent.DEFAULT_COLOR_WINDOW_CENTER;
+        this.rescaleImageColorWindow();
+    }
+
     public changeImageWindowWidth(newValue: number): void {
-        console.log('changeImageWindowWidth');
         this.colorWindowWidth = newValue;
         this.rescaleImageColorWindow();
     }
 
     public changeImageWindowCenter(newValue: number): void {
-        console.log('changeImageWindowWidth');
         this.colorWindowCenter = newValue;
         this.rescaleImageColorWindow();
     }
@@ -346,15 +352,15 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private applyWindowScaling(imageRGBBytes: Uint8ClampedArray): Uint8ClampedArray {
-        let lowestVisibleValue = this.colorWindowCenter - (this.colorWindowWidth / 2);
-        let highestVisibleValue = this.colorWindowCenter + (this.colorWindowWidth / 2);
+        const lowestVisibleValue = this.colorWindowCenter - (this.colorWindowWidth / 2);
+        const highestVisibleValue = this.colorWindowCenter + (this.colorWindowWidth / 2);
 
         for (let i = 0; i < imageRGBBytes.length; i += 4) {
-            
-            let greyScaleValue = imageRGBBytes[i]; // red channel here, same as the next two beeing greyscale image
-            let alpha = imageRGBBytes[i + 3];
 
-            if (alpha == 0) {
+            const greyScaleValue = imageRGBBytes[i]; // red channel here, same as the next two beeing greyscale image
+            const alpha = imageRGBBytes[i + 3];
+
+            if (alpha === 0) {
                 continue;
             }
 

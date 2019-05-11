@@ -327,12 +327,12 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     public modifyViewerImage(transformer: (imageRGBBytes: Uint8ClampedArray) => Uint8ClampedArray) {
-        let imageBytes: Uint8ClampedArray = this.getUnmodifiedImageData();
+        const imageBytes: Uint8ClampedArray = this.getUnmodifiedImageData();
 
-        let modifiedImage: ImageData = new ImageData(transformer(imageBytes), this.currentImage.width, this.currentImage.height);
+        const modifiedImage: ImageData = new ImageData(transformer(imageBytes), this.currentImage.width, this.currentImage.height);
         this.inMemoryCanvasCtx.putImageData(modifiedImage, 0, 0);
 
-        this.currentImage.src = this.inMemoryCanvas.toDataURL("image/png");
+        this.currentImage.src = this.inMemoryCanvas.toDataURL('image/png');
         this.resizeImageToCurrentWorkspace();
-    } 
+    }
 }

@@ -21,7 +21,7 @@
                                     [max]="255"
                                     [min]="1" 
                                     [step]="1" 
-                                    [tickInterval]="1" 
+                                    [tickInterval]="1"
                                     [value]="colorWindowWidth">
                         </mat-slider>
                         <span>
@@ -32,10 +32,13 @@
                                     [max]="255"
                                     [min]="0" 
                                     [step]="1" 
-                                    [tickInterval]="1" 
+                                    [tickInterval]="1"
                                     [value]="colorWindowCenter">
                         </mat-slider>
                     </mat-card-content>
+                    <mat-card-actions class="color-window-panel--card__actions">
+                        <button mat-button color="primary" (click)="resetColorWindowPanel()">Reset to default</button>
+                      </mat-card-actions>
                 </mat-card>
             </div>
             <button mat-mini-fab
