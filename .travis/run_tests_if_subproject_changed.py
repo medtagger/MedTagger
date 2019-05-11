@@ -1,10 +1,7 @@
-#!/usr/bin/env python
-from __future__ import print_function
-import logging
-import os
 import argparse
+import os
+import logging
 import subprocess
-from subprocess import Popen, PIPE, STDOUT
 
 
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +19,7 @@ def get_root_dir(path):
 
 def run(command):
     logging.info('Let\'s run the CI!')
-    p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print('=============================')
     print('        TESTS OUTPUT         ')
     print('=============================')
@@ -39,7 +36,8 @@ def do_not_run():
     exit(0)
 
 
-logging.info('This is a CI on branch %s.', os.environ.get('TRAVIS_BRANCH'))
+branch_name = os.environ.get('TRAVIS_BRANCH')
+logging.info('Running CI tests on branch "%s".', branch_name)
 logging.info('Full testing on all subprojects run on these branches: %s.', BRANCHES_WITH_FULL_TESTS)
 if os.environ.get('TRAVIS_BRANCH') not in BRANCHES_WITH_FULL_TESTS:
     logging.info('This is not a fully testing branch, so we will run tests only for changed subprojects.')
