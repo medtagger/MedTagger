@@ -18,7 +18,7 @@ services:
       - 52002:5432
 
   medtagger_backend_functional_tests:
-    image: medtagger_backend/functional_tests
+    image: medtagger/backend_functional_tests
     env_file:
       - ../backend/docker/backend.env
     build:

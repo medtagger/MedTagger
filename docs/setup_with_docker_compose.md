@@ -31,6 +31,14 @@ To run whole MedTagger (with all dependencies) using Docker Compose, you can jus
 $ docker-compose up
 ```
 
+By default, Docker-Compose will set up latest stable version of MedTagger. You can also setup and instance
+ with different version using appropriate environment variable:
+
+```bash
+$ export MEDTAGGER_VERSION=1.0.1
+$ docker-compose up
+``` 
+
 _**TIP!**_ Add `-d` (detach) option to run everything in the background!
 
 ### How to scale MedTagger with multiple containers?
@@ -50,14 +58,19 @@ $ docker-compose up -d \
 Remember that each service may run on multiple processes on its own, so be reasonable about
  resource allocation!
 
-### How to update MedTagger in Docker?
+### How to upgrade MedTagger in Docker?
 
-To update MedTagger using Docker Compose please use below `up` command with `--build` switch:
+To upgrade MedTagger using Docker Compose you can pull new images for given version and restart running
+ containers. It may look like this:
 
 ```bash
-$ git pull
-$ docker-compose up -d --no-deps --build medtagger_frontend medtagger_backend_rest \
-  medtagger_backend_websocket medtagger_backend_worker medtagger_backend_database_migrations
+$ export MEDTAGGER_VERSION=1.0.1
+$ export MEDTAGGER_SERVICES_TO_UPGRADE="medtagger_frontend medtagger_backend_rest \
+medtagger_backend_websocket medtagger_backend_worker medtagger_backend_database_migrations"
+$ docker-compose pull 
+$ docker-compose down
+$ docker-compose up -d --no-deps $MEDTAGGER_SERVICES_TO_UPGRADE
+$ docker-compose rm $MEDTAGGER_SERVICES_TO_UPGRADE
 ```
 
 ### How to setup only dependencies?
