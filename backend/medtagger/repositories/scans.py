@@ -1,5 +1,5 @@
 """Module responsible for definition of ScansRepository."""
-from typing import List
+from typing import List, Tuple
 
 from sqlalchemy.sql.expression import func
 
@@ -7,6 +7,25 @@ from medtagger.database import db_connection_session, db_transaction_session
 from medtagger.database.models import Dataset, Scan, Slice, User, Label, Task, datasets_tasks
 from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.types import ScanID
+
+
+def get_paginated_scans(dataset_key: str = None, page: int = 1, per_page: int = 25) -> Tuple[List[Scan], int]:
+    """Fetch and return all Scans filtered by given parameters.
+
+    :param dataset_key: (optional) key for Dataset that should be used as a filter
+    :param page: (optional) page number which should be fetched
+    :param per_page: (optional) number of entries per page
+    :return: tuple of list of Scans and total number of entries available
+    """
+    query = Scan.query
+    if dataset_key:
+        query = query.join(Dataset)
+        query = query.filter(Dataset.key == dataset_key)
+    query = query.order_by(Scan.id)
+
+    scans = query.limit(per_page).offset((page - 1) * per_page).all()
+    total_scans = query.count()
+    return scans, total_scans
 
 
 def get_all_scans() -> List[Scan]:

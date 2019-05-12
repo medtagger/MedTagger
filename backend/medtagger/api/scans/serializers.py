@@ -2,7 +2,9 @@
 from flask_restplus import reqparse, fields
 
 from medtagger.api import api
+from medtagger.api.pagination import PAGINATION
 from medtagger.definitions import ScanStatus, LabelVerificationStatus
+
 
 in__new_scan = api.model('New Scan model', {
     'dataset': fields.String(description='Dataset', required=True),
@@ -103,6 +105,12 @@ out__scan = api.model('Scan model', {
                                        attribute='declared_number_of_slices'),
 })
 
+out__scans = api.model('List of Scans model', {
+    'scans': fields.List(fields.Nested(out__scan)),
+})
+
+out__scans_paginated = api.inherit('Paginated list of Scans model', out__scans, PAGINATION)
+
 out__random_scan = api.inherit('Random Scan model', out__scan, {
     'predefined_label_id': fields.String(description='Predefined Label\'s ID'),
 })
@@ -123,6 +131,11 @@ out__new_scan = api.model('Newly created Scan model', {
 out__new_slice = api.model('Newly created Slice model', {
     'slice_id': fields.String(description='Slice\'s ID', attribute='id'),
 })
+
+args__scans = reqparse.RequestParser()
+args__scans.add_argument('dataset_key', type=str, help='Dataset\'s key')
+args__scans.add_argument('page', type=int, default=1, help='Page which should be fetched')
+args__scans.add_argument('per_page', type=int, default=25, help='Number of items per Page which should be fetched')
 
 args__random_scan = reqparse.RequestParser()
 args__random_scan.add_argument('task', type=str, required=True, help='Task\'s key')
