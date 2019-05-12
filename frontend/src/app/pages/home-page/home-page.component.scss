@@ -11,6 +11,7 @@
 
 .account {
     &-button {
+        min-width: 140px;
         position: relative;
         border-radius: 5px;
         transition: background-color 0.2s ease-in, border-radius 0.2s;

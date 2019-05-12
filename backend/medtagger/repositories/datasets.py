@@ -1,7 +1,7 @@
 """Module responsible for definition of DatasetsRepository."""
 from typing import List
 
-from medtagger.database import db_session
+from medtagger.database import db_connection_session, db_transaction_session
 from medtagger.database.models import Dataset
 from medtagger.exceptions import InternalErrorException
 
@@ -20,7 +20,7 @@ def get_dataset_by_key(key: str) -> Dataset:
     :param key: key for a Dataset
     :return: Dataset object
     """
-    with db_session() as session:
+    with db_connection_session() as session:
         dataset = session.query(Dataset).filter(Dataset.key == key).one()
     return dataset
 
@@ -32,8 +32,8 @@ def add_new_dataset(key: str, name: str) -> Dataset:
     :param name: name that will be used in the Use Interface for such Dataset
     :return: Dataset object
     """
-    with db_session() as session:
-        dataset = Dataset(key, name)
+    dataset = Dataset(key, name)
+    with db_transaction_session() as session:
         session.add(dataset)
     return dataset
 

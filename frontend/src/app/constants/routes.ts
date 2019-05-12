@@ -4,4 +4,4 @@ export const UPLOAD = 'upload';
 export const SETTINGS = 'settings';
 export const VALIDATION = 'validation';
 export const LABELING = 'labeling';
-export const LABELING_TUTORIAL = 'labeling/tutorial';
+export const TUTORIAL = 'tutorial';

@@ -60,12 +60,12 @@ describe('Service: ScanService', () => {
             MOCK_MARKER_SLICE_RAW.image);
 
     const MOCK_UPLOAD_SCAN: SelectedScan = new SelectedScan('Example', [
-            new File(['Example file 1'], 'file1'),
-            new File(['Example file 2'], 'file2'),
-            new File(['Example file 3'], 'file3'),
-            new File(['Example file 4'], 'file4'),
-            new File(['Example file 5'], 'file5')
-        ], [], [], {});
+        new File(['Example file 1'], 'file1'),
+        new File(['Example file 2'], 'file2'),
+        new File(['Example file 3'], 'file3'),
+        new File(['Example file 4'], 'file4'),
+        new File(['Example file 5'], 'file5')
+    ], [], [], {});
 
     const MOCK_FUNCTIONS = {
         onSubscribe: function (response: any) {}

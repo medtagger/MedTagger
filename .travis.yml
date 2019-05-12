@@ -22,7 +22,7 @@ matrix:
     - language: python
       name: "Backend - Linters & Unit Tests"
       script:
-        - ./.travis/run_tests_if_subproject_changed.py backend --command="
+        - python3 .travis/run_tests_if_subproject_changed.py backend --command="
            docker-compose build medtagger_backend_rest medtagger_backend_websocket medtagger_backend_worker medtagger_backend_database_migrations &&
            docker-compose run --no-deps medtagger_backend_rest /bin/bash -c \"make install_dev_packages && make test\""
 
@@ -31,7 +31,7 @@ matrix:
       name: "Backend - Functional Tests"
       if: branch = master
       script:
-        - ./.travis/run_tests_if_subproject_changed.py backend --command="
+        - python3 .travis/run_tests_if_subproject_changed.py backend --command="
            docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml up -d cassandra postgres rabbitmq &&
            docker-compose -f ./.travis/backend_functional_tests_docker-compose.yml run medtagger_backend_functional_tests &&
            docker-compose down"
@@ -44,7 +44,7 @@ matrix:
       node_js:
         - "8"
       script:
-        - ./.travis/run_tests_if_subproject_changed.py frontend --command="
+        - python3 .travis/run_tests_if_subproject_changed.py frontend --command="
            cd frontend/ &&
            npm i &&
            ng lint &&
@@ -56,7 +56,7 @@ matrix:
       node_js:
         - "8"
       script:
-        - ./.travis/run_tests_if_subproject_changed.py frontend --command="
+        - python3 .travis/run_tests_if_subproject_changed.py frontend --command="
            docker-compose build medtagger_frontend"
 
     # Build & Push Docker images to the Docker Hub

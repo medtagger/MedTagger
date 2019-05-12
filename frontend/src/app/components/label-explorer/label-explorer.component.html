@@ -1,50 +1,51 @@
 <mat-list dense class="label-box">
-    <ng-container *ngIf="getLabelsLength() > 0">
-        <ng-container *ngFor="let tag of tags">
+    <ng-container *ngIf="!selections.isEmpty()">
+        <ng-container *ngFor="let tag of getTags()">
             <h4 matSubheader
-                (click)="tag.hidden = !tag.hidden;"
+                (click)="toggleTagVisibility(tag)"
                 class="label-tag__header">
                 {{ tag.name }}
                 <mat-icon
-                    [class.visible]="!tag.hidden"
+                    [class.visible]="!isTagHidden(tag)"
                     class="label-tag__header-icon">
                     arrow_drop_down
                 </mat-icon>
             </h4>
-            <ng-container *ngIf="!tag.hidden">
+            <ng-container *ngIf="!isTagHidden(tag)">
                 <h5
-                    *ngIf="getLabelsForTag(tag).length == 0"
+                    *ngIf="getSelectionsForTag(tag).length == 0"
                     class="label-empty">
                     There are no labels for this tag.
                 </h5>
                 <mat-list-item
-                    *ngFor="let label of getLabelsForTag(tag)"
-                    (mouseenter)="label.hovered=true"
-                    (mouseleave)="label.hovered=false"
+                    *ngFor="let selection of getSelectionsForTag(tag)"
+                    (mouseenter)="selection.hovered=true"
+                    (mouseleave)="selection.hovered=false"
                     class="label-item__box">
                     <mat-icon mat-list-icon
                         class="label-item__tool-icon"
-                        [svgIcon]="getToolIconName(label.toolName)">
+                        [svgIcon]="getToolIconName(selection.toolName)">
                     </mat-icon>
                     <p class="label-item__header" matLine>
-                        Slice #{{ label.sliceIndex }}
+                        Slice #{{ selection.sliceIndex }}
                     </p>
                     <p class="label-item__subheader" matLine>
-                        Selection #{{ label.selectionId }}
+                        Selection #{{ selection.getId() }}
                     </p>
                     <button mat-icon-button
-                        *ngIf="label.hovered"
-                        (click)="deleteLabel(label)">
+                        (click)="removeSelection(selection)"
+                        class="hidden-btn">
                         <mat-icon class="small-size">delete</mat-icon>
                     </button>
                     <button mat-icon-button
-                        *ngIf="label.hovered || label.pinned"
-                        (click)="pinLabel(label, !label.pinned)">
-                        <mat-icon class="small-svg-size" svgIcon="{{label.pinned ? 'pin' : 'pin-off'}}"></mat-icon>
+                        [style.visibility]="selection.pinned ? 'visible' : undefined"
+                        (click)="toggleSelectionPinning(selection)"
+                        class="hidden-btn">
+                        <mat-icon class="small-svg-size" svgIcon="{{selection.pinned ? 'pin' : 'pin-off'}}"></mat-icon>
                     </button>
                     <button mat-icon-button
-                        (click)="hideLabel(label, !label.hidden)">
-                        <mat-icon class="small-size">{{label.hidden ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        (click)="toggleSelectionVisibility(selection)">
+                        <mat-icon class="small-size">{{selection.hidden ? 'visibility_off' : 'visibility'}}</mat-icon>
                     </button>
                 </mat-list-item>
             </ng-container>
@@ -52,9 +53,9 @@
         </ng-container>
     </ng-container>
     <h5
-        *ngIf="getLabelsLength() == 0"
+        *ngIf="selections.isEmpty()"
         class="label-empty"
         data-cy="no-labels-added">
-        No labels have been added so far. Please try adding labels with the tools.
+        No labels have been added so far.<br/>Add new labels using available tools.
     </h5>
 </mat-list>

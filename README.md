@@ -14,9 +14,8 @@ Contact with us directly in case you want to use our work :)
 
 Documentation for the MedTagger can be found [here](/docs).
 
-[![Build Status](https://travis-ci.org/medtagger/MedTagger.svg?branch=master)](https://travis-ci.org/medtagger/MedTagger)
+[![Build Status](https://travis-ci.com/medtagger/MedTagger.svg?branch=master)](https://travis-ci.com/medtagger/MedTagger)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/medtagger/MedTagger.svg?columns=Backlog,Sprint,In%20Progress,Under%20Review%20%EF%B8%8F,Done)](https://waffle.io/medtagger/MedTagger)
 
 ## Our technology stack
 
@@ -59,8 +58,8 @@ $ vagrant up
 ```
 
 Then follow up with our [documentation](/docs). Default development account is:
- - email: `admin@medtagger.com`,
- - password: `medtagger1`.
+ - email: `admin@medtagger`,
+ - password: `medtagger`.
 
 ### Dockerized environment
 
@@ -83,9 +82,6 @@ Below screenshots show how MedTagger looks like:
 ![Home Page](/docs/assets/home-page.png)
 
 #### Labeling Page
-![Labeling Page](/docs/assets/labeling-page.png)
+![Labeling Page](/docs/assets/labeling-page-1.png)
 ![Labeling Page](/docs/assets/labeling-page-2.png)
-
-#### Upload Page
-![Upload Page](docs/assets/upload-page-2.png)
-![Upload Page](docs/assets/upload-page.png)
+![Labeling Page](/docs/assets/labeling-page-3.png)
