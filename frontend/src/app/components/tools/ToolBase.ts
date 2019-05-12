@@ -1,31 +1,15 @@
-import {EventEmitter} from '@angular/core';
-import {SliceSelection} from '../../model/selections/SliceSelection';
-import {SelectionStateMessage} from '../../model/SelectionStateMessage';
-import {ToolAction} from '../../model/ToolAction';
-import {LabelTag} from '../../model/labels/LabelTag';
+import { List } from 'immutable';
+import { LabelTag } from '../../model/labels/LabelTag';
+import { SliceSelection } from '../../model/selections/SliceSelection';
+import { ToolAction } from '../../model/ToolAction';
+import { DrawingContext } from './DrawingContext';
+import { Tool } from './Tool';
 
-export abstract class ToolBase<CustomSliceSelection extends SliceSelection> {
+export abstract class ToolBase<CustomSliceSelection extends SliceSelection> implements Tool<CustomSliceSelection> {
+    protected drawingContext: DrawingContext;
 
-    protected selectedArea: CustomSliceSelection;
-    protected selections: Map<number, [CustomSliceSelection]>;
-    protected archivedSelections: Array<CustomSliceSelection> = [];
-    protected canvasCtx: CanvasRenderingContext2D;
-    protected currentSlice: number;
-    protected currentTag: LabelTag;
-    protected canvasPosition: ClientRect;
-    protected canvasSize: { width: number, height: number };
-    protected stateChange: EventEmitter<SelectionStateMessage>;
-    protected redrawRequestEmitter: EventEmitter<void>;
-    protected singleSelectionPerSlice = false;
-
-    protected constructor(canvas: HTMLCanvasElement) {
-        this.canvasCtx = canvas.getContext('2d');
-        this.canvasSize = {
-            width: canvas.width,
-            height: canvas.height
-        };
-        this.stateChange = new EventEmitter<SelectionStateMessage>();
-        this.selections = new Map<number, [CustomSliceSelection]>();
+    public setDrawingContext(drawingContext: DrawingContext): void {
+        this.drawingContext = drawingContext;
     }
 
     protected getStyle(): any {
@@ -37,209 +21,91 @@ export abstract class ToolBase<CustomSliceSelection extends SliceSelection> {
         };
     }
 
-    public isSingleSelectionPerSlice(): boolean {
-        return this.singleSelectionPerSlice;
-    }
-
-    public formArchivedSelections(selectionMap: CustomSliceSelection[]): CustomSliceSelection[] {
-        selectionMap.forEach((selection: CustomSliceSelection) => {
-            this.drawSelection(selection, this.getStyle().ARCHIVED_SELECTION_COLOR);
-            console.log('ToolBase | scaleToView selection: ', selection);
-        });
-        return selectionMap;
-    }
-
-    public drawSelections(): void {
-        console.log('ToolBase | drawSelections | selection: ', this.selections);
-        this.getSelections().forEach((selection: CustomSliceSelection) => {
-            let color: string;
-            const isCurrent: boolean = (selection.sliceIndex === this.currentSlice);
-            if (isCurrent) {
-                color = this.getStyle().CURRENT_SELECTION_COLOR;
-            } else {
-                color = this.getStyle().OTHER_SELECTION_COLOR;
-            }
-            if ((selection.pinned || isCurrent) && (!selection.hidden)) {
-                this.drawSelection(selection, color);
-            }
-        });
-        if (this.selectedArea) {
-            this.drawSelection(this.selectedArea, this.getStyle().CURRENT_SELECTION_COLOR);
-        }
-    }
-
-    protected isOnlyOneSelectionPerSlice(): boolean {
-        return false;
-    }
-
-    public getStateChangeEmitter(): EventEmitter<SelectionStateMessage> {
-        return this.stateChange;
-    }
-
-    public getSelections(): CustomSliceSelection[] {
-        return Array.from(this.selections.values()).reduce((x, y) => x.concat(y), []);
-    }
-
-    public clearData(): void {
-        this.selectedArea = undefined;
-        this.selections = new Map<number, [CustomSliceSelection]>();
-        this.archivedSelections = [];
-        this.stateChange = new EventEmitter<SelectionStateMessage>();
-    }
-
-    public addSelection(selection: CustomSliceSelection): void {
-        console.log('ToolBase | addCurrentSelection');
-        if (this.isOnlyOneSelectionPerSlice()) {
-            this.removeSelectionsOnCurrentSlice();
-            this.selections.set(selection.sliceIndex, [selection]);
-        } else {
-            const currentSliceSelections = this.selections.get(selection.sliceIndex);
-            if (currentSliceSelections) {
-                currentSliceSelections.push(selection);
-            } else {
-                this.selections.set(selection.sliceIndex, [selection]);
-            }
-        }
-        this.stateChange.emit(new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(),
-            selection.sliceIndex, false));
-    }
-
-    public updateCurrentSlice(currentSliceId: number): void {
-        this.currentSlice = currentSliceId;
-    }
-
-    public updateCurrentTag(tag: LabelTag) {
-        this.currentTag = tag;
-    }
-
-    public updateCanvasPosition(canvasRect: ClientRect) {
-        this.canvasPosition = canvasRect;
-    }
-
-    public hasArchivedSelections(): boolean {
-        return this.archivedSelections.length > 0;
-    }
-
-    public hasValidSelection(): boolean {
-        return this.selections.size >= 1;
-    }
-
-    public hasSliceSelection(): boolean {
-        return !!this.selections.get(this.currentSlice) || !!this.selectedArea;
-    }
-
-    public archiveSelections(selectionMap?: Array<CustomSliceSelection>): void {
-        if (!selectionMap) {
-            selectionMap = this.getSelections();
-        }
-        selectionMap.forEach((value: CustomSliceSelection) => {
-            this.archivedSelections.push(value);
-        });
-    }
-
-    public removeSelectionsOnCurrentSlice(): void {
-        const selectionsOnCurrentSlice = this.selections.get(this.currentSlice);
-        if (selectionsOnCurrentSlice) {
-            selectionsOnCurrentSlice.forEach((selection) => this.stateChange.emit(
-                new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(), selection.sliceIndex, true)));
-            this.selections.delete(this.currentSlice);
-        }
-
-        this.selectedArea = undefined;
-    }
-
-    public removeSelectionsOnSlice(sliceId: number): void {
-        const selectionsOnSlice = this.selections.get(sliceId);
-        if (selectionsOnSlice) {
-            selectionsOnSlice.forEach((selection) => this.stateChange.emit(
-                new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(), selection.sliceIndex, true)));
-            this.selections.delete(sliceId);
-        }
-
-        if (sliceId === this.currentSlice) {
-            this.selectedArea = undefined;
-        }
-    }
-
-    public clearSelections() {
-        this.getSelections().forEach((selection) => this.stateChange.emit(
-            new SelectionStateMessage(selection.label_tool, selection.label_tag, selection.getId(), selection.sliceIndex, true)));
-        this.selections.clear();
-    }
-
-    public updateCanvasHeight(height: number): void {
-        if (height && height > 0) {
-            this.canvasSize.height = height;
-        } else {
-            console.warn('ToolBase | updateCanvasHeight - non numeric/positive height provided', height);
-        }
-    }
-
-    public updateCanvasWidth(width: number): void {
-        if (width && width > 0) {
-            this.canvasSize.width = width;
-        } else {
-            console.warn('ToolBase | updateCanvasWidth - non numeric/positive width provided', width);
-        }
-    }
-
-    public removeSelection(selectionId: number): boolean {
-        return this.findAndModifySelection(selectionId, (selections, index) => selections.splice(index, 1));
-    }
-
-    public pinSelection(selectionId: number, newValue: boolean): boolean {
-        return this.findAndModifySelection(selectionId, (selections, index) => selections[index].pinned = newValue);
-    }
-
-    public hideSelection(selectionId: number, newValue: boolean): boolean {
-         return this.findAndModifySelection(selectionId, (selections, index) => selections[index].hidden = newValue);
-    }
-
-    private findAndModifySelection(selectionId: number, modifyFunc: (selections: [CustomSliceSelection], index: number) => void): boolean {
-        for (const selectionsBySlice of Array.from(this.selections.values())) {
-            const index = selectionsBySlice.findIndex((selection) => selection.getId() === selectionId);
-            if (index !== -1) {
-                modifyFunc(selectionsBySlice, index);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected normalizeByView(paramX: number, paramY: number): { x: number, y: number } {
+    protected normalizeByView(paramX: number, paramY: number): { x: number; y: number } {
         return {
-            x: paramX / this.canvasSize.width,
-            y: paramY / this.canvasSize.height
+            x: paramX / this.drawingContext.canvasSize.width,
+            y: paramY / this.drawingContext.canvasSize.height
         };
     }
 
-    protected scaleToView(paramX: number, paramY: number): { x: number, y: number } {
+    protected scaleToView(paramX: number, paramY: number): { x: number; y: number } {
         return {
-            x: paramX * this.canvasSize.width,
-            y: paramY * this.canvasSize.height
+            x: paramX * this.drawingContext.canvasSize.width,
+            y: paramY * this.drawingContext.canvasSize.height
         };
     }
-
-    public abstract drawSelection(selection: CustomSliceSelection, color: string): any;
 
     public getActions(): Array<ToolAction> {
         return [];
-    }
-
-    public setRedrawRequestEmitter(emitter: EventEmitter<void>): void {
-        this.redrawRequestEmitter = emitter;
-    }
-
-    protected requestRedraw(): void {
-        this.redrawRequestEmitter.emit();
     }
 
     public canChangeSlice(): boolean {
         return true;
     }
 
-    public onToolChange(): void {
+    public reset(): void {}
 
+    public abstract drawSelection(selection: CustomSliceSelection): any;
+
+    public abstract getToolName(): string;
+
+    public abstract onMouseDown(event: MouseEvent): void;
+
+    public abstract onMouseMove(event: MouseEvent): void;
+
+    public abstract onMouseUp(event: MouseEvent): void;
+
+    protected getOwnSelectionsOnCurrentSlice(): List<CustomSliceSelection> {
+        return this.getOwnSelections().filter(x => x.sliceIndex === this.currentSlice);
+    }
+
+    protected getOwnSelections(): List<CustomSliceSelection> {
+        return this.selections.filter(x => x.labelTool === this.getToolName()) as List<CustomSliceSelection>;
+    }
+
+    protected getColorForSelection(selection: SliceSelection): string {
+        const isOnCurrentSlice = selection.sliceIndex === this.currentSlice;
+        return isOnCurrentSlice ? this.getStyle().CURRENT_SELECTION_COLOR : this.getStyle().OTHER_SELECTION_COLOR;
+    }
+
+    protected addSelection(selection: SliceSelection): void {
+        this.drawingContext.updateSelections(this.selections.push(selection));
+    }
+
+    protected removeSelection(selection: SliceSelection): void {
+        const selectionIndexToDelete = this.selections.findIndex(x => x === selection);
+        this.drawingContext.updateSelections(this.selections.splice(selectionIndexToDelete, 1));
+    }
+
+    protected redraw(): void {
+        this.drawingContext.redraw();
+    }
+
+    protected get canvas(): HTMLCanvasElement {
+        return this.drawingContext.canvas;
+    }
+
+    protected get canvasCtx(): CanvasRenderingContext2D {
+        return this.drawingContext.canvasCtx;
+    }
+
+    protected get currentSlice(): number {
+        return this.drawingContext.currentSlice;
+    }
+
+    protected get currentTag(): LabelTag {
+        return this.drawingContext.currentTag;
+    }
+
+    protected get canvasPosition(): ClientRect {
+        return this.drawingContext.canvasPosition;
+    }
+
+    protected get canvasSize(): { width: number; height: number } {
+        return this.drawingContext.canvasSize;
+    }
+
+    protected get selections(): List<SliceSelection> {
+        return this.drawingContext.selections;
     }
 }
-

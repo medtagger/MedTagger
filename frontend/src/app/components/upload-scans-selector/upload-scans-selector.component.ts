@@ -1,5 +1,6 @@
 import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@angular/core';
 import {PredefinedLabelToUpload, handlePredefinedLabelFile} from '../../utils/PredefinedLabelHandler';
+import { deprecate } from 'util';
 
 const FILE_SIZE_LIMIT = 5;  // MB
 
@@ -111,7 +112,7 @@ export class UploadScansSelectorComponent {
                 const fileReader: FileReader = new FileReader();
 
                 fileReader.onloadend = (e: ProgressEvent) => {
-                    const fileHeaderBytes = new Uint8Array(fileReader.result);
+                    const fileHeaderBytes = new Uint8Array(fileReader.result as ArrayBuffer);
 
                     const singatureBytesValues: string[] = [];
 
@@ -143,12 +144,7 @@ export class UploadScansSelectorComponent {
             return Promise.resolve();
         }
 
-        // User selected single scan upload
-        if (!this.multipleScans) {
-            return this.prepareSingleScan();
-        }
-
-        return this.prepareMultipleScans();
+        return this.prepareSingleScan();
     }
 
     private prepareSingleScan(): Promise<void> {
@@ -186,11 +182,14 @@ export class UploadScansSelectorComponent {
         });
     }
 
+    /**
+    * @deprecated To be adressed in future upload refactor
+    */
     private prepareMultipleScans(): Promise<void> {
         const promises: Array<Promise<any>> = [];
 
         for (const selectedFile of this.userSelectedFiles) {
-            const slicePath = selectedFile.webkitRelativePath;
+            const slicePath = ''; // selectedFile.webkitRelativePath;
             const currentScanDirectory = slicePath.split('/').slice(0, -1).join('/');
             let scanForThisSlice = this.scans.find((scan: SelectedScan) => {
                 return scan.directory === currentScanDirectory;

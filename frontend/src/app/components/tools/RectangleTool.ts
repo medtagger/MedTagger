@@ -1,12 +1,11 @@
 import {RectangleSelection} from '../../model/selections/RectangleSelection';
 import {ToolBase} from './ToolBase';
 import {Tool} from './Tool';
+import { SliceSelectionType } from '../../model/selections/SliceSelection';
 
 export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<RectangleSelection> {
 
-    constructor(canvas: HTMLCanvasElement) {
-        super(canvas);
-    }
+    private currentSelection: RectangleSelection;
 
     protected getStyle(): any {
         return {
@@ -16,13 +15,21 @@ export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<
         };
     }
 
-    public drawSelection(selection: RectangleSelection, color: string): void {
+    public reset(): void {
+        if (this.currentSelection) {
+            this.removeSelection(this.currentSelection);
+            this.currentSelection = undefined;
+        }
+    }
+
+    public drawSelection(selection: RectangleSelection): void {
         console.log('RectangleTool | drawSelection | selection: ', selection);
+        const color = this.getColorForSelection(selection);
         this.canvasCtx.strokeStyle = color;
         this.canvasCtx.setLineDash(this.getStyle().SELECTION_LINE_DENSITY);
         this.canvasCtx.lineWidth = this.getStyle().SELECTION_LINE_WIDTH;
 
-        const scaledStartPoint: { x: number, y: number } = this.scaleToView(selection.positionX, selection.positionY);
+        const scaledStartPoint: { x: number, y: number } = this.scaleToView(selection.x, selection.y);
 
         const scaledSelectionValues: { x: number, y: number } = this.scaleToView(selection.width, selection.height);
 
@@ -42,65 +49,43 @@ export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<
         const selectionStartX = (event.clientX) - this.canvasPosition.left;
         const selectionStartY = (event.clientY) - this.canvasPosition.top;
 
-        const normalizedPoint: { x: number, y: number } = this.normalizeByView(selectionStartX, selectionStartY);
+        const { x, y } = this.normalizeByView(selectionStartX, selectionStartY);
 
-        this.selectedArea = new RectangleSelection(normalizedPoint.x, normalizedPoint.y, this.currentSlice, this.currentTag);
-        this.requestRedraw();
+        this.currentSelection = new RectangleSelection(x, y, this.currentSlice, this.currentTag, SliceSelectionType.NORMAL);
+        this.addSelection(this.currentSelection);
     }
 
-    public onMouseMove(mouseEvent: MouseEvent): boolean {
-        if (this.selectedArea) {
-            console.log('RectangleTool | drawSelectionRectangle | onmousemove clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            this.updateSelection(mouseEvent);
-            this.requestRedraw();
-            return true;
-        }
-        return false;
-    }
+    public onMouseMove(event: MouseEvent): void {
+        if (this.currentSelection) {
+            const { x, y } = this.scaleToView(this.currentSelection.x, this.currentSelection.y);
 
-    public updateSelection(event: MouseEvent): void {
-        console.log('RectangleTool | updateSelection | event: ', event);
-
-        if (this.selectedArea) {
-
-            const scaledStartPoint: { x: number, y: number } = this.scaleToView(this.selectedArea.positionX, this.selectedArea.positionY);
-
-            const newWidth = (event.clientX - this.canvasPosition.left) - scaledStartPoint.x;
-            const newHeight = (event.clientY - this.canvasPosition.top) - scaledStartPoint.y;
+            const newWidth = (event.clientX - this.canvasPosition.left) - x;
+            const newHeight = (event.clientY - this.canvasPosition.top) - y;
 
             const normalizedValues: { x: number, y: number } = this.normalizeByView(newWidth, newHeight);
 
-            this.selectedArea.updateWidth(normalizedValues.x);
-            this.selectedArea.updateHeight(normalizedValues.y);
+            this.currentSelection.width = normalizedValues.x;
+            this.currentSelection.height = normalizedValues.y;
+            this.redraw();
         }
     }
 
-    private checkSquareSelection(): boolean {
-        return !!this.selectedArea && this.selectedArea.height !== 0 && this.selectedArea.width !== 0;
-    }
-
-    public onMouseUp(event: MouseEvent): boolean {
-        if (this.selectedArea) {
-            if (this.checkSquareSelection()) {
-                this.addSelection(this.selectedArea);
+    public onMouseUp(): void {
+        if (this.currentSelection) {
+            const isSelectionInvalid = this.currentSelection.height === 0 || this.currentSelection.width === 0;
+            if (isSelectionInvalid) {
+                this.removeSelection(this.currentSelection);
             }
-            this.selectedArea = undefined;
-            this.requestRedraw();
-            return true;
+            this.currentSelection = undefined;
         }
-        return false;
     }
 
     public canChangeSlice(): boolean {
-        return !this.selectedArea;
+        return !this.currentSelection;
     }
 
     public getToolName(): string {
         return 'RECTANGLE';
     }
 
-    public onToolChange(): void {
-        this.selectedArea = undefined;
-        this.requestRedraw();
-    }
 }
