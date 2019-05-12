@@ -3,13 +3,13 @@
         <div class="marker-nav--actions">
             <button mat-mini-fab
                 (click)="zoomIn()"
-                [disabled]="currentZoomLevelIndex >= zoomLevels.size - 1"
+                [disabled]="!zoomHandler.zoomInAvailable()"
                 [color]="isCurrentTool('ZOOM_IN') ? 'accent' : 'primary'">
                 <mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon>
             </button>
             <button mat-mini-fab
                 (click)="zoomOut()"
-                [disabled]="currentZoomLevelIndex <= 0"
+                [disabled]="!zoomHandler.zoomOutAvailable()"
                 [color]="isCurrentTool('ZOOM_OUT') ? 'accent' : 'primary'">
                 <mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon>
             </button>
