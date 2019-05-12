@@ -169,6 +169,7 @@ export class MarkerPageComponent implements OnInit {
 
     public zoomIn(): void {
         this.marker.scale = this.zoomHandler.zoomIn();
+        this.snackBar.open('Use mouse wheel button click to drag zoomed image.', '', { duration: 3000 });
     }
 
     public zoomOut(): void {
