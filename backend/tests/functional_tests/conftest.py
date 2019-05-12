@@ -24,11 +24,11 @@ def prepare_environment() -> Any:
     logger.info('Applying fixtures to PostgreSQL.')
     apply_all_fixtures()
 
-    # Run the test
-    yield
-
-    logger.info('Clearing databases.')
-    _clear_databases()
+    try:
+        yield  # Run the test
+    finally:
+        logger.info('Clearing databases.')
+        _clear_databases()
 
 
 @pytest.fixture

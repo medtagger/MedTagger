@@ -124,6 +124,9 @@ Temporary Items
 .pytest_cache/
 venv/
 
+# Jupyter Notebook
+.ipynb_checkpoints
+
 # MedTagger
 .medtagger.yml
 !e2e/.medtagger.yml

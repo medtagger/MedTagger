@@ -11,7 +11,8 @@ Here you can find the documentation for MedTagger. In case of looking for help
 
 Here you can find more information about MedTagger:
 
- - [System Architecture](/docs/architecture.md).
+ - [System Architecture](/docs/architecture.md),
+ - [Setting up Jupyter Notebook](/docs/jupyter_notebook.md).
 
 ## Development setup
 
