@@ -20,7 +20,7 @@ export function handlePredefinedLabelFile(file: File): Promise<[string, Predefin
         fileReader.onloadend = (e: ProgressEvent) => {
             try {
                 const taskKey = file.name.split('.json')[0];
-                const fileContent: string = String.fromCharCode.apply(null, new Uint8Array(fileReader.result));
+                const fileContent: string = String.fromCharCode.apply(null, new Uint8Array(fileReader.result as ArrayBuffer));
                 const predefinedLabel = new PredefinedLabelToUpload(taskKey, JSON.parse(fileContent));
                 resolve([taskKey, predefinedLabel]);
             } catch (ex) {

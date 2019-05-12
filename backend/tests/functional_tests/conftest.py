@@ -10,7 +10,7 @@ from medtagger.api import InvalidArgumentsException
 from medtagger.api.auth.business import create_user, sign_in_user
 from medtagger.api.rest import app
 from medtagger.api.users.business import set_user_role
-from medtagger.database import Base, session, db_session
+from medtagger.database import Base, Session, db_transaction_session
 from medtagger.database.fixtures import apply_all_fixtures
 from medtagger.repositories import roles as RolesRepository
 from medtagger.storage import models
@@ -24,11 +24,11 @@ def prepare_environment() -> Any:
     logger.info('Applying fixtures to PostgreSQL.')
     apply_all_fixtures()
 
-    # Run the test
-    yield
-
-    logger.info('Clearing databases.')
-    _clear_databases()
+    try:
+        yield  # Run the test
+    finally:
+        logger.info('Clearing databases.')
+        _clear_databases()
 
 
 @pytest.fixture
@@ -69,10 +69,10 @@ def get_token_for_logged_in_user(role: str) -> str:
 
 def _clear_databases() -> None:
     logger.info('Removing all data from PostgreSQL.')
-    with db_session() as sess:
+    with db_transaction_session() as sess:
         for table in reversed(Base.metadata.sorted_tables):
             sess.execute('TRUNCATE TABLE "{}" RESTART IDENTITY CASCADE;'.format(table.name))
-    session.close_all()
+    Session.close_all()
 
     logger.info('Removing all data from Cassandra.')
     storage_session = storage.create_session()

@@ -1,27 +1,32 @@
 <div #canvasWorkspace class="marker--container">
     <div #imageContainer
-        id="imageContainer"
-        (scroll)="updateCanvasPositionInTools()"
-        (wheel)="$event.preventDefault()">
+         id="imageContainer">
         <img #image class="marker--scan"/>
-        <canvas #canvas class="marker--canvas"></canvas>
+        <canvas #canvas class="marker--canvas"
+                (mousedown)="onMouseDown($event)"
+                (mouseup)="onMouseUp($event)"
+                (mousemove)="onMouseMove($event)"
+                (mousewheel)="onWheel($event)"></canvas>
     </div>
     <mat-slider #slider id="markerSlider"
-                (blur)="sliderFocus()"
+                (change)="changeSlice($event.value)"
+                (blur)="tryFocusSlider()"
                 [disabled]="false"
-                [max]="10"
-                [min]="0"
+                [max]="getMaxSliceIndex()"
+                [min]="getMinSliceIndex()"
                 [step]="1"
                 [thumbLabel]="true"
                 [tickInterval]="1"
                 [value]="currentSlice"
                 [vertical]="true"
                 class="marker--slider"
+                [class.zoom]="scale > 1"
                 color="primary">
     </mat-slider>
     <div
         *ngIf="downloadingScanInProgress || downloadingSlicesInProgress"
-        class="marker--spinner-box">
+        class="marker--spinner-box"
+        data-cy="spinner">
         <mat-progress-spinner
             mode="indeterminate"
             color="primary">

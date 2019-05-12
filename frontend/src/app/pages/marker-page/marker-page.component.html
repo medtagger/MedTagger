@@ -1,9 +1,51 @@
 <app-nav-bar>
     <div class="marker-nav">
         <div class="marker-nav--actions">
+            <button mat-mini-fab color="primary" class="window-change-button" (click)="toggleColorWindowPanel()">
+                <mat-icon [svgIcon]="'contrast-box'"></mat-icon>
+            </button>
+            <div *ngIf="colorWindowPanelActive" id="color-window-panel" class="color-window-panel">
+                <mat-card class="color-window-panel--card">
+                    <mat-card-header class="color-window-panel--card__header">
+                        <mat-card-title>Image Window</mat-card-title>
+                        <mat-card-subtitle>Correct image brightness and contrast by tuning parameters below</mat-card-subtitle>
+                        <button mat-icon-button (click)="toggleColorWindowPanel()">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </mat-card-header>
+                    <mat-card-content class="color-window-panel--card__content">
+                        <mat-divider [inset]="true"></mat-divider>
+                        <span>
+                            Window width: {{colorWindowWidth}} 
+                        </span>
+                        <mat-slider (change)="changeImageWindowWidth($event.value)"
+                                    [disabled]="false"
+                                    [max]="255"
+                                    [min]="1" 
+                                    [step]="1" 
+                                    [tickInterval]="1"
+                                    [value]="colorWindowWidth">
+                        </mat-slider>
+                        <span>
+                            Window center: {{colorWindowCenter}}
+                        </span>
+                        <mat-slider (change)="changeImageWindowCenter($event.value)"
+                                    [disabled]="false"
+                                    [max]="255"
+                                    [min]="0" 
+                                    [step]="1" 
+                                    [tickInterval]="1"
+                                    [value]="colorWindowCenter">
+                        </mat-slider>
+                    </mat-card-content>
+                    <mat-card-actions class="color-window-panel--card__actions">
+                        <button mat-button color="primary" (click)="resetColorWindowPanel()">Reset to default</button>
+                      </mat-card-actions>
+                </mat-card>
+            </div>
             <button mat-mini-fab
                 (click)="zoomIn()"
-                [disabled]="currentZoomLevelIndex >= zoomLevels.length - 1"
+                [disabled]="currentZoomLevelIndex >= zoomLevels.size - 1"
                 [color]="isCurrentTool('ZOOM_IN') ? 'accent' : 'primary'">
                 <mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon>
             </button>
@@ -17,7 +59,7 @@
                 <button mat-raised-button
                     color="primary"
                     (click)="addLabelComment()"
-                    [disabled]="this.labelExplorer.getLabelsLength() <= 0">
+                    [disabled]="selections.isEmpty()">
                     {{ this.labelComment === '' ? 'Add comment' : 'Modify existing comment'}}
                 </button>
             </div>
@@ -28,14 +70,14 @@
                 (click)="skipScan()">
                 Skip scan
             </button>
-            <button *ngIf="this.labelExplorer.getLabelsLength() > 0"
+            <button *ngIf="!selections.isEmpty()"
                 mat-raised-button
                 color="accent"
                 (click)="sendCompleteLabel()"
                 data-cy="send-label">
                 Send label
             </button>
-            <button *ngIf="this.labelExplorer.getLabelsLength() == 0"
+            <button *ngIf="selections.isEmpty()"
                 mat-raised-button
                 color="accent"
                 (click)="sendEmptyLabel()">
@@ -49,7 +91,7 @@
         <h3 class="marker-toolbox--header">Tools</h3>
         <div class="marker-toolbox--content d-flex flex-column align-items-center">
             <mat-form-field class="marker-toolbox--select">
-                <mat-select placeholder="Active tag" [formControl]="taskTags" data-cy="tags">
+                <mat-select placeholder="Active tag" data-cy="tags">
                     <mat-option *ngFor="let tag of (task ? task.tags : [])" [value]="tag" (click)="setTag(tag)">
                         {{ tag.name }}
                     </mat-option>
@@ -87,7 +129,7 @@
             </div>
         </div>
 
-        <ng-container *ngIf="toolActions.length > 0">
+        <ng-container *ngIf="!toolActions.isEmpty()">
             <h3 class="marker-toolbox--header">Tool actions</h3>
             <div class="marker-toolbox--content">
                 <mat-chip-list>
@@ -104,11 +146,15 @@
 
         <h3 class="marker-toolbox--header">Labels</h3>
         <div class="marker-toolbox--content label-explorer pt-1">
-            <app-label-explorer></app-label-explorer>
+            <app-label-explorer [(selections)]=selections></app-label-explorer>
         </div>
     </div>
     <div class="marker-content">
-        <app-marker-component #marker></app-marker-component>
+        <app-marker-component #marker
+                              [(selections)]="selections"
+                              [tools]="tools"
+                              [currentTool]="currentTool"
+                              [currentTag]="currentTag"></app-marker-component>
     </div>
 </div>
 <div class="marker-info">

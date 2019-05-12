@@ -58,8 +58,8 @@ describe('Service: LabelService', () => {
                 expect(label.labelSelections.length).toBe(1);
 
                 const rectangleSelection = label.labelSelections[0] as RectangleSelection;
-                expect(rectangleSelection.positionX).toBe(0.5);
-                expect(rectangleSelection.positionY).toBe(0.5);
+                expect(rectangleSelection.x).toBe(0.5);
+                expect(rectangleSelection.y).toBe(0.5);
                 expect(rectangleSelection.width).toBe(0.5);
                 expect(rectangleSelection.height).toBe(0.5);
             });
@@ -84,8 +84,8 @@ describe('Service: LabelService', () => {
                 expect(label.labelSelections.length).toBe(1);
 
                 const rectangleSelection = label.labelSelections[0] as RectangleSelection;
-                expect(rectangleSelection.positionX).toBe(0.5);
-                expect(rectangleSelection.positionY).toBe(0.5);
+                expect(rectangleSelection.x).toBe(0.5);
+                expect(rectangleSelection.y).toBe(0.5);
                 expect(rectangleSelection.width).toBe(0.5);
                 expect(rectangleSelection.height).toBe(0.5);
             });

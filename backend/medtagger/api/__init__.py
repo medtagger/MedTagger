@@ -7,7 +7,7 @@ from flask import Blueprint
 from flask_restplus import Api
 from flask_socketio import SocketIO, emit
 
-from medtagger import config
+from medtagger import config, storage, database
 from medtagger.api.exceptions import UnauthorizedException, InvalidArgumentsException, NotFoundException, \
     AccessForbiddenException
 
@@ -31,6 +31,23 @@ websocket_ping_timeout = configuration.getint('api', 'websocket_ping_timeout', f
 websocket_ping_interval = configuration.getint('api', 'websocket_ping_interval', fallback=3)
 web_socket = SocketIO(logger=True, engineio_logger=True, ping_timeout=websocket_ping_timeout,
                       ping_interval=websocket_ping_interval)
+
+
+def setup_connection_to_sql_and_storage() -> None:
+    """Initialize connection to the SQL DB and Storage."""
+    try:
+        # This will raise ModuleNotFoundError if app was not run inside uWSGI server
+        from uwsgidecorators import postfork  # noqa
+
+        @postfork
+        def connect_to_db_and_storage() -> None:  # pylint: disable=unused-variable
+            """Create a single Session to DB and Storage after fork to multiple processes by uWSGI."""
+            storage.create_connection(use_gevent=True)
+            database.engine.dispose()  # Recreate SQL Pool
+    except ModuleNotFoundError:
+        # It seems that application is not running inside uWSGI server, so let's initialize session
+        # in current process as it is highly probable that we are running in Flask's dev server
+        storage.create_connection(use_gevent=True)
 
 
 @api.errorhandler

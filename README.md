@@ -14,9 +14,8 @@ Contact with us directly in case you want to use our work :)
 
 Documentation for the MedTagger can be found [here](/docs).
 
-[![Build Status](https://travis-ci.org/medtagger/MedTagger.svg?branch=master)](https://travis-ci.org/medtagger/MedTagger)
+[![Build Status](https://travis-ci.com/medtagger/MedTagger.svg?branch=master)](https://travis-ci.com/medtagger/MedTagger)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/medtagger/MedTagger.svg?columns=Backlog,Sprint,In%20Progress,Under%20Review%20%EF%B8%8F,Done)](https://waffle.io/medtagger/MedTagger)
 
 ## Our technology stack
 
@@ -31,18 +30,6 @@ Documentation for the MedTagger can be found [here](/docs).
  - [Traefik](https://traefik.io/) as a reverse proxy and load balancer for Docker containers,
  - [Vagrant](https://www.vagrantup.com) for development environment,
  - [Travis](http://travis-ci.org/) for Continuous Integration.
-
-## What are we doing now?
-
- - [x] Labeling using multiple tools
-   - [x] Rectangle
-   - [x] Points
-   - [x] Connected Points
-   - [x] Brush
- - [ ] Zoom for labeling small objects
- - [ ] Surveys as additional actions for provided labels
- - [ ] Validation mechanism
- - [ ] On-demand datasets generation
 
 ## MedTagger setup
 
@@ -62,7 +49,7 @@ Then follow up with our [documentation](/docs). Default development account is:
  - email: `admin@medtagger`,
  - password: `medtagger`.
 
-### Dockerized environment
+### Docker environment
 
 MedTagger can be set up easily with Docker-Compose:
 
@@ -70,7 +57,14 @@ MedTagger can be set up easily with Docker-Compose:
 $ docker-compose up
 ```
 
-More about setting up environment with Docker Compose can be found [here](/docs/setup_with_docker_compose.md).
+More about setting up environment with Docker-Compose can be found [here](/docs/setup_with_docker_compose.md).
+
+### Data Analysis with Jupyter Notebook
+
+Together with Docker-Compose setup, you can use Jupyter Notebook server to easily analyse collected annotations.
+ [Here](/examples/data_analysis) you can find some examples that shows how to do so.
+
+More information about setting up local Jupyter Notebook session can be found [here](/docs/jupyter_notebook.md).
 
 ## User Interface
 

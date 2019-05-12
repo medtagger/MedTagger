@@ -1,12 +1,31 @@
 """Module responsible for definition of ScansRepository."""
-from typing import List
+from typing import List, Tuple
 
 from sqlalchemy.sql.expression import func
 
-from medtagger.database import db_session
+from medtagger.database import db_connection_session, db_transaction_session
 from medtagger.database.models import Dataset, Scan, Slice, User, Label, Task, datasets_tasks
 from medtagger.definitions import ScanStatus, SliceStatus
 from medtagger.types import ScanID
+
+
+def get_paginated_scans(dataset_key: str = None, page: int = 1, per_page: int = 25) -> Tuple[List[Scan], int]:
+    """Fetch and return all Scans filtered by given parameters.
+
+    :param dataset_key: (optional) key for Dataset that should be used as a filter
+    :param page: (optional) page number which should be fetched
+    :param per_page: (optional) number of entries per page
+    :return: tuple of list of Scans and total number of entries available
+    """
+    query = Scan.query
+    if dataset_key:
+        query = query.join(Dataset)
+        query = query.filter(Dataset.key == dataset_key)
+    query = query.order_by(Scan.id)
+
+    scans = query.limit(per_page).offset((page - 1) * per_page).all()
+    total_scans = query.count()
+    return scans, total_scans
 
 
 def get_all_scans() -> List[Scan]:
@@ -44,8 +63,9 @@ def get_random_scan(task: Task = None, user: User = None) -> Scan:
 
 def delete_scan_by_id(scan_id: ScanID) -> None:
     """Remove Scan from SQL database."""
-    with db_session() as session:
+    with db_connection_session() as session:
         scan = session.query(Scan).filter(Scan.id == scan_id).one()
+    with db_transaction_session() as session:
         session.delete(scan)
 
 
@@ -57,8 +77,8 @@ def add_new_scan(dataset: Dataset, number_of_slices: int, user: User = None) -> 
     :param user: (optional) User that uploaded scan
     :return: Scan object
     """
-    with db_session() as session:
-        scan = Scan(dataset, number_of_slices, user)
+    scan = Scan(dataset, number_of_slices, user)
+    with db_transaction_session() as session:
         session.add(scan)
     return scan
 
@@ -69,7 +89,7 @@ def try_to_mark_scan_as_stored(scan_id: ScanID) -> bool:
     :param scan_id: ID of a Scan which should be tried to mark as STORED
     :return: boolean information if Scan was marked or not
     """
-    with db_session() as session:
+    with db_transaction_session() as session:
         stored_slices_subquery = session.query(func.count(Slice.id).label('count'))
         stored_slices_subquery = stored_slices_subquery.filter(Slice.scan_id == scan_id)
         stored_slices_subquery = stored_slices_subquery.filter(Slice.status == SliceStatus.STORED)
@@ -79,7 +99,7 @@ def try_to_mark_scan_as_stored(scan_id: ScanID) -> bool:
         query = query.filter(Scan.id == scan_id)
         query = query.filter(Scan.status != ScanStatus.STORED)
         query = query.filter(Scan.declared_number_of_slices == stored_slices_subquery.c.count)
-        updated = query.update({"status": (ScanStatus.STORED)}, synchronize_session=False)
+        updated = query.update({'status': ScanStatus.STORED}, synchronize_session=False)
         return bool(updated)
 
 
@@ -89,8 +109,8 @@ def increase_skip_count_of_a_scan(scan_id: ScanID) -> bool:
     :param scan_id: ID of a Scan which skip_count should be increased
     :return: boolean information whether the Scan was skipped or not
     """
-    with db_session() as session:
+    with db_transaction_session() as session:
         query = session.query(Scan)
         query = query.filter(Scan.id == scan_id)
-        updated = query.update({"skip_count": (Scan.skip_count + 1)})
+        updated = query.update({'skip_count': Scan.skip_count + 1})
         return bool(updated)
