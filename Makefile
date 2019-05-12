@@ -31,25 +31,25 @@ docker_push_nightly: docker_push_version
 	docker push medtagger/backend_database_migrations:nightly
 
 docker_tag_as_stable:
-	docker tag medtagger/frontend_ui:latest $(MEDTAGGER_VERSION)
-	docker tag medtagger/backend_rest:latest $(MEDTAGGER_VERSION)
-	docker tag medtagger/backend_websocket:latest $(MEDTAGGER_VERSION)
-	docker tag medtagger/backend_worker:latest $(MEDTAGGER_VERSION)
-	docker tag medtagger/backend_database_migrations:latest $(MEDTAGGER_VERSION)
+	docker tag medtagger/frontend_ui:latest medtagger/frontend_ui:$(MEDTAGGER_VERSION)
+	docker tag medtagger/backend_rest:latest medtagger/backend_rest:$(MEDTAGGER_VERSION)
+	docker tag medtagger/backend_websocket:latest medtagger/backend_websocket:$(MEDTAGGER_VERSION)
+	docker tag medtagger/backend_worker:latest medtagger/backend_worker:$(MEDTAGGER_VERSION)
+	docker tag medtagger/backend_database_migrations:latest medtagger/backend_database_migrations:$(MEDTAGGER_VERSION)
 
 docker_tag_as_latest:
-	docker tag medtagger/frontend_ui:$(MEDTAGGER_VERSION) latest
-	docker tag medtagger/backend_rest:$(MEDTAGGER_VERSION) latest
-	docker tag medtagger/backend_websocket:$(MEDTAGGER_VERSION) latest
-	docker tag medtagger/backend_worker:$(MEDTAGGER_VERSION) latest
-	docker tag medtagger/backend_database_migrations:$(MEDTAGGER_VERSION) latest
+	docker tag medtagger/frontend_ui:$(MEDTAGGER_VERSION) medtagger/frontend_ui:latest
+	docker tag medtagger/backend_rest:$(MEDTAGGER_VERSION) medtagger/backend_rest:latest
+	docker tag medtagger/backend_websocket:$(MEDTAGGER_VERSION) medtagger/backend_websocket:latest
+	docker tag medtagger/backend_worker:$(MEDTAGGER_VERSION) medtagger/backend_worker:latest
+	docker tag medtagger/backend_database_migrations:$(MEDTAGGER_VERSION) medtagger/backend_database_migrations:latest
 
 docker_tag_as_nightly:
-	docker tag medtagger/frontend_ui:$(MEDTAGGER_VERSION) nightly
-	docker tag medtagger/backend_rest:$(MEDTAGGER_VERSION) nightly
-	docker tag medtagger/backend_websocket:$(MEDTAGGER_VERSION) nightly
-	docker tag medtagger/backend_worker:$(MEDTAGGER_VERSION) nightly
-	docker tag medtagger/backend_database_migrations:$(MEDTAGGER_VERSION) nightly
+	docker tag medtagger/frontend_ui:$(MEDTAGGER_VERSION) medtagger/frontend_ui:nightly
+	docker tag medtagger/backend_rest:$(MEDTAGGER_VERSION) medtagger/backend_rest:nightly
+	docker tag medtagger/backend_websocket:$(MEDTAGGER_VERSION) medtagger/backend_websocket:nightly
+	docker tag medtagger/backend_worker:$(MEDTAGGER_VERSION) medtagger/backend_worker:nightly
+	docker tag medtagger/backend_database_migrations:$(MEDTAGGER_VERSION) medtagger/backend_database_migrations:nightly
 
 docker_push_version:
 	docker push medtagger/frontend_ui:$(MEDTAGGER_VERSION)
