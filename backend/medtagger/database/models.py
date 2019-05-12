@@ -14,7 +14,7 @@ from medtagger.database import Base, db_transaction_session
 from medtagger.definitions import ScanStatus, SliceStatus, SliceOrientation, LabelVerificationStatus, \
     LabelElementStatus, LabelTool
 from medtagger.storage.models import BrushLabelElement as StorageBrushLabelElement, OriginalSlice, ProcessedSlice
-from medtagger.types import ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
+from medtagger.types import UserID, ScanID, SliceID, LabelID, LabelElementID, SliceLocation, SlicePosition, \
     LabelPosition, LabelShape, LabelingTime, LabelTagID, ActionID, SurveyID, SurveyElementID, SurveyElementKey, \
     ActionResponseID, SurveyResponseID, PointID, TaskID
 
@@ -45,7 +45,7 @@ class User(Base):
     """Defines model for the Users table."""
 
     __tablename__ = 'Users'
-    id: int = Column(Integer, autoincrement=True, primary_key=True)
+    id: UserID = Column(Integer, autoincrement=True, primary_key=True)
     email: str = Column(String(50), nullable=False, unique=True)
     password: str = Column(String(255), nullable=False)
     first_name: str = Column(String(50), nullable=False)

@@ -1,39 +1,54 @@
 """Module responsible for definition of SlicesRepository."""
-from typing import List
+from typing import List, Set
 
-from medtagger.database import db_connection_session, db_transaction_session
-from medtagger.database.models import Slice, SliceOrientation, Scan
+from medtagger import definitions
+from medtagger.database import db_connection_session, db_transaction_session, models as db_models
 from medtagger.storage.models import OriginalSlice, ProcessedSlice
 from medtagger.types import SliceID, ScanID
 
 
-def get_slice_by_id(slice_id: SliceID) -> Slice:
+def get_slice_by_id(slice_id: SliceID) -> db_models.Slice:
     """Fetch Slice from database."""
     with db_connection_session() as session:
-        return session.query(Slice).filter(Slice.id == slice_id).one()
+        return session.query(db_models.Slice).filter(db_models.Slice.id == slice_id).one()
 
 
-def get_slices_by_scan_id(scan_id: ScanID, orientation: SliceOrientation = SliceOrientation.Z) -> List[Slice]:
+def get_slices_by_scan_id(scan_id: ScanID, orientation: definitions.SliceOrientation = definitions.SliceOrientation.Z) \
+        -> List[db_models.Slice]:
     """Fetch Slice from database."""
     with db_connection_session() as session:
-        query = session.query(Slice)
-        query = query.join(Scan)
-        query = query.filter(Scan.id == scan_id)
-        query = query.filter(Slice.orientation == orientation)
-        query = query.order_by(Slice.location)
+        query = session.query(db_models.Slice)
+        query = query.join(db_models.Scan)
+        query = query.filter(db_models.Scan.id == scan_id)
+        query = query.filter(db_models.Slice.orientation == orientation)
+        query = query.order_by(db_models.Slice.location)
         slices = query.all()
     return slices
 
 
-def delete_slice(_slice: Slice) -> None:
+def get_slices_ids_for_labeled_scans(label_elements: List[db_models.LabelElement]) -> Set[SliceID]:
+    """Fetch Slices' IDs for all Scans that were labeled within given Label Elements.
+
+    :param label_elements: list of Label Elements objects
+    :return: set of all Slice IDs
+    """
+    scans_ids = {label_element.label.scan_id for label_element in label_elements}
+    with db_connection_session() as session:
+        query = session.query(db_models.Slice).with_entities(db_models.Slice.id)
+        query = query.filter(db_models.Slice.scan_id.in_(scans_ids))  # type: ignore  # "ScanID" has no attribute "in_"
+        slices = query.all()
+    return {_slice.id for _slice in slices}
+
+
+def delete_slice(_slice: db_models.Slice) -> None:
     """Remove Slice from SQL database and Storage."""
     slice_id = _slice.id
     scan_id = _slice.scan_id
 
     with db_transaction_session() as session:
-        query = session.query(Scan).filter(Scan.id == scan_id)
-        query.update({'declared_number_of_slices': Scan.declared_number_of_slices - 1})
-        session.query(Slice).filter(Slice.id == slice_id).delete()
+        query = session.query(db_models.Scan).filter(db_models.Scan.id == scan_id)
+        query.update({'declared_number_of_slices': db_models.Scan.declared_number_of_slices - 1})
+        session.query(db_models.Slice).filter(db_models.Slice.id == slice_id).delete()
 
     OriginalSlice.filter(id=slice_id).delete()
     ProcessedSlice.filter(id=slice_id).delete()

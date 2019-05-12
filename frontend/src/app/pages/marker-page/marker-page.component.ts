@@ -16,7 +16,7 @@ import { MarkerSlice } from '../../model/MarkerSlice';
 import { PredefinedBrushLabelElement } from '../../model/PredefinedBrushLabelElement';
 import { ScanMetadata } from '../../model/ScanMetadata';
 import { Selection3D } from '../../model/selections/Selection3D';
-import { SliceSelection, SliceSelectionType } from '../../model/selections/SliceSelection';
+import { SliceSelection } from '../../model/selections/SliceSelection';
 import { SliceRequest } from '../../model/SliceRequest';
 import { Task } from '../../model/Task';
 import { ToolAction, ToolActionType } from '../../model/ToolAction';
@@ -34,6 +34,8 @@ import { BrushSelection } from './../../model/selections/BrushSelection';
 })
 export class MarkerPageComponent implements OnInit {
     private static readonly SLICE_BATCH_SIZE = 10;
+    private static readonly DEFAULT_COLOR_WINDOW_WIDTH = 255;
+    private static readonly DEFAULT_COLOR_WINDOW_CENTER = 128;
     private static readonly HOME_PAGE = '/' + HOME;
 
     @ViewChild(MarkerComponent) marker: MarkerComponent;
@@ -49,6 +51,10 @@ export class MarkerPageComponent implements OnInit {
     currentTag: LabelTag;
     labelComment = '';
     isInitialSliceLoad: boolean;
+
+    public colorWindowPanelActive = false;
+    public colorWindowWidth: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_WIDTH;
+    public colorWindowCenter: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_CENTER;
 
     ActionType = ToolActionType;
 
@@ -302,5 +308,59 @@ export class MarkerPageComponent implements OnInit {
                 }
                 this.marker.setSliderFocus(true);
             });
+    }
+
+    public toggleColorWindowPanel(): void {
+        this.colorWindowPanelActive = !this.colorWindowPanelActive;
+    }
+
+    public resetColorWindowPanel(): void {
+        this.colorWindowWidth = MarkerPageComponent.DEFAULT_COLOR_WINDOW_WIDTH;
+        this.colorWindowCenter = MarkerPageComponent.DEFAULT_COLOR_WINDOW_CENTER;
+        this.rescaleImageColorWindow();
+    }
+
+    public changeImageWindowWidth(newValue: number): void {
+        this.colorWindowWidth = newValue;
+        this.rescaleImageColorWindow();
+    }
+
+    public changeImageWindowCenter(newValue: number): void {
+        this.colorWindowCenter = newValue;
+        this.rescaleImageColorWindow();
+    }
+
+    private rescaleImageColorWindow(): void {
+        this.marker.modifyViewerImage(this.applyWindowScaling.bind(this));
+    }
+
+    private applyWindowScaling(imageRGBBytes: Uint8ClampedArray): Uint8ClampedArray {
+        const lowestVisibleValue = this.colorWindowCenter - (this.colorWindowWidth / 2);
+        const highestVisibleValue = this.colorWindowCenter + (this.colorWindowWidth / 2);
+
+        for (let i = 0; i < imageRGBBytes.length; i += 4) {
+
+            const greyScaleValue = imageRGBBytes[i]; // red channel here, same as the next two beeing greyscale image
+            const alpha = imageRGBBytes[i + 3];
+
+            if (alpha === 0) {
+                continue;
+            }
+
+            let pixelValue;
+            if (greyScaleValue <= lowestVisibleValue) {
+                pixelValue = 0;
+            } else if (greyScaleValue > highestVisibleValue) {
+                pixelValue = 255;
+            } else {
+                pixelValue = (((greyScaleValue - (this.colorWindowCenter - 0.5)) / (this.colorWindowWidth - 1)) + 0.5) * 255;
+            }
+
+
+            imageRGBBytes[i] = imageRGBBytes[i + 1] = imageRGBBytes[i + 2] = pixelValue;
+            imageRGBBytes[i + 3] = 255;
+        }
+
+        return imageRGBBytes;
     }
 }
