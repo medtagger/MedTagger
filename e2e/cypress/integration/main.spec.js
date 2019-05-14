@@ -38,9 +38,9 @@ describe('Basic flow', () => {
         goToLabeling('Kidneys segmentation');
         matSelect('[data-cy=tags]', 'Left Kidney');
         cy.get('[data-cy=rectangle-tool]').click();
-        cy.get('canvas').trigger('mousedown', 200, 200, {which:LEFT_MOUSE_BUTTON, timeout: 15000});
-        cy.get('canvas').trigger('mousemove', 300, 300);
-        cy.get('canvas').trigger('mouseup');
+        cy.get('canvas').trigger('mousedown', {which:LEFT_MOUSE_BUTTON, clientX: 200, clientY: 200, timeout: 15000});
+        cy.get('canvas').trigger('mousemove', {clientX: 300, clientY: 300});
+        cy.get('canvas').trigger('mouseup', {force: true});
         cy.get('[data-cy=send-label]').click();
         cy.get('[data-cy=no-labels-added]');
     });
