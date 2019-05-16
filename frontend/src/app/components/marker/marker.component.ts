@@ -48,10 +48,10 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
 
     public onMouseDown(mouseEvent: MouseEvent): void {
         if (!this.currentTag) {
-            this.snackBar.open('Please select Tag and Tool to start labeling.', '', {duration: 2000});
+            this.snackBar.open('Please select Tag and Tool to start labeling.', '', { duration: 2000 });
             return;
         } else if (!this.currentTool) {
-            this.snackBar.open('Please select Tool to start labeling.', '', {duration: 2000});
+            this.snackBar.open('Please select Tool to start labeling.', '', { duration: 2000 });
             return;
         }
 
@@ -60,9 +60,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
 
     public onMouseUp(mouseEvent: MouseEvent): void {
         console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-            if (this.currentTool) {
-                this.currentTool.onMouseUp(mouseEvent);
-            }
+        if (this.currentTool) {
+            this.currentTool.onMouseUp(mouseEvent);
+        }
     }
 
     public onMouseMove(mouseEvent: MouseEvent): void {

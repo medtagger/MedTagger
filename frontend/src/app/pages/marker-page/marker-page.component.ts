@@ -25,6 +25,7 @@ import { LabelService } from '../../services/label.service';
 import { ScanService } from '../../services/scan.service';
 import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
+import { MarkerZoomHandler } from '../../model/MarkerZoomHandler';
 
 @Component({
     selector: 'app-marker-page',
@@ -58,8 +59,7 @@ export class MarkerPageComponent implements OnInit {
 
     ActionType = ToolActionType;
 
-    zoomLevels = List([1.0, 2.0, 4.0, 8.0]);
-    currentZoomLevelIndex = 0;
+    zoomHandler: MarkerZoomHandler;
 
     constructor(
         private scanService: ScanService,
@@ -76,6 +76,8 @@ export class MarkerPageComponent implements OnInit {
 
     ngOnInit() {
         console.log('MarkerPage init', this.marker);
+
+        this.zoomHandler = new MarkerZoomHandler();
 
         this.route.queryParamMap.subscribe(params => {
             const taskKey = params.get('task') || undefined;
@@ -167,16 +169,17 @@ export class MarkerPageComponent implements OnInit {
                 }
             });
         });
+
+        this.marker.setZoomHandler(this.zoomHandler);
     }
 
     public zoomIn(): void {
-        this.currentZoomLevelIndex++;
-        this.marker.scale = this.zoomLevels.get(this.currentZoomLevelIndex);
+        this.marker.scale = this.zoomHandler.zoomIn();
+        this.snackBar.open('Use mouse wheel button click to drag zoomed image.', '', { duration: 3000 });
     }
 
     public zoomOut(): void {
-        this.currentZoomLevelIndex--;
-        this.marker.scale = this.zoomLevels.get(this.currentZoomLevelIndex);
+        this.marker.scale = this.zoomHandler.zoomOut();
     }
 
     public get toolActions(): List<ToolAction> {

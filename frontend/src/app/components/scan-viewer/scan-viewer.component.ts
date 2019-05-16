@@ -20,6 +20,7 @@ import { SliceRequest } from '../../model/SliceRequest';
 import { DrawingContext } from '../tools/DrawingContext';
 import { Tool } from '../tools/Tool';
 import { List } from 'immutable';
+import { MarkerZoomHandler } from '../../model/MarkerZoomHandler';
 
 @Component({
     selector: 'app-scan-viewer',
@@ -87,6 +88,20 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
 
     get scale(): number {
         return this._scale;
+    }
+
+    public setZoomHandler(zoomHandler: MarkerZoomHandler) {
+        this.canvas.addEventListener('mousedown', (event: MouseEvent) => {
+            zoomHandler.mouseDownHandler(event, this.imageContainer);
+        });
+
+        this.canvas.addEventListener('mousemove', (event: MouseEvent) => {
+            zoomHandler.mouseMoveHandler(event, this.imageContainer);
+        });
+
+        this.canvas.addEventListener('mouseup', (event: MouseEvent) => {
+            zoomHandler.mouseUpHandler(event, this.imageContainer);
+        });
     }
 
     ngOnChanges(changes: SimpleChanges) {
