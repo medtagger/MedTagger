@@ -1,7 +1,6 @@
 import {goToLabeling, loginAsAdmin, matSelect, uploadScans} from '../support/utils';
 
 describe('Basic flow', () => {
-    const LEFT_MOUSE_BUTTON = 1;
 
     beforeEach(() => {
         // local session and cookies are cleared automatically before each test so we don't have to do this manually
@@ -38,8 +37,8 @@ describe('Basic flow', () => {
         goToLabeling('Kidneys segmentation');
         matSelect('[data-cy=tags]', 'Left Kidney');
         cy.get('[data-cy=rectangle-tool]').click();
-        cy.get('canvas').trigger('mousedown', {which:LEFT_MOUSE_BUTTON, clientX: 200, clientY: 200, timeout: 15000});
-        cy.get('canvas').trigger('mousemove', {clientX: 300, clientY: 300});
+        cy.get('canvas').trigger('mousedown', 200, 200, {timeout: 15000});
+        cy.get('canvas').trigger('mousemove', 300, 300);
         cy.get('canvas').trigger('mouseup', {force: true});
         cy.get('[data-cy=send-label]').click();
         cy.get('[data-cy=no-labels-added]');
@@ -51,7 +50,7 @@ describe('Basic flow', () => {
         goToLabeling('Find middle of the Spine');
         matSelect('[data-cy=tags]', 'Middle of the Spine');
         cy.get('[data-cy=point-tool]').click();
-        cy.get('canvas').click(100, 100, {which:LEFT_MOUSE_BUTTON, timeout: 15000});
+        cy.get('canvas').click(100, 100, {timeout: 15000});
         cy.get('canvas').click(200, 100);
         cy.get('canvas').click(200, 200);
         cy.get('[data-cy=send-label]').click();
@@ -109,7 +108,7 @@ describe('Basic flow', () => {
         goToLabeling('Find narrowings in Veins');
         matSelect('[data-cy=tags]', 'Narrowing (region)');
         cy.get('[data-cy=brush-tool]').click();
-        cy.get('canvas').trigger('mousedown', 200, 200, {which:LEFT_MOUSE_BUTTON, timeout: 15000});
+        cy.get('canvas').trigger('mousedown', 200, 200, {timeout: 15000});
         cy.get('canvas').trigger('mousemove', 220, 200);
         cy.get('canvas').trigger('mousemove', 240, 200);
         cy.get('canvas').trigger('mousemove', 240, 250);
