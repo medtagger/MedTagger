@@ -2,6 +2,7 @@
 from typing import NewType, NamedTuple
 
 
+UserID = NewType('UserID', int)
 ScanID = NewType('ScanID', str)
 SliceID = NewType('SliceID', str)
 LabelID = NewType('LabelID', str)

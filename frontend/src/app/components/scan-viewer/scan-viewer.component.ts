@@ -76,6 +76,10 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
     protected drawingContext: DrawingContext;
     protected _scale = 1.0;
 
+    protected unmodifiedImageData: ImageData = null;
+    protected inMemoryCanvas: HTMLCanvasElement = null;
+    protected inMemoryCanvasCtx: CanvasRenderingContext2D = null;
+
     set scale(scale: number) {
         this._scale = scale;
         this.resizeImageToCurrentWorkspace();
@@ -211,6 +215,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
         if (this.currentSlice !== sliceIndex) {
             this.drawingContext.currentSlice = sliceIndex;
             this.currentImage.src = (this.slices.get(sliceIndex) && this.slices.get(sliceIndex).source) || '';
+            this.unmodifiedImageData = null;
             this.resizeImageToCurrentWorkspace();
             this.redrawSelections();
             this.requestSlicesIfNeeded();
@@ -317,5 +322,32 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
 
     protected getToolByName(toolName: string): Tool<SliceSelection> {
         return this.tools.find(x => x.getToolName() === toolName);
+    }
+
+    private getUnmodifiedImageData(): Uint8ClampedArray {
+        if (this.inMemoryCanvas == null) {
+            this.inMemoryCanvas = <HTMLCanvasElement>document.createElement('canvas');
+            this.inMemoryCanvasCtx = this.inMemoryCanvas.getContext('2d');
+        }
+
+        if (this.unmodifiedImageData == null) {
+            this.inMemoryCanvas.width = this.currentImage.width;
+            this.inMemoryCanvas.height = this.currentImage.height;
+            this.inMemoryCanvasCtx.drawImage(this.currentImage, 0, 0, this.currentImage.width, this.currentImage.height);
+
+            this.unmodifiedImageData = this.inMemoryCanvasCtx.getImageData(0, 0, this.currentImage.width, this.currentImage.height);
+        }
+
+        return new Uint8ClampedArray(this.unmodifiedImageData.data);
+    }
+
+    public modifyViewerImage(transformer: (imageRGBBytes: Uint8ClampedArray) => Uint8ClampedArray) {
+        const imageBytes: Uint8ClampedArray = this.getUnmodifiedImageData();
+
+        const modifiedImage: ImageData = new ImageData(transformer(imageBytes), this.currentImage.width, this.currentImage.height);
+        this.inMemoryCanvasCtx.putImageData(modifiedImage, 0, 0);
+
+        this.currentImage.src = this.inMemoryCanvas.toDataURL('image/png');
+        this.resizeImageToCurrentWorkspace();
     }
 }
