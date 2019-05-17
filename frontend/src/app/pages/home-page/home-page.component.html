@@ -4,29 +4,31 @@
         <span class="account-button__name">{{user.firstName + ' ' + user.lastName}}</span>
         <span *ngIf="isDropdownActive" [@displayDropdown]="isDropdownActive" class="account-button__options">
             <a class="account-button__link" [routerLink]="settingsPage" data-cy="navbar-user-dropdown-settings-button">
-                <mat-icon class="mr-2">settings</mat-icon>Settings
+                <mat-icon class="mr-2">settings</mat-icon>
+                {{ 'HOME.DROPDOWN.SETTINGS' | translate }}
             </a>
             <a class="account-button__link" [routerLink]="loginPage" (click)="logOut()" data-cy="navbar-user-dropdown-logout-button">
-                <mat-icon class="mr-2">exit_to_app</mat-icon>Log out
+                <mat-icon class="mr-2">exit_to_app</mat-icon>
+                {{ 'HOME.DROPDOWN.LOGOUT' | translate }}
             </a>
         </span>
     </button>
 </app-nav-bar>
 <div class="container">
     <div class="home-welcome my-5">
-        <h2 class="home-welcome__main">Hello, {{user.firstName}}!</h2>
-        <h4 class="home-welcome__desc pr-2">MedTagger Home Page</h4>
+        <h2 class="home-welcome__main">{{ 'HOME.HEADER.GREETING' | translate }}, {{user.firstName}}!</h2>
+        <h4 class="home-welcome__desc pr-2">{{ 'HOME.HEADER.DESCRIPTION' | translate }}</h4>
         <hr class="home-welcome__divider"/>
     </div>
     <div class="home-upload" *ngIf="user.role !== 'volunteer'">
-        <div class="home-upload__desc">Upload new scans</div>
+        <div class="home-upload__desc">{{ 'HOME.ACTIONS.UPLOAD.LABEL' | translate }}</div>
         <button mat-raised-button class="home-upload__button" (click)="goToUploadPage()" color="accent" data-cy="home-upload-button">
             <mat-icon class="home-upload__icon" aria-label="Upload new labelling scans">cloud_upload</mat-icon>
-            Start uploading new scans
+            {{ 'HOME.ACTIONS.UPLOAD.BUTTON' | translate }}
         </button>
     </div>
     <div class="home-tasks">
-        <div class="home-tasks__desc">Start labeling</div>
+        <div class="home-tasks__desc">{{ 'HOME.ACTIONS.LABELING' | translate }}</div>
         <app-task-explorer></app-task-explorer>
     </div>
 </div>
