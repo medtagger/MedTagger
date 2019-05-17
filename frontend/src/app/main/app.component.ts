@@ -18,7 +18,7 @@ export class AppComponent implements OnInit {
     public currentUser: UserInfo;
 
     constructor(private router: Router, private activatedRoute: ActivatedRoute,
-        private snackBar: MatSnackBar, private translate: TranslateService) {
+        private snackBar: MatSnackBar, public translate: TranslateService) {
 
         translate.setDefaultLang(AppComponent.DEFAULT_LANGUAGE);
 
