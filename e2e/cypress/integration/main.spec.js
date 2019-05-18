@@ -39,7 +39,7 @@ describe('Basic flow', () => {
         cy.get('[data-cy=rectangle-tool]').click();
         cy.get('canvas').trigger('mousedown', 200, 200, {timeout: 15000});
         cy.get('canvas').trigger('mousemove', 300, 300);
-        cy.get('canvas').trigger('mouseup');
+        cy.get('canvas').trigger('mouseup', {force: true});
         cy.get('[data-cy=send-label]').click();
         cy.get('[data-cy=no-labels-added]');
     });

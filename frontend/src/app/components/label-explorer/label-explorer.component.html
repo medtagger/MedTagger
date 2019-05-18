@@ -15,7 +15,7 @@
                 <h5
                     *ngIf="getSelectionsForTag(tag).length == 0"
                     class="label-empty">
-                    There are no labels for this tag.
+                    {{ 'COMPONENT.LABEL_EXPLORER.NO_LABELS_FOR_TAG' | translate }}
                 </h5>
                 <mat-list-item
                     *ngFor="let selection of getSelectionsForTag(tag)"
@@ -27,10 +27,10 @@
                         [svgIcon]="getToolIconName(selection.toolName)">
                     </mat-icon>
                     <p class="label-item__header" matLine>
-                        Slice #{{ selection.sliceIndex }}
+                        {{ 'COMPONENT.LABEL_EXPLORER.SLICE' | translate }} #{{ selection.sliceIndex }}
                     </p>
                     <p class="label-item__subheader" matLine>
-                        Selection #{{ selection.getId() }}
+                        {{ 'COMPONENT.LABEL_EXPLORER.SELECTION' | translate }} #{{ selection.getId() }}
                     </p>
                     <button mat-icon-button
                         (click)="removeSelection(selection)"
@@ -56,6 +56,7 @@
         *ngIf="selections.isEmpty()"
         class="label-empty"
         data-cy="no-labels-added">
-        No labels have been added so far.<br/>Add new labels using available tools.
+        {{ 'COMPONENT.LABEL_EXPLORER.NO_LABELS_ADDED' | translate }}<br/>
+        {{ 'COMPONENT.LABEL_EXPLORER.ADD_LABELS' | translate }}
     </h5>
 </mat-list>

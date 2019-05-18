@@ -4,6 +4,7 @@ import {UserInfo} from '../model/UserInfo';
 import {MatSnackBar} from '@angular/material';
 import {filter, map, mergeMap} from 'rxjs/operators';
 import * as appRoutes from '../constants/routes';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-root',
@@ -11,12 +12,18 @@ import * as appRoutes from '../constants/routes';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
+    private static readonly DEFAULT_LANGUAGE: string = 'en';
     public pageTitle = '';
     public shouldShowFooter = true;
     public currentUser: UserInfo;
 
-    constructor(private router: Router, private activatedRoute: ActivatedRoute, private snackBar: MatSnackBar) {
+    constructor(private router: Router, private activatedRoute: ActivatedRoute,
+        private snackBar: MatSnackBar, public translate: TranslateService) {
+
+        translate.setDefaultLang(AppComponent.DEFAULT_LANGUAGE);
+
+        translate.use(AppComponent.DEFAULT_LANGUAGE);
+
         router.events.subscribe(() => {
             this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));
             console.log(this.currentUser);
