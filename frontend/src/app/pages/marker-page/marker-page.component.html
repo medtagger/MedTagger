@@ -7,8 +7,8 @@
             <div *ngIf="colorWindowPanelActive" id="color-window-panel" class="color-window-panel">
                 <mat-card class="color-window-panel--card">
                     <mat-card-header class="color-window-panel--card__header">
-                        <mat-card-title>Image Window</mat-card-title>
-                        <mat-card-subtitle>Correct image brightness and contrast by tuning parameters below</mat-card-subtitle>
+                        <mat-card-title>{{ 'MARKER.NAVBAR.ZOOM.TITLE' | translate }}</mat-card-title>
+                        <mat-card-subtitle>{{ 'MARKER.NAVBAR.ZOOM.SUBTITLE' | translate }}</mat-card-subtitle>
                         <button mat-icon-button (click)="toggleColorWindowPanel()">
                             <mat-icon>close</mat-icon>
                         </button>
@@ -16,7 +16,7 @@
                     <mat-card-content class="color-window-panel--card__content">
                         <mat-divider [inset]="true"></mat-divider>
                         <span>
-                            Window width: {{colorWindowWidth}} 
+                            {{ 'MARKER.NAVBAR.ZOOM.WINDOW_WIDTH' | translate }}: {{colorWindowWidth}} 
                         </span>
                         <mat-slider (change)="changeImageWindowWidth($event.value)"
                                     [disabled]="false"
@@ -27,7 +27,7 @@
                                     [value]="colorWindowWidth">
                         </mat-slider>
                         <span>
-                            Window center: {{colorWindowCenter}}
+                            {{ 'MARKER.NAVBAR.ZOOM.WINDOW_CENTER' | translate }}: {{colorWindowCenter}}
                         </span>
                         <mat-slider (change)="changeImageWindowCenter($event.value)"
                                     [disabled]="false"
@@ -39,7 +39,7 @@
                         </mat-slider>
                     </mat-card-content>
                     <mat-card-actions class="color-window-panel--card__actions">
-                        <button mat-button color="primary" (click)="resetColorWindowPanel()">Reset to default</button>
+                        <button mat-button color="primary" (click)="resetColorWindowPanel()">{{ 'MARKER.NAVBAR.ZOOM.DEFAULT' | translate }}</button>
                       </mat-card-actions>
                 </mat-card>
             </div>
@@ -60,7 +60,7 @@
                     color="primary"
                     (click)="addLabelComment()"
                     [disabled]="selections.isEmpty()">
-                    {{ this.labelComment === '' ? 'Add comment' : 'Modify existing comment'}}
+                    {{ (this.labelComment === '' ? 'MARKER.NAVBAR.COMMENT.ADD' : 'MARKER.NAVBAR.COMMENT.MODIFY') | translate }}
                 </button>
             </div>
         </div>
@@ -68,30 +68,30 @@
             <button mat-raised-button
                 color="primary"
                 (click)="skipScan()">
-                Skip scan
+                {{ 'MARKER.NAVBAR.BUTTON.SKIP' | translate }}
             </button>
             <button *ngIf="!selections.isEmpty()"
                 mat-raised-button
                 color="accent"
                 (click)="sendCompleteLabel()"
                 data-cy="send-label">
-                Send label
+                {{ 'MARKER.NAVBAR.BUTTON.SEND' | translate }}
             </button>
             <button *ngIf="selections.isEmpty()"
                 mat-raised-button
                 color="accent"
                 (click)="sendEmptyLabel()">
-                Nothing to tag
+                {{ 'MARKER.NAVBAR.BUTTON.NO_TAG' | translate }}
             </button>
         </div>
     </div>
 </app-nav-bar>
 <div class="marker">
     <div class="marker-toolbox">
-        <h3 class="marker-toolbox--header">Tools</h3>
+        <h3 class="marker-toolbox--header">{{ 'MARKER.HEADER.TOOLS' | translate }}</h3>
         <div class="marker-toolbox--content d-flex flex-column align-items-center">
             <mat-form-field class="marker-toolbox--select">
-                <mat-select placeholder="Active tag" data-cy="tags">
+                <mat-select placeholder="{{ 'MARKER.ACTIVE_TAG_PLACEHOLDER' | translate }}" data-cy="tags">
                     <mat-option *ngFor="let tag of (task ? task.tags : [])" [value]="tag" (click)="setTag(tag)">
                         {{ tag.name }}
                     </mat-option>
@@ -130,7 +130,7 @@
         </div>
 
         <ng-container *ngIf="!toolActions.isEmpty()">
-            <h3 class="marker-toolbox--header">Tool actions</h3>
+            <h3 class="marker-toolbox--header">{{ 'MARKER.HEADER.TOOL_ACTIONS' | translate }}</h3>
             <div class="marker-toolbox--content">
                 <mat-chip-list>
                     <mat-chip
@@ -144,7 +144,7 @@
             </div>
         </ng-container>
 
-        <h3 class="marker-toolbox--header">Labels</h3>
+        <h3 class="marker-toolbox--header">{{ 'MARKER.HEADER.LABELS' | translate }}</h3>
         <div class="marker-toolbox--content label-explorer pt-1">
             <app-label-explorer [(selections)]=selections></app-label-explorer>
         </div>
@@ -158,5 +158,5 @@
     </div>
 </div>
 <div class="marker-info">
-    Please use bigger screen to start labeling.
+    {{ 'MARKER.SCREEN_INFO' | translate }}
 </div>
