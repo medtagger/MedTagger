@@ -13,6 +13,8 @@ import {OverlayContainer} from '@angular/cdk/overlay';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {InputDialogComponent} from '../dialogs/input-dialog.component';
 import {ReactiveFormsModule} from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
+import { TranslateServiceStub } from '../mocks/TranslateServiceStub';
 
 @Component({
     template: ''
@@ -48,7 +50,12 @@ describe('Service: DialogService', () => {
                         overlayContainer = document.createElement('div');
                         return {getContainerElement: () => overlayContainer};
                     }
-                }]
+                },
+                {
+                    provide: TranslateService,
+                    useClass: TranslateServiceStub
+                }
+            ]
         });
 
         TestBed.overrideModule(BrowserDynamicTestingModule, {

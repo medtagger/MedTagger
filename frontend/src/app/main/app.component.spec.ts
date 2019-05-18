@@ -10,6 +10,8 @@ import {
     MatToolbarModule
 } from '@angular/material';
 import {RouterTestingModule} from '@angular/router/testing';
+import { TranslateService } from '@ngx-translate/core';
+import { TranslateServiceStub } from '../mocks/TranslateServiceStub';
 
 describe('AppComponent', () => {
 
@@ -26,6 +28,12 @@ describe('AppComponent', () => {
                 MatSidenavModule,
                 MatToolbarModule,
                 MatSnackBarModule
+            ],
+            providers: [
+                {
+                    provide: TranslateService,
+                    useClass: TranslateServiceStub
+                }
             ]
         }).compileComponents();
     }));

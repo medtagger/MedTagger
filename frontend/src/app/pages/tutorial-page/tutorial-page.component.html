@@ -11,10 +11,10 @@
             <button mat-raised-button class="tutorial-info__next" (click)="endTutorial()" data-cy="end-tutorial"
                     color="primary">
                 <mat-icon>home</mat-icon>
-                Proceed to home page
+                {{ 'TUTORIAL.PROCEED' | translate }}
             </button>
             <mat-checkbox class="tutorial-info__hide" [formControl]="doNotShowAgain" data-cy="not-show">
-                Do not show this tutorial again
+                {{ 'TUTORIAL.DONT_SHOW_AGAIN' | translate }}
             </mat-checkbox>
         </div>
     </div>

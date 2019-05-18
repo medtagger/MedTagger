@@ -1,0 +1,219 @@
+{
+    "APP_NAME": "MedTagger",
+    "HOME": {
+        "DROPDOWN": {
+            "SETTINGS": "Settings",
+            "LOGOUT": "Log out"
+        },
+        "HEADER": {
+            "GREETING": "Hello",
+            "DESCRIPTION": "MedTagger Home Page"
+        },
+        "ACTIONS": {
+            "UPLOAD": {
+                "LABEL": "Upload new scans",
+                "BUTTON": "Start uploading new scans"
+            },
+            "LABELING": "Start labeling"
+        }
+    },
+    "LOGIN": {
+        "HEADER": {
+            "TITLE": "MedTagger",
+            "DESCRIPTION": "Open Source platform for aggregation and annotation of medical images powered by crowdsourcing."
+        },
+        "ACTIONS": {
+            "SIGN_IN": "Sign in",
+            "SIGN_UP": "Sign up"
+        },
+        "FORM": {
+            "GREETING": "Hello!",
+            "EMAIL": "Email",
+            "PASSWORD": "Password",
+            "CONFIRM_PASSWORD": "Confirm password",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "DESCRIPTION": {
+                "SIGN_IN": "Good to see you back! Log in and continue your work.",
+                "SIGN_UP": "Start labeling with MedTagger today. It is easy! Just take your time and fill this registration form and you are ready to go. "
+            }
+        },
+        "PLACEHOLDER": {
+            "EMAIL": "Insert your email.",
+            "PASSWORD": "Insert your password.",
+            "CONFIRM_PASSWORD": "Re-enter your password.",
+            "FIRST_NAME": "Insert your name.",
+            "LAST_NAME": "Insert your surname."
+        }
+    },
+    "MARKER": {
+        "SCREEN_INFO": "Please use bigger screen to start labeling.",
+        "ACTIVE_TAG_PLACEHOLDER": "Active tag",
+        "HEADER": {
+            "TOOLS": "Tools",
+            "TOOL_ACTIONS": "Tool actions",
+            "LABELS": "Labels"
+        },
+        "NAVBAR": {
+            "ZOOM": {
+                "TITLE": "Image Window",
+                "SUBTITLE": "Correct image brightness and contrast by tuning parameters below",
+                "WINDOW_WIDTH": "Window width",
+                "WINDOW_CENTER": "Window center",
+                "DEFAULT": "Reset to default"
+            },
+            "COMMENT": {
+                "ADD": "Add comment",
+                "MODIFY": "Modify existing comment"
+            },
+            "BUTTON": {
+                "SKIP": "Skip scan",
+                "SEND": "Send label",
+                "NO_TAG": "Nothing to tag"
+            }
+        }
+    },
+    "SETTINGS": {
+        "ACCOUNT": {
+            "TITLE": "Account settings",
+            "SUBTITLE": "Change your account data",
+            "SAVE": "Save"
+        },
+        "USERS": {
+            "TITLE": "Users",
+            "SUBTITLE": "Browse users and change their's privilages",
+            "DOCTOR_ROLE": "Doctor role"
+        },
+        "PLACEHOLDER": {
+            "EMAIL": "E-mail",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name"
+        }
+    },
+    "TUTORIAL": {
+        "PROCEED": "Proceed to home page",
+        "DONT_SHOW_AGAIN": "Do not show this tutorial again"
+    },
+    "UPLOAD": {
+        "TIP": "Tip!",
+        "PREFEDINED_LABELS": "Predefined Labels",
+        "BUTTON": {
+            "SELECT": "Select",
+            "UPLOAD": "Upload!"
+        },
+        "DATASET": {
+            "LABEL": "Select Dataset",
+            "TITLE": "Select Dataset",
+            "PLACEHOLDER": "Dataset"
+        },
+        "UPLOAD_MODE": {
+            "LABEL": "Select Upload Mode",
+            "SINGLE": {
+                "TITLE": "Single 3D Scan",
+                "DESCRIPTION": "Select this option if you want to upload a single 3D Scan."
+            },
+            "MULTIPLE": {
+                "TITLE": "Multiple 3D Scans",
+                "DESCRIPTION": "Select this option if you want to upload multiple 3D Scans."
+            }
+        },
+        "SELECT_SCAN": {
+            "SINGLE": {
+                "LABEL": "Select Scan",
+                "BEFORE_SELECTION": {
+                    "TITLE": "Single 3D Scan",
+                    "DESCRIPTION": "Go to the directory containing CT Scan and select all DICOM files (*.dcm).",
+                    "SIZE_LIMIT": "Single file size limit",
+                    "WARNING": "Not all of your files will be uploaded!\nSome of them may be corrupted or incompatible with MedTagger."
+                },
+                "AFTER_SELECTION": {
+                    "TITLE": "Selected Scans",
+                    "DESCRIPTION": "You can also specify Predefined Label which will be shown initially\non the Labeling Page. To do so, send \"TASK_KEY.json\" file together with your DICOM files."
+                }
+            },
+            "MULTIPLE": {
+                "LABEL": "Select Scans",
+                "BEFORE_SELECTION": {
+                    "TITLE": "Multiple 3D Scans",
+                    "DESCRIPTION": "Select parent directory that contains subdirectories with CT Scans.",
+                    "SIZE_LIMIT": "Single file size limit",
+                    "WARNING": "Not all of your files will be uploaded!\nSome of them may be corrupted or incompatible with MedTagger."
+                },
+                "AFTER_SELECTION": {
+                    "TITLE": "Selected Scans",
+                    "DESCRIPTION": "You can also specify Predefined Label which will be shown initially\non the Labeling Page. To do so, send \"TASK_KEY.json\" file together with your DICOM files.",
+                    "PREFEDINED_LABELS": "Predefined Labels"
+                }
+            }
+        },
+        "UPLOAD_STEP": {
+            "LABEL": "Upload",
+            "TITLE": {
+                "SINGLE": "Uploading Scan in progress",
+                "MULTIPLE": "Uploading Scans in progress"
+            },
+            "DICOMS": "DICOMs",
+            "STATUS": {
+                "UPLOADING": "UPLOADING",
+                "WAITING": "WAITING FOR PROCESSING",
+                "PROCESSING": "PROCESSING",
+                "ERROR": "ERROR",
+                "AVAILABLE": "AVAILABLE",
+                "QUEUED": "QUEUED"
+            }
+        },
+        "SUMMARY": {
+            "LABEL": "Summary",
+            "TITLE": "Upload Summary",
+            "DESCRITPION": "Upload completed sucessfully!\nAll of your scans are now available for labeling.",
+            "WARNING": "There were some issues with uploading your scans!\nYour files may be corrupted or incompatible with MedTagger.",
+            "ERROR": "None of your scans were uploaded properly!\nYour files may be corrupted or incompatible with MedTagger.",
+            "SCANS_ISSUES": "Scans with issues",
+            "ACTION": {
+                "SELECT_ALL": "Select all",
+                "DESELECT_ALL": "Deselect all",
+                "UPLOAD_MORE": "Upload more Scans",
+                "UPLOAD_SELECTED": "Upload selected Scans again"
+            }
+        }
+    },
+    "VALIDATION": {
+        "LABELING_TIME": "Labeling time",
+        "BUTTON": {
+            "VALID": "Valid",
+            "INVALID": "Invalid"
+        }
+    },
+    "COMPONENT": {
+        "LABEL_EXPLORER": {
+            "NO_LABELS_FOR_TAG" : "There are no labels for this tag.",
+            "NO_LABELS_ADDED": "No labels have been added so far.",
+            "ADD_LABELS": "Add new labels using available tools.",
+            "SLICE": "Slice",
+            "SELECTION": "Selection"
+        },
+        "MARKER": {
+            "MESSAGE": {
+                "SELECT_TAG": "Please select Tag and Tool to start labeling.",
+                "SELECT_TOOL": "Please select Tool to start labeling."
+            }
+        },
+        "TASK_EXPLORER": {
+            "ERROR_MESSAGE": "There was an error while downloading tasks",
+            "CLOSE_BUTTON": "Close"
+        },
+        "UPLOAD_SELECTOR": {
+            "SELECT_IMAGES": "Select DICOM images",
+            "SELECT_DIR": "Select directory with Scans",
+            "SELECTED": "Selected",
+            "SCANS": "Scans",
+            "DICOM_IMAGES": "DICOM images"
+        }
+    },
+    "SERVICE": {
+        "DIALOG": {
+            "OK": "Ok",
+            "SUBMIT": "Submit"
+        }
+    }
+}
