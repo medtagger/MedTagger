@@ -232,7 +232,7 @@ export class MarkerPageComponent implements OnInit {
         this.requestScan();
     }
 
-    public sendsendCompleteLabel(): void {
+    public sendCompleteLabel(): void {
         this.sendSelection(new Selection3D(this.selections.toJS()), this.labelComment);
     }
 
