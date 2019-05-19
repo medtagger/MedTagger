@@ -108,7 +108,7 @@ export class MarkerPageComponent implements OnInit {
                                     count = this.scan.numberOfSlices - sliceRequest;
                                 }
                                 if (reversed === true) {
-                                    sliceRequest -= count;
+                                    sliceRequest = sliceRequest - count + 1; // We still want requested slice thats why +1
                                     if (sliceRequest < 0) {
                                         count += sliceRequest;
                                         sliceRequest = 0;
@@ -220,6 +220,7 @@ export class MarkerPageComponent implements OnInit {
 
     public skipScan(): void {
         this.scanService.skipScan(this.scan.scanId).then();
+        this.marker.clearData();
         this.nextScan();
     }
 
@@ -228,6 +229,7 @@ export class MarkerPageComponent implements OnInit {
         this.labelComment = '';
         this.selections = List();
         this.currentTool = undefined;
+        this.marker.clearData();
         this.requestScan();
     }
 
