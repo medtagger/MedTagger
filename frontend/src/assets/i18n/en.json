@@ -203,7 +203,12 @@
             "NO_LABELS_ADDED": "No labels have been added so far.",
             "ADD_LABELS": "Add new labels using available tools.",
             "SLICE": "Slice",
-            "SELECTION": "Selection"
+            "SELECTION": "Selection",
+            "TOOLTIPS": {
+                "BTN_REMOVE": "Remove this selection. This operation will permamently delete selection, use carefully.",
+                "BTN_PIN": "Pin selection to have it on view when changing slices of scan.",
+                "BTN_VISIBLE": "Toggle visibility of this selection on current slice."
+            }
         },
         "MARKER": {
             "MESSAGE": {

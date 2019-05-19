@@ -2,6 +2,7 @@ import { List } from 'immutable';
 import { Component, Input, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { SliceSelection } from '../../model/selections/SliceSelection';
 import { LabelTag } from './../../model/labels/LabelTag';
+import { FormControl } from '@angular/forms';
 
 @Component({
     selector: 'app-label-explorer',
@@ -24,6 +25,8 @@ export class LabelExplorerComponent {
     @Input() selections: List<SliceSelection>;
 
     @Output() selectionsChange: EventEmitter<List<SliceSelection>> = new EventEmitter();
+
+    tooltipShowDelay = new FormControl(1000);
 
     private hiddenTags: List<String> = List([]);
 
