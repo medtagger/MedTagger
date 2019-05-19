@@ -48,7 +48,32 @@
     },
     "MARKER": {
         "SCREEN_INFO": "Please use bigger screen to start labeling.",
+        "ZOOM_INFO": "Use mouse wheel button click to drag zoomed image.",
+        "LABEL_SEND_INFO": "Label has been sent!",
+        "SCAN_LOADED_INFO": "New scan has been loaded!",
         "ACTIVE_TAG_PLACEHOLDER": "Active tag",
+        "DIALOG": {
+            "NO_TAGS": {
+                "TITLE": "There are no tags assigned to this task!",
+                "CONTENT": "Please try another task!",
+                "BUTTON": "Go back"
+            },
+            "NO_TASK": {
+                "TITLE": "You did not choose task properly!",
+                "CONTENT": "Please choose it again!",
+                "BUTTON": "Go back"
+            },
+            "NO_SCANS": {
+                "TITLE": "Nothing to do here!",
+                "CONTENT": "No more Scans available for you in this dataset!",
+                "BUTTON": "Go back"
+            },
+            "SEND_ERROR": {
+                "TITLE": "Error",
+                "CONTENT": "Cannot send selection",
+                "BUTTON": "Ok"
+            }
+        },
         "HEADER": {
             "TOOLS": "Tools",
             "TOOL_ACTIONS": "Tool actions",
@@ -101,6 +126,20 @@
             "EMAIL": "E-mail",
             "FIRST_NAME": "First name",
             "LAST_NAME": "Last name"
+        },
+        "INFO": {
+            "DISMISS": "Dismiss",
+            "USER_DATA_UPDATED": "User data has been updated.",
+            "USER_VALIDATION_FAILED": "User data has not been updated due to a validation failure.",
+            "INCORRECT_DATA": "Incorrect form data!"
+        },
+        "VALIDATION": {
+            "FIRST_NAME": "First name is required!",
+            "LAST_NAME": "Last name is required!",
+            "EMAIL_REQUIRED": "E-mail address is required!",
+            "INCORRECt_EMAIL": "Incorrect e-mail address",
+            "PASSWORD": "Password is required!",
+            "PASSWORD_CONFIRM": "Password confirmation is required!"
         }
     },
     "TUTORIAL": {
