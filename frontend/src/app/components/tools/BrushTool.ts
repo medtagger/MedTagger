@@ -205,9 +205,4 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
                 selection.labelTag === this.currentTag
         ) as BrushSelection;
     }
-
-    private addCurrentBrushSelection(): void {
-        console.log('Add brush selection');
-        this.actions[2].isActive = false;
-    }
 }
