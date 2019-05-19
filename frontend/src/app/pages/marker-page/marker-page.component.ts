@@ -26,6 +26,7 @@ import { ScanService } from '../../services/scan.service';
 import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
 import { MarkerZoomHandler } from '../../model/MarkerZoomHandler';
+import { FormControl } from '@angular/forms';
 
 @Component({
     selector: 'app-marker-page',
@@ -42,6 +43,8 @@ export class MarkerPageComponent implements OnInit {
     @ViewChild(MarkerComponent) marker: MarkerComponent;
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
+
+    tooltipShowDelay = new FormControl(1000);
 
     selections: List<SliceSelection> = List();
     scan: ScanMetadata;
