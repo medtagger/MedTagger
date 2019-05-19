@@ -159,6 +159,10 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
         this.downloadingSlicesInProgress = isInProgress;
     }
 
+    public isDownloadingInProgress(): boolean {
+        return this.downloadingScanInProgress || this.downloadingSlicesInProgress;
+    }
+
     public clearData(): void {
         this.slices = new Map<number, MarkerSlice>();
         this.drawingContext = undefined;

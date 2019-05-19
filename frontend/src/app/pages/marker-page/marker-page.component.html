@@ -67,6 +67,7 @@
         <div class="marker-nav--finish">
             <button mat-raised-button
                 color="primary"
+                [disabled]="marker.isDownloadingInProgress()"
                 (click)="skipScan()">
                 {{ 'MARKER.NAVBAR.BUTTON.SKIP' | translate }}
             </button>

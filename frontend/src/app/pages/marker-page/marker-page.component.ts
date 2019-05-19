@@ -220,7 +220,6 @@ export class MarkerPageComponent implements OnInit {
 
     public skipScan(): void {
         this.scanService.skipScan(this.scan.scanId).then();
-        this.marker.clearData();
         this.nextScan();
     }
 
@@ -233,7 +232,7 @@ export class MarkerPageComponent implements OnInit {
         this.requestScan();
     }
 
-    public sendCompleteLabel(): void {
+    public sendsendCompleteLabel(): void {
         this.sendSelection(new Selection3D(this.selections.toJS()), this.labelComment);
     }
 
