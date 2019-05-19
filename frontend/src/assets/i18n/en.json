@@ -76,8 +76,20 @@
             "EMPTY_LABEL": {
                 "TITLE": "You are trying to send empty label",
                 "CONTENT": "Are you sure that there are no interesting objects to tag in the whole scan?",
-                "BUTTON_CONFIRM": "Yes, send empty label",
-                "BUTTON_CANCEL": "No, take me back to labeling"
+                "BUTTON_CONFIRM": "Yes, send empty label.",
+                "BUTTON_CANCEL": "No, take me back to labeling."
+            },
+            "SINGLE_SELECTION": {
+                "TITLE": "You are trying to send single selection",
+                "CONTENT": "Remember you should create 3D selection. Use wheel scroll or arrow buttons to change slices and select objects there.",
+                "BUTTON_CONFIRM": "Send single selection.",
+                "BUTTON_CANCEL": "Take me back to labeling."
+            },
+            "SINGLE_TAG": {
+                "TITLE": "You are trying to send incomplete selections",
+                "CONTENT": "There are no selections for some of the tags. Are you sure that there are no interesting objects to select for other tags?",
+                "BUTTON_CONFIRM": "Send current selections.",
+                "BUTTON_CANCEL": "Take me back to labeling."
             }
         },
         "HEADER": {

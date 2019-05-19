@@ -237,7 +237,46 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
-        this.sendSelection(new Selection3D(this.selections.toJS()), this.labelComment);
+        let dialogPackage;
+        if (this.checkForSingleSliceSelection()) {
+            dialogPackage = 'SINGLE_SELECTION';
+        } else if (this.checkForIncompleteTagSelections()) {
+            dialogPackage = 'SINGLE_TAG';
+        }
+
+        if (dialogPackage) {
+            this.dialogService
+            .openTranslatedConfirmDialog('MARKER.DIALOG.' + dialogPackage)
+            .afterClosed()
+            .subscribe((confirmed: boolean) => {
+                if (confirmed) {
+                    this.sendSelection(new Selection3D(this.selections.toJS()), this.labelComment);
+                }
+            });
+        } else {
+            this.sendSelection(new Selection3D(this.selections.toJS()), this.labelComment);
+        }
+    }
+
+    private checkForSingleSliceSelection(): boolean {
+        const sliceIndex = (this.selections.first() as SliceSelection).sliceIndex;
+        return this.selections.every((selection) => selection.sliceIndex === sliceIndex);
+    }
+
+    private checkForIncompleteTagSelections(): boolean {
+        // So now we need 2x selections from each tag
+        let tagsWithoutSelections = this.labelExplorer.getTags().concat(this.labelExplorer.getTags());
+        console.log(tagsWithoutSelections);
+
+        let tagId;
+        this.selections.forEach((selection) => {
+            tagId = tagsWithoutSelections.findIndex((tag) => tag.key === selection.labelTag.key);
+            if (tagId >= 0) {
+                tagsWithoutSelections = tagsWithoutSelections.remove(tagId);
+            }
+        });
+
+        return tagsWithoutSelections.size !== 0;
     }
 
     public sendEmptyLabel(): void {
