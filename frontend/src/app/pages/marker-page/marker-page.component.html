@@ -74,6 +74,7 @@
             <button *ngIf="!selections.isEmpty()"
                 mat-raised-button
                 color="accent"
+                [disabled]="marker.isDownloadingInProgress()"
                 (click)="sendCompleteLabel()"
                 data-cy="send-label">
                 {{ 'MARKER.NAVBAR.BUTTON.SEND' | translate }}
@@ -81,6 +82,7 @@
             <button *ngIf="selections.isEmpty()"
                 mat-raised-button
                 color="accent"
+                [disabled]="marker.isDownloadingInProgress()"
                 (click)="sendEmptyLabel()">
                 {{ 'MARKER.NAVBAR.BUTTON.NO_TAG' | translate }}
             </button>
