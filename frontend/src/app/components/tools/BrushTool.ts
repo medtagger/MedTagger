@@ -19,7 +19,7 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
 
         this.actions = [
             new ToolAction(
-                BrushMode.BRUSH,
+                'BRUSH.BRUSH',
                 () => true,
                 () => {
                     this.changeToolMode(BrushMode.BRUSH);
@@ -28,7 +28,7 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
                 true
             ),
             new ToolAction(
-                BrushMode.ERASER,
+                'BRUSH.ERASER',
                 () => !!this.getCurrentBrushSelection(),
                 () => {
                     this.changeToolMode(BrushMode.ERASER);
@@ -204,5 +204,10 @@ export class BrushTool extends ToolBase<BrushSelection> implements Tool<BrushSel
                 selection.sliceIndex === this.currentSlice &&
                 selection.labelTag === this.currentTag
         ) as BrushSelection;
+    }
+
+    private addCurrentBrushSelection(): void {
+        console.log('Add brush selection');
+        this.actions[2].isActive = false;
     }
 }
