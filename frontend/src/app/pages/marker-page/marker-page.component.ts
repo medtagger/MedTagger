@@ -241,13 +241,18 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendEmptyLabel(): void {
-        this.sendSelection(new Selection3D(), 'This is an empty Label');
+        this.dialogService
+            .openTranslatedConfirmDialog('MARKER.DIALOG.EMPTY_LABEL')
+            .afterClosed()
+            .subscribe((confirmed: boolean) => {
+                if (confirmed) {
+                    this.sendSelection(new Selection3D(), 'This is an empty Label');
+                }
+            });
     }
 
     private sendSelection(selection3d: Selection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
-
-
 
         this.scanService
             .sendSelection(this.scan.scanId, this.task.key, selection3d, labelingTime, comment)

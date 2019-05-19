@@ -72,6 +72,12 @@
                 "TITLE": "Error",
                 "CONTENT": "Cannot send selection",
                 "BUTTON": "Ok"
+            },
+            "EMPTY_LABEL": {
+                "TITLE": "You are trying to send empty label",
+                "CONTENT": "Are you sure that there are no interesting objects to tag in the whole scan?",
+                "BUTTON_CONFIRM": "Yes, send empty label",
+                "BUTTON_CANCEL": "No, take me back to labeling"
             }
         },
         "HEADER": {
