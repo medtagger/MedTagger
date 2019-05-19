@@ -49,6 +49,7 @@ export class PointTool extends ToolBase<PointSelection> implements Tool<PointSel
 
     public onMouseDown(event: MouseEvent): void {
         console.log('PointTool | onMouseDown | event: ', event);
+        console.log('PointTool | onMouseDown | canvasPosition: ', this.canvasPosition);
         const x = event.clientX - this.canvasPosition.left;
         const y = event.clientY - this.canvasPosition.top;
 

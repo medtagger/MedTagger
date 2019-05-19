@@ -92,16 +92,22 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
 
     public setZoomHandler(zoomHandler: MarkerZoomHandler) {
         this.canvas.addEventListener('mousedown', (event: MouseEvent) => {
-            zoomHandler.mouseDownHandler(event, this.imageContainer);
+            this.refreshContextIfNeeded(zoomHandler.mouseDownHandler(event, this.imageContainer));
         });
 
         this.canvas.addEventListener('mousemove', (event: MouseEvent) => {
-            zoomHandler.mouseMoveHandler(event, this.imageContainer);
+            this.refreshContextIfNeeded(zoomHandler.mouseMoveHandler(event, this.imageContainer));
         });
 
         this.canvas.addEventListener('mouseup', (event: MouseEvent) => {
-            zoomHandler.mouseUpHandler(event, this.imageContainer);
+            this.refreshContextIfNeeded(zoomHandler.mouseUpHandler(event, this.imageContainer));
         });
+    }
+
+    private refreshContextIfNeeded(shouldRefresh: boolean) {
+        if (shouldRefresh) {
+            this.refreshDrawingContext();
+        }
     }
 
     ngOnChanges(changes: SimpleChanges) {
