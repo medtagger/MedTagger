@@ -10,6 +10,55 @@ WEBSOCKET_PID_FILE = websocket.pid
 WORKERS_PID_FILE = workers.pid
 
 #
+# Docker - Build & Push to Docker Hub
+#
+
+docker_build:
+	docker-compose build medtagger_backend_rest medtagger_frontend medtagger_backend_websocket medtagger_backend_worker medtagger_backend_database_migrations
+
+docker_push_stable: docker_push_version
+	docker push medtagger/frontend_ui:latest
+	docker push medtagger/backend_rest:latest
+	docker push medtagger/backend_websocket:latest
+	docker push medtagger/backend_worker:latest
+	docker push medtagger/backend_database_migrations:latest
+
+docker_push_nightly: docker_push_version
+	docker push medtagger/frontend_ui:nightly
+	docker push medtagger/backend_rest:nightly
+	docker push medtagger/backend_websocket:nightly
+	docker push medtagger/backend_worker:nightly
+	docker push medtagger/backend_database_migrations:nightly
+
+docker_tag_as_stable:
+	docker tag medtagger/frontend_ui:latest medtagger/frontend_ui:$(MEDTAGGER_VERSION)
+	docker tag medtagger/backend_rest:latest medtagger/backend_rest:$(MEDTAGGER_VERSION)
+	docker tag medtagger/backend_websocket:latest medtagger/backend_websocket:$(MEDTAGGER_VERSION)
+	docker tag medtagger/backend_worker:latest medtagger/backend_worker:$(MEDTAGGER_VERSION)
+	docker tag medtagger/backend_database_migrations:latest medtagger/backend_database_migrations:$(MEDTAGGER_VERSION)
+
+docker_tag_as_latest:
+	docker tag medtagger/frontend_ui:$(MEDTAGGER_VERSION) medtagger/frontend_ui:latest
+	docker tag medtagger/backend_rest:$(MEDTAGGER_VERSION) medtagger/backend_rest:latest
+	docker tag medtagger/backend_websocket:$(MEDTAGGER_VERSION) medtagger/backend_websocket:latest
+	docker tag medtagger/backend_worker:$(MEDTAGGER_VERSION) medtagger/backend_worker:latest
+	docker tag medtagger/backend_database_migrations:$(MEDTAGGER_VERSION) medtagger/backend_database_migrations:latest
+
+docker_tag_as_nightly:
+	docker tag medtagger/frontend_ui:$(MEDTAGGER_VERSION) medtagger/frontend_ui:nightly
+	docker tag medtagger/backend_rest:$(MEDTAGGER_VERSION) medtagger/backend_rest:nightly
+	docker tag medtagger/backend_websocket:$(MEDTAGGER_VERSION) medtagger/backend_websocket:nightly
+	docker tag medtagger/backend_worker:$(MEDTAGGER_VERSION) medtagger/backend_worker:nightly
+	docker tag medtagger/backend_database_migrations:$(MEDTAGGER_VERSION) medtagger/backend_database_migrations:nightly
+
+docker_push_version:
+	docker push medtagger/frontend_ui:$(MEDTAGGER_VERSION)
+	docker push medtagger/backend_rest:$(MEDTAGGER_VERSION)
+	docker push medtagger/backend_websocket:$(MEDTAGGER_VERSION)
+	docker push medtagger/backend_worker:$(MEDTAGGER_VERSION)
+	docker push medtagger/backend_database_migrations:$(MEDTAGGER_VERSION)
+
+#
 # E2E Tests
 #
 
@@ -98,4 +147,5 @@ e2e__delete_environment:
 e2e__clear_dependencies:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) down
 
-.PHONY: e2e e2e_docker e2e__prepare_environment e2e__run e2e__delete_environment e2e__clear_dependencies
+.PHONY: docker_build docker_tag_as_latest docker_tag_as_nightly docker_push docker_push_nightly docker_push_version \
+        e2e e2e_docker e2e__prepare_environment e2e__run e2e__delete_environment e2e__clear_dependencies

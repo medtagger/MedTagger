@@ -3,35 +3,35 @@
 <div class="tab-container">
     <mat-card class="tab-container__card">
         <mat-card-title>
-            Account settings
+            {{ 'SETTINGS.ACCOUNT.TITLE' | translate }}
         </mat-card-title>
         <mat-card-subtitle>
-            Change your account data
+            {{ 'SETTINGS.ACCOUNT.SUBTITLE' | translate }}
         </mat-card-subtitle>
         <mat-card-content>
             <mat-form-field>
-                <input matInput placeholder="E-mail" type="text" [value]="userEmail.value" disabled>
+                <input matInput placeholder="{{ 'SETTINGS.PLACEHOLDER.EMAIL' | translate }}" type="text" [value]="userEmail.value" disabled>
                 <mat-error *ngIf="userEmail.invalid">{{getUserEmailErrorMessage()}}</mat-error>
             </mat-form-field>
             <mat-form-field>
-                <input matInput placeholder="First name" type="text" [formControl]="userFirstName" required>
+                <input matInput placeholder="{{ 'SETTINGS.PLACEHOLDER.FIRST_NAME' | translate }}" type="text" [formControl]="userFirstName" required>
                 <mat-error *ngIf="userFirstName.invalid">{{getUserFirstNameErrorMessage()}}</mat-error>
             </mat-form-field>
             <mat-form-field>
-                <input matInput placeholder="Last name" type="text" [formControl]="userLastName" required>
+                <input matInput placeholder="{{ 'SETTINGS.PLACEHOLDER.LAST_NAME' | translate }}" type="text" [formControl]="userLastName" required>
                 <mat-error *ngIf="userLastName.invalid">{{getUserLastNameErrorMessage()}}</mat-error>
             </mat-form-field>
             <button mat-button color="primary" (click)="updateUserDetails()" [disabled]="!validateUserInput()">
-                Save
+                {{ 'SETTINGS.ACCOUNT.SAVE' | translate }}
             </button>
         </mat-card-content>
     </mat-card>
     <mat-card *ngIf="currentUser.role === 'admin'" class="tab-container__card">
         <mat-card-title>
-            Users
+            {{ 'SETTINGS.USERS.TITLE' | translate }}
         </mat-card-title>
         <mat-card-subtitle>
-            Browse users and change their's privilages
+            {{ 'SETTINGS.USERS.SUBTITLE' | translate }}
         </mat-card-subtitle>
         <mat-card-content>
             <mat-list>
@@ -43,7 +43,7 @@
                     <button *ngIf="user.role === 'volunteer'" mat-button color="primary"
                             (click)="promoteToDoctor(user)">
                         <mat-icon matListIcon>add_circle_outline</mat-icon>
-                        Doctor role
+                        {{ 'SETTINGS.USERS.DOCTOR_ROLE' | translate }}
                     </button>
                 </mat-list-item>
             </mat-list>
