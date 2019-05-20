@@ -1,0 +1,16 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+main.tf
+
+# Ansible
+inventory
+*.pem
+*.retry
+
+# Env files
+*.env
+
+# Archives
+*.tar.xz

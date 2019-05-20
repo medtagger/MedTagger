@@ -1,0 +1,10 @@
+---
+
+docker_compose_version: "1.21.2"
+local_user: karolina
+
+db_key_name: "db-key.pem"
+
+project_local_path: "/home/{{ local_user }}/MedTagger"
+project_remote_path: "/home/{{ ansible_user }}/MedTagger"
+tar_archive_file_name: "MedTagger.tar.xz"

@@ -3,7 +3,7 @@ provider "openstack" {
 }
 
 variable image_id {
-  default = "23e4701c-dbfb-49a1-bc83-96c4f30d91a6"
+  default = "bfb95819-9d93-47bf-ba97-5a60968fbdc0"
 }
 
 variable flavor_id {
@@ -21,4 +21,16 @@ variable dns_list {
 
 variable ext_network_id {
     default = "a8f3db7d-cd3f-4941-94d3-2aaffd0a9175"
+}
+
+variable user {
+  default = "ubuntu"
+}
+
+variable app_key_name {
+  default = "app-key-dev"
+}
+
+variable db_key_name {
+  default = "db-key-dev"
 }
