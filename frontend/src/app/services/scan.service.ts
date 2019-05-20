@@ -163,7 +163,7 @@ export class ScanService {
     }
 
     requestSlices(scanId: string, taskKey: string, begin: number, count: number, reversed: boolean = false): void {
-        console.log('ScanService | requestSlices | begin:', begin);
+        console.log('ScanService | requestSlices | (begin, count, reversed):', begin, count, reversed);
         const request = {
             scan_id: scanId,
             task_key: taskKey,
