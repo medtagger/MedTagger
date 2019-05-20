@@ -141,7 +141,7 @@
                         (click)="action.trigger()"
                         [color]="action.isActive && action.enable() ? 'accent' : 'primary'"
                         selected>
-                        <ng-container *ngIf="action.type === ActionType.BUTTON">{{ action.name }}</ng-container>
+                        <ng-container *ngIf="action.type === ActionType.BUTTON">{{ 'MARKER.TOOL_ACTIONS.' + action.name | translate }}</ng-container>
                     </mat-chip>
                 </mat-chip-list>
             </div>

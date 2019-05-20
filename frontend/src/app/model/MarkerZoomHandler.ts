@@ -47,15 +47,31 @@ export class MarkerZoomHandler {
         return this.currentZoomLevelIndex > 0;
     }
 
-    public mouseDownHandler(event: MouseEvent, workspace: HTMLDivElement) {
+    /**
+     *  Handling mouse down key as a part of zoom operation
+     *
+     *  @param event - Plain js MouseEvent
+     *  @param workspace - HTMLDivElement to zoom
+     *  @returns Flag that indicates successfull zoom operation
+     */
+    public mouseDownHandler(event: MouseEvent, workspace: HTMLDivElement): boolean {
         if (event.button === MarkerZoomHandler.MOUSE_WHEEL_BUTTON_ID && this.zoomOutAvailable) {
             console.log('MarkerZoomHandler | mouseDownHandler | wheel button clicked');
             this.dragActive = true;
             this.dragPoint = new Point(event.clientX + workspace.scrollLeft, event.clientY + workspace.scrollTop);
         }
+
+        return false;
     }
 
-    public mouseMoveHandler(event: MouseEvent, workspace: HTMLDivElement) {
+    /**
+     *  Handling mouse move key as a part of zoom operation
+     *
+     *  @param event - Plain js MouseEvent
+     *  @param workspace - HTMLDivElement to zoom
+     *  @returns Flag that indicates successfull zoom operation
+     */
+    public mouseMoveHandler(event: MouseEvent, workspace: HTMLDivElement): boolean {
         if (this.dragActive) {
             console.log('MarkerZoomHandler | mouseMoveHandler | wheel button clicked');
             const changeX = this.dragPoint.x - event.clientX;
@@ -64,13 +80,28 @@ export class MarkerZoomHandler {
             workspace.scrollLeft = changeX;
             workspace.scrollTop = changeY;
         }
+
+        return false;
     }
 
-    public mouseUpHandler(event: MouseEvent, workspace: HTMLDivElement) {
-        if (event.button === MarkerZoomHandler.MOUSE_WHEEL_BUTTON_ID) {
+    /**
+     *  Handling mouse up key as a part of zoom operation
+     *
+     *  @param event - Plain js MouseEvent
+     *  @param workspace - HTMLDivElement to zoom
+     *  @returns Flag that indicates successfull zoom operation
+     */
+    public mouseUpHandler(event: MouseEvent, workspace: HTMLDivElement): boolean {
+        let zoomChanged = false;
+
+        if (this.dragActive && event.button === MarkerZoomHandler.MOUSE_WHEEL_BUTTON_ID) {
             console.log('MarkerZoomHandler | mouseUpHandler | wheel button clicked');
+
+            zoomChanged = true;
             this.dragActive = false;
             this.dragPoint = null;
         }
+
+        return zoomChanged;
     }
 }
