@@ -97,6 +97,12 @@
             "TOOL_ACTIONS": "Tool actions",
             "LABELS": "Labels"
         },
+        "TOOL_ACTIONS": {
+            "BRUSH": {
+                "BRUSH": "Brush",
+                "ERASER": "Eraser"
+            }
+        },
         "NAVBAR": {
             "ZOOM": {
                 "TITLE": "Image Window",
