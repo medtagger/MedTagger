@@ -80,7 +80,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         InfoDialogComponent,
         InputDialogComponent,
         NavBarComponent,
-        TaskExplorerComponent,
+        TaskExplorerComponent
     ],
     imports: [
         routing,

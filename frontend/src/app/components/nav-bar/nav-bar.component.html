@@ -2,13 +2,20 @@
     <a class="app-navbar-brand" [routerLink]="'/' + homeRoute">
         <ng-container *ngIf="showPageTitle; else app_brand">
             <mat-icon class="app-navbar-brand__icon">arrow_back</mat-icon>
-            <span class="app-navbar-brand__text">{{activeRoute}}</span>
+            <span class="app-navbar-brand__text">{{ activeRoute }}</span>
         </ng-container>
-        <ng-template #app_brand >
+        <ng-template #app_brand>
             <img class="app-navbar-brand__logo" src="assets/icon/medtagger_logo.svg" alt="MedTagger logo" />
             <span class="app-navbar-brand__text">{{ 'APP_NAME' | translate }}</span>
         </ng-template>
     </a>
+    <ng-container *ngIf="showTaskStatus()">
+        <mat-card class="app-navbar-status">
+            {{ 'NAVBAR.SCAN' | translate }}: {{ taskStatus.currentProgress + '/' + taskStatus.scansToLabel}} |
+            {{ taskStatus.operation | translate }} | {{ 'NAVBAR.LABELLING_TIME' | translate }}:
+            {{ taskStatus.labellingTime | date: 'mm:ss' }}
+        </mat-card>
+    </ng-container>
     <div class="app-navbar__nav">
         <ng-content></ng-content>
     </div>

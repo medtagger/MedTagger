@@ -26,6 +26,7 @@ import { ScanService } from '../../services/scan.service';
 import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
 import { MarkerZoomHandler } from '../../model/MarkerZoomHandler';
+import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
 
 @Component({
     selector: 'app-marker-page',
@@ -42,6 +43,8 @@ export class MarkerPageComponent implements OnInit {
     @ViewChild(MarkerComponent) marker: MarkerComponent;
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
+
+    @ViewChild(NavBarComponent) navBar: NavBarComponent;
 
     selections: List<SliceSelection> = List();
     scan: ScanMetadata;
@@ -85,6 +88,9 @@ export class MarkerPageComponent implements OnInit {
             this.taskService.getTask(taskKey).then(
                 (task: Task) => {
                     this.task = task;
+
+                    // TODO: just for testing
+                    this.navBar.trackTaskStatus(7);
 
                     if (this.task.tags.length === 0) {
                         this.dialogService
