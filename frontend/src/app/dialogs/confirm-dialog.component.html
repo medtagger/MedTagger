@@ -3,6 +3,8 @@
     <p id="info-dialog-content" class="dialog__content">{{data.content}}</p>
 </mat-dialog-content>
 <mat-dialog-actions align="center">
-    <button mat-button mat-dialog-close>{{data.buttonCancel}}</button>
-    <button mat-button [mat-dialog-close]="true" cdkFocusInitial>{{data.buttonConfirm}}</button>
+    <button mat-button mat-dialog-close data-cy="dialog-button-cancel">
+        {{data.buttonCancel}}
+    </button>
+    <button mat-button [mat-dialog-close]="true" cdkFocusInitial data-cy="dialog-button-confirm">{{data.buttonConfirm}}</button>
 </mat-dialog-actions>
