@@ -11,9 +11,11 @@
     </a>
     <ng-container *ngIf="showTaskStatus()">
         <mat-card class="app-navbar-status">
-            {{ 'NAVBAR.SCAN' | translate }}: {{ taskStatus.currentProgress + '/' + taskStatus.scansToLabel}} |
-            {{ taskStatus.operation | translate }} | {{ 'NAVBAR.LABELLING_TIME' | translate }}:
-            {{ taskStatus.labellingTime | date: 'mm:ss' }}
+            <span>{{ 'NAVBAR.LABELLING_TIME' | translate }}: 
+                <span #timer>{{ currentTime }}</span>
+            </span>
+            <span>{{ 'NAVBAR.SCAN' | translate }}: {{ taskStatus.currentProgress + '/' + taskStatus.scansToLabel}}</span>
+            <span>{{ 'NAVBAR.STATUS' | translate }}: {{ taskStatus.operation | translate }} </span>
         </mat-card>
     </ng-container>
     <div class="app-navbar__nav">

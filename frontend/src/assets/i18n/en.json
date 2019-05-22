@@ -218,13 +218,16 @@
     },
     "NAVBAR": {
         "SCAN": "Scan",
-        "LABELLING_TIME": "Labelling time"
+        "LABELLING_TIME": "Labelling time",
+        "STATUS": "Status"
     },
     "OPERATION": {
         "SENDING_SELECTION": "Sending selection...",
         "LABELLING": "Selecting...",
         "DOWNLOADING_SLICES": "Downloading slices...",
         "DOWNLOADING_SCAN": "Downloading scan...",
+        "WAITING": "Waiting for user",
+        "DOWNLOADING_ERROR": "Downloading error!",
         "DRAG_TO_SELECT": "Use mouse drag to create labels",
         "CLICK_TO_SELECT": "Use left mouse click to create labels",
         "CHOOSE_TAG": "Choose tag.",

@@ -24,8 +24,16 @@
     }
 
     &-status {
-        height: 100%;
+        display: flex;
+        align-items: stretch;
         text-align: center;
+        height: 80%;
         line-height: 0;
+        background-color: whitesmoke;
+
+        span {
+            padding-left: 10px;
+            padding-right: 10px
+        }
     }
 }

@@ -27,6 +27,7 @@ import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
 import { MarkerZoomHandler } from '../../model/MarkerZoomHandler';
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
+import { Operation } from '../../model/TaskStatus';
 
 @Component({
     selector: 'app-marker-page',
@@ -126,6 +127,7 @@ export class MarkerPageComponent implements OnInit {
                                 if (this.marker.downloadingSlicesInProgress === false) {
                                     this.scanService.requestSlices(this.scan.scanId, this.task.key, sliceRequest, count, reversed);
                                     this.marker.setDownloadSlicesInProgress(true);
+                                    this.navBar.changeStatusText(Operation.DOWNLOADING_SLICES);
                                 }
                             });
                         }
@@ -133,6 +135,7 @@ export class MarkerPageComponent implements OnInit {
                 },
                 (_: Error) => {
                     if (!this.task) {
+                        this.navBar.changeStatusText(Operation.DOWNLOADING_ERROR);
                         this.dialogService
                             .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
                             .afterClosed()
@@ -159,6 +162,7 @@ export class MarkerPageComponent implements OnInit {
                 }
                 this.marker.setDownloadSlicesInProgress(false);
                 this.marker.setDownloadScanInProgress(false);
+                this.navBar.changeStatusText(Operation.WAITING);
             }
         });
 
@@ -179,6 +183,10 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setZoomHandler(this.zoomHandler);
     }
 
+    onStatusUpdate(eventOperation: Operation) {
+        this.navBar.changeStatusText(eventOperation);
+    }
+
     public zoomIn(): void {
         this.marker.scale = this.zoomHandler.zoomIn();
         this.snackBar.open('Use mouse wheel button click to drag zoomed image.', '', { duration: 3000 });
@@ -194,6 +202,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
+        this.navBar.changeStatusText(Operation.DOWNLOADING_SCAN);
         this.scanService.getRandomScan(this.task.key).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -231,6 +240,7 @@ export class MarkerPageComponent implements OnInit {
 
     public nextScan(): void {
         this.marker.setDownloadScanInProgress(true);
+        this.navBar.changeStatusText(Operation.DOWNLOADING_SCAN);
         this.labelComment = '';
         this.selections = List();
         this.currentTool = undefined;
@@ -247,6 +257,8 @@ export class MarkerPageComponent implements OnInit {
 
     private sendSelection(selection3d: Selection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
+        this.navBar.changeStatusText(Operation.SENDING_SELECTION);
+        this.navBar.updateScanProgress();
 
         this.scanService
             .sendSelection(this.scan.scanId, this.task.key, selection3d, labelingTime, comment)
@@ -256,6 +268,7 @@ export class MarkerPageComponent implements OnInit {
                 this.nextScan();
             })
             .catch((errorResponse: Error) => {
+                this.navBar.changeStatusText(Operation.DOWNLOADING_ERROR);
                 this.dialogService.openInfoDialog('Error', 'Cannot send selection', 'Ok');
             });
     }

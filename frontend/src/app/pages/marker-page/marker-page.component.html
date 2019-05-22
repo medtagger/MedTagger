@@ -150,11 +150,13 @@
         </div>
     </div>
     <div class="marker-content">
-        <app-marker-component #marker
-                              [(selections)]="selections"
-                              [tools]="tools"
-                              [currentTool]="currentTool"
-                              [currentTag]="currentTag"></app-marker-component>
+        <app-marker-component #marker 
+            (statusUpdate)="onStatusUpdate($event)" 
+            [(selections)]="selections" 
+            [tools]="tools"
+            [currentTool]="currentTool" 
+            [currentTag]="currentTag">
+        </app-marker-component>
     </div>
 </div>
 <div class="marker-info">

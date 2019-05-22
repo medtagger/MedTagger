@@ -7,6 +7,7 @@ import { Tool } from '../tools/Tool';
 import { DrawingContext } from './../tools/DrawingContext';
 import { List } from 'immutable';
 import { TranslateService } from '@ngx-translate/core';
+import { Operation } from '../../model/TaskStatus';
 
 @Component({
     selector: 'app-marker-component',
@@ -20,6 +21,9 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
     @Input() currentTag: LabelTag;
 
     @Output() selectionsChange: EventEmitter<List<SliceSelection>> = new EventEmitter();
+
+    // tslint:disable-next-line: no-output-rename
+    @Output('statusUpdate') markerStatusChange: EventEmitter<Operation> = new EventEmitter();
 
     constructor(private snackBar: MatSnackBar, private translateService: TranslateService) {
         super();
@@ -50,9 +54,11 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
     public onMouseDown(mouseEvent: MouseEvent): void {
         if (!this.currentTag) {
             this.snackBar.open(this.translateService.instant('COMPONENT.MARKER.MESSAGE.SELECT_TAG'), '', { duration: 2000 });
+            this.markerStatusChange.emit(Operation.CHOOSE_TAG);
             return;
         } else if (!this.currentTool) {
             this.snackBar.open(this.translateService.instant('COMPONENT.MARKER.MESSAGE.SELECT_TOOL'), '', { duration: 2000 });
+            this.markerStatusChange.emit(Operation.CHOOSE_TOOL);
             return;
         }
 
@@ -62,12 +68,14 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
     public onMouseUp(mouseEvent: MouseEvent): void {
         console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
         if (this.currentTool) {
+            this.markerStatusChange.emit(Operation.LABELLING);
             this.currentTool.onMouseUp(mouseEvent);
         }
     }
 
     public onMouseMove(mouseEvent: MouseEvent): void {
         if (this.currentTool) {
+            this.markerStatusChange.emit(Operation.LABELLING);
             this.currentTool.onMouseMove(mouseEvent);
         }
     }

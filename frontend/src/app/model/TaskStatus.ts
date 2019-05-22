@@ -1,11 +1,13 @@
 /**
  * Operations with associated resource key name
  */
-enum Operation {
+export enum Operation {
     SENDING_SELECTION = 'OPERATION.SENDING_SELECTION',
     LABELLING = 'OPERATION.LABELLING',
     DOWNLOADING_SLICES = 'OPERATION.DOWNLOADING_SLICES',
     DOWNLOADING_SCAN = 'OPERATION.DOWNLOADING_SCAN',
+    WAITING = 'OPERATION.WAITING',
+    DOWNLOADING_ERROR = 'OPERATION.DOWNLOADING_ERROR',
     DRAG_TO_SELECT = 'OPERATION.DRAG_TO_SELECT',
     CLICK_TO_SELECT = 'OPERATION.CLICK_TO_SELECT',
     CHOOSE_TAG = 'OPERATION.CHOOSE_TAG',
@@ -23,7 +25,7 @@ export class TaskStatus {
         this.labellingTime = Date.now();
         this.scansToLabel = scansToLabel;
         this.currentProgress = 1;
-        this.operation = Operation.CHOOSE_TOOL;
+        this.operation = Operation.WAITING;
     }
 
     public changeStatusOperation(operation: Operation) {
