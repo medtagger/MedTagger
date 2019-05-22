@@ -24,6 +24,8 @@ def test_sync_with_empty_database(prepare_environment: Any) -> None:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -81,6 +83,8 @@ def test_sync_with_updated_names(prepare_environment: Any) -> None:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -163,6 +167,8 @@ def test_sync_with_changed_tools_in_tag(prepare_environment: Any) -> None:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -192,6 +198,8 @@ def test_sync_with_changed_tools_in_tag(prepare_environment: Any) -> None:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: ''
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -223,6 +231,8 @@ def test_sync_with_changed_tags_in_task(prepare_environment: Any) -> None:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -252,6 +262,8 @@ def test_sync_with_changed_tags_in_task(prepare_environment: Any) -> None:
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: RIGHT_KIDNEY
                 name: Right Kidney
@@ -286,6 +298,8 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -318,6 +332,8 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
           - key: FIND_NODULES
             name: Find nodules
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: NODULE
                 name: Nodule
@@ -352,6 +368,8 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
           - key: KIDNEYS_SEGMENTATION
             name: New Kidneys segmentation
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: NEW_LEFT_KIDNEY
                 name: New Left Kidney
@@ -400,6 +418,8 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
           - key: KIDNEYS_SEGMENTATION
             name: Kidneys segmentation
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: LEFT_KIDNEY
                 name: Left Kidney
@@ -440,6 +460,8 @@ def test_sync_with_changed_dataset_and_reused_task(prepare_environment: Any) -> 
           - key: FIND_NODULES
             name: Find nodules
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: NODULE
                 name: Nodule
@@ -468,6 +490,8 @@ def test_sync_with_changed_dataset_and_reused_task(prepare_environment: Any) -> 
           - key: FIND_NODULES
             name: Find nodules
             image_path: assets/icon/kidneys_dataset_icon.svg
+            description: ''
+            label_examples: []
             tags:
               - key: NODULE
                 name: Nodule

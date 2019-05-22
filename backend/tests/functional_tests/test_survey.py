@@ -22,7 +22,7 @@ def test_adding_new_survey(prepare_environment: Any) -> None:
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     label_tag = LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add an example of Survey

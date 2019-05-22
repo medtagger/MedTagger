@@ -4,7 +4,7 @@ import uuid
 from typing import List, Dict, cast, Optional, Any
 
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event, false
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, ARRAY
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.mapper import Mapper
@@ -131,6 +131,8 @@ class Task(Base):
     id: TaskID = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
+    description: str = Column(String(500), nullable=True)
+    label_examples: str = Column(ARRAY(String(50)), nullable=True)
     image_path: str = Column(String(100), nullable=False)
     disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
@@ -139,15 +141,17 @@ class Task(Base):
 
     _tags: List['LabelTag'] = relationship("LabelTag", back_populates="task")
 
-    def __init__(self, key: str, name: str, image_path: str) -> None:
+    def __init__(self, key: str, name: str, image_path: str, description: str) -> None:
         """Initialize Task.
 
         :param key: unique key representing Task
         :param name: name which describes this Task
         :param image_path: path to the image which is located on the frontend
+        :param description: Description for a given Task
         """
         self.key = key
         self.name = name
+        self.description = description
         self.image_path = image_path
 
     def __repr__(self) -> str:

@@ -21,7 +21,7 @@ def test_add_brush_label(prepare_environment: Any, synchronous_celery: Any) -> N
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.BRUSH], task.id)
 
     # Step 2. Add Scan to the system
@@ -76,7 +76,7 @@ def test_add_point_label(prepare_environment: Any, synchronous_celery: Any) -> N
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.POINT], task.id)
 
     # Step 2. Add Scan to the system
@@ -127,7 +127,7 @@ def test_add_chain_label(prepare_environment: Any, synchronous_celery: Any) -> N
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.CHAIN], task.id)
 
     # Step 2. Add Scan to the system
@@ -190,7 +190,7 @@ def test_add_chain_label_not_enough_points(prepare_environment: Any, synchronous
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.CHAIN], task.id)
 
     # Step 2. Add Scan to the system
@@ -232,8 +232,8 @@ def test_add_label_with_tag_from_other_task(prepare_environment: Any, synchronou
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    left_task = TasksRepository.add_task('MARK_LEFT', 'Mark Left', 'path/to/image', ['KIDNEYS'], [])
-    right_task = TasksRepository.add_task('MARK_RIGHT', 'Mark Left', 'path/to/image', ['KIDNEYS'], [])
+    left_task = TasksRepository.add_task('MARK_LEFT', 'Mark Left', 'path/to/image', ['KIDNEYS'], '', [], [])
+    right_task = TasksRepository.add_task('MARK_RIGHT', 'Mark Left', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('TAG_LEFT', 'Tag Left', [LabelTool.POINT], left_task.id)
     LabelTagsRepository.add_new_tag('TAG_RIGHT', 'Tag Right', [LabelTool.POINT], right_task.id)
 
