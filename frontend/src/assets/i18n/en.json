@@ -49,6 +49,11 @@
     "MARKER": {
         "SCREEN_INFO": "Please use bigger screen to start labeling.",
         "ACTIVE_TAG_PLACEHOLDER": "Active tag",
+        "STATUS_BAR": {
+            "SCAN": "Scan",
+            "LABELLING_TIME": "Labelling time",
+            "STATUS": "Status"
+        },
         "HEADER": {
             "TOOLS": "Tools",
             "TOOL_ACTIONS": "Tool actions",
@@ -69,7 +74,13 @@
             "BUTTON": {
                 "SKIP": "Skip scan",
                 "SEND": "Send label",
-                "NO_TAG": "Nothing to tag"
+                "NO_TAG": "Nothing to tag",
+                "TASK_DESCRIPTION": "Task description"
+            },
+            "DESCRIPTION": {
+                "TITLE": "Task description",
+                "SUBTITLE": "Information about the task and selections",
+                "CLOSE": "Close"
             }
         }
     },
@@ -215,11 +226,6 @@
             "OK": "Ok",
             "SUBMIT": "Submit"
         }
-    },
-    "NAVBAR": {
-        "SCAN": "Scan",
-        "LABELLING_TIME": "Labelling time",
-        "STATUS": "Status"
     },
     "OPERATION": {
         "SENDING_SELECTION": "Sending selection...",

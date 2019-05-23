@@ -1,5 +1,5 @@
 import { List } from 'immutable';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, NgZone, Renderer2 } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LabelExplorerComponent } from '../../components/label-explorer/label-explorer.component';
@@ -27,7 +27,8 @@ import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
 import { MarkerZoomHandler } from '../../model/MarkerZoomHandler';
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
-import { Operation } from '../../model/TaskStatus';
+import { Operation, TaskStatus } from '../../model/TaskStatus';
+import { TaskDescription } from '../../model/TaskDescription';
 
 @Component({
     selector: 'app-marker-page',
@@ -47,6 +48,11 @@ export class MarkerPageComponent implements OnInit {
 
     @ViewChild(NavBarComponent) navBar: NavBarComponent;
 
+    @ViewChild('timer')
+    public taskTimer: ElementRef;
+    currentTime: string;
+    taskStatus: TaskStatus;
+
     selections: List<SliceSelection> = List();
     scan: ScanMetadata;
     task: Task;
@@ -61,6 +67,9 @@ export class MarkerPageComponent implements OnInit {
     public colorWindowWidth: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_WIDTH;
     public colorWindowCenter: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_CENTER;
 
+    public taskDescription: TaskDescription;
+    public taskDescriptionPanelActive = false;
+
     ActionType = ToolActionType;
 
     zoomHandler: MarkerZoomHandler;
@@ -72,7 +81,9 @@ export class MarkerPageComponent implements OnInit {
         private router: Router,
         private snackBar: MatSnackBar,
         private taskService: TaskService,
-        private labelService: LabelService
+        private labelService: LabelService,
+        private zone: NgZone,
+        private renderer: Renderer2
     ) {
         console.log('MarkerPage constructor', this.marker);
         this.isInitialSliceLoad = true;
@@ -91,7 +102,12 @@ export class MarkerPageComponent implements OnInit {
                     this.task = task;
 
                     // TODO: just for testing
-                    this.navBar.trackTaskStatus(7);
+                    this.taskStatus = new TaskStatus(5);
+                    // tslint:disable-next-line: max-line-length
+                    this.taskDescription = new TaskDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent scelerisque nulla non laoreet eleifend. Quisque gravida sem sit amet quam consequat malesuada. Nunc tellus nisl, euismod et augue efficitur, egestas sollicitudin neque. Etiam convallis, diam quis convallis posuere, dolor mi blandit ante, ut blandit diam orci quis dolor. Morbi tellus felis, blandit et lorem ac, hendrerit luctus risus. Cras sodales urna ultricies est dignissim tempor. Sed at velit ac odio lacinia dignissim sit amet.',
+                     new Array('../../../assets/img/login_pic.jpg', '../../../assets/img/login_pic.jpg'));
+
+                    this.zone.runOutsideAngular(this.printCurrentLabellingTime.bind(this));
 
                     if (this.task.tags.length === 0) {
                         this.dialogService
@@ -127,7 +143,7 @@ export class MarkerPageComponent implements OnInit {
                                 if (this.marker.downloadingSlicesInProgress === false) {
                                     this.scanService.requestSlices(this.scan.scanId, this.task.key, sliceRequest, count, reversed);
                                     this.marker.setDownloadSlicesInProgress(true);
-                                    this.navBar.changeStatusText(Operation.DOWNLOADING_SLICES);
+                                    this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_SLICES);
                                 }
                             });
                         }
@@ -135,7 +151,7 @@ export class MarkerPageComponent implements OnInit {
                 },
                 (_: Error) => {
                     if (!this.task) {
-                        this.navBar.changeStatusText(Operation.DOWNLOADING_ERROR);
+                        this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_ERROR);
                         this.dialogService
                             .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
                             .afterClosed()
@@ -162,7 +178,7 @@ export class MarkerPageComponent implements OnInit {
                 }
                 this.marker.setDownloadSlicesInProgress(false);
                 this.marker.setDownloadScanInProgress(false);
-                this.navBar.changeStatusText(Operation.WAITING);
+                this.taskStatus.changeStatusOperation(Operation.WAITING);
             }
         });
 
@@ -183,8 +199,22 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setZoomHandler(this.zoomHandler);
     }
 
+    private printCurrentLabellingTime() {
+        setInterval(() => {
+            if (!!this.taskStatus) {
+                const newTime = new Date(Date.now() - this.taskStatus.labellingTime);
+                const minutes = newTime.getMinutes();
+                const seconds = newTime.getSeconds();
+
+                this.currentTime = `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+
+                this.renderer.setProperty(this.taskTimer.nativeElement, 'textContent', this.currentTime);
+            }
+        }, 1000);
+    }
+
     onStatusUpdate(eventOperation: Operation) {
-        this.navBar.changeStatusText(eventOperation);
+        this.taskStatus.changeStatusOperation(eventOperation);
     }
 
     public zoomIn(): void {
@@ -202,7 +232,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.navBar.changeStatusText(Operation.DOWNLOADING_SCAN);
+        this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_SCAN);
         this.scanService.getRandomScan(this.task.key).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -240,7 +270,7 @@ export class MarkerPageComponent implements OnInit {
 
     public nextScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.navBar.changeStatusText(Operation.DOWNLOADING_SCAN);
+        this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_SCAN);
         this.labelComment = '';
         this.selections = List();
         this.currentTool = undefined;
@@ -257,8 +287,8 @@ export class MarkerPageComponent implements OnInit {
 
     private sendSelection(selection3d: Selection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
-        this.navBar.changeStatusText(Operation.SENDING_SELECTION);
-        this.navBar.updateScanProgress();
+        this.taskStatus.changeStatusOperation(Operation.SENDING_SELECTION);
+        this.taskStatus.updateProgress();
 
         this.scanService
             .sendSelection(this.scan.scanId, this.task.key, selection3d, labelingTime, comment)
@@ -268,7 +298,7 @@ export class MarkerPageComponent implements OnInit {
                 this.nextScan();
             })
             .catch((errorResponse: Error) => {
-                this.navBar.changeStatusText(Operation.DOWNLOADING_ERROR);
+                this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_ERROR);
                 this.dialogService.openInfoDialog('Error', 'Cannot send selection', 'Ok');
             });
     }
@@ -330,6 +360,14 @@ export class MarkerPageComponent implements OnInit {
                 }
                 this.marker.setSliderFocus(true);
             });
+    }
+
+    private hasTaskDescription(): boolean {
+        return !!this.taskDescription;
+    }
+
+    public toggleTaskDescriptionPanel(): void {
+        this.taskDescriptionPanelActive = !this.taskDescriptionPanelActive;
     }
 
     public toggleColorWindowPanel(): void {

@@ -9,15 +9,6 @@
             <span class="app-navbar-brand__text">{{ 'APP_NAME' | translate }}</span>
         </ng-template>
     </a>
-    <ng-container *ngIf="showTaskStatus()">
-        <mat-card class="app-navbar-status">
-            <span>{{ 'NAVBAR.LABELLING_TIME' | translate }}: 
-                <span #timer>{{ currentTime }}</span>
-            </span>
-            <span>{{ 'NAVBAR.SCAN' | translate }}: {{ taskStatus.currentProgress + '/' + taskStatus.scansToLabel}}</span>
-            <span>{{ 'NAVBAR.STATUS' | translate }}: {{ taskStatus.operation | translate }} </span>
-        </mat-card>
-    </ng-container>
     <div class="app-navbar__nav">
         <ng-content></ng-content>
     </div>
