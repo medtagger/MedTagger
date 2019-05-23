@@ -1,6 +1,5 @@
-import {Component, Output, EventEmitter, ViewChild, ElementRef, Input} from '@angular/core';
-import {PredefinedLabelToUpload, handlePredefinedLabelFile} from '../../utils/PredefinedLabelHandler';
-import { deprecate } from 'util';
+import { Component, Output, EventEmitter, ViewChild, ElementRef, Input } from '@angular/core';
+import { PredefinedLabelToUpload, handlePredefinedLabelFile } from '../../utils/PredefinedLabelHandler';
 
 const FILE_SIZE_LIMIT = 5;  // MB
 

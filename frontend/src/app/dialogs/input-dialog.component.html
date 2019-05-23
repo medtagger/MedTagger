@@ -1,10 +1,10 @@
-<h1 id="input-dialog-title" mat-dialog-title>{{data.title}}</h1>
+<h1 id="input-dialog-title" mat-dialog-title>{{ data.title }}</h1>
 <div mat-dialog-content>
-    <p id="input-dialog-content" class="dialog__content">{{data.content}}</p>
+    <p id="input-dialog-content" class="dialog__content">{{ data.content }}</p>
     <mat-form-field style="width: 100%;">
         <textarea id="input-dialog-textarea" matInput matTextareaAutosize [formControl]="userInput" [(value)]="data.input" rows="1"></textarea>
     </mat-form-field>
 </div>
 <div mat-dialog-actions align="center">
-    <button id="input-dialog-button" mat-raised-button color="primary" (click)="closeDialog()">{{data.buttonText}}</button>
+    <button id="input-dialog-button" mat-raised-button color="primary" (click)="closeDialog()">{{ data.buttonText }}</button>
 </div>

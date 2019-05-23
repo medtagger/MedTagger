@@ -1,22 +1,22 @@
-import {throwError as observableThrowError, Observable} from 'rxjs';
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams, HttpErrorResponse} from '@angular/common/http';
+import { throwError as observableThrowError, Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 
-import {ScanMetadata} from '../model/ScanMetadata';
-import {MarkerSlice} from '../model/MarkerSlice';
+import { ScanMetadata } from '../model/ScanMetadata';
+import { MarkerSlice } from '../model/MarkerSlice';
 
-import {API_URL} from '../utils/ApiUrl';
-import {environment} from '../../environments/environment';
-import {ScanSelection} from '../model/selections/ScanSelection';
-import {SliceSelection} from '../model/selections/SliceSelection';
-import {MedTaggerWebSocket} from './websocket.service';
-import {concat, delay, map, mergeAll, retryWhen, take} from 'rxjs/operators';
-import {of} from 'rxjs/internal/observable/of';
-import {from} from 'rxjs/internal/observable/from';
-import {defer} from 'rxjs/internal/observable/defer';
-import {TaskResponse} from './task.service';
-import {isUndefined} from 'util';
-import {PredefinedBrushLabelElement} from '../model/PredefinedBrushLabelElement';
+import { API_URL } from '../utils/ApiUrl';
+import { environment } from '../../environments/environment';
+import { ScanSelection } from '../model/selections/ScanSelection';
+import { SliceSelection } from '../model/selections/SliceSelection';
+import { MedTaggerWebSocket } from './websocket.service';
+import { concat, delay, map, mergeAll, retryWhen, take } from 'rxjs/operators';
+import { of } from 'rxjs/internal/observable/of';
+import { from } from 'rxjs/internal/observable/from';
+import { defer } from 'rxjs/internal/observable/defer';
+import { TaskResponse } from './task.service';
+import { isUndefined } from 'util';
+import { PredefinedBrushLabelElement } from '../model/PredefinedBrushLabelElement';
 
 interface ScanResponse {
     scan_id: string;

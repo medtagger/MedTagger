@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {UserInfo} from '../../model/UserInfo';
-import {Router} from '@angular/router';
-import {UPLOAD, SETTINGS, LOGIN} from '../../constants/routes';
+import { Component, OnInit } from '@angular/core';
+import { UserInfo } from '../../model/UserInfo';
+import { Router } from '@angular/router';
+import { UPLOAD, SETTINGS, LOGIN } from '../../constants/routes';
 import {
     trigger,
     style,

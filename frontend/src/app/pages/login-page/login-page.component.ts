@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {passwordValidator} from '../validators/password-validator.directive';
-import {AccountService} from '../../services/account.service';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { passwordValidator } from '../validators/password-validator.directive';
+import { AccountService } from '../../services/account.service';
 import * as appRoutes from '../../constants/routes';
-import {UserInfo} from '../../model/UserInfo';
+import { UserInfo } from '../../model/UserInfo';
 
 enum LoginPageMode {
     LOG_IN,

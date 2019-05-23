@@ -1,9 +1,9 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {UserInfo} from '../model/UserInfo';
-import {environment} from '../../environments/environment';
-import {UserSettings} from '../model/UserSettings';
-import {API_URL} from '../utils/ApiUrl';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { UserInfo } from '../model/UserInfo';
+import { environment } from '../../environments/environment';
+import { UserSettings } from '../model/UserSettings';
+import { API_URL } from '../utils/ApiUrl';
 
 interface AllUsersResponse {
     users: Array<UserInfo>;

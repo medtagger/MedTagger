@@ -22,7 +22,6 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
 
     @Output() selectionsChange: EventEmitter<List<SliceSelection>> = new EventEmitter();
 
-    // tslint:disable-next-line: no-output-rename
     @Output('statusUpdate') markerStatusChange: EventEmitter<Operation> = new EventEmitter();
 
     constructor(private snackBar: MatSnackBar, private translateService: TranslateService) {

@@ -1,5 +1,5 @@
-import {ScanSelection} from './ScanSelection';
-import {SliceSelection} from './SliceSelection';
+import { ScanSelection } from './ScanSelection';
+import { SliceSelection } from './SliceSelection';
 
 export class Selection3D implements ScanSelection<SliceSelection> {
     _elements: SliceSelection[];

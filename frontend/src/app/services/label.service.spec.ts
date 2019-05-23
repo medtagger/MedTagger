@@ -1,13 +1,13 @@
-import {async, inject, TestBed} from '@angular/core/testing';
-import {HttpClientModule, HttpRequest} from '@angular/common/http';
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {environment} from '../../environments/environment';
-import {API_URL} from '../utils/ApiUrl';
-import {Task} from '../model/Task';
-import {LabelService, RandomLabelResponse} from './label.service';
-import {LabelTag} from '../model/labels/LabelTag';
-import {Label} from '../model/labels/Label';
-import {RectangleSelection} from '../model/selections/RectangleSelection';
+import { async, inject, TestBed } from '@angular/core/testing';
+import { HttpClientModule, HttpRequest } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { environment } from '../../environments/environment';
+import { API_URL } from '../utils/ApiUrl';
+import { Task } from '../model/Task';
+import { LabelService, RandomLabelResponse } from './label.service';
+import { LabelTag } from '../model/labels/LabelTag';
+import { Label } from '../model/labels/Label';
+import { RectangleSelection } from '../model/selections/RectangleSelection';
 
 describe('Service: LabelService', () => {
     const EXAMPLE_TASK = new Task(1, 'EXAMPLE_TASK', 'Example Task', 'image.jpg', [

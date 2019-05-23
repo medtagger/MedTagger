@@ -1,18 +1,18 @@
-import {ComponentFixture, inject, TestBed} from '@angular/core/testing';
+import { ComponentFixture, inject, TestBed } from '@angular/core/testing';
 import {
     MatDialogModule,
     MatDialogRef,
     MatFormFieldModule,
     MatInputModule
 } from '@angular/material';
-import {DialogService} from './dialog.service';
-import {Component} from '@angular/core';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
-import {InfoDialogComponent} from '../dialogs/info-dialog.component';
-import {OverlayContainer} from '@angular/cdk/overlay';
-import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
-import {InputDialogComponent} from '../dialogs/input-dialog.component';
-import {ReactiveFormsModule} from '@angular/forms';
+import { DialogService } from './dialog.service';
+import { Component } from '@angular/core';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { InfoDialogComponent } from '../dialogs/info-dialog.component';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { InputDialogComponent } from '../dialogs/input-dialog.component';
+import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateServiceStub } from '../mocks/TranslateServiceStub';
 

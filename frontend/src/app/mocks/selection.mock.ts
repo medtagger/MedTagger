@@ -1,5 +1,5 @@
-import {SliceSelection, SliceSelectionType} from '../model/selections/SliceSelection';
-import {LabelTag} from '../model/labels/LabelTag';
+import { SliceSelection, SliceSelectionType } from '../model/selections/SliceSelection';
+import { LabelTag } from '../model/labels/LabelTag';
 
 export class SelectionMock extends SliceSelection {
     constructor(sliceIndex: number,

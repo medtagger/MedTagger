@@ -3,7 +3,7 @@
     <button type="button" mat-raised-button (click)="selectFile()">
         <mat-icon>recent_actors</mat-icon>
         <span *ngIf="!scans.length">{{ 'COMPONENT.UPLOAD_SELECTOR.SELECT_IMAGES' | translate }}</span>
-        <span *ngIf="scans.length">{{ 'COMPONENT.UPLOAD_SELECTOR.SELECTED' | translate }} <span>{{scans[0].files.length}}</span> {{ 'COMPONENT.UPLOAD_SELECTOR.DICOM_IMAGES' | translate }}</span>
+        <span *ngIf="scans.length">{{ 'COMPONENT.UPLOAD_SELECTOR.SELECTED' | translate }} <span>{{ scans[0].files.length }}</span> {{ 'COMPONENT.UPLOAD_SELECTOR.DICOM_IMAGES' | translate }}</span>
     </button>
 </section>
 
@@ -12,6 +12,6 @@
     <button type="button" mat-raised-button (click)="selectFile()">
         <mat-icon>folder</mat-icon>
         <span [hidden]="scans.length">{{ 'COMPONENT.UPLOAD_SELECTOR.SELECT_DIR' | translate }}</span>
-        <span [hidden]="!scans.length">{{ 'COMPONENT.UPLOAD_SELECTOR.SELECTED' | translate }} <span>{{scans.length}}</span> {{ 'COMPONENT.UPLOAD_SELECTOR.SCANS' | translate }}</span>
+        <span [hidden]="!scans.length">{{ 'COMPONENT.UPLOAD_SELECTOR.SELECTED' | translate }} <span>{{ scans.length }}</span> {{ 'COMPONENT.UPLOAD_SELECTOR.SCANS' | translate }}</span>
     </button>
 </section>

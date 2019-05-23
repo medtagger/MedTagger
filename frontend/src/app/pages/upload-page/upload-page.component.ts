@@ -1,22 +1,22 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MatHorizontalStepper, MatStep, MatSelectionList} from '@angular/material';
-import {FormBuilder, FormGroup, FormControl, Validators} from '@angular/forms';
-import {HttpErrorResponse} from '@angular/common/http';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatHorizontalStepper, MatStep, MatSelectionList } from '@angular/material';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 
-import {ScanService} from '../../services/scan.service';
-import {DatasetService} from '../../services/dataset.service';
-import {ScanMetadata} from '../../model/ScanMetadata';
+import { ScanService } from '../../services/scan.service';
+import { DatasetService } from '../../services/dataset.service';
+import { ScanMetadata } from '../../model/ScanMetadata';
 import {
     UploadScansSelectorComponent,
     SelectedScan,
     UserFiles,
     IncompatibleFile,
 } from '../../components/upload-scans-selector/upload-scans-selector.component';
-import {Observable} from 'rxjs/internal/Observable';
-import {interval} from 'rxjs/internal/observable/interval';
-import {throwError} from 'rxjs/internal/observable/throwError';
-import {Subscription} from 'rxjs/Subscription';
-import {PredefinedLabelToUpload} from '../../utils/PredefinedLabelHandler';
+import { Observable } from 'rxjs/internal/Observable';
+import { interval } from 'rxjs/internal/observable/interval';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { Subscription } from 'rxjs/Subscription';
+import { PredefinedLabelToUpload } from '../../utils/PredefinedLabelHandler';
 
 
 enum UploadMode {

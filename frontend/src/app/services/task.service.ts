@@ -1,9 +1,9 @@
-import {Injectable} from '@angular/core';
-import {environment} from '../../environments/environment';
-import {Task} from '../model/Task';
-import {HttpClient} from '@angular/common/http';
-import {LabelTag} from '../model/labels/LabelTag';
-import {isUndefined} from 'util';
+import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
+import { Task } from '../model/Task';
+import { HttpClient } from '@angular/common/http';
+import { LabelTag } from '../model/labels/LabelTag';
+import { isUndefined } from 'util';
 
 export interface TaskResponse {
     task_id: number;

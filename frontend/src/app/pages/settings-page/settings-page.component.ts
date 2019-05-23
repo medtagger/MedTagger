@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {MatSnackBar} from '@angular/material';
-import {FormControl, Validators} from '@angular/forms';
-import {UserInfo} from '../../model/UserInfo';
-import {UsersService} from '../../services/users.service';
+import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
+import { FormControl, Validators } from '@angular/forms';
+import { UserInfo } from '../../model/UserInfo';
+import { UsersService } from '../../services/users.service';
 
 
 @Component({

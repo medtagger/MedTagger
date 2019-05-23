@@ -1,8 +1,8 @@
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import {ValidationPageComponent} from './validation-page.component';
-import {MatButtonModule} from '@angular/material';
-import {ScanViewerComponent} from '../../components/scan-viewer/scan-viewer.component';
+import { ValidationPageComponent } from './validation-page.component';
+import { MatButtonModule } from '@angular/material';
+import { ScanViewerComponent } from '../../components/scan-viewer/scan-viewer.component';
 
 describe('ValidationPageComponent', () => {
     let component: ValidationPageComponent;
