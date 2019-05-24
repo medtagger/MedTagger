@@ -27,5 +27,5 @@ SurveyElementKey = NewType('SurveyElementKey', str)
 ActionResponseID = NewType('ActionResponseID', int)
 SurveyResponseID = NewType('SurveyResponseID', ActionResponseID)
 
-TaskMetadata = NamedTuple('TaskMetadata', [('task_id', TaskID), ('task_name', str), ('description', str),
+TaskMetadata = NamedTuple('TaskMetadata', [('key', str), ('name', str), ('description', str),
                                            ('label_examples', List[str]), ('number_of_available_scans', int)])

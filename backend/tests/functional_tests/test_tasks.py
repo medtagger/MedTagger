@@ -46,8 +46,6 @@ def test_add_task(prepare_environment: Any) -> None:
     assert json_response['key'] == 'MARK_NODULES'
     assert json_response['name'] == 'Mark nodules'
     assert json_response['image_path'] == 'assets/icon/my_icon.svg'
-    assert json_response['description'] == 'This task will focus on tagging nodules.'
-    assert len(json_response['label_examples']) == 2
     assert len(json_response['tags']) == 2
     assert len(json_response['datasets_keys']) == 2
 
@@ -57,3 +55,25 @@ def test_add_task(prepare_environment: Any) -> None:
     datasets = [dataset for dataset in json_response
                 if any(task for task in dataset['tasks'] if task['key'] == 'MARK_NODULES')]
     assert len(datasets) == 2
+
+    # Step 4. Add Scans to datasets
+    for _ in range(2):
+        payload = {'dataset': 'KIDNEYS', 'number_of_slices': 1}
+        response = api_client.post('/api/v1/scans', data=json.dumps(payload),
+                                   headers=get_headers(token=user_token, json=True))
+        assert response.status_code == 201
+        payload = {'dataset': 'LUNGS', 'number_of_slices': 1}
+        response = api_client.post('/api/v1/scans', data=json.dumps(payload),
+                                   headers=get_headers(token=user_token, json=True))
+        assert response.status_code == 201
+
+    # Step 4. Check for Task metadata through the REST API
+    response = api_client.get('/api/v1/tasks/MARK_NODULES/metadata', headers=get_headers(token=user_token, json=True))
+    assert response.status_code == 200
+    json_response = json.loads(response.data)
+    assert isinstance(json_response, dict)
+    assert json_response['key'] == 'MARK_NODULES'
+    assert json_response['name'] == 'Mark nodules'
+    assert json_response['number_of_available_scans'] == 4
+    assert len(json_response['label_examples']) == 2
+    assert json_response['description'] == 'This task will focus on tagging nodules.'

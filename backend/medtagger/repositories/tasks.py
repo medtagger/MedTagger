@@ -34,8 +34,7 @@ def get_task_metadata_by_key(key: str) -> TaskMetadata:
     """
     with db_connection_session() as session:
         task = session.query(Task).filter(Task.key == key).first()
-    return TaskMetadata(task_id=task.id, task_name=task.name, description=task.description,
-                        label_examples=task.label_examples,
+    return TaskMetadata(key=task.key, name=task.name, description=task.description, label_examples=task.label_examples,
                         number_of_available_scans=task.number_of_available_scans)
 
 
@@ -53,7 +52,7 @@ def add_task(key: str, name: str, image_path: str, datasets_keys: List[str], des
     :return: Task object
     """
     with db_transaction_session() as session:
-        task = Task(key, name, image_path, description)
+        task = Task(key, name, image_path)
         datasets = Dataset.query.filter(Dataset.key.in_(datasets_keys)).all()  # type: ignore
         task.datasets = datasets
         task.label_examples = label_examples

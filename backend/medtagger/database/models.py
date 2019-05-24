@@ -168,12 +168,11 @@ class Task(Base):
     @property
     def number_of_available_scans(self) -> int:
         """Returns a number of available Scans for this Task."""
-
-        scans = Scan.query.filter(and_(
-            Slice.dataset == self.id,
-            Slice.orientation == SliceOrientation.Z,
-            Slice.height.isnot(None),  # type: ignore  # "int" has no attribute "isnot"
-        )).first()
+        datasets_ids = [dataset.id for dataset in self.datasets]
+        number_of_scans = Scan.query.filter(and_(
+            Scan.dataset_id.in_(datasets_ids)
+        )).count()
+        return number_of_scans
 
 
 class Scan(Base):

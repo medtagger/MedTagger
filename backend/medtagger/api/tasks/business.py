@@ -36,7 +36,7 @@ def get_task_metadata_for_key(task_key: str) -> TaskMetadata:
     :return: TaskMetadata
     """
     try:
-        return TasksRepository.get_task_metadata_by_key(task_key)
+        return TasksRepository.get_task_metadata_by_key(task_key)._asdict()
     except NoResultFound:
         raise NotFoundException('Did not found task for {} key!'.format(task_key))
 
