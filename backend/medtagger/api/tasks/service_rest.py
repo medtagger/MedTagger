@@ -42,8 +42,8 @@ class Tasks(Resource):
         name = payload['name']
         image_path = payload['image_path']
         datasets_keys = payload['datasets_keys']
-        description = payload["description"]
-        label_examples = payload["label_examples"]
+        description = payload.get('description', '')
+        label_examples = payload.get('label_examples', [])
         tags = [LabelTag(tag['key'], tag['name'], tag['tools']) for tag in payload['tags']]
         return business.create_task(key, name, image_path, datasets_keys, description, label_examples, tags), 201
 
@@ -63,16 +63,16 @@ class Task(Resource):
         return business.get_task_for_key(task_key)
 
 
-@tasks_ns.route('/<string:task_key>')
+@tasks_ns.route('/<string:task_key>/metadata')
 class TaskMetadata(Resource):
-    """Return Task Metadata."""
+    """Endpoint that manages single task metadata."""
 
     @staticmethod
     @login_required
-    @tasks_ns.marshal_with(serializers.out__task)
+    @tasks_ns.marshal_with(serializers.out__task_metadata)
     @tasks_ns.doc(security='token')
-    @tasks_ns.doc(description='Get task for given key.')
+    @tasks_ns.doc(description='Get task metadata for given key.')
     @tasks_ns.doc(responses={200: 'Success', 404: 'Could not find task'})
     def get(task_key: str) -> Any:
-        """Return task for given key."""
-        return business.get_task_metadata(task_key)
+        """Return task metadata for given key."""
+        return business.get_task_metadata_for_key(task_key)

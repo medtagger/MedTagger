@@ -3,7 +3,7 @@
 import uuid
 from typing import List, Dict, cast, Optional, Any
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event, false
+from sqlalchemy import Column, Integer, Text, Float, String, ForeignKey, Boolean, Enum, Table, and_, event, false
 from sqlalchemy.dialects.postgresql import JSONB, ARRAY
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import relationship
@@ -131,27 +131,24 @@ class Task(Base):
     id: TaskID = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
-    description: str = Column(String(500), nullable=True)
-    label_examples: str = Column(ARRAY(String(50)), nullable=True)
+    description: str = Column(Text, nullable=True, server_default='')
+    label_examples: str = Column(ARRAY(String(256)), nullable=True, server_default='{}')
     image_path: str = Column(String(100), nullable=False)
     disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
     datasets: List[Dataset] = relationship('Dataset', back_populates='tasks',
                                            secondary=datasets_tasks)
-
     _tags: List['LabelTag'] = relationship("LabelTag", back_populates="task")
 
-    def __init__(self, key: str, name: str, image_path: str, description: str) -> None:
+    def __init__(self, key: str, name: str, image_path: str) -> None:
         """Initialize Task.
 
         :param key: unique key representing Task
         :param name: name which describes this Task
         :param image_path: path to the image which is located on the frontend
-        :param description: Description for a given Task
         """
         self.key = key
         self.name = name
-        self.description = description
         self.image_path = image_path
 
     def __repr__(self) -> str:
@@ -167,6 +164,16 @@ class Task(Base):
     def available_tags(self, new_tags: List['LabelTag']) -> None:
         """Set new Label Tags for this Task."""
         self._tags = new_tags
+
+    @property
+    def number_of_available_scans(self) -> int:
+        """Returns a number of available Scans for this Task."""
+
+        scans = Scan.query.filter(and_(
+            Slice.dataset == self.id,
+            Slice.orientation == SliceOrientation.Z,
+            Slice.height.isnot(None),  # type: ignore  # "int" has no attribute "isnot"
+        )).first()
 
 
 class Scan(Base):
