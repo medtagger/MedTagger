@@ -26,6 +26,8 @@ import { ScanService } from '../../services/scan.service';
 import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
 import { MarkerZoomHandler } from '../../model/MarkerZoomHandler';
+import { FormControl } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-marker-page',
@@ -42,6 +44,8 @@ export class MarkerPageComponent implements OnInit {
     @ViewChild(MarkerComponent) marker: MarkerComponent;
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
+
+    tooltipShowDelay = new FormControl(1000);
 
     selections: List<SliceSelection> = List();
     scan: ScanMetadata;
@@ -68,7 +72,8 @@ export class MarkerPageComponent implements OnInit {
         private router: Router,
         private snackBar: MatSnackBar,
         private taskService: TaskService,
-        private labelService: LabelService
+        private labelService: LabelService,
+        private translateService: TranslateService
     ) {
         console.log('MarkerPage constructor', this.marker);
         this.isInitialSliceLoad = true;
@@ -88,7 +93,7 @@ export class MarkerPageComponent implements OnInit {
 
                     if (this.task.tags.length === 0) {
                         this.dialogService
-                            .openInfoDialog('There are no tags assigned to this task!', 'Please try another task!', 'Go back')
+                            .openTranslatedInfoDialog('MARKER.DIALOG.NO_TAGS')
                             .afterClosed()
                             .subscribe(() => {
                                 this.router.navigateByUrl(MarkerPageComponent.HOME_PAGE);
@@ -128,7 +133,7 @@ export class MarkerPageComponent implements OnInit {
                 (_: Error) => {
                     if (!this.task) {
                         this.dialogService
-                            .openInfoDialog('You did not choose task properly!', 'Please choose it again!', 'Go back')
+                            .openTranslatedInfoDialog('MARKER.DIALOG.NO_TASK')
                             .afterClosed()
                             .subscribe(() => {
                                 this.router.navigateByUrl(MarkerPageComponent.HOME_PAGE);
@@ -175,7 +180,7 @@ export class MarkerPageComponent implements OnInit {
 
     public zoomIn(): void {
         this.marker.scale = this.zoomHandler.zoomIn();
-        this.snackBar.open('Use mouse wheel button click to drag zoomed image.', '', { duration: 3000 });
+        this.snackBar.open(this.translateService.instant('MARKER.ZOOM_INFO'), '', { duration: 3000 });
     }
 
     public zoomOut(): void {
@@ -209,7 +214,7 @@ export class MarkerPageComponent implements OnInit {
                 this.marker.setDownloadScanInProgress(false);
                 this.marker.setDownloadSlicesInProgress(false);
                 this.dialogService
-                    .openInfoDialog('Nothing to do here!', 'No more Scans available for you in this dataset!', 'Go back')
+                    .openTranslatedInfoDialog('MARKER.DIALOG.NO_SCANS')
                     .afterClosed()
                     .subscribe(() => {
                         this.router.navigateByUrl(MarkerPageComponent.HOME_PAGE);
@@ -233,11 +238,57 @@ export class MarkerPageComponent implements OnInit {
     }
 
     public sendCompleteLabel(): void {
-        this.sendSelection(new Selection3D(this.selections.toJS()), this.labelComment);
+        let dialogPackage;
+        if (this.checkForSingleSliceSelection()) {
+            dialogPackage = 'SINGLE_SELECTION';
+        } else if (this.checkForIncompleteTagSelections()) {
+            dialogPackage = 'SINGLE_TAG';
+        }
+
+        if (dialogPackage) {
+            this.dialogService
+            .openTranslatedConfirmDialog('MARKER.DIALOG.' + dialogPackage)
+            .afterClosed()
+            .subscribe((confirmed: boolean) => {
+                if (confirmed) {
+                    this.sendSelection(new Selection3D(this.selections.toJS()), this.labelComment);
+                }
+            });
+        } else {
+            this.sendSelection(new Selection3D(this.selections.toJS()), this.labelComment);
+        }
+    }
+
+    private checkForSingleSliceSelection(): boolean {
+        const sliceIndex = (this.selections.first() as SliceSelection).sliceIndex;
+        return this.selections.every((selection) => selection.sliceIndex === sliceIndex);
+    }
+
+    private checkForIncompleteTagSelections(): boolean {
+        // So now we need 2x selections from each tag
+        let tagsWithoutSelections = this.labelExplorer.getTags().concat(this.labelExplorer.getTags());
+        console.log(tagsWithoutSelections);
+
+        let tagId;
+        this.selections.forEach((selection) => {
+            tagId = tagsWithoutSelections.findIndex((tag) => tag.key === selection.labelTag.key);
+            if (tagId >= 0) {
+                tagsWithoutSelections = tagsWithoutSelections.remove(tagId);
+            }
+        });
+
+        return tagsWithoutSelections.size !== 0;
     }
 
     public sendEmptyLabel(): void {
-        this.sendSelection(new Selection3D(), 'This is an empty Label');
+        this.dialogService
+            .openTranslatedConfirmDialog('MARKER.DIALOG.EMPTY_LABEL')
+            .afterClosed()
+            .subscribe((confirmed: boolean) => {
+                if (confirmed) {
+                    this.sendSelection(new Selection3D(), 'This is an empty Label');
+                }
+            });
     }
 
     private sendSelection(selection3d: Selection3D, comment: string) {
@@ -251,7 +302,7 @@ export class MarkerPageComponent implements OnInit {
                 this.nextScan();
             })
             .catch((errorResponse: Error) => {
-                this.dialogService.openInfoDialog('Error', 'Cannot send selection', 'Ok');
+                this.dialogService.openTranslatedInfoDialog('MARKER.DIALOG.SEND_ERROR');
             });
     }
 
@@ -261,11 +312,11 @@ export class MarkerPageComponent implements OnInit {
     }
 
     private indicateLabelHasBeenSend(): void {
-        this.snackBar.open('Label has been sent!', '', { duration: 2000 });
+        this.snackBar.open(this.translateService.instant('MARKER.LABEL_SEND_INFO'), '', { duration: 2000 });
     }
 
     private indicateNewScanAppeared(): void {
-        this.snackBar.open('New scan has been loaded!', '', { duration: 2000 });
+        this.snackBar.open(this.translateService.instant('MARKER.SCAN_LOADED_INFO'), '', { duration: 2000 });
     }
 
     public isCurrentTool(toolName: string): boolean {

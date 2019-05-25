@@ -48,7 +48,50 @@
     },
     "MARKER": {
         "SCREEN_INFO": "Please use bigger screen to start labeling.",
+        "ZOOM_INFO": "Use mouse wheel button click to drag zoomed image.",
+        "LABEL_SEND_INFO": "Label has been sent!",
+        "SCAN_LOADED_INFO": "New scan has been loaded!",
         "ACTIVE_TAG_PLACEHOLDER": "Active tag",
+        "DIALOG": {
+            "NO_TAGS": {
+                "TITLE": "There are no tags assigned to this task!",
+                "CONTENT": "Please try another task!",
+                "BUTTON": "Go back"
+            },
+            "NO_TASK": {
+                "TITLE": "You did not choose task properly!",
+                "CONTENT": "Please choose it again!",
+                "BUTTON": "Go back"
+            },
+            "NO_SCANS": {
+                "TITLE": "Nothing to do here!",
+                "CONTENT": "No more Scans available for you in this dataset!",
+                "BUTTON": "Go back"
+            },
+            "SEND_ERROR": {
+                "TITLE": "Error",
+                "CONTENT": "Cannot send selection",
+                "BUTTON": "Ok"
+            },
+            "EMPTY_LABEL": {
+                "TITLE": "You are trying to send empty label",
+                "CONTENT": "Are you sure that there are no interesting objects to tag in the whole scan?",
+                "BUTTON_CONFIRM": "Yes, send empty label.",
+                "BUTTON_CANCEL": "No, take me back to labeling."
+            },
+            "SINGLE_SELECTION": {
+                "TITLE": "You are trying to send single selection",
+                "CONTENT": "Remember you should create 3D selection. Use scroll wheel or arrow buttons to change slices and select objects there.",
+                "BUTTON_CONFIRM": "Send single selection.",
+                "BUTTON_CANCEL": "Take me back to labeling."
+            },
+            "SINGLE_TAG": {
+                "TITLE": "You are trying to send incomplete selections",
+                "CONTENT": "There are no selections for some of the tags. Are you sure that there are no interesting objects to select for other tags?",
+                "BUTTON_CONFIRM": "Send current selections.",
+                "BUTTON_CANCEL": "Take me back to labeling."
+            }
+        },
         "HEADER": {
             "TOOLS": "Tools",
             "TOOL_ACTIONS": "Tool actions",
@@ -77,6 +120,19 @@
                 "SEND": "Send label",
                 "NO_TAG": "Nothing to tag"
             }
+        },
+        "TOOLTIPS": {
+            "RECT_TOOL": "Rectangle tool. Use it to select rectangular region of interest by dragging mouse over given image part.",
+            "BRUSH_TOOL": "Brush tool. Mark interesting objects on image using freehand technique.",
+            "POINT_TOOL": "Point tool. Add point selection by clicking on displayed image.",
+            "CHAIN_TOOL": "Polyline tool. Add another vertices to image and form polygon or polyline.",
+            "IMG_WINDOW": "Contrast window. Manipulate window parameters to brighten/darken image or add contrast.",
+            "ZOOM_IN": "Zoom in by a factor x2. Navigate on the zoomed image using mouse scroll button drag.",
+            "ZOOM_OUT": "Zoom out by a factor x2. Navigate on the zoomed image using mouse scroll button drag.",
+            "COMMENT": "Add text label to created selection. Your text will be send to platform along the graphic selection.",
+            "SKIP_SCAN": "Request another image to tag, leaving current for future analysis.",
+            "NO_TAG": "Send empty selection. Use this button where there are no task bound objects to tag on all slices of scan.",
+            "SEND_SCAN": "Send selections from all slices of current scan."
         }
     },
     "SETTINGS": {
@@ -94,6 +150,20 @@
             "EMAIL": "E-mail",
             "FIRST_NAME": "First name",
             "LAST_NAME": "Last name"
+        },
+        "INFO": {
+            "DISMISS": "Dismiss",
+            "USER_DATA_UPDATED": "User data has been updated.",
+            "USER_VALIDATION_FAILED": "User data has not been updated due to a validation failure.",
+            "INCORRECT_DATA": "Incorrect form data!"
+        },
+        "VALIDATION": {
+            "FIRST_NAME": "First name is required!",
+            "LAST_NAME": "Last name is required!",
+            "EMAIL_REQUIRED": "E-mail address is required!",
+            "INCORRECt_EMAIL": "Incorrect e-mail address",
+            "PASSWORD": "Password is required!",
+            "PASSWORD_CONFIRM": "Password confirmation is required!"
         }
     },
     "TUTORIAL": {
@@ -196,7 +266,12 @@
             "NO_LABELS_ADDED": "No labels have been added so far.",
             "ADD_LABELS": "Add new labels using available tools.",
             "SLICE": "Slice",
-            "SELECTION": "Selection"
+            "SELECTION": "Selection",
+            "TOOLTIPS": {
+                "BTN_REMOVE": "Remove this selection. This operation will permamently delete selection, use carefully.",
+                "BTN_PIN": "Pin selection to have it on view when changing slices of scan.",
+                "BTN_VISIBLE": "Toggle visibility of this selection on current slice."
+            }
         },
         "MARKER": {
             "MESSAGE": {

@@ -55,6 +55,7 @@ describe('Basic flow', () => {
         cy.get('canvas').click(200, 100);
         cy.get('canvas').click(200, 200);
         cy.get('[data-cy=send-label]').click();
+        cy.get('[data-cy=dialog-button-confirm]').click();
         cy.get('[data-cy=no-labels-added]');
     });
 
@@ -98,6 +99,7 @@ describe('Basic flow', () => {
         //         expect(labelElements.length).equals(2);
         //     });
         // });
+        cy.get('[data-cy=dialog-button-confirm]').click();
  
         // UI should be empty once again
         cy.get('[data-cy=no-labels-added]');
