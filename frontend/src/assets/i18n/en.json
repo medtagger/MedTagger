@@ -81,7 +81,7 @@
             },
             "SINGLE_SELECTION": {
                 "TITLE": "You are trying to send single selection",
-                "CONTENT": "Remember you should create 3D selection. Use wheel scroll or arrow buttons to change slices and select objects there.",
+                "CONTENT": "Remember you should create 3D selection. Use scroll wheel or arrow buttons to change slices and select objects there.",
                 "BUTTON_CONFIRM": "Send single selection.",
                 "BUTTON_CANCEL": "Take me back to labeling."
             },
