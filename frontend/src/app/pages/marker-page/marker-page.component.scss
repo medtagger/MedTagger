@@ -10,6 +10,10 @@ $toolbox-width: 300px;
     cursor: pointer;
 }
 
+::ng-deep .mat-tooltip {
+    font-size: 14px;
+}
+
 .color-window-panel {
     display: block;
     position: fixed;

@@ -34,18 +34,24 @@
                     </p>
                     <button mat-icon-button
                         (click)="removeSelection(selection)"
-                        class="hidden-btn">
+                        class="hidden-btn"
+                        matTooltip="{{ 'COMPONENT.LABEL_EXPLORER.TOOLTIPS.BTN_REMOVE' | translate }}"
+                        [matTooltipShowDelay]="tooltipShowDelay.value">
                         <mat-icon class="small-size">delete</mat-icon>
                     </button>
                     <button mat-icon-button
                         [style.visibility]="selection.pinned ? 'visible' : undefined"
                         (click)="toggleSelectionPinning(selection)"
-                        class="hidden-btn">
+                        class="hidden-btn"
+                        matTooltip="{{ 'COMPONENT.LABEL_EXPLORER.TOOLTIPS.BTN_PIN' | translate }}"
+                        [matTooltipShowDelay]="tooltipShowDelay.value">
                         <mat-icon class="small-svg-size" svgIcon="{{selection.pinned ? 'pin' : 'pin-off'}}"></mat-icon>
                     </button>
                     <button mat-icon-button
-                        (click)="toggleSelectionVisibility(selection)">
-                        <mat-icon class="small-size">{{ selection.hidden ? 'visibility_off' : 'visibility' }}</mat-icon>
+                        (click)="toggleSelectionVisibility(selection)"
+                        matTooltip="{{ 'COMPONENT.LABEL_EXPLORER.TOOLTIPS.BTN_VISIBLE' | translate }}"
+                        [matTooltipShowDelay]="tooltipShowDelay.value">
+                        <mat-icon class="small-size">{{selection.hidden ? 'visibility_off' : 'visibility'}}</mat-icon>
                     </button>
                 </mat-list-item>
             </ng-container>

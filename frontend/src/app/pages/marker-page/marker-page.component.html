@@ -26,7 +26,12 @@
                     </mat-card>
                 </div>
             </div>
-            <button mat-mini-fab color="primary" class="window-change-button" (click)="toggleColorWindowPanel()">
+            <button mat-mini-fab 
+                color="primary" 
+                class="window-change-button" 
+                (click)="toggleColorWindowPanel()"
+                matTooltip="{{ 'MARKER.TOOLTIPS.IMG_WINDOW' | translate }}"
+                [matTooltipShowDelay]="tooltipShowDelay.value">
                 <mat-icon [svgIcon]="'contrast-box'"></mat-icon>
             </button>
             <div *ngIf="colorWindowPanelActive" id="color-window-panel" class="color-window-panel">
@@ -70,12 +75,14 @@
             </div>
             <button mat-mini-fab
                 (click)="zoomIn()"
+                matTooltip="{{ 'MARKER.TOOLTIPS.ZOOM_IN' | translate }}"
                 [disabled]="!zoomHandler.zoomInAvailable()"
                 [color]="isCurrentTool('ZOOM_IN') ? 'accent' : 'primary'">
                 <mat-icon [svgIcon]="getToolIconName('ZOOM_IN')"></mat-icon>
             </button>
             <button mat-mini-fab
                 (click)="zoomOut()"
+                matTooltip="{{ 'MARKER.TOOLTIPS.ZOOM_OUT' | translate }}"
                 [disabled]="!zoomHandler.zoomOutAvailable()"
                 [color]="isCurrentTool('ZOOM_OUT') ? 'accent' : 'primary'">
                 <mat-icon [svgIcon]="getToolIconName('ZOOM_OUT')"></mat-icon>
@@ -84,6 +91,8 @@
                 <button mat-raised-button
                     color="primary"
                     (click)="addLabelComment()"
+                    matTooltip="{{ 'MARKER.TOOLTIPS.COMMENT' | translate }}"
+                    [matTooltipShowDelay]="tooltipShowDelay.value"
                     [disabled]="selections.isEmpty()">
                     {{ (this.labelComment === '' ? 'MARKER.NAVBAR.COMMENT.ADD' : 'MARKER.NAVBAR.COMMENT.MODIFY') | translate }}
                 </button>
@@ -92,20 +101,29 @@
         <div class="marker-nav--finish">
             <button mat-raised-button
                 color="primary"
-                (click)="skipScan()">
+                (click)="skipScan()"
+                matTooltip="{{ 'MARKER.TOOLTIPS.SKIP_SCAN' | translate }}"
+                [matTooltipShowDelay]="tooltipShowDelay.value">
+                [disabled]="marker.isDownloadingInProgress()"
                 {{ 'MARKER.NAVBAR.BUTTON.SKIP' | translate }}
             </button>
             <button *ngIf="!selections.isEmpty()"
                 mat-raised-button
                 color="accent"
+                [disabled]="marker.isDownloadingInProgress()"
                 (click)="sendCompleteLabel()"
+                matTooltip="{{ 'MARKER.TOOLTIPS.SEND_SCAN' | translate }}"
+                [matTooltipShowDelay]="tooltipShowDelay.value"
                 data-cy="send-label">
                 {{ 'MARKER.NAVBAR.BUTTON.SEND' | translate }}
             </button>
             <button *ngIf="selections.isEmpty()"
                 mat-raised-button
                 color="accent"
-                (click)="sendEmptyLabel()">
+                (click)="sendEmptyLabel()"
+                matTooltip="{{ 'MARKER.TOOLTIPS.NO_TAG' | translate }}"
+                [matTooltipShowDelay]="tooltipShowDelay.value">
+                [disabled]="marker.isDownloadingInProgress()"
                 {{ 'MARKER.NAVBAR.BUTTON.NO_TAG' | translate }}
             </button>
         </div>
@@ -141,6 +159,8 @@
                     (click)="setTool('RECTANGLE')"
                     [color]="isCurrentTool('RECTANGLE') ? 'accent' : 'primary'"
                     [disabled]="!isToolSupportedByCurrentTag('RECTANGLE')"
+                    matTooltip="{{ 'MARKER.TOOLTIPS.RECT_TOOL' | translate }}"
+                    [matTooltipShowDelay]="tooltipShowDelay.value"
                     data-cy="rectangle-tool">
                     <mat-icon [svgIcon]="getToolIconName('RECTANGLE')"></mat-icon>
                 </button>
@@ -148,6 +168,8 @@
                     (click)="setTool('BRUSH')"
                     [color]="isCurrentTool('BRUSH') ? 'accent' : 'primary'"
                     [disabled]="!isToolSupportedByCurrentTag('BRUSH')"
+                    matTooltip="{{ 'MARKER.TOOLTIPS.BRUSH_TOOL' | translate }}"
+                    [matTooltipShowDelay]="tooltipShowDelay.value"
                     data-cy="brush-tool">
                     <mat-icon [svgIcon]="getToolIconName('BRUSH')"></mat-icon>
                 </button>
@@ -155,6 +177,8 @@
                     [color]="isCurrentTool('POINT') ? 'accent' : 'primary'"
                     [disabled]="!isToolSupportedByCurrentTag('POINT')"
                     (click)="setTool('POINT')"
+                    matTooltip="{{ 'MARKER.TOOLTIPS.POINT_TOOL' | translate }}"
+                    [matTooltipShowDelay]="tooltipShowDelay.value"
                     data-cy="point-tool">
                     <mat-icon [svgIcon]="getToolIconName('POINT')"></mat-icon>
                 </button>
@@ -162,6 +186,8 @@
                     (click)="setTool('CHAIN')"
                     [color]="isCurrentTool('CHAIN') ? 'accent' : 'primary'"
                     [disabled]="!isToolSupportedByCurrentTag('CHAIN')"
+                    matTooltip="{{ 'MARKER.TOOLTIPS.CHAIN_TOOL' | translate }}"
+                    [matTooltipShowDelay]="tooltipShowDelay.value"
                     data-cy="chain-tool">
                     <mat-icon [svgIcon]="getToolIconName('CHAIN')"></mat-icon>
                 </button>
@@ -177,7 +203,7 @@
                         (click)="action.trigger()"
                         [color]="action.isActive && action.enable() ? 'accent' : 'primary'"
                         selected>
-                        <ng-container *ngIf="action.type === ActionType.BUTTON">{{ action.name }}</ng-container>
+                        <ng-container *ngIf="action.type === ActionType.BUTTON">{{ 'MARKER.TOOL_ACTIONS.' + action.name | translate }}</ng-container>
                     </mat-chip>
                 </mat-chip-list>
             </div>

@@ -88,7 +88,7 @@ export class ValidationPageComponent implements OnInit {
             });
         }).catch(() => {
             this.dialogService
-                .openInfoDialog('Nothing to do here!', 'No more Labels need your attention!', 'Go back')
+                .openTranslatedInfoDialog('MARKER.DIALOG.NO_SCANS')
                 .afterClosed()
                 .subscribe(() => {
                     this.location.back();

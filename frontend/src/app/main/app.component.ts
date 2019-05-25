@@ -57,8 +57,4 @@ export class AppComponent implements OnInit {
         sessionStorage.removeItem('userInfo');
         this.router.navigate([appRoutes.LOGIN]);
     }
-
-    private indicateValidationPageIsUnavailable(): void {
-      this.snackBar.open('Validation Page is temporarily unavailable.', '', {duration: 2000, });
-  }
 }

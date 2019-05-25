@@ -58,6 +58,7 @@ import { TaskExplorerComponent } from '../components/task-explorer/task-explorer
 import { HttpAuthenticationInterceptor } from '../interceptors/http-authentication.interceptor';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { ConfirmDialogComponent } from '../dialogs/confirm-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http);
@@ -79,6 +80,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         ValidationPageComponent,
         InfoDialogComponent,
         InputDialogComponent,
+        ConfirmDialogComponent,
         NavBarComponent,
         TaskExplorerComponent
     ],
@@ -124,7 +126,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     ],
     entryComponents: [
         InfoDialogComponent,
-        InputDialogComponent
+        InputDialogComponent,
+        ConfirmDialogComponent
     ],
     providers: [
         {

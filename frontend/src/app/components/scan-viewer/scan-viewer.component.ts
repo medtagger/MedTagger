@@ -92,16 +92,22 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
 
     public setZoomHandler(zoomHandler: MarkerZoomHandler) {
         this.canvas.addEventListener('mousedown', (event: MouseEvent) => {
-            zoomHandler.mouseDownHandler(event, this.imageContainer);
+            this.refreshContextIfNeeded(zoomHandler.mouseDownHandler(event, this.imageContainer));
         });
 
         this.canvas.addEventListener('mousemove', (event: MouseEvent) => {
-            zoomHandler.mouseMoveHandler(event, this.imageContainer);
+            this.refreshContextIfNeeded(zoomHandler.mouseMoveHandler(event, this.imageContainer));
         });
 
         this.canvas.addEventListener('mouseup', (event: MouseEvent) => {
-            zoomHandler.mouseUpHandler(event, this.imageContainer);
+            this.refreshContextIfNeeded(zoomHandler.mouseUpHandler(event, this.imageContainer));
         });
+    }
+
+    private refreshContextIfNeeded(shouldRefresh: boolean) {
+        if (shouldRefresh) {
+            this.refreshDrawingContext();
+        }
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -159,6 +165,10 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
         this.downloadingSlicesInProgress = isInProgress;
     }
 
+    public isDownloadingInProgress(): boolean {
+        return this.downloadingScanInProgress || this.downloadingSlicesInProgress;
+    }
+
     public clearData(): void {
         this.slices = new Map<number, MarkerSlice>();
         this.drawingContext = undefined;
@@ -200,8 +210,6 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
         console.log('ScanViewer | ngOnInit');
         console.log('View elements: image ', this.currentImage, ', canvas ', this.canvas, ', slider ', this.slider);
 
-        this.changeSlice(0);
-
         this.refreshDrawingContext();
 
         this.initializeImage(() => this.drawSelections());
@@ -212,6 +220,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     public changeSlice(sliceIndex: number): void {
+        console.log('Change slice to: ', sliceIndex);
         if (this.currentSlice !== sliceIndex) {
             this.drawingContext.currentSlice = sliceIndex;
             this.currentImage.src = (this.slices.get(sliceIndex) && this.slices.get(sliceIndex).source) || '';
@@ -232,11 +241,11 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
 
     protected requestSlicesIfNeeded(): void {
         console.log('ScanViewer | requestSlicesIfNeeded sliceIndex: ', this.currentSlice);
-        if (this.getMaxSliceIndex() === this.currentSlice) {
+        if (this.getMaxSliceIndex() === this.currentSlice && this.currentSlice < this.scanMetadata.numberOfSlices) {
             console.log('ScanViewer | requestSlicesIfNeeded more (higher indexes): ', this.currentSlice + 1);
             this.observableSliceRequest.next(new SliceRequest(this.currentSlice + 1));
         }
-        if (this.getMinSliceIndex() === this.currentSlice) {
+        if (this.getMinSliceIndex() === this.currentSlice && this.currentSlice > 0) {
             console.log('ScanViewer | requestSlicesIfNeeded more (lower indexes): ', this.currentSlice - 1);
             this.observableSliceRequest.next(new SliceRequest(this.currentSlice - 1, true));
         }
@@ -316,7 +325,7 @@ export class ScanViewerComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     protected createDrawingContext(): DrawingContext {
-        const currentSlice = this.currentSlice || this.slices.keys().next().value;
+        const currentSlice = this.currentSlice;
         return new DrawingContext(this.canvas, this.selections, currentSlice, null, null, this.redrawSelections.bind(this));
     }
 
