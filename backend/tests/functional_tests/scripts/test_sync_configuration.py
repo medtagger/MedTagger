@@ -478,7 +478,7 @@ def test_sync_with_changed_dataset_and_reused_task(prepare_environment: Any) -> 
     """)
     script.sync_configuration(configuration)
 
-    # Check if description was synchronized properly
+    # Check if Datasets were synchronized properly
     datasets = DatasetsRepository.get_all_datasets(include_disabled=True)
     assert len(datasets) == 1
     kidneys = DatasetsRepository.get_dataset_by_key('KIDNEYS')
