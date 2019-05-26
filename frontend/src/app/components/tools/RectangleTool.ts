@@ -11,7 +11,7 @@ export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<
         return {
             ...super.getStyle(),
             SELECTION_LINE_DENSITY: [6],
-            SELECTION_LINE_WIDTH: 1,
+            SELECTION_LINE_WIDTH: 3,
         };
     }
 

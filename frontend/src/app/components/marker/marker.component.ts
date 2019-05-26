@@ -14,6 +14,7 @@ import { TranslateService } from '@ngx-translate/core';
     styleUrls: ['./marker.component.scss']
 })
 export class MarkerComponent extends ScanViewerComponent implements OnInit, OnChanges {
+    private static readonly MOUSE_LEFT_BUTTON_ID = 0;
 
     @Input() currentTool: Tool<SliceSelection>;
 
@@ -48,27 +49,33 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
     }
 
     public onMouseDown(mouseEvent: MouseEvent): void {
-        if (!this.currentTag) {
-            this.snackBar.open(this.translateService.instant('COMPONENT.MARKER.MESSAGE.SELECT_TAG'), '', { duration: 2000 });
-            return;
-        } else if (!this.currentTool) {
-            this.snackBar.open(this.translateService.instant('COMPONENT.MARKER.MESSAGE.SELECT_TOOL'), '', { duration: 2000 });
-            return;
-        }
+        if (mouseEvent.button === MarkerComponent.MOUSE_LEFT_BUTTON_ID) {
+            if (!this.currentTag) {
+                this.snackBar.open(this.translateService.instant('COMPONENT.MARKER.MESSAGE.SELECT_TAG'), '', { duration: 2000 });
+                return;
+            } else if (!this.currentTool) {
+                this.snackBar.open(this.translateService.instant('COMPONENT.MARKER.MESSAGE.SELECT_TOOL'), '', { duration: 2000 });
+                return;
+            }
 
-        this.currentTool.onMouseDown(mouseEvent);
+            this.currentTool.onMouseDown(mouseEvent);
+        }
     }
 
     public onMouseUp(mouseEvent: MouseEvent): void {
-        console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
-        if (this.currentTool) {
-            this.currentTool.onMouseUp(mouseEvent);
+        if (mouseEvent.button === MarkerComponent.MOUSE_LEFT_BUTTON_ID) {
+            console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
+            if (this.currentTool) {
+                this.currentTool.onMouseUp(mouseEvent);
+            }
         }
     }
 
     public onMouseMove(mouseEvent: MouseEvent): void {
-        if (this.currentTool) {
-            this.currentTool.onMouseMove(mouseEvent);
+        if (mouseEvent.button === MarkerComponent.MOUSE_LEFT_BUTTON_ID) {
+            if (this.currentTool) {
+                this.currentTool.onMouseMove(mouseEvent);
+            }
         }
     }
 

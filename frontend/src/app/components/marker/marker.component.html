@@ -21,7 +21,8 @@
                 [vertical]="true"
                 class="marker--slider"
                 [class.zoom]="scale > 1"
-                color="primary">
+                color="primary"
+                data-cy="slider">
     </mat-slider>
     <div
         *ngIf="isDownloadingInProgress()"

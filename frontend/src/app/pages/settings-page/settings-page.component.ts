@@ -1,8 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {MatSnackBar} from '@angular/material';
-import {FormControl, Validators} from '@angular/forms';
-import {UserInfo} from '../../model/UserInfo';
-import {UsersService} from '../../services/users.service';
+import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
+import { FormControl, Validators } from '@angular/forms';
+import { UserInfo } from '../../model/UserInfo';
+import { UsersService } from '../../services/users.service';
+import { TranslateService } from '@ngx-translate/core';
 
 
 @Component({
@@ -22,7 +23,8 @@ export class SettingsPageComponent implements OnInit {
     public currentUser: UserInfo;
     public allUsers: Array<UserInfo>;
 
-    constructor(public snackBar: MatSnackBar, private usersService: UsersService) {
+    constructor(public snackBar: MatSnackBar, private usersService: UsersService,
+        private translateService: TranslateService) {
         this.currentUser = JSON.parse(sessionStorage.getItem('userInfo'));
         if (this.currentUser.role === 'admin') {
             this.usersService.getAllUsers().then(users => this.allUsers = users);
@@ -44,19 +46,23 @@ export class SettingsPageComponent implements OnInit {
 
     updateUserDetails() {
         if (!this.validateUserInput()) {
-          this.snackBar.open('User data has not been updated due to a validation failure.', 'Dismiss', {
-            duration: 3000,
-          });
-          return;
+            this.snackBar.open(
+                this.translateService.instant('SETTINGS.INFO.USER_VALIDATION_FAILED'),
+                this.translateService.instant('SETTINGS.INFO.DISMISS'),
+                { duration: 3000 }
+            );
+            return;
         }
         this.usersService.setUserDetails(this.currentUser.id, this.userFirstName.value, this.userLastName.value)
             .then(() => {
-              this.currentUser.firstName = this.userFirstName.value;
-              this.currentUser.lastName = this.userLastName.value;
-              sessionStorage.setItem('userInfo', JSON.stringify(this.currentUser));
-              this.snackBar.open('User data has been updated.', 'Dismiss', {
-                duration: 3000,
-              });
+                this.currentUser.firstName = this.userFirstName.value;
+                this.currentUser.lastName = this.userLastName.value;
+                sessionStorage.setItem('userInfo', JSON.stringify(this.currentUser));
+                this.snackBar.open(
+                    this.translateService.instant('SETTINGS.INFO.USER_DATA_UPDATED'),
+                    this.translateService.instant('SETTINGS.INFO.DISMISS'),
+                    { duration: 3000 }
+                );
             });
     }
 
@@ -68,30 +74,38 @@ export class SettingsPageComponent implements OnInit {
     }
 
     showInvalidFormMessage() {
-        this.snackBar.open('Incorrect form data!', 'Dismiss', {
-            duration: 5000,
-        });
+        this.snackBar.open(
+            this.translateService.instant('SETTINGS.INFO.INCORRECT_DATA'),
+            this.translateService.instant('SETTINGS.INFO.DISMISS'),
+            { duration: 5000 }
+        );
     }
 
     getUserFirstNameErrorMessage() {
-        return this.userFirstName.hasError('required') ? 'First name is required!' : '';
+        return this.userFirstName.hasError('required')
+            ? this.translateService.instant('SETTINGS.VALIDATION.FIRST_NAME') : '';
     }
 
     getUserLastNameErrorMessage() {
-        return this.userLastName.hasError('required') ? 'Last name is required!' : '';
+        return this.userLastName.hasError('required')
+            ? this.translateService.instant('SETTINGS.VALIDATION.LAST_NAME') : '';
     }
 
     getUserEmailErrorMessage() {
-        return this.userEmail.hasError('required') ? 'E-mail address is required!' :
-            this.userEmail.hasError('email') ? 'Incorrect e-mail address' : '';
+        return this.userEmail.hasError('required')
+            ? this.translateService.instant('SETTINGS.VALIDATION.EMAIL_REQUIRED') :
+            this.userEmail.hasError('email')
+                ? this.translateService.instant('SETTINGS.VALIDATION.INCORRECt_EMAIL') : '';
     }
 
     getUserPasswordErrorMessage() {
-        return this.userPassword.hasError('required') ? 'Password is required!' : '';
+        return this.userPassword.hasError('required')
+            ? this.translateService.instant('SETTINGS.VALIDATION.PASSWORD') : '';
     }
 
     getUserPasswordConfirmationErrorMessage() {
-        return this.userPasswordConfirmation.hasError('required') ? 'Password confirmation is required!' : '';
+        return this.userPasswordConfirmation.hasError('required')
+            ? this.translateService.instant('SETTINGS.VALIDATION.PASSWORD_CONFIRM') : '';
     }
 
 }
