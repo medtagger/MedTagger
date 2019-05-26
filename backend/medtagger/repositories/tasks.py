@@ -86,8 +86,8 @@ def unassign_label_tag(tag: LabelTag, task_key: str) -> None:
         session.add(task)
 
 
-def update(task_key: str, description: str = None, label_examples: List[str] = None, name: str = None,
-           image_path: str = None, datasets_keys: List[str] = None) -> Task:
+def update(task_key: str, name: str = None, image_path: str = None, datasets_keys: List[str] = None,
+           description: str = None, label_examples: List[str] = None) -> Task:
     """Update Datasets where this Task will be available.
 
     :param task_key: key that will identify such Task

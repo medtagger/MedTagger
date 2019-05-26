@@ -79,7 +79,7 @@ def _sync_tasks(configuration: Dict) -> None:
         name: Kidneys segmentation
         image_path: assets/icon/kidneys_dataset_icon.svg
         description: Task description
-        label_examples: [assets/example_1, assets/example_2]
+        label_examples: ['assets/example_1', 'assets/example_2']
         tags:
           - key: LEFT_KIDNEY
             name: Left Kidney
@@ -117,7 +117,8 @@ def _sync_tasks(configuration: Dict) -> None:
         _sync_label_tags_in_task(configuration, task_key)
         task = next(task for task in tasks if task['key'] == task_key)
         datasets_keys = [dataset['key'] for dataset in datasets if task['key'] in dataset['tasks']]
-        TasksRepository.update(task_key, task['name'], task['image_path'], datasets_keys)
+        TasksRepository.update(task_key, task['name'], task['image_path'], datasets_keys, task['description'],
+                               task['label_examples'])
         logger.info('Task enabled: %s', task_key)
 
     # Disable all Tasks that exists in the DB but are missing in configuration file
