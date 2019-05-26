@@ -1,5 +1,4 @@
 """Module responsible for business logic in all Tasks endpoints."""
-# pylint: disable-msg=too-many-arguments
 from typing import List
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -30,6 +29,7 @@ def get_task_for_key(task_key: str) -> Task:
         raise NotFoundException('Did not found task for {} key!'.format(task_key))
 
 
+# pylint: disable-msg=too-many-arguments
 def create_task(key: str, name: str, image_path: str, datasets_keys: List[str], description: str,
                 label_examples: List[str], tags: List[LabelTag]) -> Task:
     """Create new Task.

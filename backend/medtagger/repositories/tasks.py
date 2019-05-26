@@ -1,5 +1,4 @@
 """Module responsible for definition of TaskRepository."""
-# pylint: disable-msg=too-many-arguments
 from typing import List
 
 from medtagger.database import db_connection_session, db_transaction_session
@@ -26,6 +25,7 @@ def get_task_by_key(key: str) -> Task:
     return task
 
 
+# pylint: disable-msg=too-many-arguments
 def add_task(key: str, name: str, image_path: str, datasets_keys: List[str], description: str,
              label_examples: List[str], tags: List[LabelTag]) -> Task:
     """Add new Task to the database.
@@ -74,6 +74,7 @@ def unassign_label_tag(tag: LabelTag, task_key: str) -> None:
         session.add(task)
 
 
+# pylint: disable-msg=too-many-arguments
 def update(task_key: str, name: str = None, image_path: str = None, datasets_keys: List[str] = None,
            description: str = None, label_examples: List[str] = None) -> Task:
     """Update Datasets where this Task will be available.
