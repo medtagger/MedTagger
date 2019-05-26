@@ -54,7 +54,7 @@ def test_sync_with_empty_database(prepare_environment: Any) -> None:
     assert kidneys_segmentation.name == 'Kidneys segmentation'
     assert kidneys_segmentation.image_path == 'assets/icon/kidneys_dataset_icon.svg'
     assert kidneys_segmentation.description == 'This is a test task'
-    assert len(kidneys_segmentation.label_examples) == 2
+    assert kidneys_segmentation.label_examples == ['assets/example_1', 'assets/example_2']
     assert not kidneys_segmentation.disabled
     assert len(kidneys_segmentation.available_tags) == 2
     assert {tag.key for tag in kidneys_segmentation.available_tags} == {'LEFT_KIDNEY', 'RIGHT_KIDNEY'}
@@ -142,7 +142,7 @@ def test_sync_with_updated_names(prepare_environment: Any) -> None:
     assert kidneys_segmentation.name == 'New Kidneys segmentation'
     assert kidneys_segmentation.image_path == 'new_assets/icon/kidneys_dataset_icon.svg'
     assert kidneys_segmentation.description == 'This is a test task'
-    assert len(kidneys_segmentation.label_examples) == 2
+    assert kidneys_segmentation.label_examples == ['assets/example_1', 'assets/example_2']
     assert not kidneys_segmentation.disabled
     assert len(kidneys_segmentation.available_tags) == 2
     assert {tag.key for tag in kidneys_segmentation.available_tags} == {'LEFT_KIDNEY', 'RIGHT_KIDNEY'}
@@ -398,7 +398,7 @@ def test_sync_with_changed_task_in_dataset(mocker: Any, prepare_environment: Any
     assert kidneys_segmentation.name == 'New Kidneys segmentation'
     assert kidneys_segmentation.image_path == 'assets/icon/kidneys_dataset_icon.svg'
     assert kidneys_segmentation.description == 'This is a test task'
-    assert len(kidneys_segmentation.label_examples) == 2
+    assert kidneys_segmentation.label_examples == ['assets/example_1', 'assets/example_2']
     assert not kidneys_segmentation.disabled
     assert len(kidneys_segmentation.available_tags) == 1
     assert {tag.key for tag in kidneys_segmentation.available_tags} == {'NEW_LEFT_KIDNEY'}
@@ -479,6 +479,8 @@ def test_sync_with_changed_dataset_and_reused_task(prepare_environment: Any) -> 
     script.sync_configuration(configuration)
 
     # Check if description was synchronized properly
+    datasets = DatasetsRepository.get_all_datasets(include_disabled=True)
+    assert len(datasets) == 1
     kidneys = DatasetsRepository.get_dataset_by_key('KIDNEYS')
     assert kidneys.name == 'Kidneys'
     assert not kidneys.disabled
