@@ -1,4 +1,5 @@
 """Module responsible for definition of TaskRepository."""
+# pylint: disable-msg=too-many-arguments
 from typing import List
 
 from medtagger.database import db_connection_session, db_transaction_session

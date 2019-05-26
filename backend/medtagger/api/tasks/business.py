@@ -1,4 +1,5 @@
 """Module responsible for business logic in all Tasks endpoints."""
+# pylint: disable-msg=too-many-arguments
 from typing import List
 
 from sqlalchemy.orm.exc import NoResultFound
