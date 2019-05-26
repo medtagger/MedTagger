@@ -167,7 +167,7 @@ class Task(Base):
 
     @property
     def number_of_available_scans(self) -> int:
-        """Returns a number of available Scans for this Task."""
+        """Return a number of available Scans for this Task."""
         datasets_ids = [dataset.id for dataset in self.datasets]
         number_of_scans = Scan.query.filter(and_(
             Scan.dataset_id.in_(datasets_ids),

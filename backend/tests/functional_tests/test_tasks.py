@@ -3,9 +3,8 @@ import glob
 import json
 from typing import Any
 
-
 from medtagger.repositories import (
-    datasets as DatasetsRepository
+    datasets as DatasetsRepository,
 )
 
 from tests.functional_tests import get_api_client, get_headers
