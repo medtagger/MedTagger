@@ -61,18 +61,3 @@ class Task(Resource):
     def get(task_key: str) -> Any:
         """Return task for given key."""
         return business.get_task_for_key(task_key)
-
-
-@tasks_ns.route('/<string:task_key>/metadata')
-class TaskMetadata(Resource):
-    """Endpoint that manages single task metadata."""
-
-    @staticmethod
-    @login_required
-    @tasks_ns.marshal_with(serializers.out__task_metadata)
-    @tasks_ns.doc(security='token')
-    @tasks_ns.doc(description='Get task metadata for given key.')
-    @tasks_ns.doc(responses={200: 'Success', 404: 'Could not find task'})
-    def get(task_key: str) -> Any:
-        """Return task metadata for given key."""
-        return business.get_task_metadata_for_key(task_key)

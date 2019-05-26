@@ -106,8 +106,8 @@ def _sync_tasks(configuration: Dict) -> None:
     for task_key in tasks_to_add:
         task = next(task for task in tasks if task['key'] == task_key)
         datasets_keys = [dataset['key'] for dataset in datasets if task['key'] in dataset['tasks']]
-        TasksRepository.add_task(task['key'], task['name'], task['image_path'], datasets_keys, task["description"],
-                                 task["label_examples"], [])
+        TasksRepository.add_task(task['key'], task['name'], task['image_path'], datasets_keys,
+                                 task.get('description', ''), task.get("label_examples", []), [])
         _sync_label_tags_in_task(configuration, task_key)
         logger.info('New Task added: %s', task['key'])
 

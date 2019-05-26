@@ -8,7 +8,6 @@ from medtagger.database.models import Task, LabelTag
 from medtagger.repositories import (
     tasks as TasksRepository,
 )
-from medtagger.types import TaskMetadata
 
 
 def get_tasks() -> List[Task]:
@@ -26,17 +25,6 @@ def get_task_for_key(task_key: str) -> Task:
     """
     try:
         return TasksRepository.get_task_by_key(task_key)
-    except NoResultFound:
-        raise NotFoundException('Did not found task for {} key!'.format(task_key))
-
-
-def get_task_metadata_for_key(task_key: str) -> TaskMetadata:
-    """Fetch Task metadata for given key.
-
-    :return: TaskMetadata
-    """
-    try:
-        return TasksRepository.get_task_metadata_by_key(task_key)._asdict()
     except NoResultFound:
         raise NotFoundException('Did not found task for {} key!'.format(task_key))
 

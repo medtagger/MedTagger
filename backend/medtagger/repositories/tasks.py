@@ -4,7 +4,6 @@ from typing import List
 from medtagger.database import db_connection_session, db_transaction_session
 from medtagger.database.models import Task, LabelTag, Dataset
 from medtagger.exceptions import InternalErrorException
-from medtagger.types import TaskMetadata
 
 
 def get_all_tasks(include_disabled: bool = False) -> List[Task]:
@@ -24,18 +23,6 @@ def get_task_by_key(key: str) -> Task:
     with db_connection_session() as session:
         task = session.query(Task).filter(Task.key == key).first()
     return task
-
-
-def get_task_metadata_by_key(key: str) -> TaskMetadata:
-    """Fetch Task metadata database.
-
-    :param key: key for a Task
-    :return: Task metadata object
-    """
-    with db_connection_session() as session:
-        task = session.query(Task).filter(Task.key == key).first()
-    return TaskMetadata(key=task.key, name=task.name, description=task.description, label_examples=task.label_examples,
-                        number_of_available_scans=task.number_of_available_scans)
 
 
 def add_task(key: str, name: str, image_path: str, datasets_keys: List[str], description: str,

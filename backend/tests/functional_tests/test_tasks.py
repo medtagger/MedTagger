@@ -46,6 +46,9 @@ def test_add_task(prepare_environment: Any) -> None:
     assert json_response['key'] == 'MARK_NODULES'
     assert json_response['name'] == 'Mark nodules'
     assert json_response['image_path'] == 'assets/icon/my_icon.svg'
+    assert json_response['number_of_available_scans'] == 0
+    assert len(json_response['label_examples']) == 2
+    assert json_response['description'] == 'This task will focus on tagging nodules.'
     assert len(json_response['tags']) == 2
     assert len(json_response['datasets_keys']) == 2
 
@@ -68,7 +71,7 @@ def test_add_task(prepare_environment: Any) -> None:
         assert response.status_code == 201
 
     # Step 4. Check for Task metadata through the REST API
-    response = api_client.get('/api/v1/tasks/MARK_NODULES/metadata', headers=get_headers(token=user_token, json=True))
+    response = api_client.get('/api/v1/tasks/MARK_NODULES', headers=get_headers(token=user_token, json=True))
     assert response.status_code == 200
     json_response = json.loads(response.data)
     assert isinstance(json_response, dict)
