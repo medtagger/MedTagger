@@ -414,7 +414,7 @@ export class MarkerPageComponent implements OnInit {
             });
     }
 
-    private hasTaskDescription(): boolean {
+    public hasTaskDescription(): boolean {
         return !!this.taskDescription;
     }
 
