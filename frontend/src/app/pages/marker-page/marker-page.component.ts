@@ -56,8 +56,8 @@ export class MarkerPageComponent implements OnInit {
     @ViewChild('timer')
     public taskTimer: ElementRef;
     public currentTime: string;
-    private taskStatus: TaskStatus;
-    private taskDescription: TaskDescription;
+    public taskStatus: TaskStatus;
+    public taskDescription: TaskDescription;
     public taskDescriptionPanelActive = false;
     public task: Task;
 

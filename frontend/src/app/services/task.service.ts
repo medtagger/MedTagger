@@ -79,7 +79,7 @@ export class TaskService {
     private getTaskFromResponse(response: TaskResponse): Task {
         const tags = response.tags.map(tag => new LabelTag(tag.key, tag.name, tag.tools));
 
-        //Dev only
+        // Dev only
         response.number_of_available_scans = 5;
         // tslint:disable-next-line: max-line-length
         response.description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent scelerisque nulla non laoreet eleifend. Quisque gravida sem sit amet quam consequat malesuada. Nunc tellus nisl, euismod et augue efficitur, egestas sollicitudin neque. Etiam convallis, diam quis convallis posuere, dolor mi blandit ante, ut blandit diam orci quis dolor. Morbi tellus felis, blandit et lorem ac, hendrerit luctus risus. Cras sodales urna ultricies est dignissim tempor. Sed at velit ac odio lacinia dignissim sit amet.';
