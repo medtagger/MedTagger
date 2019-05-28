@@ -18,7 +18,7 @@ import { ScanMetadata } from '../../model/ScanMetadata';
 import { Selection3D } from '../../model/selections/Selection3D';
 import { SliceSelection } from '../../model/selections/SliceSelection';
 import { SliceRequest } from '../../model/SliceRequest';
-import { Task } from '../../model/Task';
+import { Task } from '../../model/task/Task';
 import { ToolAction, ToolActionType } from '../../model/ToolAction';
 import { DialogService } from '../../services/dialog.service';
 import { LabelService } from '../../services/label.service';
@@ -27,8 +27,8 @@ import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
 import { MarkerZoomHandler } from '../../model/MarkerZoomHandler';
 import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
-import { Operation, TaskStatus } from '../../model/TaskStatus';
-import { TaskDescription } from '../../model/TaskDescription';
+import { Operation, TaskStatus } from '../../model/task/TaskStatus';
+import { TaskDescription } from '../../model/task/TaskDescription';
 import { FormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -45,6 +45,8 @@ export class MarkerPageComponent implements OnInit {
     private static readonly DEFAULT_COLOR_WINDOW_CENTER = 128;
     private static readonly HOME_PAGE = '/' + HOME;
 
+    ActionType = ToolActionType;
+
     @ViewChild(MarkerComponent) marker: MarkerComponent;
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
@@ -53,13 +55,16 @@ export class MarkerPageComponent implements OnInit {
 
     @ViewChild('timer')
     public taskTimer: ElementRef;
-    currentTime: string;
-    taskStatus: TaskStatus;
+    public currentTime: string;
+    private taskStatus: TaskStatus;
+    private taskDescription: TaskDescription;
+    public taskDescriptionPanelActive = false;
+    public task: Task;
+
     tooltipShowDelay = new FormControl(1000);
 
     selections: List<SliceSelection> = List();
     scan: ScanMetadata;
-    task: Task;
     startTime: Date;
     tools: List<Tool<SliceSelection>>;
     currentTool: Tool<SliceSelection>;
@@ -70,11 +75,6 @@ export class MarkerPageComponent implements OnInit {
     public colorWindowPanelActive = false;
     public colorWindowWidth: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_WIDTH;
     public colorWindowCenter: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_CENTER;
-
-    public taskDescription: TaskDescription;
-    public taskDescriptionPanelActive = false;
-
-    ActionType = ToolActionType;
 
     zoomHandler: MarkerZoomHandler;
 
@@ -106,11 +106,10 @@ export class MarkerPageComponent implements OnInit {
                 (task: Task) => {
                     this.task = task;
 
-                    // TODO: just for testing
-                    this.taskStatus = new TaskStatus(5);
+                    // Dev only
+                    this.taskStatus = task.getStatus();
                     // tslint:disable-next-line: max-line-length
-                    this.taskDescription = new TaskDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent scelerisque nulla non laoreet eleifend. Quisque gravida sem sit amet quam consequat malesuada. Nunc tellus nisl, euismod et augue efficitur, egestas sollicitudin neque. Etiam convallis, diam quis convallis posuere, dolor mi blandit ante, ut blandit diam orci quis dolor. Morbi tellus felis, blandit et lorem ac, hendrerit luctus risus. Cras sodales urna ultricies est dignissim tempor. Sed at velit ac odio lacinia dignissim sit amet.',
-                     new Array('../../../assets/img/login_pic.jpg', '../../../assets/img/login_pic.jpg'));
+                    this.taskDescription = task.getDescription();
 
                     this.zone.runOutsideAngular(this.printCurrentLabellingTime.bind(this));
 
@@ -400,10 +399,12 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setSliderFocus(false);
         this.dialogService
             .openInputDialog(
-                'Add comment to your label (optional)',
+                this.translateService.instant('MARKER.DIALOG.LABEL_COMMENT.TITLE'),
                 '',
                 this.labelComment,
-                this.labelComment ? 'Save comment' : 'Add comment'
+                this.labelComment
+                    ? this.translateService.instant('MARKER.DIALOG.LABEL_COMMENT.BUTTON_SAVE')
+                    : this.translateService.instant('MARKER.DIALOG.LABEL_COMMENT.BUTTON_ADD')
             )
             .afterClosed()
             .subscribe(comment => {

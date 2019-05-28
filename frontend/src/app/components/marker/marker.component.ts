@@ -7,7 +7,7 @@ import { Tool } from '../tools/Tool';
 import { DrawingContext } from './../tools/DrawingContext';
 import { List } from 'immutable';
 import { TranslateService } from '@ngx-translate/core';
-import { Operation } from '../../model/TaskStatus';
+import { Operation } from '../../model/task/TaskStatus';
 
 @Component({
     selector: 'app-marker-component',

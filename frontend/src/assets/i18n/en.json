@@ -95,6 +95,11 @@
                 "CONTENT": "There are no selections for some of the tags. Are you sure that there are no interesting objects to select for other tags?",
                 "BUTTON_CONFIRM": "Send current selections.",
                 "BUTTON_CANCEL": "Take me back to labeling."
+            },
+            "LABEL_COMMENT": {
+                "TITLE": "Add comment to your label (optional)",
+                "BUTTON_SAVE": "Save comment",
+                "BUTTON_ADD": "Add comment"
             }
         },
         "HEADER": {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Task } from '../model/Task';
+import { Task } from '../model/task/Task';
 import { HttpClient } from '@angular/common/http';
 import { LabelTag } from '../model/labels/LabelTag';
 import { isUndefined } from 'util';
@@ -12,9 +12,12 @@ export interface TaskResponse {
     image_path: string;
     tags: Array<LabelTagResponse>;
     datasets_keys: Array<string>;
+    number_of_available_scans: number;
+    description: string;
+    label_examples: Array<string>;
 }
 
-interface LabelTagResponse {
+export interface LabelTagResponse {
     key: string;
     name: string;
     actions_ids: Array<number>;
@@ -26,8 +29,7 @@ export class TaskService {
 
     private tasks: Array<Task> = [];
 
-    constructor(private http: HttpClient) {
-    }
+    constructor(private http: HttpClient) {}
 
     getTask(taskKey: string): Promise<Task> {
         if (isUndefined(taskKey)) {
@@ -76,7 +78,13 @@ export class TaskService {
 
     private getTaskFromResponse(response: TaskResponse): Task {
         const tags = response.tags.map(tag => new LabelTag(tag.key, tag.name, tag.tools));
-        return new Task(response.task_id, response.key, response.name, response.image_path, tags,
-            response.datasets_keys);
+
+        //Dev only
+        response.number_of_available_scans = 5;
+        // tslint:disable-next-line: max-line-length
+        response.description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent scelerisque nulla non laoreet eleifend. Quisque gravida sem sit amet quam consequat malesuada. Nunc tellus nisl, euismod et augue efficitur, egestas sollicitudin neque. Etiam convallis, diam quis convallis posuere, dolor mi blandit ante, ut blandit diam orci quis dolor. Morbi tellus felis, blandit et lorem ac, hendrerit luctus risus. Cras sodales urna ultricies est dignissim tempor. Sed at velit ac odio lacinia dignissim sit amet.';
+        response.label_examples = ['../../../assets/img/login_pic.jpg', '../../../assets/img/login_pic.jpg'];
+
+        return new Task(response, tags);
     }
 }

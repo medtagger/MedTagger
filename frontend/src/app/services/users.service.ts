@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { UserInfo } from '../model/UserInfo';
+import { UserInfo } from '../model/user/UserInfo';
 import { environment } from '../../environments/environment';
-import { UserSettings } from '../model/UserSettings';
+import { UserSettings } from '../model/user/UserSettings';
 import { API_URL } from '../utils/ApiUrl';
 
 interface AllUsersResponse {
@@ -11,8 +11,7 @@ interface AllUsersResponse {
 
 @Injectable()
 export class UsersService {
-    constructor(private http: HttpClient) {
-    }
+    constructor(private http: HttpClient) {}
 
     public getAllUsers(): Promise<Array<UserInfo>> {
         const url = environment.API_URL + API_URL.USERS;

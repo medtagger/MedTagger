@@ -14,7 +14,6 @@ import { concat, delay, map, mergeAll, retryWhen, take } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { from } from 'rxjs/internal/observable/from';
 import { defer } from 'rxjs/internal/observable/defer';
-import { TaskResponse } from './task.service';
 import { isUndefined } from 'util';
 import { PredefinedBrushLabelElement } from '../model/PredefinedBrushLabelElement';
 
@@ -25,18 +24,6 @@ interface ScanResponse {
     width: number;
     height: number;
     predefined_label_id: string;
-}
-
-interface AvailableDatasetResponse {
-    key: string;
-    name: string;
-    tasks: Array<TaskResponse>;
-}
-
-interface LabelTagResponse {
-    key: string;
-    name: string;
-    actions_id: Array<number>;
 }
 
 interface NewScanResponse {

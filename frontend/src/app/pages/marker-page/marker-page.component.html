@@ -103,8 +103,8 @@
                 color="primary"
                 (click)="skipScan()"
                 matTooltip="{{ 'MARKER.TOOLTIPS.SKIP_SCAN' | translate }}"
-                [matTooltipShowDelay]="tooltipShowDelay.value">
-                [disabled]="marker.isDownloadingInProgress()"
+                [matTooltipShowDelay]="tooltipShowDelay.value"
+                [disabled]="marker.isDownloadingInProgress()">
                 {{ 'MARKER.NAVBAR.BUTTON.SKIP' | translate }}
             </button>
             <button *ngIf="!selections.isEmpty()"
@@ -122,8 +122,8 @@
                 color="accent"
                 (click)="sendEmptyLabel()"
                 matTooltip="{{ 'MARKER.TOOLTIPS.NO_TAG' | translate }}"
-                [matTooltipShowDelay]="tooltipShowDelay.value">
-                [disabled]="marker.isDownloadingInProgress()"
+                [matTooltipShowDelay]="tooltipShowDelay.value"
+                [disabled]="marker.isDownloadingInProgress()">
                 {{ 'MARKER.NAVBAR.BUTTON.NO_TAG' | translate }}
             </button>
         </div>

@@ -3,16 +3,41 @@ import { HttpClientModule, HttpRequest } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { environment } from '../../environments/environment';
 import { API_URL } from '../utils/ApiUrl';
-import { Task } from '../model/Task';
+import { Task } from '../model/task/Task';
 import { LabelService, RandomLabelResponse } from './label.service';
 import { LabelTag } from '../model/labels/LabelTag';
 import { Label } from '../model/labels/Label';
 import { RectangleSelection } from '../model/selections/RectangleSelection';
+import { TaskResponse, LabelTagResponse } from './task.service';
 
 describe('Service: LabelService', () => {
-    const EXAMPLE_TASK = new Task(1, 'EXAMPLE_TASK', 'Example Task', 'image.jpg', [
-        new LabelTag('LEFT_NODULE', 'Left Nodule', ['RECTANGLE'])
-    ], ['LUNGS']);
+
+    const EXAMPLE_LABEL_RESPONSE: LabelTagResponse = {
+        key: 'LEFT_NODULE',
+        name: 'Left Nodule',
+        actions_ids: [1],
+        tools: ['RECTANGLE']
+    };
+
+    const EXAMPLE_TASK_RESPONSE: TaskResponse = {
+        task_id: 1,
+        key: 'EXAMPLE_TASK',
+        name: 'Example',
+        image_path: 'image.jpg',
+        tags: [EXAMPLE_LABEL_RESPONSE],
+        datasets_keys: ['LUNGS'],
+        number_of_available_scans: 10,
+        description: 'Lorem ipsum dolor sit amet, consectetur cras amet.',
+        label_examples: ['example1.png', 'example2.png']
+    };
+
+    const EXAMPLE_LABEL_TAG = new LabelTag(
+        EXAMPLE_LABEL_RESPONSE.key,
+        EXAMPLE_LABEL_RESPONSE.name,
+        EXAMPLE_LABEL_RESPONSE.tools
+    );
+
+    const EXAMPLE_TASK = new Task(EXAMPLE_TASK_RESPONSE, [EXAMPLE_LABEL_TAG]);
 
     const EXAMPLE_RANDOM_LABEL_RESPONSE: RandomLabelResponse = {
         label_id: 'label-hash',

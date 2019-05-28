@@ -2,8 +2,8 @@ import { async, inject, TestBed } from '@angular/core/testing';
 import { HttpClientModule, HttpRequest } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { UsersService } from './users.service';
-import { UserSettings } from '../model/UserSettings';
-import { UserInfo } from '../model/UserInfo';
+import { UserSettings } from '../model/user/UserSettings';
+import { UserInfo } from '../model/user/UserInfo';
 import { environment } from '../../environments/environment';
 import { API_URL } from '../utils/ApiUrl';
 

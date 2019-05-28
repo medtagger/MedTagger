@@ -15,24 +15,39 @@ export enum Operation {
 }
 
 export class TaskStatus {
-
-    public labellingTime: number;
-    private scansToLabel: number;
-    private currentProgress: number;
-    private operation: Operation;
+    private _labellingTime: number;
+    private _scansToLabel: number;
+    private _currentProgress: number;
+    private _operation: Operation;
 
     constructor(scansToLabel: number) {
-        this.labellingTime = Date.now();
-        this.scansToLabel = scansToLabel;
-        this.currentProgress = 1;
-        this.operation = Operation.WAITING;
+        this._labellingTime = Date.now();
+        this._scansToLabel = scansToLabel;
+        this._currentProgress = 1;
+        this._operation = Operation.WAITING;
+    }
+
+    public get labellingTime(): number {
+        return this._labellingTime;
+    }
+
+    public get scansToLabel(): number {
+        return this._scansToLabel;
+    }
+
+    public get currentProgress(): number {
+        return this._currentProgress;
+    }
+
+    public get operation(): Operation {
+        return this._operation;
     }
 
     public changeStatusOperation(operation: Operation) {
-        this.operation = operation;
+        this._operation = operation;
     }
 
     public updateProgress() {
-        this.currentProgress++;
+        this._currentProgress++;
     }
 }

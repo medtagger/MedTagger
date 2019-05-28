@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { UserInfo } from '../model/UserInfo';
+import { UserInfo } from '../model/user/UserInfo';
 import { HttpClient } from '@angular/common/http';
 
 export interface RegisterResponse {

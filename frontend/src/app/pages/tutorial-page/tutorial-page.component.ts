@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from '../../services/users.service';
-import { UserInfo } from '../../model/UserInfo';
-import { UserSettings } from '../../model/UserSettings';
+import { UserInfo } from '../../model/user/UserInfo';
+import { UserSettings } from '../../model/user/UserSettings';
 import * as appRoutes from '../../constants/routes';
 
 @Component({
