@@ -144,7 +144,7 @@ export class MarkerPageComponent implements OnInit {
                                 if (this.marker.downloadingSlicesInProgress === false) {
                                     this.scanService.requestSlices(this.scan.scanId, this.task.key, sliceRequest, count, reversed);
                                     this.marker.setDownloadSlicesInProgress(true);
-                                    this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_SLICES);
+                                    this.changeTaskStatus(Operation.DOWNLOADING_SLICES);
                                 }
                             });
                         }
@@ -152,7 +152,7 @@ export class MarkerPageComponent implements OnInit {
                 },
                 (_: Error) => {
                     if (!this.task) {
-                        this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_ERROR);
+                        this.changeTaskStatus(Operation.DOWNLOADING_ERROR);
                         this.dialogService
                             .openTranslatedInfoDialog('MARKER.DIALOG.NO_TASK')
                             .afterClosed()
@@ -179,7 +179,7 @@ export class MarkerPageComponent implements OnInit {
                 }
                 this.marker.setDownloadSlicesInProgress(false);
                 this.marker.setDownloadScanInProgress(false);
-                this.taskStatus.changeStatusOperation(Operation.WAITING);
+                this.changeTaskStatus(Operation.WAITING);
             }
         });
 
@@ -200,6 +200,12 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setZoomHandler(this.zoomHandler);
     }
 
+    private changeTaskStatus(operation: Operation) {
+        if (!!this.taskStatus) {
+            this.taskStatus.changeStatusOperation(operation);
+        }
+    }
+
     private printCurrentLabellingTime() {
         setInterval(() => {
             if (!!this.taskStatus) {
@@ -215,7 +221,9 @@ export class MarkerPageComponent implements OnInit {
     }
 
     onStatusChange(eventOperation: Operation) {
-        this.taskStatus.changeStatusOperation(eventOperation);
+        if (!!this.taskStatus) {
+            this.taskStatus.changeStatusOperation(eventOperation);
+        }
     }
 
     public zoomIn(): void {
@@ -233,7 +241,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_SCAN);
+        this.changeTaskStatus(Operation.DOWNLOADING_SCAN);
         this.scanService.getRandomScan(this.task.key).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -271,7 +279,7 @@ export class MarkerPageComponent implements OnInit {
 
     public nextScan(): void {
         this.marker.setDownloadScanInProgress(true);
-        this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_SCAN);
+        this.changeTaskStatus(Operation.DOWNLOADING_SCAN);
         this.labelComment = '';
         this.selections = List();
         this.currentTool = undefined;
@@ -335,8 +343,8 @@ export class MarkerPageComponent implements OnInit {
 
     private sendSelection(selection3d: Selection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
-        this.taskStatus.changeStatusOperation(Operation.SENDING_SELECTION);
-        this.taskStatus.updateProgress();
+        this.changeTaskStatus(Operation.SENDING_SELECTION);
+        this.updateTaskProgress();
 
         this.scanService
             .sendSelection(this.scan.scanId, this.task.key, selection3d, labelingTime, comment)
@@ -346,9 +354,15 @@ export class MarkerPageComponent implements OnInit {
                 this.nextScan();
             })
             .catch((errorResponse: Error) => {
-                this.taskStatus.changeStatusOperation(Operation.DOWNLOADING_ERROR);
+                this.changeTaskStatus(Operation.DOWNLOADING_ERROR);
                 this.dialogService.openTranslatedInfoDialog('MARKER.DIALOG.SEND_ERROR');
             });
+    }
+
+    private updateTaskProgress() {
+        if (!!this.taskStatus) {
+            this.taskStatus.updateProgress();
+        }
     }
 
     private getLabelingTimeInSeconds(startTime: Date): number {
