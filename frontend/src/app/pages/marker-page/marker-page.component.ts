@@ -1,5 +1,5 @@
 import { List } from 'immutable';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, NgZone, Renderer2 } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LabelExplorerComponent } from '../../components/label-explorer/label-explorer.component';
@@ -18,7 +18,7 @@ import { ScanMetadata } from '../../model/ScanMetadata';
 import { Selection3D } from '../../model/selections/Selection3D';
 import { SliceSelection } from '../../model/selections/SliceSelection';
 import { SliceRequest } from '../../model/SliceRequest';
-import { Task } from '../../model/Task';
+import { Task } from '../../model/task/Task';
 import { ToolAction, ToolActionType } from '../../model/ToolAction';
 import { DialogService } from '../../services/dialog.service';
 import { LabelService } from '../../services/label.service';
@@ -26,8 +26,12 @@ import { ScanService } from '../../services/scan.service';
 import { TaskService } from '../../services/task.service';
 import { BrushSelection } from './../../model/selections/BrushSelection';
 import { MarkerZoomHandler } from '../../model/MarkerZoomHandler';
+import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
+import { Operation, TaskStatus } from '../../model/task/TaskStatus';
+import { TaskDescription } from '../../model/task/TaskDescription';
 import { FormControl } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+
 
 @Component({
     selector: 'app-marker-page',
@@ -41,15 +45,26 @@ export class MarkerPageComponent implements OnInit {
     private static readonly DEFAULT_COLOR_WINDOW_CENTER = 128;
     private static readonly HOME_PAGE = '/' + HOME;
 
+    ActionType = ToolActionType;
+
     @ViewChild(MarkerComponent) marker: MarkerComponent;
 
     @ViewChild(LabelExplorerComponent) labelExplorer: LabelExplorerComponent;
+
+    @ViewChild(NavBarComponent) navBar: NavBarComponent;
+
+    @ViewChild('timer')
+    public taskTimer: ElementRef;
+    public currentTime: string;
+    public taskStatus: TaskStatus;
+    public taskDescription: TaskDescription;
+    public taskDescriptionPanelActive = false;
+    public task: Task;
 
     tooltipShowDelay = new FormControl(1000);
 
     selections: List<SliceSelection> = List();
     scan: ScanMetadata;
-    task: Task;
     startTime: Date;
     tools: List<Tool<SliceSelection>>;
     currentTool: Tool<SliceSelection>;
@@ -61,8 +76,6 @@ export class MarkerPageComponent implements OnInit {
     public colorWindowWidth: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_WIDTH;
     public colorWindowCenter: number = MarkerPageComponent.DEFAULT_COLOR_WINDOW_CENTER;
 
-    ActionType = ToolActionType;
-
     zoomHandler: MarkerZoomHandler;
 
     constructor(
@@ -73,6 +86,8 @@ export class MarkerPageComponent implements OnInit {
         private snackBar: MatSnackBar,
         private taskService: TaskService,
         private labelService: LabelService,
+        private zone: NgZone,
+        private renderer: Renderer2,
         private translateService: TranslateService
     ) {
         console.log('MarkerPage constructor', this.marker);
@@ -90,6 +105,10 @@ export class MarkerPageComponent implements OnInit {
             this.taskService.getTask(taskKey).then(
                 (task: Task) => {
                     this.task = task;
+                    this.taskStatus = task.getStatus();
+                    this.taskDescription = task.getDescription();
+
+                    this.zone.runOutsideAngular(this.printCurrentLabellingTime.bind(this));
 
                     if (this.task.tags.length === 0) {
                         this.dialogService
@@ -125,6 +144,7 @@ export class MarkerPageComponent implements OnInit {
                                 if (this.marker.downloadingSlicesInProgress === false) {
                                     this.scanService.requestSlices(this.scan.scanId, this.task.key, sliceRequest, count, reversed);
                                     this.marker.setDownloadSlicesInProgress(true);
+                                    this.changeTaskStatus(Operation.DOWNLOADING_SLICES);
                                 }
                             });
                         }
@@ -132,6 +152,7 @@ export class MarkerPageComponent implements OnInit {
                 },
                 (_: Error) => {
                     if (!this.task) {
+                        this.changeTaskStatus(Operation.DOWNLOADING_ERROR);
                         this.dialogService
                             .openTranslatedInfoDialog('MARKER.DIALOG.NO_TASK')
                             .afterClosed()
@@ -158,6 +179,7 @@ export class MarkerPageComponent implements OnInit {
                 }
                 this.marker.setDownloadSlicesInProgress(false);
                 this.marker.setDownloadScanInProgress(false);
+                this.changeTaskStatus(Operation.WAITING);
             }
         });
 
@@ -178,6 +200,32 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setZoomHandler(this.zoomHandler);
     }
 
+    private changeTaskStatus(operation: Operation) {
+        if (!!this.taskStatus) {
+            this.taskStatus.changeStatusOperation(operation);
+        }
+    }
+
+    private printCurrentLabellingTime() {
+        setInterval(() => {
+            if (!!this.taskStatus) {
+                const newTime = new Date(Date.now() - this.taskStatus.labellingTime);
+                const minutes = newTime.getMinutes();
+                const seconds = newTime.getSeconds();
+
+                this.currentTime = `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+
+                this.renderer.setProperty(this.taskTimer.nativeElement, 'textContent', this.currentTime);
+            }
+        }, 1000);
+    }
+
+    onStatusChange(eventOperation: Operation) {
+        if (!!this.taskStatus) {
+            this.taskStatus.changeStatusOperation(eventOperation);
+        }
+    }
+
     public zoomIn(): void {
         this.marker.scale = this.zoomHandler.zoomIn();
         this.snackBar.open(this.translateService.instant('MARKER.ZOOM_INFO'), '', { duration: 3000 });
@@ -193,6 +241,7 @@ export class MarkerPageComponent implements OnInit {
 
     private requestScan(): void {
         this.marker.setDownloadScanInProgress(true);
+        this.changeTaskStatus(Operation.DOWNLOADING_SCAN);
         this.scanService.getRandomScan(this.task.key).then(
             (scan: ScanMetadata) => {
                 this.scan = scan;
@@ -230,6 +279,7 @@ export class MarkerPageComponent implements OnInit {
 
     public nextScan(): void {
         this.marker.setDownloadScanInProgress(true);
+        this.changeTaskStatus(Operation.DOWNLOADING_SCAN);
         this.labelComment = '';
         this.selections = List();
         this.currentTool = undefined;
@@ -293,6 +343,8 @@ export class MarkerPageComponent implements OnInit {
 
     private sendSelection(selection3d: Selection3D, comment: string) {
         const labelingTime = this.getLabelingTimeInSeconds(this.startTime);
+        this.changeTaskStatus(Operation.SENDING_SELECTION);
+        this.updateTaskProgress();
 
         this.scanService
             .sendSelection(this.scan.scanId, this.task.key, selection3d, labelingTime, comment)
@@ -302,8 +354,15 @@ export class MarkerPageComponent implements OnInit {
                 this.nextScan();
             })
             .catch((errorResponse: Error) => {
+                this.changeTaskStatus(Operation.DOWNLOADING_ERROR);
                 this.dialogService.openTranslatedInfoDialog('MARKER.DIALOG.SEND_ERROR');
             });
+    }
+
+    private updateTaskProgress() {
+        if (!!this.taskStatus) {
+            this.taskStatus.updateProgress();
+        }
     }
 
     private getLabelingTimeInSeconds(startTime: Date): number {
@@ -351,10 +410,12 @@ export class MarkerPageComponent implements OnInit {
         this.marker.setSliderFocus(false);
         this.dialogService
             .openInputDialog(
-                'Add comment to your label (optional)',
+                this.translateService.instant('MARKER.DIALOG.LABEL_COMMENT.TITLE'),
                 '',
                 this.labelComment,
-                this.labelComment ? 'Save comment' : 'Add comment'
+                this.labelComment
+                    ? this.translateService.instant('MARKER.DIALOG.LABEL_COMMENT.BUTTON_SAVE')
+                    : this.translateService.instant('MARKER.DIALOG.LABEL_COMMENT.BUTTON_ADD')
             )
             .afterClosed()
             .subscribe(comment => {
@@ -363,6 +424,14 @@ export class MarkerPageComponent implements OnInit {
                 }
                 this.marker.setSliderFocus(true);
             });
+    }
+
+    public hasTaskDescription(): boolean {
+        return !!this.taskDescription;
+    }
+
+    public toggleTaskDescriptionPanel(): void {
+        this.taskDescriptionPanelActive = !this.taskDescriptionPanelActive;
     }
 
     public toggleColorWindowPanel(): void {

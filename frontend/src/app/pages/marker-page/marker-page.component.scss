@@ -58,6 +58,54 @@ $toolbox-width: 300px;
     }
 }
 
+
+.task-description-panel {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    transform:translateY(60%);
+    right: 250px;
+    height: 30px;
+
+    &--button {
+        margin-right: 10px;
+    }
+
+    &--card {
+        width: 700px;
+        
+        &__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+
+            .mat-card-header-text {
+                margin: 0 0 0 0;
+            }
+        }
+
+        &__content {
+            display: flex;
+            flex-direction: column;
+
+            &__info {
+                padding-bottom: 20px;
+            }
+
+            &__image_group {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            &__image {
+                width: 320px;
+                padding: 5px 5px 5px 5px;
+            }
+        }
+    }
+}
+
 .marker {
     @include media-breakpoint-up(md){
         display: flex;
@@ -71,6 +119,11 @@ $toolbox-width: 300px;
         display: flex;
         align-items: center;
         height: 100%;
+
+        &--task-bar {
+            margin-left: 10px;
+            border-right: 1px solid color('white', medium) ;
+        }
 
         &--actions {
             display: flex;
@@ -98,6 +151,16 @@ $toolbox-width: 300px;
         height: inherit;
         flex-direction: column;
         background-color: color('card');
+
+        &--status_bar {
+            display: flex;
+            flex-direction: column;
+            background-color: whitesmoke;
+
+            b {
+                padding-right: 5px;
+            }
+        }
 
         &--header {
             padding: 0.6em 0.8em;

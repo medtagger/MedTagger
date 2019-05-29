@@ -1,4 +1,4 @@
-import {BinaryConverter} from '../utils/BinaryConverter';
+import { BinaryConverter } from '../utils/BinaryConverter';
 
 export class PredefinedBrushLabelElement {
     private readonly _scan_id: string;

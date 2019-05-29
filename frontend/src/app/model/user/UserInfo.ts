@@ -1,4 +1,4 @@
-import {UserSettings} from './UserSettings';
+import { UserSettings } from './UserSettings';
 
 export class UserInfo {
     public id: number;

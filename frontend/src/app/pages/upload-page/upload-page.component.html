@@ -16,7 +16,7 @@
                                 <mat-select placeholder="{{ 'UPLOAD.DATASET.PLACEHOLDER' | translate }}" formControlName="dataset" required data-cy="datasets">
                                     <mat-option *ngFor="let availableDataset of availableDatasets"
                                                 [value]="availableDataset.key">
-                                        {{availableDataset.name}}
+                                        {{ availableDataset.name }}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
@@ -108,7 +108,7 @@
                                     <mat-list dense>
                                         <mat-list-item class="incompatible-file" *ngFor="let incompatibleFile of incompatibleFiles">
                                             <mat-icon matListIcon>attachment</mat-icon>
-                                            <span matLine>{{incompatibleFile.file.name}}</span>
+                                            <span matLine>{{ incompatibleFile.file.name }}</span>
                                             <mat-icon [matTooltip]="incompatibleFile.reason">info_outline</mat-icon>
                                         </mat-list-item>
                                     </mat-list>
@@ -142,9 +142,9 @@
                                 <mat-list dense>
                                     <mat-list-item *ngFor="let selectedScan of scans">
                                         <mat-icon matListIcon>recent_actors</mat-icon>
-                                        <p class="scan-directory" matLine>{{selectedScan.directory}}</p>
+                                        <p class="scan-directory" matLine>{{ selectedScan.directory }}</p>
                                         <span class="scan-status" matTooltip="{{selectedScan.predefinedLabelsTasks.join(', ')}}">
-                                            {{selectedScan.predefinedLabels.length}} {{ 'UPLOAD.PREFEDINED_LABELS' | translate }}
+                                            {{ selectedScan.predefinedLabels.length }} {{ 'UPLOAD.PREFEDINED_LABELS' | translate }}
                                         </span>
                                     </mat-list-item>
                                 </mat-list>
@@ -190,7 +190,7 @@
                                     <mat-list dense>
                                         <mat-list-item class="incompatible-file" *ngFor="let incompatibleFile of incompatibleFiles">
                                             <mat-icon matListIcon>attachment</mat-icon>
-                                            <span matLine>{{incompatibleFile.file.webkitRelativePath}}</span>
+                                            <span matLine>{{ incompatibleFile.file.webkitRelativePath }}</span>
                                             <mat-icon [matTooltip]="incompatibleFile.reason">info_outline</mat-icon>
                                         </mat-list-item>
                                     </mat-list>
@@ -225,7 +225,7 @@
                                         <mat-icon matListIcon>recent_actors</mat-icon>
                                         <p class="scan-directory" matLine>{{selectedScan.directory}}</p>
                                         <span class="scan-status" matTooltip="{{selectedScan.predefinedLabelsTasks.join(', ')}}">
-                                            {{selectedScan.predefinedLabels.length}} {{ 'UPLOAD.PREFEDINED_LABELS' | translate }}
+                                            {{ selectedScan.predefinedLabels.length }} {{ 'UPLOAD.PREFEDINED_LABELS' | translate }}
                                         </span>
                                     </mat-list-item>
                                 </mat-list>
@@ -261,7 +261,7 @@
                         <mat-card-header>
                             <mat-card-title *ngIf="uploadMode == UploadMode.SINGLE_SCAN">{{ 'UPLOAD.UPLOAD_STEP.TITLE.SINGLE' | translate }}...</mat-card-title>
                             <mat-card-title *ngIf="uploadMode == UploadMode.MULTIPLE_SCANS">{{ 'UPLOAD.UPLOAD_STEP.TITLE.MULTIPLE' | translate }}...</mat-card-title>
-                            <p class="overall-status">{{slicesSent}}/{{totalNumberOfSlices}} {{ 'UPLOAD.UPLOAD_STEP.DICOMS' | translate }}</p>
+                            <p class="overall-status">{{ slicesSent }}/{{ totalNumberOfSlices }} {{ 'UPLOAD.UPLOAD_STEP.DICOMS' | translate }}</p>
                         </mat-card-header>
                         <mat-card-content>
                             <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
@@ -269,7 +269,7 @@
                                 <!-- At the top of the list show all Uploading and Processing Scans -->
                                 <mat-list-item *ngFor="let uploadingScan of uploadingAndProcessingScans">
                                     <mat-icon matListIcon>recent_actors</mat-icon>
-                                    <p class="scan-directory" matLine>{{uploadingScan.scan.directory}}</p>
+                                    <p class="scan-directory" matLine>{{ uploadingScan.scan.directory }}</p>
                                     <mat-icon class="spinner upload-status progress-color">autorenew</mat-icon>
                                     <span [ngSwitch]="uploadingScan.status">
                                         <span class="scan-status" *ngSwitchCase="UploadingScanStatus.UPLOADING">{{ 'UPLOAD.UPLOAD_STEP.STATUS.UPLOADING' | translate }}</span>
@@ -281,7 +281,7 @@
                                 <!-- Then show all Scans with Errors -->
                                 <mat-list-item *ngFor="let uploadingScan of errorScans">
                                     <mat-icon matListIcon>recent_actors</mat-icon>
-                                    <p matLine>{{uploadingScan.scan.directory}}</p>
+                                    <p matLine>{{ uploadingScan.scan.directory }}</p>
                                     <mat-icon class="upload-status error-color">error</mat-icon>
                                     <span class="scan-status">{{ 'UPLOAD.UPLOAD_STEP.STATUS.ERROR' | translate }}</span>
                                 </mat-list-item>
@@ -289,7 +289,7 @@
                                 <!-- After Errors show all Available Scans -->
                                 <mat-list-item *ngFor="let uploadingScan of availableScans">
                                     <mat-icon matListIcon>recent_actors</mat-icon>
-                                    <p matLine>{{uploadingScan.scan.directory}}</p>
+                                    <p matLine>{{ uploadingScan.scan.directory }}</p>
                                     <mat-icon class="upload-status success-color">done</mat-icon>
                                     <span class="scan-status">{{ 'UPLOAD.UPLOAD_STEP.STATUS.AVAILABLE' | translate }}</span>
                                 </mat-list-item>
@@ -297,7 +297,7 @@
                                 <!-- At the end of the list show all Queued Scans -->
                                 <mat-list-item *ngFor="let uploadingScan of queuedScans">
                                     <mat-icon matListIcon>recent_actors</mat-icon>
-                                    <p matLine>{{uploadingScan.scan.directory}}</p>
+                                    <p matLine>{{ uploadingScan.scan.directory }}</p>
                                     <mat-icon class="upload-status queue-color">timer</mat-icon>
                                     <span class="scan-status">{{ 'UPLOAD.UPLOAD_STEP.STATUS.QUEUED' | translate }}</span>
                                 </mat-list-item>
@@ -352,7 +352,7 @@
                             <mat-selection-list dense #scansForRetry>
                                 <mat-list-option *ngFor="let uploadingScan of errorScans" [value]="uploadingScan">
                                     <!-- TODO: It would be nice to add mat-icon here but Material Design has a bug... -->
-                                    {{uploadingScan.scan.directory}}
+                                    {{ uploadingScan.scan.directory }}
                                 </mat-list-option>
                             </mat-selection-list>
                         </section>

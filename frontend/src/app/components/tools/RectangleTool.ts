@@ -1,6 +1,6 @@
-import {RectangleSelection} from '../../model/selections/RectangleSelection';
-import {ToolBase} from './ToolBase';
-import {Tool} from './Tool';
+import { RectangleSelection } from '../../model/selections/RectangleSelection';
+import { ToolBase } from './ToolBase';
+import { Tool } from './Tool';
 import { SliceSelectionType } from '../../model/selections/SliceSelection';
 
 export class RectangleTool extends ToolBase<RectangleSelection> implements Tool<RectangleSelection> {

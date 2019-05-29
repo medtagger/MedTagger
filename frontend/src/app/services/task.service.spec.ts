@@ -1,11 +1,11 @@
-import {async, inject, TestBed} from '@angular/core/testing';
-import {HttpClientModule, HttpRequest} from '@angular/common/http';
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {TaskService} from './task.service';
-import {Task} from '../model/Task';
-import {environment} from '../../environments/environment';
-import {LabelTag} from '../model/labels/LabelTag';
-import {API_URL} from '../utils/ApiUrl';
+import { async, inject, TestBed } from '@angular/core/testing';
+import { HttpClientModule, HttpRequest } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TaskService } from './task.service';
+import { Task } from '../model/task/Task';
+import { environment } from '../../environments/environment';
+import { LabelTag } from '../model/labels/LabelTag';
+import { API_URL } from '../utils/ApiUrl';
 
 describe('Service: TaskService', () => {
     const EXAMPLE_DATA = {
@@ -43,7 +43,6 @@ describe('Service: TaskService', () => {
                     exampleLabelTagData.name,
                     exampleLabelTagData.tools
                 );
-                expect(task.id).toEqual(EXAMPLE_DATA.TASK.task_id);
                 expect(task.imagePath).toEqual(EXAMPLE_DATA.TASK.image_path);
                 expect(task.key).toEqual(EXAMPLE_DATA.TASK.key);
                 expect(task.name).toEqual(EXAMPLE_DATA.TASK.name);
@@ -85,7 +84,6 @@ describe('Service: TaskService', () => {
                 );
 
                 tasks.forEach((task: Task) => {
-                    expect(task.id).toEqual(EXAMPLE_DATA.TASK.task_id);
                     expect(task.imagePath).toEqual(EXAMPLE_DATA.TASK.image_path);
                     expect(task.key).toEqual(EXAMPLE_DATA.TASK.key);
                     expect(task.name).toEqual(EXAMPLE_DATA.TASK.name);

@@ -2,7 +2,7 @@
     <div class="innerElement canvasInterface">
         <app-scan-viewer #scanViewer></app-scan-viewer>
         <div class="labeling-time-info" *ngIf="!!label && !!label.labelingTime">
-            <p>{{ 'VALIDATION.LABELING_TIME' | translate }}: {{label.labelingTime | number : '1.2-2' }}s</p>
+            <p>{{ 'VALIDATION.LABELING_TIME' | translate }}: {{ label.labelingTime | number : '1.2-2' }}s</p>
         </div>
         <div class="button-row">
             <button mat-raised-button color="primary" (click)="markAsValid()">

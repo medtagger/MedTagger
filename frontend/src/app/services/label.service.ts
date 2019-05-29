@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Task } from '../model/Task';
+import { Task } from '../model/task/Task';
 import { Point } from '../model/Point';
 import { Label } from '../model/labels/Label';
 import { LabelTag } from '../model/labels/LabelTag';

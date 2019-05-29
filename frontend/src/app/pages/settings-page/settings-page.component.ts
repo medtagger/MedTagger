@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { FormControl, Validators } from '@angular/forms';
-import { UserInfo } from '../../model/UserInfo';
+import { UserInfo } from '../../model/user/UserInfo';
 import { UsersService } from '../../services/users.service';
 import { TranslateService } from '@ngx-translate/core';
-
 
 @Component({
     selector: 'app-settings-page',

@@ -52,6 +52,11 @@
         "LABEL_SEND_INFO": "Label has been sent!",
         "SCAN_LOADED_INFO": "New scan has been loaded!",
         "ACTIVE_TAG_PLACEHOLDER": "Active tag",
+        "STATUS_BAR": {
+            "SCAN": "Scan",
+            "LABELLING_TIME": "Labelling time",
+            "STATUS": "Status"
+        },
         "DIALOG": {
             "NO_TAGS": {
                 "TITLE": "There are no tags assigned to this task!",
@@ -90,6 +95,11 @@
                 "CONTENT": "There are no selections for some of the tags. Are you sure that there are no interesting objects to select for other tags?",
                 "BUTTON_CONFIRM": "Send current selections.",
                 "BUTTON_CANCEL": "Take me back to labeling."
+            },
+            "LABEL_COMMENT": {
+                "TITLE": "Add comment to your label (optional)",
+                "BUTTON_SAVE": "Save comment",
+                "BUTTON_ADD": "Add comment"
             }
         },
         "HEADER": {
@@ -118,7 +128,13 @@
             "BUTTON": {
                 "SKIP": "Skip scan",
                 "SEND": "Send label",
-                "NO_TAG": "Nothing to tag"
+                "NO_TAG": "Nothing to tag",
+                "TASK_DESCRIPTION": "Task description"
+            },
+            "DESCRIPTION": {
+                "TITLE": "Task description",
+                "SUBTITLE": "Information about the task and selections",
+                "CLOSE": "Close"
             }
         },
         "TOOLTIPS": {
@@ -296,5 +312,17 @@
             "OK": "Ok",
             "SUBMIT": "Submit"
         }
+    },
+    "OPERATION": {
+        "SENDING_SELECTION": "Sending selection...",
+        "LABELLING": "Selecting...",
+        "DOWNLOADING_SLICES": "Downloading slices...",
+        "DOWNLOADING_SCAN": "Downloading scan...",
+        "WAITING": "Waiting for user",
+        "DOWNLOADING_ERROR": "Downloading error!",
+        "DRAG_TO_SELECT": "Use mouse drag to create labels",
+        "CLICK_TO_SELECT": "Use left mouse click to create labels",
+        "CHOOSE_TAG": "Choose tag.",
+        "CHOOSE_TOOL": "Choose tool." 
     }
 }

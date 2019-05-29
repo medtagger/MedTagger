@@ -1,7 +1,7 @@
-import {SliceSelection, SliceSelectionType} from './SliceSelection';
-import {BinaryConverter} from '../../utils/BinaryConverter';
-import {LabelTag} from '../labels/LabelTag';
-import {isUndefined} from 'util';
+import { SliceSelection, SliceSelectionType } from './SliceSelection';
+import { BinaryConverter } from '../../utils/BinaryConverter';
+import { LabelTag } from '../labels/LabelTag';
+import { isUndefined } from 'util';
 
 export class BrushSelection extends SliceSelection {
     selectionLayer: HTMLImageElement;

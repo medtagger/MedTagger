@@ -1,6 +1,31 @@
 <app-nav-bar>
     <div class="marker-nav">
         <div class="marker-nav--actions">
+            <div class="marker-nav--task-bar">
+                <button *ngIf="hasTaskDescription()" mat-raised-button color="accent" class="task-description-panel--button"
+                    (click)="toggleTaskDescriptionPanel()">
+                    {{ 'MARKER.NAVBAR.BUTTON.TASK_DESCRIPTION' | translate }}
+                </button>
+                <div *ngIf="taskDescriptionPanelActive" class="task-description-panel">
+                    <mat-card class="task-description-panel--card">
+                        <mat-card-header class="task-description-panel--card__header">
+                            <mat-card-title>{{ 'MARKER.NAVBAR.DESCRIPTION.TITLE' | translate }}</mat-card-title>
+                            <mat-card-subtitle>{{ 'MARKER.NAVBAR.DESCRIPTION.SUBTITLE' | translate }}</mat-card-subtitle>
+                            <button mat-icon-button (click)="toggleTaskDescriptionPanel()">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </mat-card-header>
+                        <mat-card-content class="task-description-panel--card__content">
+                            <span class="task-description-panel--card__content__info">{{ taskDescription.description }}</span>
+                            <div class="task-description-panel--card__content__image_group">
+                                <div *ngFor="let image of taskDescription.imageExamples">
+                                    <img class="task-description-panel--card__content__image" [src]="image" />
+                                </div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </div>
             <button mat-mini-fab 
                 color="primary" 
                 class="window-change-button" 
@@ -78,8 +103,8 @@
                 color="primary"
                 (click)="skipScan()"
                 matTooltip="{{ 'MARKER.TOOLTIPS.SKIP_SCAN' | translate }}"
-                [matTooltipShowDelay]="tooltipShowDelay.value">
-                [disabled]="marker.isDownloadingInProgress()"
+                [matTooltipShowDelay]="tooltipShowDelay.value"
+                [disabled]="marker.isDownloadingInProgress()">
                 {{ 'MARKER.NAVBAR.BUTTON.SKIP' | translate }}
             </button>
             <button *ngIf="!selections.isEmpty()"
@@ -97,8 +122,8 @@
                 color="accent"
                 (click)="sendEmptyLabel()"
                 matTooltip="{{ 'MARKER.TOOLTIPS.NO_TAG' | translate }}"
-                [matTooltipShowDelay]="tooltipShowDelay.value">
-                [disabled]="marker.isDownloadingInProgress()"
+                [matTooltipShowDelay]="tooltipShowDelay.value"
+                [disabled]="marker.isDownloadingInProgress()">
                 {{ 'MARKER.NAVBAR.BUTTON.NO_TAG' | translate }}
             </button>
         </div>
@@ -106,6 +131,20 @@
 </app-nav-bar>
 <div class="marker">
     <div class="marker-toolbox">
+        <ng-container *ngIf="!!taskStatus">
+            <mat-card class="marker-toolbox--status_bar">
+                <span>
+                    <b>{{ 'MARKER.STATUS_BAR.LABELLING_TIME' | translate }}:</b>
+                    <span #timer>{{ currentTime }}</span>
+                </span>
+                <span>
+                    <b>{{ 'MARKER.STATUS_BAR.SCAN' | translate }}:</b>
+                    {{ taskStatus.currentProgress + '/' + taskStatus.scansToLabel}}</span>
+                <span>
+                    <b>{{ 'MARKER.STATUS_BAR.STATUS' | translate }}:</b>
+                    {{ taskStatus.operation | translate }} </span>
+            </mat-card>
+        </ng-container>
         <h3 class="marker-toolbox--header">{{ 'MARKER.HEADER.TOOLS' | translate }}</h3>
         <div class="marker-toolbox--content d-flex flex-column align-items-center">
             <mat-form-field class="marker-toolbox--select">
@@ -176,11 +215,13 @@
         </div>
     </div>
     <div class="marker-content">
-        <app-marker-component #marker
-                              [(selections)]="selections"
-                              [tools]="tools"
-                              [currentTool]="currentTool"
-                              [currentTag]="currentTag"></app-marker-component>
+        <app-marker-component #marker 
+            (statusChange)="onStatusChange($event)" 
+            [(selections)]="selections" 
+            [tools]="tools"
+            [currentTool]="currentTool" 
+            [currentTag]="currentTag">
+        </app-marker-component>
     </div>
 </div>
 <div class="marker-info">

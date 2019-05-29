@@ -3,9 +3,9 @@ import { MatIconRegistry, MatSnackBar } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TaskService } from '../../services/task.service';
 import { LABELING } from '../../constants/routes';
-import { UserInfo } from '../../model/UserInfo';
+import { UserInfo } from '../../model/user/UserInfo';
 import { Router } from '@angular/router';
-import { Task } from '../../model/Task';
+import { Task } from '../../model/task/Task';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({

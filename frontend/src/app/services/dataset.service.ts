@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {Dataset} from '../model/ScanMetadata';
-import {environment} from '../../environments/environment';
-import {HttpClient} from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Dataset } from '../model/ScanMetadata';
+import { environment } from '../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 interface AvailableDatasetResponse {
     key: string;

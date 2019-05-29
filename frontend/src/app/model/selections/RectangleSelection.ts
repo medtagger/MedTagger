@@ -1,5 +1,5 @@
 import { SliceSelection, SliceSelectionType } from './SliceSelection';
-import {LabelTag} from '../labels/LabelTag';
+import { LabelTag } from '../labels/LabelTag';
 
 export class RectangleSelection extends SliceSelection {
 

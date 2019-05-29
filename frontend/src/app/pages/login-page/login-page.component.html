@@ -30,14 +30,14 @@
                         <mat-label>{{ 'LOGIN.FORM.EMAIL' | translate }}</mat-label>
                         <input matInput type="text" placeholder="{{ 'LOGIN.PLACEHOLDER.EMAIL' | translate }}"
                                id="email" formControlName="email" required data-cy="login-email">
-                        <mat-error *ngIf="loginForm.get('email').invalid">{{getEmailErrorMessage()}}</mat-error>
+                        <mat-error *ngIf="loginForm.get('email').invalid">{{ getEmailErrorMessage() }}</mat-error>
                     </mat-form-field>
                     <mat-form-field appearance="fill">
                         <mat-label>{{ 'LOGIN.FORM.PASSWORD' | translate }}</mat-label>
                         <input matInput type="{{loginPasswordVisible && 'text' || 'password'}}"
                                placeholder="{{ 'LOGIN.PLACEHOLDER.PASSWORD' | translate }}"
                                id="password" formControlName="password" required data-cy="login-password">
-                        <mat-error *ngIf="loginForm.get('password').invalid">{{getPasswordErrorMessage()}}</mat-error>
+                        <mat-error *ngIf="loginForm.get('password').invalid">{{ getPasswordErrorMessage() }}</mat-error>
                         <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                     </mat-form-field>
                     <div class="action-form__submit">
@@ -50,7 +50,7 @@
                     </div>
                     <div *ngIf="loggingInError !== undefined" class="action-form__error">
                         <mat-icon color="warn">error</mat-icon>
-                        <mat-error>{{loggingInError}}</mat-error>
+                        <mat-error>{{ loggingInError }}</mat-error>
                     </div>
                 </form>
             </main>
@@ -67,14 +67,14 @@
                             <mat-label>{{ 'LOGIN.FORM.FIRST_NAME' | translate }}</mat-label>
                             <input matInput type="text" placeholder="{{ 'LOGIN.PLACEHOLDER.FIRST_NAME' | translate }}"
                                    id="firstName" formControlName="firstName" required>
-                            <mat-error *ngIf="registerForm.get('firstName').invalid">{{getFirstNameErrorMessage()}}
+                            <mat-error *ngIf="registerForm.get('firstName').invalid">{{ getFirstNameErrorMessage() }}
                             </mat-error>
                         </mat-form-field>
                         <mat-form-field appearance="fill" class="col-12 col-lg-6">
                             <mat-label>{{ 'LOGIN.FORM.LAST_NAME' | translate }}</mat-label>
                             <input matInput type="text" placeholder="{{ 'LOGIN.PLACEHOLDER.LAST_NAME' | translate }}"
                                    id="lastName" formControlName="lastName" required>
-                            <mat-error *ngIf="registerForm.get('lastName').invalid">{{getLastNameErrorMessage()}}
+                            <mat-error *ngIf="registerForm.get('lastName').invalid">{{ getLastNameErrorMessage() }}
                             </mat-error>
                         </mat-form-field>
                     </div>
@@ -82,14 +82,14 @@
                         <mat-label>{{ 'LOGIN.FORM.EMAIL' | translate }}</mat-label>
                         <input matInput type="text" placeholder="{{ 'LOGIN.PLACEHOLDER.EMAIL' | translate }}"
                                id="email" formControlName="email" required>
-                        <mat-error *ngIf="registerForm.get('email').invalid">{{getEmailErrorMessage()}}</mat-error>
+                        <mat-error *ngIf="registerForm.get('email').invalid">{{ getEmailErrorMessage() }}</mat-error>
                     </mat-form-field>
                     <mat-form-field appearance="fill">
                         <mat-label>{{ 'LOGIN.FORM.PASSWORD' | translate }}</mat-label>
                         <input matInput type="{{registerPasswordVisible && 'text' || 'password'}}"
                                placeholder="{{ 'LOGIN.PLACEHOLDER.PASSWORD' | translate }}"
                                id="password" formControlName="password" required>
-                        <mat-error *ngIf="registerForm.get('password').invalid">{{getPasswordErrorMessage()}}
+                        <mat-error *ngIf="registerForm.get('password').invalid">{{ getPasswordErrorMessage() }}
                         </mat-error>
                         <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                     </mat-form-field>
@@ -98,7 +98,7 @@
                         <input matInput type="{{registerPasswordVisible && 'text' || 'password'}}"
                                placeholder="{{ 'LOGIN.PLACEHOLDER.CONFIRM_PASSWORD' | translate }}"
                                id="confirmPassword" formControlName="confirmPassword" required>
-                        <mat-error *ngIf="registerForm.get('password').invalid">{{getConfirmPasswordErrorMessage()}}
+                        <mat-error *ngIf="registerForm.get('password').invalid">{{ getConfirmPasswordErrorMessage() }}
                         </mat-error>
                         <mat-icon matSuffix (click)="changeVisibility()">visibility</mat-icon>
                     </mat-form-field>
@@ -112,7 +112,7 @@
                     </div>
                     <div *ngIf="registrationError !== undefined" class="action-form__error">
                         <mat-icon color="warn">error</mat-icon>
-                        <mat-error>{{registrationError}}</mat-error>
+                        <mat-error>{{ registrationError }}</mat-error>
                     </div>
                 </form>
             </main>

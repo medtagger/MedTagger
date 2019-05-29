@@ -1,6 +1,6 @@
-import {TestBed, async} from '@angular/core/testing';
+import { TestBed, async } from '@angular/core/testing';
 
-import {AppComponent} from './app.component';
+import { AppComponent } from './app.component';
 import {
     MatButtonModule,
     MatIconModule,
@@ -9,7 +9,7 @@ import {
     MatSnackBarModule,
     MatToolbarModule
 } from '@angular/material';
-import {RouterTestingModule} from '@angular/router/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateServiceStub } from '../mocks/TranslateServiceStub';
 

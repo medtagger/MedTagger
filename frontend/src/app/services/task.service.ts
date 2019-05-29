@@ -1,9 +1,9 @@
-import {Injectable} from '@angular/core';
-import {environment} from '../../environments/environment';
-import {Task} from '../model/Task';
-import {HttpClient} from '@angular/common/http';
-import {LabelTag} from '../model/labels/LabelTag';
-import {isUndefined} from 'util';
+import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
+import { Task } from '../model/task/Task';
+import { HttpClient } from '@angular/common/http';
+import { LabelTag } from '../model/labels/LabelTag';
+import { isUndefined } from 'util';
 
 export interface TaskResponse {
     task_id: number;
@@ -12,9 +12,12 @@ export interface TaskResponse {
     image_path: string;
     tags: Array<LabelTagResponse>;
     datasets_keys: Array<string>;
+    number_of_available_scans: number;
+    description: string;
+    label_examples: Array<string>;
 }
 
-interface LabelTagResponse {
+export interface LabelTagResponse {
     key: string;
     name: string;
     actions_ids: Array<number>;
@@ -26,8 +29,7 @@ export class TaskService {
 
     private tasks: Array<Task> = [];
 
-    constructor(private http: HttpClient) {
-    }
+    constructor(private http: HttpClient) {}
 
     getTask(taskKey: string): Promise<Task> {
         if (isUndefined(taskKey)) {
@@ -76,7 +78,6 @@ export class TaskService {
 
     private getTaskFromResponse(response: TaskResponse): Task {
         const tags = response.tags.map(tag => new LabelTag(tag.key, tag.name, tag.tools));
-        return new Task(response.task_id, response.key, response.name, response.image_path, tags,
-            response.datasets_keys);
+        return new Task(response, tags);
     }
 }

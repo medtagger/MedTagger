@@ -1,11 +1,11 @@
-import {AccountService} from './account.service';
-import {TestBed, async, inject} from '@angular/core/testing';
-import {HttpClientModule, HttpRequest} from '@angular/common/http';
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {environment} from '../../environments/environment';
-import {UserInfo} from '../model/UserInfo';
-import {UserSettings} from '../model/UserSettings';
-import {API_URL} from '../utils/ApiUrl';
+import { AccountService } from './account.service';
+import { TestBed, async, inject } from '@angular/core/testing';
+import { HttpClientModule, HttpRequest } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { environment } from '../../environments/environment';
+import { UserInfo } from '../model/user/UserInfo';
+import { UserSettings } from '../model/user/UserSettings';
+import { API_URL } from '../utils/ApiUrl';
 
 describe('Service: AccountService', () => {
     const USER_SETTINGS: UserSettings = {

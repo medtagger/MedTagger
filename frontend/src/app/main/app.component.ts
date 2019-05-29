@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {Router, NavigationEnd, ActivatedRoute} from '@angular/router';
-import {UserInfo} from '../model/UserInfo';
-import {MatSnackBar} from '@angular/material';
-import {filter, map, mergeMap} from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import { UserInfo } from '../model/user/UserInfo';
+import { MatSnackBar } from '@angular/material';
+import { filter, map, mergeMap } from 'rxjs/operators';
 import * as appRoutes from '../constants/routes';
 import { TranslateService } from '@ngx-translate/core';
 
