@@ -216,7 +216,7 @@
     </div>
     <div class="marker-content">
         <app-marker-component #marker 
-            (statusUpdate)="onStatusUpdate($event)" 
+            (statusChange)="onStatusChange($event)" 
             [(selections)]="selections" 
             [tools]="tools"
             [currentTool]="currentTool" 

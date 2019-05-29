@@ -105,10 +105,7 @@ export class MarkerPageComponent implements OnInit {
             this.taskService.getTask(taskKey).then(
                 (task: Task) => {
                     this.task = task;
-
-                    // Dev only
                     this.taskStatus = task.getStatus();
-                    // tslint:disable-next-line: max-line-length
                     this.taskDescription = task.getDescription();
 
                     this.zone.runOutsideAngular(this.printCurrentLabellingTime.bind(this));
@@ -217,7 +214,7 @@ export class MarkerPageComponent implements OnInit {
         }, 1000);
     }
 
-    onStatusUpdate(eventOperation: Operation) {
+    onStatusChange(eventOperation: Operation) {
         this.taskStatus.changeStatusOperation(eventOperation);
     }
 

@@ -23,7 +23,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
 
     @Output() selectionsChange: EventEmitter<List<SliceSelection>> = new EventEmitter();
 
-    @Output('statusUpdate') markerStatusChange: EventEmitter<Operation> = new EventEmitter();
+    @Output() statusChange: EventEmitter<Operation> = new EventEmitter();
 
     constructor(private snackBar: MatSnackBar, private translateService: TranslateService) {
         super();
@@ -55,11 +55,11 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
         if (mouseEvent.button === MarkerComponent.MOUSE_LEFT_BUTTON_ID) {
             if (!this.currentTag) {
                 this.snackBar.open(this.translateService.instant('COMPONENT.MARKER.MESSAGE.SELECT_TAG'), '', { duration: 2000 });
-                this.markerStatusChange.emit(Operation.CHOOSE_TAG);
+                this.statusChange.emit(Operation.CHOOSE_TAG);
                 return;
             } else if (!this.currentTool) {
                 this.snackBar.open(this.translateService.instant('COMPONENT.MARKER.MESSAGE.SELECT_TOOL'), '', { duration: 2000 });
-                this.markerStatusChange.emit(Operation.CHOOSE_TOOL);
+                this.statusChange.emit(Operation.CHOOSE_TOOL);
                 return;
             }
 
@@ -71,7 +71,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
         if (mouseEvent.button === MarkerComponent.MOUSE_LEFT_BUTTON_ID) {
             console.log('Marker | initCanvasSelectionTool | onmouseup clientXY: ', mouseEvent.clientX, mouseEvent.clientY);
             if (this.currentTool) {
-                this.markerStatusChange.emit(Operation.LABELLING);
+                this.statusChange.emit(Operation.LABELLING);
                 this.currentTool.onMouseUp(mouseEvent);
             }
         }
@@ -80,7 +80,7 @@ export class MarkerComponent extends ScanViewerComponent implements OnInit, OnCh
     public onMouseMove(mouseEvent: MouseEvent): void {
         if (mouseEvent.button === MarkerComponent.MOUSE_LEFT_BUTTON_ID) {
             if (this.currentTool) {
-                this.markerStatusChange.emit(Operation.LABELLING);
+                this.statusChange.emit(Operation.LABELLING);
                 this.currentTool.onMouseMove(mouseEvent);
             }
         }
