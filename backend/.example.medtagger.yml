@@ -1,6 +1,12 @@
 tasks:
   - name: Kidneys segmentation
     key: KIDNEYS_SEGMENTATION
+    description: The kidneys are two bean-shaped organs found in vertebrates.
+      They are located on the left and right in the retroperitoneal space, and in adult
+      humans are about 11 centimetres (4.3 in) in length. They receive blood from the paired
+      renal arteries; blood exits into the paired renal veins. Each kidney is attached to a ureter,
+      a tube that carries excreted urine to the bladder.
+    label_examples: [assets/img/example_1.png, assets/img/example_2.png]
     image_path: assets/icon/kidneys_dataset_icon.svg
     tags:
         - name: Left Kidney
