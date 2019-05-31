@@ -109,7 +109,7 @@ def test_ownership(prepare_environment: Any, synchronous_celery: Any) -> None:
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('LUNGS', 'Lungs')
-    task = TasksRepository.add_task('FIND_NODULES', 'Find Nodules', 'path/to/image', ['LUNGS'], [])
+    task = TasksRepository.add_task('FIND_NODULES', 'Find Nodules', 'path/to/image', ['LUNGS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
     admin_id, _ = create_user(ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_FIRST_NAME, ADMIN_LAST_NAME)
     set_user_role(admin_id, 'admin')

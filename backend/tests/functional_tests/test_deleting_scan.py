@@ -27,7 +27,7 @@ def test_delete_scan_without_slices(prepare_environment: Any, synchronous_celery
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
@@ -66,7 +66,7 @@ def test_delete_scan_with_slices(prepare_environment: Any, synchronous_celery: A
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
@@ -125,7 +125,7 @@ def test_delete_scan_with_labels(prepare_environment: Any, synchronous_celery: A
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag',
                                     [LabelTool.RECTANGLE, LabelTool.CHAIN, LabelTool.POINT, LabelTool.BRUSH],
                                     task.id)

@@ -1,7 +1,6 @@
 """Module containing all custom types."""
 from typing import NewType, NamedTuple
 
-
 UserID = NewType('UserID', int)
 ScanID = NewType('ScanID', str)
 SliceID = NewType('SliceID', str)

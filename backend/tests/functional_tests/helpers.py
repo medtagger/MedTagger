@@ -30,7 +30,7 @@ def create_tag_and_assign_to_task(key: str, name: str, task_key: str, tools: Lis
 def prepare_scan_and_tag_for_labeling() -> Tuple[models.Scan, models.LabelTag]:
     """Create needed Scan and Label Tag for labeling purpose."""
     dataset = DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     label_tag = LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [definitions.LabelTool.POINT], task.id)
     scan = ScansRepository.add_new_scan(dataset, number_of_slices=3)
     for _ in range(3):

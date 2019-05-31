@@ -3,8 +3,8 @@
 import uuid
 from typing import List, Dict, cast, Optional, Any
 
-from sqlalchemy import Column, Integer, Float, String, ForeignKey, Boolean, Enum, Table, and_, event, false
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, Integer, Text, Float, String, ForeignKey, Boolean, Enum, Table, and_, event, false
+from sqlalchemy.dialects.postgresql import JSONB, ARRAY
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.mapper import Mapper
@@ -131,12 +131,13 @@ class Task(Base):
     id: TaskID = Column(Integer, autoincrement=True, primary_key=True)
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
+    description: str = Column(Text, nullable=True, server_default='')
+    label_examples: List[str] = Column(ARRAY(String(256)), nullable=True, server_default='{}')
     image_path: str = Column(String(100), nullable=False)
     disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
     datasets: List[Dataset] = relationship('Dataset', back_populates='tasks',
                                            secondary=datasets_tasks)
-
     _tags: List['LabelTag'] = relationship("LabelTag", back_populates="task")
 
     def __init__(self, key: str, name: str, image_path: str) -> None:
@@ -163,6 +164,16 @@ class Task(Base):
     def available_tags(self, new_tags: List['LabelTag']) -> None:
         """Set new Label Tags for this Task."""
         self._tags = new_tags
+
+    @property
+    def number_of_available_scans(self) -> int:
+        """Return a number of available Scans for this Task."""
+        datasets_ids = [dataset.id for dataset in self.datasets]
+        number_of_scans = Scan.query.filter(and_(
+            Scan.dataset_id.in_(datasets_ids),  # type: ignore  # "int" has no attribute "in_"
+            Scan.status == ScanStatus.AVAILABLE,
+        )).count()
+        return number_of_scans
 
 
 class Scan(Base):

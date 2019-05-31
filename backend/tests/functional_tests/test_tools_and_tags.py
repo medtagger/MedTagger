@@ -22,7 +22,7 @@ def test_add_label_non_existing_tag(prepare_environment: Any) -> None:
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
@@ -61,7 +61,7 @@ def test_add_label_non_supported_tool(prepare_environment: Any) -> None:
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
@@ -101,7 +101,7 @@ def test_add_label_missing_tag(prepare_environment: Any) -> None:
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
@@ -140,7 +140,7 @@ def test_add_label_missing_tool(prepare_environment: Any) -> None:
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 2. Add Scan to the system
@@ -179,7 +179,7 @@ def test_add_label_wrong_tool_for_tag(prepare_environment: Any) -> None:
 
     # Step 1. Prepare a structure for the test
     DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('LEFT_KIDNEY', 'Left Kidney', [LabelTool.RECTANGLE], task.id)
 
     # Step 1. Add Scan to the system

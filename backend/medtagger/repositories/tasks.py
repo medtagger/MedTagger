@@ -1,5 +1,5 @@
 """Module responsible for definition of TaskRepository."""
-from typing import List
+from typing import Any, List
 
 from medtagger.database import db_connection_session, db_transaction_session
 from medtagger.database.models import Task, LabelTag, Dataset
@@ -25,13 +25,16 @@ def get_task_by_key(key: str) -> Task:
     return task
 
 
-def add_task(key: str, name: str, image_path: str, datasets_keys: List[str], tags: List[LabelTag]) -> Task:
+def add_task(key: str, name: str, image_path: str, datasets_keys: List[str],  # pylint: disable-msg=too-many-arguments
+             description: str, label_examples: List[str], tags: List[LabelTag]) -> Task:
     """Add new Task to the database.
 
     :param key: key that will identify such Task
     :param name: name that will be used in the Use Interface for such Task
     :param image_path: path to the image that represents such Task (used in User Interface)
     :param datasets_keys: Keys of Datasets that Task takes Scans from
+    :param description: Description of a given Task
+    :param label_examples: List of paths to examples of labels for given Task
     :param tags: Label Tags that will be created and assigned to Task
     :return: Task object
     """
@@ -39,7 +42,9 @@ def add_task(key: str, name: str, image_path: str, datasets_keys: List[str], tag
         task = Task(key, name, image_path)
         datasets = Dataset.query.filter(Dataset.key.in_(datasets_keys)).all()  # type: ignore
         task.datasets = datasets
+        task.label_examples = label_examples
         task.available_tags = tags
+        task.description = description
         session.add(task)
     return task
 
@@ -68,25 +73,34 @@ def unassign_label_tag(tag: LabelTag, task_key: str) -> None:
         session.add(task)
 
 
-def update(task_key: str, name: str = None, image_path: str = None, datasets_keys: List[str] = None) -> Task:
+def update(task_key: str, name: str = None, image_path: str = None,  # pylint: disable-msg=too-many-arguments
+           datasets_keys: List[str] = None, description: str = None, label_examples: List[str] = None) -> Task:
     """Update Datasets where this Task will be available.
 
     :param task_key: key that will identify such Task
     :param name: (optional) new name for such Task
     :param image_path: (optional) new path to the image which shows on the UI
+    :param description: (optional) Description of a given Task
+    :param label_examples: (optional) List of paths to examples of labels for given Task
     :param datasets_keys: (optional) keys of Datasets which should have this Task
     """
     with db_transaction_session() as session:
         task = Task.query.filter(Task.key == task_key).one()
-        if name:
-            task.name = name
-        if image_path:
-            task.image_path = image_path
+        update_parameter_if_needed(task, 'name', name)
+        update_parameter_if_needed(task, 'image_path', image_path)
+        update_parameter_if_needed(task, 'description', description)
+        update_parameter_if_needed(task, 'label_examples', label_examples)
         if datasets_keys:
             datasets = Dataset.query.filter(Dataset.key.in_(datasets_keys)).all()  # type: ignore
             task.datasets = datasets
         session.add(task)
     return task
+
+
+def update_parameter_if_needed(task: Task, name: str, value: Any) -> None:
+    """Help function to update single parameter."""
+    if value is not None:
+        setattr(task, name, value)
 
 
 def disable(task_key: str) -> None:

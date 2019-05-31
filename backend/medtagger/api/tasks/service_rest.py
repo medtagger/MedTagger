@@ -42,8 +42,10 @@ class Tasks(Resource):
         name = payload['name']
         image_path = payload['image_path']
         datasets_keys = payload['datasets_keys']
+        description = payload.get('description', '')
+        label_examples = payload.get('label_examples', [])
         tags = [LabelTag(tag['key'], tag['name'], tag['tools']) for tag in payload['tags']]
-        return business.create_task(key, name, image_path, datasets_keys, tags), 201
+        return business.create_task(key, name, image_path, datasets_keys, description, label_examples, tags), 201
 
 
 @tasks_ns.route('/<string:task_key>')

@@ -29,14 +29,18 @@ def get_task_for_key(task_key: str) -> Task:
         raise NotFoundException('Did not found task for {} key!'.format(task_key))
 
 
-def create_task(key: str, name: str, image_path: str, datasets_keys: List[str], tags: List[LabelTag]) -> Task:
+# pylint: disable-msg=too-many-arguments
+def create_task(key: str, name: str, image_path: str, datasets_keys: List[str], description: str,
+                label_examples: List[str], tags: List[LabelTag]) -> Task:
     """Create new Task.
 
     :param key: unique key representing Task
     :param name: name which describes this Task
     :param image_path: path to the image which is located on the frontend
     :param datasets_keys: Keys of Datasets that Task takes Scans from
+    :param description: Description of a given Task
+    :param label_examples: List of paths to examples of labels for given Task
     :param tags: Label Tags that will be created and assigned to Task
     :return: Task object
     """
-    return TasksRepository.add_task(key, name, image_path, datasets_keys, tags)
+    return TasksRepository.add_task(key, name, image_path, datasets_keys, description, label_examples, tags)

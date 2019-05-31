@@ -28,6 +28,9 @@ out__task = api.model('Task model', {
     'image_path': fields.String(),
     'tags': fields.List(fields.Nested(out__label_tag), attribute=lambda task: sorted(task.available_tags,
                                                                                      key=lambda tag: tag.name)),
+    'number_of_available_scans': fields.Integer(),
+    'description': fields.String(required=False),
+    'label_examples': fields.List(fields.String(), required=False),
     'datasets_keys': fields.List(fields.String(), attribute=lambda task: [dataset.key for dataset in task.datasets]),
 })
 
@@ -36,5 +39,7 @@ in__task = api.model('New Task model', {
     'name': fields.String(),
     'image_path': fields.String(),
     'datasets_keys': fields.List(fields.String()),
+    'description': fields.String(required=False),
+    'label_examples': fields.List(fields.String(), required=False),
     'tags': fields.List(fields.Nested(in__label_tag), attribute='available_tags'),
 })

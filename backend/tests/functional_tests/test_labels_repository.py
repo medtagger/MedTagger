@@ -18,7 +18,7 @@ def test_get_predefined_label_for_scan_in_task__no_predefined_label(prepare_envi
     """Test for fetching Predefined Label that does not exist."""
     # Step 1. Prepare a structure for the test
     dataset = DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
     scan = ScansRepository.add_new_scan(dataset, 0)
 
@@ -31,7 +31,7 @@ def test_get_predefined_label_for_scan_in_task__label_that_is_not_predefined(pre
     """Test for fetching Predefined Label that is not predefined."""
     # Step 1. Prepare a structure for the test
     dataset = DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
     scan = ScansRepository.add_new_scan(dataset, 0)
     user_id = UsersRepository.add_new_user(User('user@medtagger', 'HASH', 'Admin', 'Admin'))
@@ -49,7 +49,7 @@ def test_get_predefined_label_for_scan_in_task__predefined_label(prepare_environ
     """Test for fetching Predefined Label that exists."""
     # Step 1. Prepare a structure for the test
     dataset = DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
     scan = ScansRepository.add_new_scan(dataset, 0)
     user_id = UsersRepository.add_new_user(User('user@medtagger', 'HASH', 'Admin', 'Admin'))
@@ -68,8 +68,8 @@ def test_get_predefined_label_for_scan_in_task__predefined_label_for_given_task(
     """Test for fetching Predefined Label only for specific Task."""
     # Step 1. Prepare a structure for the test
     dataset = DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task_left = TasksRepository.add_task('MARK_LEFT', 'Mark Left', 'path/to/image', ['KIDNEYS'], [])
-    task_right = TasksRepository.add_task('MARK_RIGHT', 'Mark Right', 'path/to/image', ['KIDNEYS'], [])
+    task_left = TasksRepository.add_task('MARK_LEFT', 'Mark Left', 'path/to/image', ['KIDNEYS'], '', [], [])
+    task_right = TasksRepository.add_task('MARK_RIGHT', 'Mark Right', 'path/to/image', ['KIDNEYS'], '', [], [])
     LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task_left.id)
     scan = ScansRepository.add_new_scan(dataset, 0)
     user_id = UsersRepository.add_new_user(User('user@medtagger', 'HASH', 'Admin', 'Admin'))
@@ -92,7 +92,7 @@ def test_get_predefined_brush_label_elements(prepare_environment: Any) -> None:
     """Test for fetching Predefined Brush Label Elements."""
     # Step 1. Prepare a structure for the test
     dataset = DatasetsRepository.add_new_dataset('KIDNEYS', 'Kidneys')
-    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], [])
+    task = TasksRepository.add_task('MARK_KIDNEYS', 'Mark Kidneys', 'path/to/image', ['KIDNEYS'], '', [], [])
     label_tag = LabelTagsRepository.add_new_tag('EXAMPLE_TAG', 'Example Tag', [LabelTool.RECTANGLE], task.id)
     scan = ScansRepository.add_new_scan(dataset, 3)
     user_id = UsersRepository.add_new_user(User('user@medtagger', 'HASH', 'Admin', 'Admin'))
