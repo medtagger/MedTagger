@@ -722,4 +722,3 @@ def test_sync_with_missing_description(prepare_environment: Any) -> None:
     assert len(tasks) == 1
     kidneys_segmentation = TasksRepository.get_task_by_key('KIDNEYS_SEGMENTATION')
     assert kidneys_segmentation.description == ""
-
