@@ -1,5 +1,5 @@
 """Module responsible for definition of TaskRepository."""
-from typing import List
+from typing import Any, List
 
 from medtagger.database import db_connection_session, db_transaction_session
 from medtagger.database.models import Task, LabelTag, Dataset
@@ -25,7 +25,7 @@ def get_task_by_key(key: str) -> Task:
     return task
 
 
-def add_task(key: str, name: str, image_path: str, datasets_keys: List[str], # pylint: disable-msg=too-many-arguments
+def add_task(key: str, name: str, image_path: str, datasets_keys: List[str],  # pylint: disable-msg=too-many-arguments
              description: str, label_examples: List[str], tags: List[LabelTag]) -> Task:
     """Add new Task to the database.
 
@@ -86,19 +86,21 @@ def update(task_key: str, name: str = None, image_path: str = None,  # pylint: d
     """
     with db_transaction_session() as session:
         task = Task.query.filter(Task.key == task_key).one()
-        if name:
-            task.name = name
-        if image_path:
-            task.image_path = image_path
+        update_parameter_if_needed(task, 'name', name)
+        update_parameter_if_needed(task, 'image_path', image_path)
+        update_parameter_if_needed(task, 'description', description)
+        update_parameter_if_needed(task, 'label_examples', label_examples)
         if datasets_keys:
             datasets = Dataset.query.filter(Dataset.key.in_(datasets_keys)).all()  # type: ignore
             task.datasets = datasets
-        if description:
-            task.description = description
-        if label_examples:
-            task.label_examples = label_examples
         session.add(task)
     return task
+
+
+def update_parameter_if_needed(task: Task, name: str, value: Any) -> None:
+    """Help function to update single parameter."""
+    if value is not None:
+        setattr(task, name, value)
 
 
 def disable(task_key: str) -> None:

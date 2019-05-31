@@ -132,7 +132,7 @@ class Task(Base):
     key: str = Column(String(50), nullable=False, unique=True)
     name: str = Column(String(100), nullable=False)
     description: str = Column(Text, nullable=True, server_default='')
-    label_examples: str = Column(ARRAY(String(256)), nullable=True, server_default='{}')
+    label_examples: List[str] = Column(ARRAY(String(256)), nullable=True, server_default='{}')
     image_path: str = Column(String(100), nullable=False)
     disabled: bool = Column(Boolean, nullable=False, server_default='f')
 
@@ -170,7 +170,7 @@ class Task(Base):
         """Return a number of available Scans for this Task."""
         datasets_ids = [dataset.id for dataset in self.datasets]
         number_of_scans = Scan.query.filter(and_(
-            Scan.dataset_id.in_(datasets_ids),
+            Scan.dataset_id.in_(datasets_ids),  # type: ignore  # "int" has no attribute "in_"
             Scan.status == ScanStatus.AVAILABLE,
         )).count()
         return number_of_scans
