@@ -655,3 +655,71 @@ def test_sync_with_changed_label_examples(prepare_environment: Any) -> None:
     assert len(tasks) == 1
     kidneys_segmentation = TasksRepository.get_task_by_key('KIDNEYS_SEGMENTATION')
     assert kidneys_segmentation.label_examples == ['new_assets/example_1']
+
+
+def test_sync_with_missing_label_examples(prepare_environment: Any) -> None:
+    """Test for configuration synchronization with missing optional label examples."""
+    configuration = yaml.load("""
+            datasets:
+              - key: KIDNEYS
+                name: Kidneys
+                tasks:
+                  - KIDNEYS_SEGMENTATION
+
+            tasks:
+              - key: KIDNEYS_SEGMENTATION
+                name: Kidneys segmentation
+                image_path: assets/icon/kidneys_dataset_icon.svg
+                description: This is a test task
+                tags:
+                  - key: LEFT_KIDNEY
+                    name: Left Kidney
+                    tools:
+                      - CHAIN
+                      - BRUSH
+                  - key: RIGHT_KIDNEY
+                    name: Right Kidney
+                    tools:
+                      - CHAIN
+        """)
+    script.sync_configuration(configuration)
+
+    # Check if Tasks were synchronized properly
+    tasks = TasksRepository.get_all_tasks(include_disabled=True)
+    assert len(tasks) == 1
+    kidneys_segmentation = TasksRepository.get_task_by_key('KIDNEYS_SEGMENTATION')
+    assert kidneys_segmentation.label_examples == []
+
+
+def test_sync_with_missing_description(prepare_environment: Any) -> None:
+    """Test for configuration synchronization with missing optional description."""
+    configuration = yaml.load("""
+            datasets:
+              - key: KIDNEYS
+                name: Kidneys
+                tasks:
+                  - KIDNEYS_SEGMENTATION
+
+            tasks:
+              - key: KIDNEYS_SEGMENTATION
+                name: Kidneys segmentation
+                image_path: assets/icon/kidneys_dataset_icon.svg
+                tags:
+                  - key: LEFT_KIDNEY
+                    name: Left Kidney
+                    tools:
+                      - CHAIN
+                      - BRUSH
+                  - key: RIGHT_KIDNEY
+                    name: Right Kidney
+                    tools:
+                      - CHAIN
+        """)
+    script.sync_configuration(configuration)
+
+    # Check if Tasks were synchronized properly
+    tasks = TasksRepository.get_all_tasks(include_disabled=True)
+    assert len(tasks) == 1
+    kidneys_segmentation = TasksRepository.get_task_by_key('KIDNEYS_SEGMENTATION')
+    assert kidneys_segmentation.description == ""
+
