@@ -61,7 +61,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
-    return new TranslateHttpLoader(http);
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 @NgModule({
