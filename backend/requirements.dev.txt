@@ -9,7 +9,7 @@ flake8-logging-format==0.6.0
 flake8-polyfill==1.0.2
 flake8-print==3.1.0
 flake8-single-quotes==0.1.0
-pytest==4.5.0
+pytest==4.6.2
 pytest-cov==2.7.1
 pytest-mock==1.10.4
 
