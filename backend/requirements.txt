@@ -5,7 +5,7 @@ werkzeug==0.15.4
 flask==1.0.3
 flask-socketio==4.0.0
 flask-restplus==0.12.1
-flask-cors==3.0.7
+flask-cors==3.0.8
 flask-login==0.4.1
 Flask-HTTPAuth==3.3.0
 passlib==1.7.1
