@@ -134,7 +134,7 @@ e2e__run:
 	echo "E2E Tests passed!"
 
 e2e__run_docker:
-	sleep 30  # Let's wait a while for booting up of all services
+	sleep 60  # Let's wait a while for booting up of all services
 	cd $(E2E_DIRECTORY) && CYPRESS_HOST_URL=http://localhost/ CYPRESS_API_URL=http://localhost/api/v1/ $(NODE_MODULES_BIN)/cypress run --record
 
 e2e__execute:
