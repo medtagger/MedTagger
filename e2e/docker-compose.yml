@@ -6,7 +6,6 @@ services:
     command: --configFile=/var/traefik/traefik.toml
     ports:
       - 80:80
-      - 52000:4200
     volumes:
       - $PWD/traefik.toml:/var/traefik/traefik.toml
       - /var/run/docker.sock:/var/run/docker.sock
