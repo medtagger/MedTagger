@@ -17,7 +17,8 @@ matrix:
       script:
         - sudo apt-get install -y xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
         - make e2e_build_docker
-        - sudo make e2e_docker
+        - sudo make e2e__docker_run_medtagger  # Needed sudo to access port 80
+        - make e2e_docker
 
     # Backend - linters & unit tests
     - language: python

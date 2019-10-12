@@ -74,10 +74,9 @@ e2e:
 	echo "E2E Tests passed!"
 
 e2e_build_docker:
-	docker-compose -f $(E2E_DOCKER_COMPOSE) up --build -d
+	docker-compose -f $(E2E_DOCKER_COMPOSE) build
 
-e2e_docker:
-	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d
+e2e_docker: e2e__docker_run_medtagger
 	cd e2e && npm install
 	@if ! make e2e__run_docker; then\
 	    docker-compose -f $(E2E_DOCKER_COMPOSE) logs e2e_medtagger_backend_database_migrations;\
@@ -87,6 +86,9 @@ e2e_docker:
 	fi
 	docker-compose -f $(E2E_DOCKER_COMPOSE) down
 	echo "E2E Tests passed!"
+
+e2e__docker_run_medtagger:
+	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d
 
 e2e__prepare_environment:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) up -d e2e_cassandra e2e_postgres e2e_rabbitmq
