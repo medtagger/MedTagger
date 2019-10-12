@@ -76,7 +76,7 @@ e2e:
 e2e_build_docker:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) build
 
-e2e_docker: e2e__docker_run_medtagger
+e2e_run_docker: e2e__docker_run_medtagger
 	cd e2e && npm install
 	@if ! make e2e__run_docker; then\
 	    docker-compose -f $(E2E_DOCKER_COMPOSE) logs e2e_medtagger_backend_database_migrations;\
