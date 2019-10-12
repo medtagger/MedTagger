@@ -1,4 +1,5 @@
 # Linters and code style checkers
+astroid==2.2.5  # Frozen due to broken numpy support
 mypy==0.701
 mypy-extensions==0.4.1
 pylint==2.3.1
