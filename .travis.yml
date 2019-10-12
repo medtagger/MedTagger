@@ -16,6 +16,7 @@ matrix:
         - "8"
       script:
         - sudo apt-get install -y xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
+        - make e2e_build_docker
         - make e2e_docker
 
     # Backend - linters & unit tests
