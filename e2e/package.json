@@ -3,7 +3,7 @@
     "start": "node_modules/.bin/cypress open"
   },
   "devDependencies": {
-    "cypress": "^3.1.5"
+    "cypress": "^3.4.1"
   },
   "dependencies": {}
 }

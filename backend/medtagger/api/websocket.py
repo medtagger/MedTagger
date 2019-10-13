@@ -38,7 +38,7 @@ debug = configuration.getboolean('api', 'debug', fallback=True)
 app = Flask(__name__)
 CORS(app)
 app.secret_key = configuration.get('api', 'secret_key', fallback='')
-web_socket.init_app(app)
+web_socket.init_app(app, cors_allowed_origins='*')
 setup_connection_to_sql_and_storage()
 
 

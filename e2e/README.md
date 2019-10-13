@@ -20,7 +20,8 @@ Also, you can run them inside of the Docker containers in the same way as it is 
  in Travis CI. This setup also reflects full Production setup!
 
 ```bash
-$ make e2e_docker
+$ make e2e_build_docker
+$ make e2e_run_docker
 ```
 
 ### Speed up your testing

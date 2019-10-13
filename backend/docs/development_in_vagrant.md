@@ -9,29 +9,28 @@ Please follow the documentation about setting up Vagrant [here](/docs/developmen
 
 ### How to run backend?
 
-Open three SSH connections (in separate windows) to your virtual machine and make sure that you're inside `/vagrant/backend`
- directory. Then run below command in each of the windows to prepare your development environment:
- 
- ```bash
- $ . devenv.sh
-```
+Open three SSH connections (in separate windows) to your virtual machine using `vagrant ssh` and make sure that you're
+ inside `/vagrant/backend` directory. Then run below commands in three separate windows.
  
 In the first window we'll run Celery workers which are responsible for handling difficult tasks (eg. adding and
  converting DICOMs to our Storage). To run Celery workers, please execute such command:
 
 ```bash
+$ . devenv.sh
 $ make run_workers
 ```
 
 In the second window we'll open our REST API server. To do so, please execute:
 
 ```bash
+$ . devenv.sh
 $ make run_rest
 ```
 
 In the third window we'll open our WebSocket API server:
 
 ```bash
+$ . devenv.sh
 $ make run_websocket
 ```
 
