@@ -73,10 +73,10 @@ e2e:
 	make e2e__delete_environment
 	echo "E2E Tests passed!"
 
-e2e_build_docker:
+e2e_build_docker_compose:
 	docker-compose -f $(E2E_DOCKER_COMPOSE) build
 
-e2e_run_docker: e2e__docker_run_medtagger
+e2e_run_on_docker_compose: e2e__docker_run_medtagger
 	cd e2e && npm install
 	@if ! make e2e__run_docker; then\
 	    docker-compose -f $(E2E_DOCKER_COMPOSE) logs e2e_medtagger_backend_database_migrations;\
@@ -140,7 +140,7 @@ e2e__run:
 
 e2e__run_docker:
 	sleep 30  # Let's wait a while for booting up of all services
-	cd $(E2E_DIRECTORY) && CYPRESS_HOST_URL=http://0.0.0.0/ CYPRESS_API_URL=http://0.0.0.0/api/v1/ $(NODE_MODULES_BIN)/cypress run
+	cd $(E2E_DIRECTORY) && CYPRESS_HOST_URL=http://localhost/ CYPRESS_API_URL=http://localhost/api/v1/ $(NODE_MODULES_BIN)/cypress run --record
 
 e2e__execute:
 	cd $(E2E_DIRECTORY) && $(NODE_MODULES_BIN)/cypress run

@@ -50,5 +50,5 @@ def test_data_set_generator(prepare_environment: Any) -> None:  # pylint: disabl
     assert ground_truth_for_slice_id[example_slice_id].shape == expected_ground_truth.shape
 
     ground_truth = ground_truth_for_slice_id[example_slice_id]
-    for i in range(expected_ground_truth.shape[0]):
+    for i in range(expected_ground_truth.shape[0]):  # pylint: disable=unsubscriptable-object  # Astroid>2.3 bug
         assert math.isclose(ground_truth[i], expected_ground_truth[i], abs_tol=1e-5)
