@@ -1,9 +1,11 @@
-Running MedTagger Frontend in Vagrant
-------------------------------------
+Running MedTagger Frontend with Vagrant
+---------------------------------------
 
-Here you can find more information about running MedTagger Frontend in Vagrant.
+Here you can find more information about running MedTagger Frontend with Vagrant.
 
 ### Requirements 
+
+Make sure that you've got [NodeJS 8](https://nodejs.org/en/download/releases/) installed with NPM.
 
 Please follow the documentation about setting up Vagrant [here](/docs/development_setup_vagrant.md).
  
@@ -12,17 +14,23 @@ Please follow the documentation about setting up Vagrant [here](/docs/developmen
 
 ### How to run Frontend?
 
-Open one SSH connection to your virtual machine and make sure that you're inside `/vagrant/frontend`
- directory. Then run command below to start the web server:
+Sadly, NPM does not work inside of a Vagrant, so we need to run Frontend locally. It can be installed
+ on any operating system with:
  
 ```bash
-$ make run_frontend
+$ npm install
 ```
- 
-And that's all! You should be able to see MedTagger UI on `http://10.0.0.99:4200`. 
+
+Then, run our frontend:
+
+```bash
+$ ng serve
+```
+
+And that's all! You should be able to see MedTagger UI on `http://localhost:4200`. 
 
 ### How to log in?
 
 There is default account for development purposes:
- - email: `admin@medtagger.com`,
- - password: `medtagger1`.
+ - email: `admin@medtagger`,
+ - password: `medtagger`.
