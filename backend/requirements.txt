@@ -10,7 +10,7 @@ flask-login==0.4.1
 Flask-HTTPAuth==3.3.0
 passlib==1.7.1
 uWSGI==2.0.18
-gevent==1.4.0
+gevent==20.5.2
 cassandra-driver==3.19.0
 SimpleITK==1.2.3
 numpy==1.16.3
