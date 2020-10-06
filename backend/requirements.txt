@@ -8,7 +8,7 @@ flask-restplus==0.12.1
 flask-cors==3.0.8
 flask-login==0.4.1
 Flask-HTTPAuth==3.3.0
-passlib==1.7.1
+passlib==1.7.3
 uWSGI==2.0.18
 gevent==1.4.0
 cassandra-driver==3.19.0
