@@ -55,7 +55,7 @@
         "karma-coverage-istanbul-reporter": "^1.2.1",
         "karma-jasmine": "~1.1.0",
         "karma-jasmine-html-reporter": "^0.2.2",
-        "node-sass": "^4.12.0",
+        "node-sass": "^4.13.1",
         "raw-loader": "^0.5.1",
         "sass-loader": "^6.0.6",
         "sshpk": "^1.14.1",
