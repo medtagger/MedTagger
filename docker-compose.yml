@@ -2,7 +2,7 @@ version: '3'
 
 services:
   reverse-proxy:
-    image: traefik
+    image: traefik:v1.7.19
     restart: unless-stopped
     command: --configFile=/var/traefik/traefik.toml
     ports:
@@ -15,7 +15,7 @@ services:
       - "traefik.enable=false"
 
   cassandra:
-    image: cassandra
+    image: cassandra:3.11.9
     restart: unless-stopped
     volumes:
       - cassandra-data:/var/lib/cassandra
@@ -25,7 +25,7 @@ services:
       - "traefik.enable=false"
 
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq:3.8.9-management
     restart: unless-stopped
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq/mnesia
@@ -36,7 +36,7 @@ services:
       - "traefik.enable=false"
 
   postgres:
-    image: postgres
+    image: postgres:10.15
     restart: unless-stopped
     ports:
       - 5432:5432
@@ -52,7 +52,7 @@ services:
       - "traefik.enable=false"
 
   netdata:
-    image: netdata/netdata
+    image: netdata/netdata:v1.28.0
     restart: unless-stopped
     ports:
       - 19999:19999
