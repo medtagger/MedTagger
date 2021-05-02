@@ -7,7 +7,7 @@ flask-socketio==4.3.2
 flask-restplus==0.12.1
 flask-cors==3.0.9
 flask-login==0.4.1
-Flask-HTTPAuth==3.3.0
+Flask-HTTPAuth==4.3.0
 gevent-websocket==0.10.1
 passlib==1.7.1
 uWSGI==2.0.18
